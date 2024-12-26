@@ -31,5 +31,11 @@ namespace Utilities.Contants
         public const string HotelLocationB2B = "HB2B_LOCATION";
         public const string HotelLocationB2BList = "HB2B_LOCATION_LIST";
         public const string HotelSearchB2B = "HS_B2B_";
+
+        public const string B2B_ORDER_TOUR_ACCOUNTID = "B2B_ORDER_TOUR_ACCOUNTID_";
+        public const string B2B_ORDER_TOUR_DETAIL_ID = "B2B_ORDER_TOUR_DETAIL_ID_";
+        public const string B2B_TOUR_LOCATION_START_ = "B2B_TOUR_LOCATION_START_";
+        public const string B2B_TOUR_LOCATION_END_ = "B2B_TOUR_LOCATION_END_";
+        public const string B2B_TOUR_SEARCH = "B2B_TOUR_SEARCH_";
     }
 }

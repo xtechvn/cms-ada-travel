@@ -1,5 +1,7 @@
 ﻿using DAL.Generic;
+using DAL.StoreProcedure;
 using Entities.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,11 @@ namespace DAL
 {
     public class AllCodeDAL : GenericService<AllCode>
     {
-        public AllCodeDAL(string connection) : base(connection) { }
+        private DbWorker dbWorker;
+        public AllCodeDAL(string connection) : base(connection) {
+
+            dbWorker = new DbWorker(connection);
+        }
 
         public List<AllCode> GetListByType(string type)
         {
@@ -172,5 +178,52 @@ namespace DAL
             }
             return null;
         }
+
+        public async Task<long> InsertAllcode(AllCode model)
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[7];
+                objParam[0] = new SqlParameter("@Type", model.Type);
+                objParam[1] = new SqlParameter("@CodeValue", model.CodeValue);
+                objParam[2] = new SqlParameter("@Description", model.Description);
+                objParam[3] = new SqlParameter("@OrderNo", model.OrderNo);
+                objParam[4] = new SqlParameter("@CreatedBy", model.CreatedBy);
+                objParam[5] = new SqlParameter("@CreateDate", DBNull.Value);
+                objParam[6] = new SqlParameter("@UpdateTime", DBNull.Value);
+                return dbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_InsertAllcode, objParam);
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertAllcode - AllCodeDAL. " + ex);
+                return -1;
+            }
+        }
+        public async Task<long> UpdateAllCode(AllCode model)
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[8];
+                objParam[0] = new SqlParameter("@Id", model.Id);
+                objParam[1] = new SqlParameter("@Type", model.Type);
+                objParam[2] = new SqlParameter("@CodeValue", model.CodeValue);
+                objParam[3] = new SqlParameter("@Description", model.Description);
+                objParam[4] = new SqlParameter("@OrderNo", model.OrderNo);
+                objParam[5] = new SqlParameter("@CreateDate", DBNull.Value);
+                objParam[6] = new SqlParameter("@UpdatedBy", model.UpdatedBy);
+                objParam[7] = new SqlParameter("@UpdateTime", DBNull.Value);
+                return dbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateAllCode, objParam);
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateAllCode - AllCodeDAL. " + ex);
+                return -1;
+            }
+        } 
+        
     }
 }

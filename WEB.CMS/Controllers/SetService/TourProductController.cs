@@ -204,6 +204,17 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                         _redisService.DeleteCacheByKeyword(cache_name, db_index);    
                         cache_name = CacheName.B2C_TOUR_Favourites;
                         _redisService.DeleteCacheByKeyword(cache_name, db_index);
+
+                        cache_name = CacheName.B2B_ORDER_TOUR_ACCOUNTID;
+                        _redisService.DeleteCacheByKeyword(cache_name, db_index);
+                        cache_name = CacheName.B2B_ORDER_TOUR_DETAIL_ID;
+                        _redisService.DeleteCacheByKeyword(cache_name, db_index); 
+                        cache_name = CacheName.B2B_TOUR_LOCATION_END_;
+                        _redisService.DeleteCacheByKeyword(cache_name, db_index);
+                        cache_name = CacheName.B2B_TOUR_LOCATION_START_;
+                        _redisService.DeleteCacheByKeyword(cache_name, db_index);
+                        cache_name = CacheName.B2B_TOUR_SEARCH;
+                        _redisService.DeleteCacheByKeyword(cache_name, db_index);
                     }
                     //workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS, "UpsertTourProduct TourProductController");
 
@@ -338,6 +349,19 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 var success = await _TourRepository.UpsertTourProductPrices(tour_product_id, model_upload, _UserId);
                 if (success)
                 {
+                    int db_index = Convert.ToInt32(_configuration["Redis:Database:db_common"]);
+                    string cache_name = CacheName.B2B_ORDER_TOUR_ACCOUNTID;
+              
+                    cache_name = CacheName.B2B_ORDER_TOUR_ACCOUNTID;
+                    _redisService.DeleteCacheByKeyword(cache_name, db_index);
+                    cache_name = CacheName.B2B_ORDER_TOUR_DETAIL_ID;
+                    _redisService.DeleteCacheByKeyword(cache_name, db_index);
+                    cache_name = CacheName.B2B_TOUR_LOCATION_END_;
+                    _redisService.DeleteCacheByKeyword(cache_name, db_index);
+                    cache_name = CacheName.B2B_TOUR_LOCATION_START_;
+                    _redisService.DeleteCacheByKeyword(cache_name, db_index);
+                    cache_name = CacheName.B2B_TOUR_SEARCH;
+                    _redisService.DeleteCacheByKeyword(cache_name, db_index);
                     return new JsonResult(new
                     {
                         isSuccess = true,

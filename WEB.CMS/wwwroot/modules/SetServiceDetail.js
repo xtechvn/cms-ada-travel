@@ -71,8 +71,8 @@ var _SetService_Detail = {
         }
     },
     ExportVinHotelCode: function (booking_id) {
-        var title = 'Xác nhận xuất vé tự động Vinwonder'
-        var description = 'Đơn hàng tự động Vinwonder sẽ được xuất vé tự động, bạn có chắc chắn không?'
+        var title = 'Xác nhận xuất code khách sạn Vinpearl'
+        var description = 'Dịch vụ khách sạn Vinpearl sẽ được xuất code tự động, bạn có chắc chắn không?'
 
 
         _msgconfirm.openDialog(title, description, function () {

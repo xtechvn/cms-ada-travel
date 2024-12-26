@@ -1,0 +1,68 @@
+﻿@using Entities.Models
+@{ 
+    Layout = null;
+}
+@model AllCode
+    @if(ViewBag.id!=0){
+    <form id="All_Code_Detail" onsubmit="return false">
+        <div class="">
+            <div class="grid-item border">
+               
+                <div class="form-default3 pd10">
+                    <div class="row">
+                        <input style="display:none;" value="@Model.Id" id="id" />
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Type <sup class="red">*</sup></label></div>
+                        <div class="col-md-8 mb10">
+                            <input type="text" id="Type" value="@Model.Type" name="Type" class="form-control Type">
+                        </div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">CodeValue <sup class="red">*</sup></label></div>
+                        <div class="col-md-8 mb10">
+                            <input type="text" id="CodeValue" value="@Model.CodeValue" name="CodeValue" class="form-control CodeValue">
+                        </div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Description <sup class="red">*</sup></label></div>
+                        <div class="col-md-8 mb10">
+                            <input type="text" id="Description" value="@Model.Description" name="Description" class="form-control Description">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="text-center">
+            <button onclick="$.magnificPopup.close();" class="btn btn-default btn btn-default cancel">Bỏ qua</button>
+            <button onclick="all_code.Summit()" class="btn btn-default">Cập nhật</button>
+        </div>
+    </form>
+    }else{
+    <form id="All_Code_Detail" onsubmit="return false">
+        <div class="">
+            <div class="grid-item border">
+               
+                <div class="form-default3 pd10">
+                    <div class="row">
+                        <input style="display:none;" value="0" id="id" />
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Type <sup class="red">*</sup></label></div>
+                        <div class="col-md-8 mb10">
+                            <input type="text" id="Type" name="Type" class="form-control Type">
+                        </div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">CodeValue <sup class="red">*</sup></label></div>
+                        <div class="col-md-8 mb10">
+                            <input type="text" id="CodeValue" name="CodeValue" class="form-control CodeValue">
+                        </div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Description <sup class="red">*</sup></label></div>
+                        <div class="col-md-8 mb10">
+                            <input type="text" id="Description" name="Description" class="form-control Description">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="text-center">
+            <button onclick="$.magnificPopup.close();" class="btn btn-default btn btn-default cancel">Bỏ qua</button>
+            <button onclick="all_code.Summit()" class="btn btn-default">Lưu</button>
+        </div>
+    </form>
+    }

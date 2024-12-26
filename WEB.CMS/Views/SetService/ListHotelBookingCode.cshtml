@@ -20,7 +20,7 @@
         <a href="javascript:;" class="btn btn-default min blue ml-1 service-code-send-email" data-booking-id="@ViewBag.HotelBookingID">Gửi email Sale</a>
     }
     <a href="javascript:;" class="btn btn-default min blue ml-1 service-code-send-email2" data-booking-id="@ViewBag.HotelBookingID">Gửi email nhà cung cấp</a>
-    @if (ViewBag.HotelBookingstatus == (int)ServiceStatus.ServeCode && is_vin_hotel)
+        @if (ViewBag.HotelBookingstatus == (int)ServiceStatus.OnExcution && is_vin_hotel && Model.Count<=0)
     {
         <a href="javascript:;" class="btn btn-default min blue ml-1 service-code-get-vin-code" data-booking-id="@ViewBag.HotelBookingID">Xuất Code tự động (Khách sạn Vinpearl) </a>
     }
@@ -107,6 +107,10 @@
 <a href="javascript:;" id="add-service-code" onclick="_SetService_Detail.PopupAddCode('',@ViewBag.HotelBookingID,@ViewBag.Type)" class="btn btn-default min ml-2">Thêm code</a>
 <a href="javascript:;" class="btn btn-default min blue ml-1 service-code-send-email" data-booking-id="@ViewBag.HotelBookingID">Gửi email Sale</a>}
     <a href="javascript:;" class="btn btn-default min blue ml-1 service-code-send-email2" data-booking-id="@ViewBag.HotelBookingID">Gửi email nhà cung cấp</a>
+        @if (ViewBag.HotelBookingstatus == (int)ServiceStatus.OnExcution && is_vin_hotel)
+        {
+            <a href="javascript:;" class="btn btn-default min blue ml-1 service-code-get-vin-code" data-booking-id="@ViewBag.HotelBookingID">Xuất Code tự động (Khách sạn Vinpearl) </a>
+        }
 </div>
     <div class="wrap_bg wrap_bg_no-padding mb20">
     <div class="table-responsive table-default table-gray">

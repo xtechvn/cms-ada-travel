@@ -24,5 +24,7 @@ namespace Repositories.IRepositories
         Task<T> GetAllCodeValueByType<T>(string apiPrefix, string keyToken, string key, string type);
         Task<T> Sendata<T>(string apiPrefix, string keyToken, Dictionary<string,string> keyValuePairs);
         BankOnePay GetBankOnePayByBankName(string BankName);
+        Task<long> UpdateAllCode(AllCode model);
+        Task<long> InsertAllcode(AllCode model);
     }
 }

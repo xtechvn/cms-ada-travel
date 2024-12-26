@@ -165,5 +165,31 @@ namespace Repositories.Repositories
         {
             return bankingAccountDAL.GetBankAccountDataTableBySupplierId(supplierId).ToList<BankingAccount>();
         }
+        public async Task<long> InsertAllcode(AllCode model)
+        {
+            try
+            {
+                return await _AllCodeDAL.InsertAllcode(model);
+            }
+            catch(Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertAllcode - AllCodeRepository" + ex);
+                return -1;
+            }
+            
+        }  
+        public async Task<long> UpdateAllCode(AllCode model)
+        {
+            try
+            {
+                return await _AllCodeDAL.UpdateAllCode(model);
+            }
+            catch(Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertAllcode - AllCodeRepository" + ex);
+                return -1;
+            }
+            
+        }
     }
 }

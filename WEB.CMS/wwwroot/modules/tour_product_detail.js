@@ -4,6 +4,15 @@
         this.validImageSize = 5 * 1024 * 1024;
         this.noImageSrc = "/images/icons/noimage.png";
         _tour_product_detail.GetTourProductPrices()
+        _ajax_caller.post('/TourProduct/GetTourProgramPackages', { tour_product_id: $('#Id').val() }, function (result) {
+            if (result) {
+                if (result.client_types && result.client_types.length > 0) {
+                    result.client_types.map((item2) => {
+                        _tour_product_detail.HTML.HTMLOptions += `<option value="${item2.codeValue}">${item2.description}</option>`
+                    });
+                }
+            }
+        });
     },
 
     GetFormData: function ($form) {
@@ -164,7 +173,7 @@
         _ajax_caller.post(url, formData, function (result) {
             if (result.isSuccess) {
                 _msgalert.success(result.message);
-                _tour_product_detail.UpSertProductPrices(result.productID)
+                /*_tour_product_detail.UpSertProductPrices(result.productID)*/
 
                 window.location.href = "/TourProduct";
             } else {
@@ -449,6 +458,7 @@
         return id
     },
     AddNewProductPrice: function () {
+    
         var new_id = _tour_product_detail.GetTourPriceID() + 1
         var html = _tour_product_detail.HTML.PriceItem.replaceAll('{id}', new_id)
             .replaceAll('{data-id}', '0')
@@ -529,7 +539,9 @@
             if (notification && result) {
                 if (result.isSuccess) {
                     _msgalert.success(result.message)
-
+                    _tour_product_detail.Init();
+                    $(".tab-default a").removeClass("active")
+                    $(".tab_gia").addClass("active")
                 }
                 else {
                     _msgalert.error(result.message)
@@ -543,7 +555,9 @@
             _ajax_caller.post('/TourProduct/DeleteProductPrice', { price_id: tr.attr('data-id') }, function (result) {
                 if (result.isSuccess) {
                     _msgalert.success(result.message)
-
+                    _tour_product_detail.Init();
+                    $(".tab-default a").removeClass("active")
+                    $(".tab_gia").addClass("active")
                 }
                 else {
                     _msgalert.error(result.message)

@@ -34,6 +34,7 @@ namespace Repositories.Repositories
         private readonly OrderDAL _orderDAL;
         private readonly ClientDAL _clientDAL;
         private readonly HotelBookingRoomDAL _hotelBookingRoomDAL;
+        private readonly HotelBookingRoomRatesDAL _hotelBookingRoomRatesDAL;
         private HotelESRepository _hotelESRepository;
         private IConfiguration _configuration;
         private IESRepository<HotelESViewModel> _ESRepository;
@@ -48,6 +49,7 @@ namespace Repositories.Repositories
             _orderDAL = new OrderDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _clientDAL = new ClientDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _hotelBookingRoomDAL = new HotelBookingRoomDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
+            _hotelBookingRoomRatesDAL = new HotelBookingRoomRatesDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _ESRepository = new ESRepository<HotelESViewModel>(_configuration["DataBaseConfig:Elastic:Host"]);
 
@@ -170,10 +172,20 @@ namespace Repositories.Repositories
                         room_profit += rate.profit;
                         room_price += (rate.amount - rate.profit);
                         string rate_id = CommonHelper.RemoveUnicode(rate.package_code).Trim().Replace(" ", "-");
+                        string AllotmentId = "";
+                        string PackagesInclude = "";
+                        if (rate.id != 0)
+                        {
+                            var detailhotelBookingRoomRates = await _hotelBookingRoomRatesDAL.GetById(rate.id);
+                            if(detailhotelBookingRoomRates!=null && rate.package_code == detailhotelBookingRoomRates.RatePlanCode)
+                            rate_id= detailhotelBookingRoomRates.RatePlanId;
+                            AllotmentId = detailhotelBookingRoomRates.AllotmentId;
+                            PackagesInclude = detailhotelBookingRoomRates.PackagesInclude;
+                        }
                         room.rates.Add(new Entities.Models.HotelBookingRoomRates()
                         {
-                            AllotmentId = "",
-                            PackagesInclude = "",
+                            AllotmentId = AllotmentId,
+                            PackagesInclude = PackagesInclude,
                             Price = (rate.amount - rate.profit),
                             Profit = rate.profit,
                             TotalAmount = rate.amount,

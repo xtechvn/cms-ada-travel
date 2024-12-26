@@ -321,6 +321,9 @@ namespace Utilities.Contants
         public static string SP_GetListRequest = "SP_GetListRequest";
         public static string sp_UpdateRequest = "sp_UpdateRequest";
         public static string Sp_GetDetailRequest = "Sp_GetDetailRequest";
+
+        public static string sp_InsertAllcode = "sp_InsertAllcode";
+        public static string SP_DeleteAllCode = "SP_DeleteAllCode";
         #endregion
 
         #region Tour product

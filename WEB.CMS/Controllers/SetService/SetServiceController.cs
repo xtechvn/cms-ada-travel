@@ -1,4 +1,6 @@
-﻿using Caching.Elasticsearch;
+﻿using API_CORE.Service.Vin;
+using Caching.Elasticsearch;
+using DAL.MongoDB.Hotel;
 using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.Attachment;
@@ -6,7 +8,9 @@ using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.HotelBooking;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.HotelBookingRoom;
+using Entities.ViewModels.Mongo;
 using Entities.ViewModels.SupplierConfig;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service;
@@ -62,7 +67,8 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
         private OrderESRepository _orderESRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IHotelRepository _HotelRepository;
-
+        private readonly HotelBookingMongoService hotelBookingMongoService;
+        private LogActionMongoService LogActionMongo;
 
         public SetServiceController(IConfiguration configuration, IHotelBookingRepositories hotelBookingRepositories, IOrderRepositor orderRepositor, IOrderRepository orderRepository, IWebHostEnvironment WebHostEnvironment
             , IHotelBookingRoomRepository hotelBookingRoomRepository, IHotelBookingGuestRepository hotelBookingGuestRepository, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository,
@@ -99,6 +105,8 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
             _orderESRepository = new OrderESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _clientRepository = clientRepository;
             _HotelRepository = HotelRepository;
+            hotelBookingMongoService = new HotelBookingMongoService(configuration);
+            LogActionMongo = new LogActionMongoService(configuration);
         }
         public async Task<IActionResult> SetServiceHotel()
         {
@@ -677,15 +685,28 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                     string link = "/Order/" + OrderId;
                     var current_user = _ManagementUser.GetCurrentUser();
                     int statusOder = 0;
+                    var orderStatus = _allCodeRepository.GetListByType("BOOKING_HOTEL_ROOM_STATUS");
+                    var user = await _userRepository.GetById(_UserId);
+                    var model = new LogActionModel();
+                    model.Type = (int)AttachmentType.OrderDetail;
+                    model.LogId = OrderId;
+                    model.CreatedUserName = user.FullName;
+
                     if (status == (int)ServiceStatus.Decline)
                     {
-
-
+                        var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Decline);
+                        model.Log = allCodes.Description;
+                        model.Note = user.FullName + " " + allCodes.Description + "dịch vụ đơn";
+                        LogActionMongo.InsertLog(model);
                         apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.QUYET_TOAN).ToString(), order.OrderNo, link, current_user.Role.ToString(), Hotel[0].ServiceCode);
                         smg = "Từ chối dịch vụ thành công";
                     }
                     if (status == (int)ServiceStatus.OnExcution)
                     {
+                        var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.OnExcution);
+                        model.Log = allCodes.Description;
+                        model.Note = user.FullName + " " + allCodes.Description + "dịch vụ đơn";
+                        LogActionMongo.InsertLog(model);
                         //apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.NHAN_TRIEN_KHAI).ToString(), order.OrderNo, link, current_user.Role.ToString(), Hotel[0].ServiceCode);
                         smg = "Nhận đặt dịch vụ thành công";
                     }
@@ -697,6 +718,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
 
                         if (data != null && data.Count > 0 && sum >= amount)
                         {
+                            var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Payment);
+                            model.Log = allCodes.Description;
+                            model.Note = user.FullName + " " + allCodes.Description + "dịch vụ đơn";
+                            LogActionMongo.InsertLog(model);
                             apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.QUYET_TOAN).ToString(), order.OrderNo, link, current_user.Role.ToString(), Hotel[0].ServiceCode);
                             smg = "Quyết toán dịch vụ thành công";
                         }
@@ -716,6 +741,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                         var hotelBookingCode = await _hotelBookingCodeRepository.GetListlBookingCodeByHotelBookingId(id, Type);
                         if (hotelBookingCode != null && hotelBookingCode.Count > 0)
                         {
+                            var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.ServeCode);
+                            model.Log = allCodes.Description;
+                            model.Note = user.FullName + " " + allCodes.Description + "dịch vụ đơn";
+                            LogActionMongo.InsertLog(model);
                             apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TRA_CODE).ToString(), order.OrderNo, link, current_user.Role.ToString(), Hotel[0].ServiceCode);
                             smg = "Trả code dịch vụ thành công";
                         }
@@ -1812,39 +1841,202 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
 
                 var current_user = _ManagementUser.GetCurrentUser();
                 var hotel_booking = await _hotelBookingRepositories.GetHotelBookingByID(booking_id);
+                Hotel hotel = new Hotel();
+                try
+                {
+                    hotel = _HotelRepository.GetHotelByHotelID(hotel_booking.PropertyId);
+                    if (hotel.Id > 0 && (hotel.IsVinHotel == null|| hotel.IsVinHotel==false))
+                    {
+                        return new JsonResult(new
+                        {
+                            isSuccess = false,
+                            message = "Khách sạn hiện tại không thể xuất code tự động, vui lòng liên hệ điều hành để thực hiện thủ công",
+                        });
+                    }
+                }
+                catch
+                {
+
+                }
+                var order = await _orderRepository.GetOrderByID(hotel_booking.OrderId);
                 var hotel_booking_room = await _hotelBookingRoomRepository.GetByHotelBookingID(booking_id);
+                var contact_client =  _contactClientRepository.GetByContactClientId((long)order.ContactClientId);
+                var client = await _clientRepository.GetClientDetailByClientId(contact_client.ClientId);
                 var hotel_booking_rates = await _hotelBookingRoomRatesRepository.GetByHotelBookingID(booking_id);
                 var hotel_booking_guest = await _hotelBookingGuestRepository.GetByHotelBookingID(booking_id);
-                HotelBookingCreateBookingModel commit_booking = new HotelBookingCreateBookingModel()
+                var hotel_booking_mongo =  hotelBookingMongoService.GetBookingById(hotel_booking.BookingId);
+
+                var commit_booking = new ENTITIES.ViewModels.Hotel.MongoBookingData()
                 {
                     arrivalDate = hotel_booking.ArrivalDate.ToString("yyyy-MM-dd"),
                     departureDate = hotel_booking.DepartureDate.ToString("yyyy-MM-dd"),
-                    distributionChannel = _configuration["API_Vinpearl:Distribution_ID"],
+                    distributionChannel = hotel_booking_mongo.booking_data.distributionChannel,
                     propertyId = hotel_booking.PropertyId,
-                    reservations = new List<HotelBookingCreateBookingModelreservations>()
-
-                };
-                foreach (var room in hotel_booking_room)
-                {
-                    var guest = hotel_booking_guest.Where(x => x.HotelBookingRoomsId == room.Id);
-                    var number_of_adt = guest.Count() > 0 ? guest.Count(x => x.Type == 0) : 1;
-                    var number_of_chd = guest.Count() > 0 ? guest.Count(x => x.Type == 1) : 0;
-                    var number_of_inf = guest.Count() > 0 ? guest.Count(x => x.Type == 2) : 0;
-                    var item = new HotelBookingCreateBookingModelreservations()
+                    propertyName = hotel.Name != null ? hotel.Name : "",
+                    reservations = new List<ENTITIES.ViewModels.Hotel.HotelMongoReservation>()
                     {
-                        roomOccupancy = new HotelBookingCreateBookingModelroomOccupancy()
+
+                    },
+                };
+                foreach(var room in hotel_booking_room)
+                {
+                    var split_name = contact_client.Name.Split(" ");
+                    var first_name= contact_client.Name;
+                    var last_name="";
+                    if (split_name.Count() > 1)
+                    {
+                        first_name= split_name[1];
+                        last_name = split_name[0];
+                    }
+                    var item = new ENTITIES.ViewModels.Hotel.HotelMongoReservation()
+                    {
+                        roomOccupancy = new ENTITIES.ViewModels.Hotel.HotelMongoRoomOccupancy()
                         {
-                            numberOfAdult = number_of_adt,
-                            otherOccupancies = new List<HotelBookingCreateBookingModelroomOccupancyotherOccupancies>()
+                            numberOfAdult = (room.NumberOfAdult==null?1:(int)room.NumberOfAdult),
+                             otherOccupancies=new List<ENTITIES.ViewModels.Hotel.HotelMongoOtherOccupancy>()
+                             {
+                                 new ENTITIES.ViewModels.Hotel.HotelMongoOtherOccupancy()
+                                 {
+                                     quantity=(room.NumberOfChild==null?1:(int)room.NumberOfChild),
+                                     otherOccupancyRefCode="child",
+                                     otherOccupancyRefID="child"
+                                 },
+                                  new ENTITIES.ViewModels.Hotel.HotelMongoOtherOccupancy()
+                                 {
+                                     quantity=(room.NumberOfInfant==null?1:(int)room.NumberOfInfant),
+                                     otherOccupancyRefCode="infant",
+                                     otherOccupancyRefID="infant"
+                                 }
+                             }
+                        },
+                        isPackagesSpecified=false,
+                        isProfilesSpecified=true,
+                        profiles=new List<ENTITIES.ViewModels.Hotel.HotelMongoProfile>()
+                        {
+                            new ENTITIES.ViewModels.Hotel.HotelMongoProfile()
+                            {
+                                birthday="",
+                                email=_configuration["config_api_vinpearl:OPERATOR_EMAIL"],
+                                firstName="Adavigo",
+                                lastName="Travel",
+                                isPrimary=true,
+                                 phoneNumber="",
+                                 primarySearchValues=new ENTITIES.ViewModels.Hotel.HotelMongoPrimarySearchValues()
+                                 {
+                                     email=_configuration["config_api_vinpearl:OPERATOR_EMAIL"],
+                                     phoneNumber=""
+                                 },
+                                 travelAgentCode=null,
+                                 profileRefID=null,
+                                 profileType="TravelAgent",
+                                 nationality= "VN",
+                                 country= "VN",
+                            },
+                            new ENTITIES.ViewModels.Hotel.HotelMongoProfile()
+                            {
+                                birthday="",
+                                email=_configuration["config_api_vinpearl:OPERATOR_EMAIL"],
+                                firstName="Pham",
+                                lastName="Thi Hoa",
+                                isPrimary=false,
+                                 phoneNumber="",
+                                 primarySearchValues=new ENTITIES.ViewModels.Hotel.HotelMongoPrimarySearchValues()
+                                 {
+                                     email=_configuration["config_api_vinpearl:OPERATOR_EMAIL"],
+                                     phoneNumber=""
+                                 },
+                                 travelAgentCode=null,
+                                 profileRefID=null,
+                                 profileType="Booker",
+                                 nationality= "VN",
+                                 country= "VN",
+                            },
+                            new ENTITIES.ViewModels.Hotel.HotelMongoProfile()
+                            {
+                                birthday=(client.Birthday!=null?((DateTime)client.Birthday).ToString("yyyy-MM-dd"): ""),
+                                email=contact_client.Email,
+                                firstName=first_name,
+                                isPrimary=false,
+                                lastName=last_name,
+                                phoneNumber=contact_client.Mobile,
+                                 primarySearchValues=new ENTITIES.ViewModels.Hotel.HotelMongoPrimarySearchValues()
+                                 {
+                                     email=contact_client.Email,
+                                     phoneNumber= contact_client.Mobile
+                                 },
+                                 travelAgentCode=null,
+                                 profileRefID=null,
+                                 profileType="Guest",
+                                 nationality= hotel_booking_mongo.booking_b2b_data.contact.country,
+                                 country= hotel_booking_mongo.booking_b2b_data.contact.country,
+                            }
+                        },
+                        isRoomRatesSpecified=true,
+                        isSpecialRequestSpecified=false,
+                        numberOfRoom=(int)room.NumberOfRooms,
+                        specialRequests=new List<ENTITIES.ViewModels.Hotel.HotelMongoSpecialRequest>(),
+                        totalAmount=new ENTITIES.ViewModels.Hotel.HotelMongoTotalAmount()
+                        {
+                            currencyCode="VND",
+                            amount= (room.TotalUnitPrice!=null && room.TotalUnitPrice>0)? Convert.ToInt32(room.TotalUnitPrice) : Convert.ToInt32(room.Price)
+                        },
+                        packages=new List<ENTITIES.ViewModels.Hotel.HotelMongoPackage>(),
+                        roomRates=new List<ENTITIES.ViewModels.Hotel.HotelMongoRoomRate>()
+                        {
+
                         }
-
                     };
+                    var rate_by_room = hotel_booking_rates.Where(x => x.HotelBookingRoomId == room.Id);
+                    if(rate_by_room!=null && rate_by_room.Count() > 0)
+                    {
+                        foreach(var rate in rate_by_room)
+                        {
+                            for(int i = 1; i <= rate.Nights; i++)
+                            {
+                                item.roomRates.Add(new ENTITIES.ViewModels.Hotel.HotelMongoRoomRate()
+                                {
+                                    allotmentId = rate.AllotmentId,
+                                    ratePlanCode = rate.RatePlanCode,
+                                    ratePlanRefID = rate.RatePlanId,
+                                    roomTypeCode = room.RoomTypeCode,
+                                    roomTypeRefID = room.RoomTypeId,
+                                    stayDate = ((DateTime)rate.StartDate).AddDays(i-1).ToString("yyyy-MM-dd")
+                                });
+                            }
+                           
+                        }
+                    }
+                    commit_booking.reservations.Add(item);
                 }
+                VinpearlLib vinpearlLib = new VinpearlLib(_configuration);
+                var commit_input = JsonConvert.SerializeObject(commit_booking);
+                var commit= await vinpearlLib.getVinpearlCreateBooking(commit_input);
+                if(commit!=null && commit.isSuccess == true && commit.data.reservations.Count>0)
+                {
+                    HotelBookingCodeViewModel order_code = new HotelBookingCodeViewModel()
+                    {
+                        AttactFile = "",
+                        BookingCode = commit.data.reservations[0].confirmationNumber,
+                        CreatedBy = 18,
+                        CreatedDate = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss"),
+                        Description = "Code khách sạn Vinpearl được xuất tự động từ hệ thống API VinHMS",
+                        HotelBookingId = booking_id,
+                        Id = 0,
+                        IsDelete = 0,
+                        Note = "ReservationId: "+ commit.data.reservations[0].reservationID 
+                        + "\n GuaranteePolicyId: " + (commit.data.reservations[0].guaranteePolicies!=null && commit.data.reservations[0].guaranteePolicies.Count>0? commit.data.reservations[0].guaranteePolicies[0].id:"NULL" ) 
+                        + "\n GuaranteePolicyId: " + (commit.data.reservations[0].guaranteePolicies!=null && commit.data.reservations[0].guaranteePolicies.Count>0? commit.data.reservations[0].guaranteePolicies[0].id:"NULL" ) ,
+                        Type = (int)ServiceType.BOOK_HOTEL_ROOM_VIN,
+                        UpdatedBy = 18,
+                        UpdatedDate = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")
+                    };
+                    var id = await _hotelBookingCodeRepository.InsertHotelBookingCode(order_code);
 
+                }
                 return new JsonResult(new
                 {
                     isSuccess = true,
-                    message = "Xuất dữ liệu thành công",
+                    message = "Xuất code khách sạn Vinpearl thành công",
                 });
             }
             catch (Exception ex)

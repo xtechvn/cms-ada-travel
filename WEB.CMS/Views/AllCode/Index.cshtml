@@ -1,0 +1,40 @@
+﻿@{ ViewData["Title"] = "all code"; }
+@using Entities.Models
+@{
+    var data = (List<AllCode>)ViewBag.data;
+
+}
+<section style=" overflow-x: hidden;">
+    <div class="row-main container">
+        <h2 class="txt_18 bold mb20">AllCode</h2>
+        <div class="flex fillter-donhang mb10">
+            <div class="row">
+                <div class="tab-default col-md-9 mb0 mt10" >
+                    <div class="datepicker-wrap" >
+                        <select class="form-control" id="Type" onchange="all_code.SearchData()">
+                            @if (data != null && data.Count > 0)
+                            {
+                                foreach (var item in data)
+                                {
+                                    <option value="@item.Type">@item.Type</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                </div>
+                <div class="col-md-3 text-right mt10">
+                    <button type="button" class="btn btn-default bg-main mr-2" onclick="all_code.OpenPopup(0)"><i class="fa fa-plus-circle"></i>Tạo mới</button>
+
+                </div>
+            </div>
+        </div>
+        <div id="grid_data">
+
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script asp-append-version="true" type="text/javascript" src="/modules/all_code.js"></script>
+}

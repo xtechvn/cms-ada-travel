@@ -196,7 +196,7 @@ namespace DAL
                             {
                                 var a = UpdataContactStatus(model.ContractId, (long)model.ContractStatus, "");
                             }
-                            return 1;
+                            return model.ContractId;
                         }
                         return 0;
                     }
