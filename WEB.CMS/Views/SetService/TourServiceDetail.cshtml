@@ -112,26 +112,32 @@
                     <div class="col-8 mb10">: @ViewBag.amount.ToString("N0") </div>
                     @if (Model.Status != (int)Utilities.Contants.ServiceStatus.Payment && Model.Status != (int)Utilities.Contants.ServiceStatus.Cancel)
                     {
-
-                        @if (Model.FundCustomerCare != null && Model.FundCustomerCare > 0)
+                        if (Model.Status != (int)Utilities.Contants.ServiceStatus.ServeCodeKH && Model.Status != (int)Utilities.Contants.ServiceStatus.Payment)
                         {
+                            @if (Model.FundCustomerCare != null && Model.FundCustomerCare > 0)
+                            {
 
-                            <div class="col-8 mb10 gray">
-                                Áp dụng quỹ chăm sóc khách hàng &nbsp;
-                                <input type="checkbox" id="checkbox_Tour" onclick="_SetService_Tour_Detail.OpenPopupFundCustomer(@Model.Id)" checked />
-                            </div>
-                            <div class="col-4 mb10 "></div>
-                            <div class="col-4 mb10 gray">Quỹ chăm sóc khách hàng  </div>
-                            <div class="col-8 mb10">: @(((double)Model.FundCustomerCare).ToString("N0"))</div>
+                                <div class="col-8 mb10 gray">
+                                    Áp dụng quỹ chăm sóc khách hàng &nbsp;
+                                    <input type="checkbox" id="checkbox_Tour" onclick="_SetService_Tour_Detail.OpenPopupFundCustomer(@Model.Id)" checked />
+                                </div>
+                                <div class="col-4 mb10 "></div>
+                                <div class="col-4 mb10 gray">Quỹ chăm sóc khách hàng  </div>
+                                <div class="col-8 mb10">: @(((double)Model.FundCustomerCare).ToString("N0"))</div>
+                            }
+                            else
+                            {
+                                <div class="col-8 mb10 gray">
+                                    Áp dụng quỹ chăm sóc khách hàng &nbsp;
+                                    <input type="checkbox" id="checkbox_Tour" onclick="_SetService_Tour_Detail.OpenPopupFundCustomer(@Model.Id)" />
+                                </div>
+                            }
                         }
                         else
                         {
-                            <div class="col-8 mb10 gray">
-                                Áp dụng quỹ chăm sóc khách hàng &nbsp;
-                                <input type="checkbox" id="checkbox_Tour" onclick="_SetService_Tour_Detail.OpenPopupFundCustomer(@Model.Id)" />
-                            </div>
+                            <div class="col-4 mb10 gray">Quỹ chăm sóc khách hàng  </div>
+                            <div class="col-8 mb10">: @(Model.FundCustomerCare==null?"0":((double)Model.FundCustomerCare).ToString("N0"))</div>
                         }
-
 
                     }
 
