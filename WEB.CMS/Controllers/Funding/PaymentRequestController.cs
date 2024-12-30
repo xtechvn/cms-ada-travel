@@ -95,13 +95,61 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                         searchModel.CreateByIds = current_user.UserUnderList.Split(',').Select(n => int.Parse(n)).ToList();
 
                 }
+                var list = Array.ConvertAll(current_user.Role.Split(','), int.Parse);
+                foreach (var item in list)
+                {
+                    if (item == (int)RoleType.Admin || item == (int)RoleType.PhoTPKeToan || item == (int)RoleType.KeToanTruong)
+                    {
+                        searchModel.CreateByIds = null;
+                    }
+                }
                 var listPaymentRequest = _paymentRequestRepository.GetPaymentRequests(searchModel, out long total, currentPage, pageSize);
                 model.CurrentPage = currentPage;
                 model.ListData = listPaymentRequest;
                 model.PageSize = pageSize;
                 model.TotalRecord = total;
                 model.TotalPage = (int)Math.Ceiling((double)total / pageSize);
+                ViewBag.Amount = 0;
+                var countStatus = _paymentRequestRepository.GetCountStatus(searchModel);
+                switch (searchModel.Status)
+                {
+                    case -1:
+                        {
+                            ViewBag.Amount = countStatus.Sum(s => s.Amount);
+                        }
+                        break;
+                    case (int)PaymentRequetStatus.Luu_Nhap:
+                        {
+                            ViewBag.Amount = countStatus.Where(s => s.Status == (int)PaymentRequetStatus.Luu_Nhap).Sum(s => s.Amount);
+                        }
+                        break;
+                    case (int)PaymentRequetStatus.Tu_choi:
+                        {
+                            ViewBag.Amount = countStatus.Where(s => s.Status == (int)PaymentRequetStatus.Tu_choi).Sum(s => s.Amount);
+                        }
+                        break;
+                    case (int)PaymentRequetStatus.Cho_TBP_duyet:
+                        {
+                            ViewBag.Amount = countStatus.Where(s => s.Status == (int)PaymentRequetStatus.Cho_TBP_duyet).Sum(s => s.Amount);
+                        }
+                        break;
+                    case (int)PaymentRequetStatus.Cho_KTT_duyet:
+                        {
+                            ViewBag.Amount = countStatus.Where(s => s.Status == (int)PaymentRequetStatus.Cho_KTT_duyet).Sum(s => s.Amount);
 
+                        }
+                        break;
+                    case (int)PaymentRequetStatus.Cho_chi:
+                        {
+                            ViewBag.Amount = countStatus.Where(s => s.Status == (int)PaymentRequetStatus.Cho_chi).Sum(s => s.Amount);
+                        }
+                        break;
+                    case (int)PaymentRequetStatus.Da_chi:
+                        {
+                            ViewBag.Amount = countStatus.Where(s => s.Status == (int)PaymentRequetStatus.Da_chi).Sum(s => s.Amount);
+                        }
+                        break;
+                }
                 ViewBag.VIEW_PHIEU_CHI = 0;
                 if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
                 {

@@ -16,5 +16,6 @@ namespace Entities.ViewModels.Funding
         public string StatusName { get; set; }
         public int ServiceType { get; set; }
         public string PaymentRequestStatus { get; set; }
+        public double Amount { get; set; }
     }
 }

@@ -47,6 +47,27 @@ else
             <tbody>
                 @if (Model.ListData != null && Model.ListData.Count > 0)
                 {
+                    <tr style="background: blanchedalmond;">
+                        <td></td>
+                        <td style="font-weight: bold">Tổng cộng</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-right" style="font-weight: bold">@ViewBag.Amount.ToString("N0")</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                     var counter = (Model.CurrentPage - 1) * Model.PageSize;
                     foreach (var item in Model.ListData)
                     {
