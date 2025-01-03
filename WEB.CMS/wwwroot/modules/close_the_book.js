@@ -10,11 +10,11 @@ $(document).ready(function () {
         var Month = element.closest('.list-row').find('.Month').text();
         var StartDate = element.closest('.list-row').find('.day-StartDate').text();
         var EndDate = element.closest('.list-row').find('.day-EndDate').text();
-        if (parseFloat(Month) < parseFloat(Month_day + 1)) {
+        if (parseFloat(Month) < parseFloat(Month_day + 1) || Month_day == 0) {
             if (element.is(":checked") == true) {
                 description = 'Bạn muốn khóa sổ Tháng ' + Month + ',từ ngày ' + StartDate + ' đến ngày ' + EndDate
                 _close_the_book.openDialogSummit(title, description, function () {
-                    var model =  {
+                    var model = {
                         FromDateStr: StartDate,
                         ToDateStr: EndDate,
                     }
@@ -34,7 +34,7 @@ $(document).ready(function () {
                             }
                         }
                     });
-                  
+
 
                 },
                     function () {
@@ -63,7 +63,7 @@ $(document).ready(function () {
             element.removeAttr("checked")
             _msgalert.error('bạn không thể khóa sổ tháng ' + Month + ' vì chưa đến ngày');
         }
-     
+
     });
 });
 var _close_the_book = {
