@@ -24,7 +24,7 @@
             success: function (result) {
                 if (result != undefined && result.data != undefined && result.data.length > 0) {
                     result.data.forEach(function (item) {
-                        element.append(_order_detail_html.html_user_option.replaceAll('{user_id}', item.id).replace('{user_email}', item.fullname).replace('{user_name}', item.username).replace('{user_phone}', item.phone == undefined ? "" : ' - ' + item.phone))
+                        element.append(_order_detail_html.html_user_option.replaceAll('{user_id}', item.id).replace('{user_email}', item.email).replace('{user_name}', item.fullname).replace('{user_phone}', item.phone == undefined ? "" : ' - ' + item.phone))
 
                     });
                     element.val(selected).trigger('change');
