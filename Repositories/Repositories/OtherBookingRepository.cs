@@ -28,10 +28,9 @@ namespace Repositories.Repositories
         private readonly OtherBookingPackagesDAL otherBookingPackagesDAL;
         private readonly OtherBookingPackagesOptionalDAL otherBookingPackagesOptionalDAL;
         private readonly AllCodeDAL AllCodeDAL;
-        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         private readonly IConfiguration _configuration;
 
-        public OtherBookingRepository(IOptions<DataBaseConfig> dataBaseConfig, IIdentifierServiceRepository identifierServiceRepository, IConfiguration configuration)
+        public OtherBookingRepository(IOptions<DataBaseConfig> dataBaseConfig,  IConfiguration configuration)
         {
             orderDAL = new OrderDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             otherBookingDAL = new OtherBookingDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
@@ -39,7 +38,6 @@ namespace Repositories.Repositories
             otherBookingPackagesOptionalDAL = new OtherBookingPackagesOptionalDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             AllCodeDAL = new AllCodeDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             contactClientDAL = new ContactClientDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
-            _identifierServiceRepository = identifierServiceRepository;
             _configuration = configuration;
         }
         public async Task<List<OtherBookingPackages>> GetOtherBookingPackagesByBookingId(long booking_id)

@@ -48,5 +48,6 @@ namespace Repositories.IRepositories
         Task<long> CheckBookClosingByDate(DateTime FromDate, DateTime ToDate);
         Task<long> UpdateOrderAmountFundCustomer(long order_id);
         Task<List<OrderBookClosingRequestViewModel>> GetListOrderBookClosingByOrderId(long OrderId);
+        Task<long> CountOrderInYear();
     }
 }

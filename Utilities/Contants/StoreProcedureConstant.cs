@@ -380,7 +380,9 @@ namespace Utilities.Contants
         public static string SP_GetHotelRoomByHotelId = "SP_GetHotelRoomByHotelId";
         public static string sp_InsertHotelPosition = "sp_InsertHotelPosition";
         public static string sp_UpdateHotelPosition = "sp_UpdateHotelPosition";
-        
+
         #endregion
+        public static string sp_countServiceUse = "sp_countServiceUse";
+
     }
 }

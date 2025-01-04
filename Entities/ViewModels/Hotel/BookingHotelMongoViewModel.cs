@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Entities.Models;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace ENTITIES.ViewModels.Hotel
         public HotelMongoBookingOrder booking_order { get; set; }
         public BookingHotelB2BViewModel booking_b2b_data { get; set; }
         public string? voucher_code { get; set; }
+        public List<HotelBookingRoomExtraPackages> extrapackages { get; set; }
 
         public void GenID()
         {

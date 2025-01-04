@@ -233,7 +233,7 @@ namespace DAL
                 return -2;
             }
         }
-        public static long CountOrderInYear()
+        public long CountOrderInYear()
         {
             try
             {
@@ -1081,5 +1081,6 @@ namespace DAL
             }
             return null;
         }
+   
     }
 }

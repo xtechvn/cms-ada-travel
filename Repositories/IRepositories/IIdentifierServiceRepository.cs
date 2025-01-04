@@ -6,5 +6,6 @@ namespace Repositories.IRepositories
         Task<string> buildOrderNoManual(int company_type = 0);// don thu cong
         Task<string> buildContractPay(); // sinh mã PHIEU THU
         Task<string> buildContractNo();//mã hợp đồng
+        public int countServiceUse(int service_type);
     }
 }

@@ -33,13 +33,13 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private HotelESRepository _hotelESRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IOrderRepository _orderRepository;
-        private readonly IndentiferService indentiferService;
         private readonly IHotelRepository _hotelRepository;
         private readonly CommentService _commentService;
         private readonly ISubscriber _subscriber;
         private readonly IVoucherRepository _voucherRepository;
+        private readonly IndentiferService _indentiferService;
         public RequestHotelBookingController(IConfiguration configuration, IUserRepository userRepository, IHotelBookingRepositories hotelBookingRepository,
-            IRequestRepository requestRepository, IClientRepository clientRepository, IOrderRepository orderRepository, IHotelRepository hotelRepository,
+            IRequestRepository requestRepository,IIdentifierServiceRepository identifierServiceRepository, IClientRepository clientRepository, IOrderRepository orderRepository, IHotelRepository hotelRepository,
             IHttpContextAccessor httpContextAccessor, IVoucherRepository voucherRepository)
         {
             _configuration = configuration;
@@ -50,12 +50,12 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             _requestRepository = requestRepository;
             _clientRepository = clientRepository;
             _orderRepository = orderRepository;
-            indentiferService = new IndentiferService(configuration);
             _hotelRepository = hotelRepository;
             _commentService = new CommentService(configuration, httpContextAccessor);
             var connection = ConnectionMultiplexer.Connect(_configuration["Redis:Host"] + ":" + _configuration["Redis:Port"]);
             _subscriber = connection.GetSubscriber();
             _voucherRepository = voucherRepository;
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository);
         }
         public IActionResult Index()
         {
@@ -230,7 +230,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
 
                 if (data.hotel.id <= 0 || data.hotel.service_code == null || data.hotel.service_code.Trim() == "")
                 {
-                    data.hotel.service_code = await indentiferService.GetServiceCodeByType((int)ServicesType.VINHotelRent);
+                    data.hotel.service_code = await _indentiferService.buildServiceNo((int)ServicesType.VINHotelRent);
                 }
 
                 #region Check Client Debt:

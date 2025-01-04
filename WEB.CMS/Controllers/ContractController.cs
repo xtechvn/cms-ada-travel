@@ -40,14 +40,13 @@ namespace WEB.Adavigo.CMS.Controllers
         private IClientRepository _clientRepository;
         private IUserAgentRepository _userAgentRepository;
         private IPolicyRepository _policyRepository;
-        private IIdentifierServiceRepository _identifierServiceRepository;
         private ManagementUser _ManagementUser;
         private IUserRepository _userRepository;
         private APIService apiService;
         private ICustomerManagerRepository _customerManagerRepository;
         private readonly WorkQueueClient _workQueueClient;
         public ContractController(IConfiguration configuration, IAllCodeRepository allCodeRepository, IContractRepository contractRepository, ManagementUser ManagementUser, IUserRepository userRepository,
-            IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IIdentifierServiceRepository identifierServiceRepository, IPolicyRepository policyRepository, ICustomerManagerRepository customerManagerRepository)
+            IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IPolicyRepository policyRepository, ICustomerManagerRepository customerManagerRepository)
         {
 
             _configuration = configuration;
@@ -58,7 +57,6 @@ namespace WEB.Adavigo.CMS.Controllers
             _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _clientRepository = clientRepository;
             _userAgentRepository = userAgentRepository;
-            _identifierServiceRepository = identifierServiceRepository;
             _policyRepository = policyRepository;
             _ManagementUser = ManagementUser;
             _userRepository = userRepository;

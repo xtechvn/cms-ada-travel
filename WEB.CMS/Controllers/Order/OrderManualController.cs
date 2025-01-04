@@ -1,28 +1,17 @@
 ﻿using APP_CHECKOUT.RabitMQ;
 using Caching.Elasticsearch;
-using Caching.RedisWorker;
 using Entities.Models;
 using Entities.ViewModels;
-using Entities.ViewModels.Attachment;
 using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Mongo;
 using Entities.ViewModels.OrderManual;
 using ENTITIES.ViewModels.Articles;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OfficeOpenXml;
 using Repositories.IRepositories;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Security.Claims;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service;
@@ -43,6 +32,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private readonly IAccountClientRepository _accountClientRepository;
         private readonly IUserRepository _userRepository;
         private readonly IIdentifierServiceRepository _identifierServiceRepository;
+        private readonly IndentiferService _indentiferService;
         private ClientESRepository _clientESRepository;
         private UserESRepository _userESRepository;
         private NationalESRepository _nationalESRepository;
@@ -62,7 +52,6 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private ISupplierRepository _supplierRepository;
         private IGroupProductRepository _groupProductRepository;
         private IOtherBookingRepository _otherBookingRepository;
-        private readonly IndentiferService indentiferService;
         private ManagementUser _ManagementUser;
         private readonly List<int> list_order_status_not_allow_to_edit = new List<int>() { (int)OrderStatus.FINISHED, (int)OrderStatus.CANCEL, (int)OrderStatus.WAITING_FOR_ACCOUNTANT,(int)OrderStatus.WAITING_FOR_OPERATOR };
         private readonly List<int> list_service_status_not_allow_to_edit = new List<int>() { (int)ServiceStatus.OnExcution, (int)ServiceStatus.ServeCode, (int)ServiceStatus.Payment };
@@ -104,7 +93,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             _tourRepository = tourRepository;
             _provinceRepository = provinceRepository;
             _nationalRepository = nationalRepository;
-            indentiferService = new IndentiferService(configuration);
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository,orderRepository);
             _supplierRepository = supplierRepository;
             _ManagementUser = managementUser;
             _contractRepository = contractRepository;
@@ -514,7 +503,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 }*/
                 if (data.hotel.id <= 0 || data.hotel.service_code == null || data.hotel.service_code.Trim() == "")
                 {
-                    data.hotel.service_code = await indentiferService.GetServiceCodeByType((int)ServicesType.VINHotelRent);
+                    data.hotel.service_code = await _indentiferService.buildServiceNo((int)ServicesType.VINHotelRent);
                 }
 
                 #region Check Client Debt:
@@ -951,10 +940,19 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 data.user_summit = (int)_UserId;
                 var client = await _clientRepository.GetClientDetailByClientId((long)exists_order.ClientId);
                 data.client_type = (int)client.ClientType;
-                if (data.service_code == null || data.service_code.Trim() == "")
+                if((data.service_code == null || data.service_code.Trim() == ""))
                 {
-                    data.service_code = await indentiferService.GetServiceCodeByType((int)ServicesType.FlyingTicket);
+                    if (data.go == null || data.go.id <= 0)
+                    {
+                        data.service_code = await _indentiferService.buildServiceNo((int)ServicesType.FlyingTicket);
+                    }
+                    else
+                    {
+                        string s_format = string.Format(String.Format("{0,4:0000}", data.go.id));
+                        data.service_code = ServicesTypeCode.service[Convert.ToInt16((int)ServicesType.FlyingTicket)] + s_format+"-1";
+                    }
                 }
+                
                 if (data.end_date < data.start_date)
                 {
                     data.end_date = data.start_date;
@@ -1145,7 +1143,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 catch { }
                 Entities.Models.Order order = new Entities.Models.Order()
                 {
-                    OrderNo = await _identifierServiceRepository.buildOrderNoManual(company_type),
+                    OrderNo = await _indentiferService.buildOrderManual(company_type),
                     SalerId = model.main_sale_id,
                     SalerGroupId = string.Join(",", model.sub_sale_id),
                     Note = model.note,
@@ -1390,7 +1388,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 data.client_type = (int)client.ClientType;
                 if (data.tour_id <= 0 || data.service_code == null || data.service_code.Trim() == "")
                 {
-                    data.service_code = await indentiferService.GetServiceCodeByType((int)ServicesType.Tourist);
+                    data.service_code = await _indentiferService.buildServiceNo((int)ServicesType.Tourist);
                 }
 
 
@@ -2101,7 +2099,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 }
                 if (data.service_code == null || data.service_code.Trim() == "")
                 {
-                    data.service_code = await indentiferService.GetServiceCodeByType((int)ServiceType.Other);
+                    data.service_code = await _indentiferService.buildServiceNo((int)ServiceType.Other);
                 }
                 var exists_order = await _orderRepository.GetOrderByID(data.order_id);
                 int service_status = (int)ServiceStatus.OnExcution;

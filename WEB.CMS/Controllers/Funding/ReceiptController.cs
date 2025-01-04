@@ -35,7 +35,6 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly IClientRepository _clientRepository;
         private readonly IDepositHistoryRepository _depositHistoryRepository;
         private readonly IContractPayRepository _contractPayRepository;
-        private IIdentifierServiceRepository identifierServiceRepository;
         private readonly IUserRepository _userRepository;
         private ManagementUser _ManagementUser;
         private readonly IOrderRepository _orderRepository;
@@ -50,7 +49,7 @@ namespace WEB.Adavigo.CMS.Controllers
 
         public ReceiptController(IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, IHotelBookingRepositories hotelBookingRepositories, ITourRepository tourRepository,
             IClientRepository clientRepository, IDepositHistoryRepository depositHistoryRepository, IOrderRepository orderRepository, ManagementUser ManagementUser,
-             IUserRepository userRepository, IIdentifierServiceRepository _identifierServiceRepository, IPaymentRequestRepository paymentRequestRepository,
+             IUserRepository userRepository,  IPaymentRequestRepository paymentRequestRepository,
              IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService)
         {
             _supplierRepository = supplierRepository;
@@ -62,7 +61,6 @@ namespace WEB.Adavigo.CMS.Controllers
             _orderRepository = orderRepository;
             _ManagementUser = ManagementUser;
             _userRepository = userRepository;
-            identifierServiceRepository = _identifierServiceRepository;
             apiService = new APIService(configuration, userRepository);
             _hotelBookingRepositories = hotelBookingRepositories;
             _paymentRequestRepository = paymentRequestRepository;

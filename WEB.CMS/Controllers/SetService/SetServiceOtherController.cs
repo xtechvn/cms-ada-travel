@@ -34,7 +34,6 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Other
         private readonly IAllCodeRepository _allCodeRepository;
         private readonly IUserRepository _userRepository;
         private UserESRepository _userESRepository;
-        private IndentiferService _indentiferService;
         private IPassengerRepository _passengerRepository;
         private IAirlinesRepository _airlinesRepository;
         private readonly IPaymentRequestRepository _paymentRequestRepository;
@@ -59,7 +58,6 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Other
             _flyBookingESRepository = new FlyBookingESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _allCodeRepository = allcodeRepository;
             _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
-            _indentiferService = new IndentiferService(configuration);
             _userRepository = userRepository;
             _passengerRepository = passengerRepository;
             _airlinesRepository = airlinesRepository;

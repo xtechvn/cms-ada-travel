@@ -13,7 +13,6 @@ using ENTITIES.ViewModels.ElasticSearch;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver.Linq;
 using Newtonsoft.Json;
-using PdfSharp;
 using Repositories.IRepositories;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -47,6 +46,7 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly IAttachFileRepository _AttachFileRepository;
         private readonly ITourRepository _tourRepository;
         private readonly IContractRepository _contractRepository;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         private ManagementUser _ManagementUser;
         private readonly IEmailService _emailService;
         private readonly IHotelBookingCodeRepository _hotelBookingCodeRepository;
@@ -60,12 +60,14 @@ namespace WEB.Adavigo.CMS.Controllers
         private APIService apiService;
         private HotelBookingCodeESRepository _boongKingCodeESRepository;
         private LogActionMongoService LogActionMongo;
+        private IndentiferService _indentiferService;
 
         private readonly List<int> list_order_status_not_allow_to_edit = new List<int>() { (int)OrderStatus.FINISHED, (int)OrderStatus.CANCEL, (int)OrderStatus.WAITING_FOR_ACCOUNTANT, (int)OrderStatus.WAITING_FOR_OPERATOR };
         public OrderController(IConfiguration configuration, IOrderRepository orderRepository, IClientRepository clientRepository, IHotelBookingRepositories hotelBookingRepositories, ManagementUser managementUser, IContractRepository contractRepository,
             IAllCodeRepository allcodeRepository, IContactClientRepository contactClientRepository, IOrderRepositor iOrderRepositories, IFlightSegmentRepository flightSegmentRepository, IBagageRepository bagageRepository, IContactClientRepository ContactClientRepository, IHotelBookingCodeRepository hotelBookingCodeRepository,
             IFlyBookingDetailRepository flyBookingDetailRepository, IUserRepository userRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, ITourRepository tourRepository, IEmailService emailService, IAttachFileRepository attachFileRepository, IOtherBookingRepository otherBookingRepository,
-            IInvoiceRequestRepository invoiceRequestRepository, IVinWonderBookingRepository vinWonderBookingRepository, IWebHostEnvironment WebHostEnvironment, IInvoiceRepository invoiceRepository, IAccountClientRepository accountClientRepository, IPaymentRequestRepository paymentRequestRepository)
+            IInvoiceRequestRepository invoiceRequestRepository, IVinWonderBookingRepository vinWonderBookingRepository, IIdentifierServiceRepository identifierServiceRepository,
+            IWebHostEnvironment WebHostEnvironment, IInvoiceRepository invoiceRepository, IAccountClientRepository accountClientRepository, IPaymentRequestRepository paymentRequestRepository)
         {
             _invoiceRequestRepository = invoiceRequestRepository;
             _configuration = configuration;
@@ -98,6 +100,8 @@ namespace WEB.Adavigo.CMS.Controllers
             _boongKingCodeESRepository = new HotelBookingCodeESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             LogActionMongo = new LogActionMongoService(configuration);
             workQueueClient = new WorkQueueClient(configuration);
+            _identifierServiceRepository = identifierServiceRepository;
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository);
         }
 
 
@@ -360,7 +364,7 @@ namespace WEB.Adavigo.CMS.Controllers
                         ViewBag.PermisionType = ClientDetai.PermisionType;
                     }
 
-                    if (OrderIndentiferService.IsOrderManual(dataOrder.OrderNo))
+                    if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
                     {
                         ViewBag.OrderNo_Type = 1;
                     }
@@ -372,7 +376,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     ViewBag.OrderServiceType = 0;
                     ViewBag.IsB2COrder = false;
                     ViewBag.HasSaleToProgress = true;
-                    if (OrderIndentiferService.IsOrderManual(dataOrder.OrderNo))
+                    if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
                     {
                         ViewBag.IsManualOrder = true;
                     }
@@ -795,7 +799,7 @@ namespace WEB.Adavigo.CMS.Controllers
                             is_allow_to_edit = true;
                         }
                         ViewBag.AllowToEdit = is_allow_to_edit;
-                        if (OrderIndentiferService.IsOrderManual(dataOrder.OrderNo))
+                        if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
                         {
                             ViewBag.OrderNo_Type = 1;
                         }

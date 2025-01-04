@@ -2010,6 +2010,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 }
                 VinpearlLib vinpearlLib = new VinpearlLib(_configuration);
                 var commit_input = JsonConvert.SerializeObject(commit_booking);
+                //--Create Booking
                 var commit= await vinpearlLib.getVinpearlCreateBooking(commit_input);
                 if(commit!=null && commit.isSuccess == true && commit.data.reservations.Count>0)
                 {
@@ -2030,6 +2031,30 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                         UpdatedBy = 18,
                         UpdatedDate = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")
                     };
+                    //-- get Get Guarantee Methods
+                    var guarantee_input = new
+                    {
+                        organization = "vinpearl"
+                    };
+                    var guarantee_method = await vinpearlLib.getGuaranteeMethods(commit.data.reservations[0].reservationID, JsonConvert.SerializeObject(guarantee_input));
+                    if(guarantee_method!=null && guarantee_method.isSuccess== true && guarantee_method.data.guaranteeMethods!=null && guarantee_method.data.guaranteeMethods.Count > 0)
+                    {
+                        var confirm_commit = new List<object>();
+                        foreach(var method in guarantee_method.data.guaranteeMethods)
+                        {
+                            confirm_commit.Add(new
+                            {
+                                guaranteeRefID= "00000001-0000-0000-0000-000000000000",
+                                guaranteePolicyId= method.id,
+                                guaranteeValue=method.amount.amount.amount
+                            });
+                        }
+                        var commit_result = await vinpearlLib.CommitBooking(commit.data.reservations[0].reservationID, JsonConvert.SerializeObject(new
+                        {
+                            guaranteeInfos= confirm_commit
+                        }));
+                        order_code.Description += "\n Result CommitBooking: "+ commit_result;
+                    }
                     var id = await _hotelBookingCodeRepository.InsertHotelBookingCode(order_code);
 
                 }

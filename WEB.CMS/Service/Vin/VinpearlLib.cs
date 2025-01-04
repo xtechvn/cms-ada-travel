@@ -348,7 +348,7 @@ namespace API_CORE.Service.Vin
             try
             {
                 await ValidateToken();
-                string url = configuration["config_api_vinpearl:API_VIN_URL"] + configuration["config_api_vinpearl:enpoint:get_guarantee_methods"].Replace("reservationID", reservationid);
+                string url = configuration["config_api_vinpearl:API_VIN_URL"] + configuration["config_api_vinpearl:enpoint:get_guarantee_methods"].Replace("{reservationID}", reservationid);
                 var uri = new System.Uri(url);
                 using (var httpClient = new HttpClient())
                 {
@@ -378,15 +378,15 @@ namespace API_CORE.Service.Vin
         }
        
         /// <summary>
-        /// Api  Batch Commit VIN
+        ///  Commit VIN
         /// </summary>
         /// <returns>
-        public async Task<string> getBatchCommit(string input_api_vin)
+        public async Task<string> CommitBooking(String reservationid, string input_api_vin)
         {
             try
             {
                 await ValidateToken();
-                string url = configuration["config_api_vinpearl:API_VIN_URL"] + configuration["config_api_vinpearl:enpoint:get_batch_commit"];
+                string url = configuration["config_api_vinpearl:API_VIN_URL"] + configuration["config_api_vinpearl:enpoint:commit_booking"].Replace("{reservationID}", reservationid);
                 var uri = new System.Uri(url);
                 using (var httpClient = new HttpClient())
                 {

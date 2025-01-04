@@ -1136,6 +1136,7 @@ namespace Repositories.Repositories
             }
             return 0;
         }
+       
         public async Task<long> CheckBookClosingByDate(DateTime FromDate, DateTime ToDate)
         {
             try
@@ -1179,6 +1180,11 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("GetTotalCountSumOrder in OrderRepository: " + ex);
             }
             return null;
+        }
+        public async Task<long> CountOrderInYear()
+        {
+           
+            return  _OrderDal.CountOrderInYear();
         }
     }
 }
