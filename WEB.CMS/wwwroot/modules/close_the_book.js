@@ -7,10 +7,12 @@ $(document).ready(function () {
         var title = 'Khóa sổ';
         var description = '';
         var Month_day = new Date().getMonth();
+        var Year_day = new Date().getFullYear();
         var Month = element.closest('.list-row').find('.Month').text();
         var StartDate = element.closest('.list-row').find('.day-StartDate').text();
+        var date = StartDate.split('/')
         var EndDate = element.closest('.list-row').find('.day-EndDate').text();
-        if (parseFloat(Month) < parseFloat(Month_day + 1) || Month_day == 0) {
+        if ((parseFloat(Month) < parseFloat(Month_day + 1) && parseFloat(date[2]) == parseFloat(Year_day) )|| ( parseFloat(date[2]) < parseFloat(Year_day))) {
             if (element.is(":checked") == true) {
                 description = 'Bạn muốn khóa sổ Tháng ' + Month + ',từ ngày ' + StartDate + ' đến ngày ' + EndDate
                 _close_the_book.openDialogSummit(title, description, function () {
