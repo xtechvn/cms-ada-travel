@@ -93,7 +93,7 @@ var _report_operator = {
                         format: 'DD/MM/YYYY'
                     }
                 });
-                element.data('daterangepicker').setStartDate(start_day_of_year);
+                element.data('daterangepicker').setStartDate(min_range);
                 element.data('daterangepicker').setEndDate(today);
             })
             $('#operator-to-date').each(function (index, item) {
@@ -109,7 +109,7 @@ var _report_operator = {
                         format: 'DD/MM/YYYY'
                     }
                 });
-                element.data('daterangepicker').setStartDate(start_day_of_year);
+                element.data('daterangepicker').setStartDate(min_range);
                 element.data('daterangepicker').setEndDate(today);
             })
             $('#operator-invoice-finish-status').each(function (index, item) {
