@@ -122,14 +122,13 @@ namespace WEB.Adavigo.CMS.Controllers.FundCustomer
                         var list = Array.ConvertAll(current_user.Role.Split(','), int.Parse);
                         foreach (var item in list)
                         {
-
                             searchModel.SalerPermission = current_user.UserUnderList;
 
                             if (item == (int)RoleType.Admin)
                             {
                                 searchModel.SalerPermission = null;
-                                i++;
                             }
+                            i++;
                         }
                     }
                     if (i != 0)
