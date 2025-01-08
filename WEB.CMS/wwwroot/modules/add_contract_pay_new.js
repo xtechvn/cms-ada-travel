@@ -217,6 +217,12 @@ var _contract_pay_create_new = {
                 cache: true
             }
         });
+        if (is_admin == true) {
+            $("#client-select").on('change', function () {
+                _contract_pay_create_new.GetDataByClientId()
+            })
+        }
+    
     },
     FormatNumber: function () {
         var amount = $('#amount').val()
@@ -286,7 +292,7 @@ var _contract_pay_create_new = {
         var contract_type = $('#contract-type').val()
         if (contract_type !== null && contract_type !== '' && parseInt(contract_type) == contractpay_type_other) return
         if (clientId == null || clientId == undefined || clientId == '') {
-            var clientId = $('#client-select').val()[0]
+            var clientId = $('#client-select').val() != null ? $('#client-select').val()[0]:0
             //if (client !== null && client !== undefined && client !== '') {
             //    clientId = client[0]
             //}
