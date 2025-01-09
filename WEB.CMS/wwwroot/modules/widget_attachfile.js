@@ -41,6 +41,48 @@
         this.WidgetOption = option;
         this.Init()
     };
+    UploadURL() {
+        var class_object = this;
+        var widget = $('.' + class_object.ElementName)
+
+        widget.find('.attachment-file-url').prop('disabled',true)
+        widget.find('.attachment-file-url-confirm').prop('disabled',true)
+        var widget = $('.' + class_object.ElementName)
+        var input_url = widget.find('.attachment-file-url')
+        const imageUrl = input_url.val();
+        if (!imageUrl) {
+            alert("Link ảnh không được bỏ trống!");
+            return;
+        }
+        $.ajax({
+            url: "/AttachFile/UploadImageFromURL",
+            data: { 'url': imageUrl },
+            type: "POST",
+            success: function (result) {
+                class_object.Trigger = false
+                var item = result.data
+                var ext = item.split('.')
+                var split = item.split('/')
+                var file_name = split[split.length - 1]
+                var text_name = split[split.length - 1]
+                if (class_object.VideoExtension.includes(ext[ext.length - 1])) {
+                    widget.find('.attachment-file-gallery').append(class_object.HTMLVideo.replaceAll('@item.Id', '0').replaceAll('@item.Path', item).replaceAll('@(file_name)', text_name).replaceAll('@file_name', file_name));
+
+                }
+                else if (class_object.ImageExtension.includes(ext[ext.length - 1])) {
+                    widget.find('.attachment-file-gallery').append(class_object.HTMLImage.replaceAll('@item.Id', '0').replaceAll('@item.Path', item).replaceAll('@(file_name)', text_name));
+
+                }
+                else {
+                    widget.find('.attachment-file-gallery').append(class_object.HTMLOthers.replaceAll('@item.Id', '0').replaceAll('@item.Path', item).replaceAll('@default_icon', class_object.DefaultImage).replaceAll('@item.Path', item).replaceAll('@(file_name)', text_name).replaceAll('@file_name', file_name));
+                }
+                widget.find('.on-addfile-loading').remove()
+                widget.find('.attachment-file-url').val('')
+                widget.find('.attachment-file-url').prop('disabled', false)
+                widget.find('.attachment-file-url-confirm').prop('disabled', false)
+            }
+        });
+    }
     Upload() {
         var class_object = this;
         var widget = $('.' + class_object.ElementName)
@@ -138,6 +180,10 @@
             })
             $('body').on('click', '.' + class_object.ElementName + ' .confirm-file', function () {
                 class_object.Confirm()
+
+            })
+            $('body').on('click', '.' + class_object.ElementName + ' .attachment-file-url-confirm', function () {
+                class_object.UploadURL()
 
             })
         }

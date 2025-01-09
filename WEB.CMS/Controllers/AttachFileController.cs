@@ -14,6 +14,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Models;
@@ -49,6 +50,78 @@ namespace WEB.CMS.Controllers
             ViewBag.Option = option;
             ViewBag.ID = id;
             return PartialView();
+        }
+        public async Task<IActionResult> UploadImageFromURL(string url)
+        {
+            try
+            {
+                var _UserLogin = 0;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserLogin = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                using (var httpClient = new HttpClient())
+                {
+                    // Fetch the image
+                    var response = await httpClient.GetAsync(url);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        return new JsonResult(new
+                        {
+                            status = (int)ResponseType.FAILED,
+                            msg = $"Không thể tải file từ đường dẫn đã nhập. Code: {response.StatusCode}"
+                        });
+                    }
+
+                    // Remove query parameters
+                    var uri = new Uri(url);
+                    string path = uri.AbsolutePath;
+                    string extension = Path.GetExtension(path);
+                    var allow_extenstion= new List<string>() { "png", "jpg", "gif", "jpeg", "PNG", "JPG", "GIF", "JPEG" };
+                    if (!allow_extenstion.Any(x => x.ToLower().Trim() == extension.ToLower().Trim())) {
+                        return new JsonResult(new
+                        {
+                            status = (int)ResponseType.FAILED,
+                            msg = $"Hệ thống chỉ cho phép nhập đường link ảnh, vui lòng thử lại url khác"
+                        });
+
+                    }
+                    // Create an HttpClient to download the image
+                    var imageBytes = await response.Content.ReadAsByteArrayAsync();
+                    // File Name
+                    string _FileName = Path.GetFileName(url);
+                    if (string.IsNullOrEmpty(_FileName))
+                    {
+                        _FileName = Guid.NewGuid().ToString() + ".jpg"; // Default to .jpg
+                    }
+
+                    string _UploadFolder = @"uploads/images/" + _UserLogin;
+                    string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, _UploadFolder);
+
+                    if (!Directory.Exists(_UploadDirectory))
+                    {
+                        Directory.CreateDirectory(_UploadDirectory);
+                    }
+                    string filePath = Path.Combine(_UploadDirectory, _FileName);
+                    await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+
+                    return new JsonResult(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        msg = "Thành công",
+                        data = "/" + _UploadFolder + "/" + _FileName
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UploadFile - AttachFileViewComponent" + ex.ToString());
+            }
+            return new JsonResult(new
+            {
+                status = (int)ResponseType.FAILED,
+                msg = "Lỗi trong quá trình tải lên tệp đính kèm, vui lòng liên hệ IT.",
+            });
         }
         public async Task<IActionResult> UploadFile(IFormFile[] files)
         {
