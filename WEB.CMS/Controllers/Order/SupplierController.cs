@@ -81,6 +81,17 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         {
             try
             {
+                var suplier = _supplierRepository.GetByIDOrName(model.SupplierId, model.FullName.Trim());
+                if (suplier > 0)
+                {
+                    {
+                        return new JsonResult(new
+                        {
+                            isSuccess = false,
+                            message = "Nhà cung cấp đã tồn tại"
+                        });
+                    }
+                }
                 var result = _supplierRepository.Add(model);
 
                 if (result > 0)
