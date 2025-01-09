@@ -78,7 +78,7 @@ namespace WEB.CMS.Controllers
                     string path = uri.AbsolutePath;
                     string extension = Path.GetExtension(path);
                     var allow_extenstion= new List<string>() { "png", "jpg", "gif", "jpeg", "PNG", "JPG", "GIF", "JPEG" };
-                    if (!allow_extenstion.Any(x => x.ToLower().Trim() == extension.ToLower().Trim())) {
+                    if (!allow_extenstion.Any(x => x.ToLower().Trim() == extension.Replace(".","").ToLower().Trim())) {
                         return new JsonResult(new
                         {
                             status = (int)ResponseType.FAILED,
@@ -89,11 +89,8 @@ namespace WEB.CMS.Controllers
                     // Create an HttpClient to download the image
                     var imageBytes = await response.Content.ReadAsByteArrayAsync();
                     // File Name
-                    string _FileName = Path.GetFileName(url);
-                    if (string.IsNullOrEmpty(_FileName))
-                    {
-                        _FileName = Guid.NewGuid().ToString() + ".jpg"; // Default to .jpg
-                    }
+                    string _FileName = _FileName = Guid.NewGuid().ToString()+ extension;
+ 
 
                     string _UploadFolder = @"uploads/images/" + _UserLogin;
                     string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, _UploadFolder);

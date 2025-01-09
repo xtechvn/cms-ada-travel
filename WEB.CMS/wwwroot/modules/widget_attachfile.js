@@ -60,6 +60,10 @@
             type: "POST",
             success: function (result) {
                 class_object.Trigger = false
+                if (result == undefined || result.status == undefined || result.status != 0) {
+                    _msgalert.error(result.msg)
+                    return
+                }
                 var item = result.data
                 var ext = item.split('.')
                 var split = item.split('/')
