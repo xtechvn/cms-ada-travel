@@ -121,5 +121,7 @@ namespace Entities.ViewModels
         public decimal TotalSupplierRefund { get; set; }
         public decimal TotalAmountService { get; set; }
         public string PackageName { get; set; }
+        public List<AttachFile> AttachFile { get; set; }
+        public string AttachFiles { get; set; }
     }
 }

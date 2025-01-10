@@ -32,6 +32,7 @@ namespace Repositories.Repositories
         private readonly IOtherBookingRepository _otherBookingRepository;
         private readonly IHotelBookingRepositories _hotelBookingRepositories;
         private readonly IFlyBookingDetailRepository _flyBookingDetailRepository;
+        private readonly AttachFileDAL attachFileDAL;
 
         public PaymentRequestRepository(IOptions<DataBaseConfig> dataBaseConfig, ITourPackagesOptionalRepository tourPackagesOptionalRepository
             , IOtherBookingRepository otherBookingRepository, IHotelBookingRepositories hotelBookingRepositories,
@@ -46,6 +47,7 @@ namespace Repositories.Repositories
             _otherBookingRepository = otherBookingRepository;
             _hotelBookingRepositories = hotelBookingRepositories;
             _flyBookingDetailRepository = flyBookingDetailRepository;
+            attachFileDAL = new AttachFileDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
         }
 
         public int CreatePaymentRequest(PaymentRequestViewModel model)
@@ -266,6 +268,10 @@ namespace Repositories.Repositories
                 var requestInfos = paymentRequestDAL.GetRequestDetail(paymentRequestId,
                     ProcedureConstants.sp_GetDetailPaymentRequest).ToList<PaymentRequestViewModel>();
                 var requestInfo = requestInfos.FirstOrDefault();
+                if (requestInfo.PaymentVoucherId != null && requestInfo.PaymentVoucherId != 0)
+                {
+                    requestInfo.AttachFile = attachFileDAL.GetListByDataID(requestInfo.PaymentVoucherId, (int)AttachmentType.Payment_Voucher).Result;
+                }
                 requestInfo.PaymentDateStr = DateUtil.DateToString(requestInfo.PaymentDate);
                 requestInfo.RelateData = new List<PaymentRequestDetailViewModel>();
                 if (requestInfo.Type == (int)PAYMENT_VOUCHER_TYPE.HOAN_TRA_KHACH_HANG)
@@ -878,7 +884,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var listPaymentRequest = paymentRequestDAL.GetListPaymentRequestByClientId(clientId,3,
+                var listPaymentRequest = paymentRequestDAL.GetListPaymentRequestByClientId(clientId, 3,
                     ProcedureConstants.SP_GetListPaymentRequestByClientId).ToList<PaymentRequestViewModel>();
                 foreach (var item in listPaymentRequest)
                 {

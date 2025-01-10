@@ -40,7 +40,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private readonly IndentiferService _indentiferService;
         public RequestHotelBookingController(IConfiguration configuration, IUserRepository userRepository, IHotelBookingRepositories hotelBookingRepository,
             IRequestRepository requestRepository,IIdentifierServiceRepository identifierServiceRepository, IClientRepository clientRepository, IOrderRepository orderRepository, IHotelRepository hotelRepository,
-            IHttpContextAccessor httpContextAccessor, IVoucherRepository voucherRepository)
+            IHttpContextAccessor httpContextAccessor, IVoucherRepository voucherRepository, IContractPayRepository contractPayRepository)
         {
             _configuration = configuration;
             _userRepository = userRepository;
@@ -55,7 +55,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             var connection = ConnectionMultiplexer.Connect(_configuration["Redis:Host"] + ":" + _configuration["Redis:Port"]);
             _subscriber = connection.GetSubscriber();
             _voucherRepository = voucherRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository);
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
         }
         public IActionResult Index()
         {

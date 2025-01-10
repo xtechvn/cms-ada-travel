@@ -21,8 +21,9 @@
         </div>
         <div class="form-default row">
             <div class="col-md-6">
-                <input type="hidden" asp-for="@Model.Id" />
-                <input type="hidden" asp-for="@Model.Status" />
+                <input type="text" style="display:none" asp-for="@Model.Id" />
+                <input type="text"style="display:none" asp-for="@Model.Status" />
+                <input type="text"style="display:none" asp-for="@Model.Password" />
                 <div class="form-group">
                     <label class="lbl">Họ tên</label>
                     <div class="wrap_input">
@@ -91,6 +92,12 @@
                     <label class="radio-inline"><input type="radio" asp-for="@Model.Gender" value="1">Nam</label>
                     <label class="radio-inline"><input type="radio" asp-for="@Model.Gender" value="0">Nữ</label>
                 </div>
+                <div class="form-group">
+                    <label class="lbl">Tài khoản Telegram</label>
+                    <div class="wrap_input">
+                        <input type="text" class="form-control" asp-for="@Model.NickName">
+                    </div>
+                </div> 
                 <div class="form-group">
                     <label class="lbl">Ghi chú</label>
                     <div class="wrap_input">

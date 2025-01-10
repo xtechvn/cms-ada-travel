@@ -7,7 +7,7 @@
     var _DepartmentList = (List<Department>)ViewBag.DepartmentList;
     var _UserPosition = (List<UserPosition>)ViewBag.UserPosition;
     var _UserRoleList = (List<int>)ViewBag.UserRoleList;
-    string company_type= (string)ViewBag.CompanyType;
+    string company_type = (string)ViewBag.CompanyType;
     async Task ShowDepartment(Department item, int level = 0)
     {
         var childs = _DepartmentList.Where(s => s.ParentId == item.Id);
@@ -162,6 +162,12 @@
                             <input type="text" class="form-control" asp-for="@Model.Note">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="lbl">Tài khoản Telegram</label>
+                        <div class="wrap_input">
+                            <input type="text" class="form-control" asp-for="@Model.NickName">
+                        </div>
+                    </div>
                     <div class="form-group male">
                         <label class="lbl">Giới tính</label>
                         <label class="radio-inline"><input type="radio" asp-for="@Model.Gender" value="1">Nam</label>
@@ -294,6 +300,12 @@
                         <label class="lbl">Ghi chú</label>
                         <div class="wrap_input">
                             <input type="text" class="form-control" asp-for="@Model.Note">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="lbl">Tài khoản Telegram</label>
+                        <div class="wrap_input">
+                            <input type="text" class="form-control" asp-for="@Model.NickName">
                         </div>
                     </div>
                     <div class="form-group male">

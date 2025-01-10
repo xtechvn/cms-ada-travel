@@ -68,7 +68,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository, IHotelBookingGuestRepository hotelBookingGuestRepository, IFlyBookingDetailRepository flyBookingDetailRepository, IAirlinesRepository airlinesRepository,
                  IPassengerRepository passengerRepository, IProvinceRepository provinceRepository, INationalRepository nationalRepository, ManagementUser managementUser, IOtherBookingRepository otherBookingRepository,
                  ITourRepository tourRepository, ISupplierRepository supplierRepository, IContractRepository contractRepository, IAttachFileRepository attachFileRepository, IVinWonderBookingRepository vinWonderBookingRepository,
-                 IGroupProductRepository groupProductRepository, IHotelBookingCodeRepository hotelBookingCodeRepository, IDepartmentRepository departmentRepository)
+                 IGroupProductRepository groupProductRepository, IHotelBookingCodeRepository hotelBookingCodeRepository, IDepartmentRepository departmentRepository, IContractPayRepository contractPayRepository)
         {
             _configuration = configuration;
             _orderRepository = orderRepository;
@@ -93,7 +93,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             _tourRepository = tourRepository;
             _provinceRepository = provinceRepository;
             _nationalRepository = nationalRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository,orderRepository);
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository,orderRepository,contractPayRepository);
             _supplierRepository = supplierRepository;
             _ManagementUser = managementUser;
             _contractRepository = contractRepository;

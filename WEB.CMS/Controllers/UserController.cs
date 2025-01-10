@@ -125,7 +125,7 @@ namespace WEB.CMS.Controllers
                     {
                         ViewBag.UserRoleList = list_role_active.Select(x => x.Id).ToList();
                     }
-                    var user = await _aPIService.GetByUserDetail(model.Id,model.UserName,model.Email);
+                    var user = await _aPIService.GetByUserDetail(model.Id, model.UserName, model.Email);
                     ViewBag.CompanyType = user != null && user.Id > 0 ? user.CompanyType : "";
                 }
                 else
@@ -143,7 +143,7 @@ namespace WEB.CMS.Controllers
                 LogHelper.InsertLogTelegram("AddOrUpdate - UserController: " + ex);
                 return Content("");
             }
-           
+
         }
 
         [HttpPost]
@@ -176,12 +176,12 @@ namespace WEB.CMS.Controllers
                 }
 
                 int rs = 0;
-                if(model.UserPositionId!=null && model.UserPositionId > 0)
+                if (model.UserPositionId != null && model.UserPositionId > 0)
                 {
                     var active_position = await _UserRepository.GetUserPositionsByID((int)model.UserPositionId);
                     if (active_position != null) model.Level = active_position.Rank;
                 }
-                if(model.CompanyType==null || model.CompanyType.Trim() == "")
+                if (model.CompanyType == null || model.CompanyType.Trim() == "")
                 {
                     model.CompanyType = _configuration["CompanyType"];
                 }
@@ -195,9 +195,10 @@ namespace WEB.CMS.Controllers
                 if (model.Phone == null) model.Phone = "";
                 if (model.Avata == null) model.Avata = "";
                 if (model.Address == null) model.Address = "";
+                if (model.NickName == null) model.NickName = "";
                 //-- check exists:
                 var exists_detail = await _aPIService.GetByUserDetail(model.Id <= 0 ? -1 : model.Id, model.UserName, model.Email);
-                if(exists_detail !=null && exists_detail.Id > 0)
+                if (exists_detail != null && exists_detail.Id > 0)
                 {
                     model.Id = exists_detail.Id;
                     var combine_company_type = (exists_detail.CompanyType + "," + model.CompanyType).Split(",").Where(x => x != null && x.Trim() != "").Distinct();
@@ -205,10 +206,10 @@ namespace WEB.CMS.Controllers
                 }
                 //-- Update dbUser:
                 var success = await _aPIService.UpdateUser(model);
-                if (success > 0 )
+                if (success > 0)
                 {
                     var exists = await _UserRepository.GetById(model.Id);
-                    if(exists==null || exists.Id <= 0)
+                    if (exists == null || exists.Id <= 0)
                     {
                         rs = await _UserRepository.Create(model);
 
@@ -223,16 +224,16 @@ namespace WEB.CMS.Controllers
                 {
                     rs = -2;
                 }
-                  /*
-                if (model.Id != 0)
-                {
-                    rs = await _UserRepository.Update(model);
-                }
-                else
-                {
-                    rs = await _UserRepository.Create(model);
-                }
-               */
+                /*
+              if (model.Id != 0)
+              {
+                  rs = await _UserRepository.Update(model);
+              }
+              else
+              {
+                  rs = await _UserRepository.Create(model);
+              }
+             */
                 if (rs > 0)
                 {
                     _workQueueClient.SyncES(rs, _configuration["DataBaseConfig:Elastic:SP:sp_GetUser"], _configuration["DataBaseConfig:Elastic:Index:User"], ProjectType.ADAVIGO_CMS, "UpSert UserController");
@@ -414,7 +415,7 @@ namespace WEB.CMS.Controllers
                 LogHelper.InsertLogTelegram("UserProfile - UserController: " + ex);
                 return Content("");
             }
-        
+
         }
 
         public IActionResult UserChangePass()
@@ -428,12 +429,12 @@ namespace WEB.CMS.Controllers
                 };
                 return PartialView(model);
             }
-            catch ( Exception ex)
+            catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("UserChangePass - UserController: " + ex);
                 return Content("");
             }
-          
+
         }
 
         [HttpPost]
@@ -524,7 +525,7 @@ namespace WEB.CMS.Controllers
             try
             {
                 var order = _orderRepository.GetAllOrderIDs();
-                if(order!=null && order.Count > 0)
+                if (order != null && order.Count > 0)
                 {
                     var _UserLogin = 0;
                     if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
@@ -559,7 +560,7 @@ namespace WEB.CMS.Controllers
             try
             {
                 ViewBag.id = id;
-         
+
                 return PartialView();
             }
             catch (Exception ex)
@@ -569,14 +570,14 @@ namespace WEB.CMS.Controllers
             }
 
         }
-        public async Task<IActionResult> ConfirmPassQr(long id,string pass)
+        public async Task<IActionResult> ConfirmPassQr(long id, string pass)
         {
             try
             {
-               
-                var user =await _UserRepository.GetById(id);
+
+                var user = await _UserRepository.GetById(id);
                 string passqr = user.UserName + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.ToString("dd");
-                if(pass== passqr)
+                if (pass == passqr)
                 {
                     return new JsonResult(new
                     {
@@ -592,7 +593,7 @@ namespace WEB.CMS.Controllers
                         message = "mật khẩu không đúng"
                     });
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -614,13 +615,13 @@ namespace WEB.CMS.Controllers
                 APIService apiService = new APIService(_configuration, _UserRepository);
                 string enviroment = _configuration["Config:OTP_Enviroment"];
                 if (enviroment == null) enviroment = "";
-           
+
                 mfa_record.Username = model.UserName;
                 mfa_record.Id = model.Id;
                 var data = await apiService.GenQrCode(model.UserName);
                 if (data != null)
                 {
-                   ViewBag.manual_entry_key = data.manual_entry_key;
+                    ViewBag.manual_entry_key = data.manual_entry_key;
                     mfa_record.SecretKey = data.manual_entry_key;
                 }
                 ViewBag.key = MFAService.GenerateQRCode(mfa_record, enviroment);
@@ -633,6 +634,6 @@ namespace WEB.CMS.Controllers
             }
 
         }
-       
+
     }
 }

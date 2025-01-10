@@ -211,6 +211,7 @@ namespace Repositories.Repositories
                     Id = model.Id,
                     Manager = model.Manager,
                     UserMapId = model.UserMapId,
+                    NickName = model.NickName,
                     //UserRole = model.UserRole
                 };
 
@@ -337,7 +338,8 @@ namespace Repositories.Repositories
                 entity.DepartmentId = model.DepartmentId;
                 entity.ModifiedOn = DateTime.Now;
                 entity.UserPositionId = model.UserPositionId;
-                entity.Level = model.Level;
+                entity.Level = model.Level == null ? entity.Level : model.Level;
+                entity.NickName = model.NickName;
 
 
                 await _UserDAL.UpdateAsync(entity);
@@ -443,7 +445,7 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("GetUserSuggesstion - ClientDAL: " + ex);
                 return null;
             }
-        } 
+        }
         public async Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids)
         {
             try

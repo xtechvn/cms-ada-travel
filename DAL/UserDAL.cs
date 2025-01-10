@@ -248,7 +248,9 @@ namespace DAL
                                       Status = u.Status,
                                       Gender = u.Gender,
                                       UserPositionId = u.UserPositionId,
-                                      Level = u.Level
+                                      Level = u.Level,
+                                      NickName=u.NickName,
+                                      Password=u.Password
                                   }).FirstOrDefaultAsync();
                 }
             }

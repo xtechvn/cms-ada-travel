@@ -34,5 +34,6 @@ namespace Repositories.IRepositories
         List<PaymentRequestViewModel> GetContractPayServiceListBySupplierId(long supplierId, int contractPayId = 0, int serviceId = 0);
         PaymentRequestViewModel GetServiceDetail(string serviceCode);
         double GetTotalAmountContractPayByServiceId(string ServiceId, long ServiceType, long ContractPayType);
+        long CountPaymentRequest();
     }
 }

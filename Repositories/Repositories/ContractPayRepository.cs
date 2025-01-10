@@ -6,6 +6,7 @@ using Entities.ConfigModels;
 using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.Funding;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Nest;
 using Repositories.IRepositories;
@@ -1023,6 +1024,10 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("GetServiceDetail - ContractPayRepository: " + ex);
             }
             return 0;
+        }
+        public long CountPaymentRequest()
+        {
+            return _contractPayDAL.CountPaymentRequest();
         }
     }
 }

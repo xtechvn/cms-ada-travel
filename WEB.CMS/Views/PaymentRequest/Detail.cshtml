@@ -28,7 +28,7 @@
                         <td colspan="3">
                             <strong>Mã  phiếu yêu cầu chi: @Model.PaymentCode</strong>
                             @if (Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET) ||
-                            Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))
+                           Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))
                             {
                                 <span class="status-wait">@Model.PaymentRequestStatus</span>
                             }
@@ -137,7 +137,23 @@
                                         <div>:@Model.Description</div>
                                     }
                                 </div>
-
+                                @if (!string.IsNullOrEmpty(Model.AttachFiles))
+                                {
+                                    <div class="col-5 mb10">Ảnh đính kèm</div>
+                                    <div class="col-7 mb10">
+                                        @if (!string.IsNullOrEmpty(Model.AttachFiles))
+                                        {
+                                            <a href="@Model.AttachFiles" class="blue" style="color: #056BD3 !important; cursor:pointer;"
+                                               target="_blank">Xem</a>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-7 mb10">
+                                        <div id="attachment-detail" class="attachment-detail"></div>
+                                    </div>
+                                }
                             </div>
                         </td>
                         <td>
@@ -344,10 +360,10 @@
             <button type="submit" class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</button>
             @if (ViewBag.TYPE == (int)PAYMENT_VOUCHER_TYPE.QUY_CHAM_SOC_KHACH_HANG)
             {<button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
-                         onclick="_payment_request_service.PopupInYCChi(@Model.Id)">
+                     onclick="_payment_request_service.PopupInYCChi(@Model.Id)">
                     <a class="fa fa-print txt_14" href="javascript:;" onclick="_payment_request_service.PopupInYCChi(@Model.Id)"></a>
                 </button>
-              
+
             }
             @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.LUU_NHAP || Model.Status == (int)PAYMENT_REQUEST_STATUS.TU_CHOI)
             {
@@ -401,12 +417,12 @@
                 </button>
             }
             @*@if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET && KTV_DUYET_YEU_CAU_CHI == 1 && Model.Type == (int)PAYMENT_VOUCHER_TYPE.CHI_PHI_MARKETING)
-        {
-        <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
-        onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_CHI))">
-        Duyệt
-        </button>
-        }*@
+                {
+                <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
+                onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_CHI))">
+                Duyệt
+                </button>
+                }*@
             @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET && TBP_DUYET_YEU_CAU_CHI == 1)
             {
                 <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
@@ -488,4 +504,7 @@
 @section scripts {
     <script type="text/javascript" src="~/js/zebra_datepicker.min.js"></script>
     <script type="text/javascript" src="~/modules/payment_request.js?v=1"></script>
+    <script>
+        _global_function.RenderFileAttachment($('#attachment-detail'), @Model.PaymentVoucherId, @((int)AttachmentType.Payment_Voucher), false)
+    </script>
 }

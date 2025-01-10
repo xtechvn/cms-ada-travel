@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Repositories.IRepositories;
+using Repositories.Repositories;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
@@ -37,11 +38,12 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         private ManagementUser _ManagementUser;
         private APIService apiService;
         private readonly IUserRepository _userRepository;
+        private IndentiferService _indentiferService;
         public PaymentRequestController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser,
            IPaymentRequestRepository paymentRequestRepository, ISupplierRepository supplierRepository, IUserRepository userRepository,
            ITourPackagesOptionalRepository tourPackagesOptionalRepository, IConfiguration configuration, IFlyBookingDetailRepository flyBookingDetailRepository,
            IOtherBookingRepository otherBookingRepository, IHotelBookingRepositories hotelBookingRepositories, IBankingAccountRepository bankingAccountRepository,
-           IClientRepository clientRepository, IContractPayRepository contractPayRepository)
+           IClientRepository clientRepository, IContractPayRepository contractPayRepository, IIdentifierServiceRepository identifierServiceRepository, IOrderRepository orderRepository)
         {
             _contractPayRepository = contractPayRepository;
             _WebHostEnvironment = hostEnvironment;
@@ -58,6 +60,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             _flyBookingDetailRepository = flyBookingDetailRepository;
             _bankingAccountRepository = bankingAccountRepository;
             _clientRepository = clientRepository;
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
         }
 
         public IActionResult Index()
@@ -457,24 +460,24 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                         message = messages
                     });
                 }
-                var client = new HttpClient();
-                var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
-                var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
-                HttpClient httpClient = new HttpClient();
-                JObject jsonObject = new JObject(
-                   new JProperty("code_type", ((int)GET_CODE_MODULE.YEU_CAU_CHI).ToString())
-                );
-                var j_param = new Dictionary<string, object>
-                 {
-                     { "key",jsonObject}
-                 };
-                var data_product = JsonConvert.SerializeObject(j_param);
-                var token = CommonHelper.Encode(data_product, key_token_api);
-                var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
-                var response = await httpClient.PostAsync(apiPrefix, content);
-                var resultAPI = await response.Content.ReadAsStringAsync();
-                var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.PaymentCode = output.code;
+                //var client = new HttpClient();
+                //var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
+                //var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
+                //HttpClient httpClient = new HttpClient();
+                //JObject jsonObject = new JObject(
+                //   new JProperty("code_type", ((int)GET_CODE_MODULE.YEU_CAU_CHI).ToString())
+                //);
+                //var j_param = new Dictionary<string, object>
+                // {
+                //     { "key",jsonObject}
+                // };
+                //var data_product = JsonConvert.SerializeObject(j_param);
+                //var token = CommonHelper.Encode(data_product, key_token_api);
+                //var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
+                //var response = await httpClient.PostAsync(apiPrefix, content);
+                //var resultAPI = await response.Content.ReadAsStringAsync();
+                //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
+                model.PaymentCode =await _indentiferService.BuildPaymentRequest();
                 var result = _paymentRequestRepository.CreatePaymentRequest(model);
                 if (result == -2)
                     return Ok(new

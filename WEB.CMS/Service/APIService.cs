@@ -10,6 +10,7 @@ using PdfSharp;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -380,7 +381,9 @@ namespace WEB.Adavigo.CMS.Service
                     Password = md5_hash ?? model.Password,
                     ResetPassword = md5_hash ?? model.Password,
                     Phone = model.Phone ?? "",
-                    BirthDay = model.BirthDay,
+                    BirthDay = !string.IsNullOrEmpty(model.BirthDayPicker) ?
+                                DateTime.ParseExact(model.BirthDayPicker, "dd/MM/yyyy", CultureInfo.InvariantCulture)
+                              : model.BirthDay,
                     Gender = model.Gender,
                     Email = model.Email ?? "",
                     Avata = model.Avata ?? "",

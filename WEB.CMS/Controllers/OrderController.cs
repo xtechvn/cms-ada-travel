@@ -101,7 +101,7 @@ namespace WEB.Adavigo.CMS.Controllers
             LogActionMongo = new LogActionMongoService(configuration);
             workQueueClient = new WorkQueueClient(configuration);
             _identifierServiceRepository = identifierServiceRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository);
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
         }
 
 

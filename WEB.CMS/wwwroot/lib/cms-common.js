@@ -620,6 +620,11 @@ var _account = {
         if (FromValid.valid()) {
             let form = document.getElementById('form-user-profile');
             var formData = new FormData(form);
+            formData.set("Id", $('#Id').val());
+            formData.set("UserName", $('#UserName').val());
+            formData.set("Password", $('#Password').val());
+ 
+            console.log(formData)
             $.ajax({
                 url: '/user/upsert',
                 type: 'POST',
