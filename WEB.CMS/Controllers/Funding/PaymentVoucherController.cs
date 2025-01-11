@@ -1,21 +1,14 @@
-﻿using Entities.ViewModels;
+﻿using Entities.Models;
+using Entities.ViewModels;
 using Entities.ViewModels.Funding;
-using Entities.ViewModels.SupplierConfig;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Repositories.IRepositories;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
+using WEB.Adavigo.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
@@ -31,15 +24,17 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         private readonly IPaymentVoucherRepository _paymentVoucherRepository;
         private readonly string _UrlStaticImage;
         private readonly WEB.CMS.Models.AppSettings config;
+        private readonly IEmailService _emailService;
 
         public PaymentVoucherController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment,
-           IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository)
+           IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository, IEmailService emailService)
         {
             _WebHostEnvironment = hostEnvironment;
             _allCodeRepository = allCodeRepository;
             _paymentRequestRepository = paymentRequestRepository;
             _paymentVoucherRepository = paymentVoucherRepository;
             config = ReadFile.LoadConfig();
+            _emailService = emailService;
         }
 
         public IActionResult Index()
@@ -481,6 +476,44 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 });
             }
         }
+        public async Task<IActionResult> ViewEmailPayment(int id)
+        {
+            ViewBag.id = id;
+            var model = _paymentVoucherRepository.GetDetail(id);
+            
+            ViewBag.EmailBody = await _emailService.GetTemplatePaymentVoucher(id); ;
+            return PartialView();
+        }
+        public async Task<IActionResult> SendEmail(int id)
+        {
+            var status = (int)ResponseType.ERROR;
+            var msg = "Không thành công";
+            try
+            {
+                var model = _paymentVoucherRepository.GetDetail(id);
+                if (model != null)
+                {
+                    bool resulstSendMail = await _emailService.SendEmailpaymentVoucher(id, model.AttachFile);
+                    if (resulstSendMail)
+                    {
+                        status = (int)ResponseType.SUCCESS;
+                        msg = "Gửi email thành công";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ConfirmSendEmail - SetServiceController: " + ex);
+                status = (int)ResponseType.ERROR;
+                msg = "Đã xảy ra lỗi, vui lòng liên hệ IT";
+            }
+            return Ok(new
+            {
+                status = status,
+                msg = msg
+            });
+        }
+
 
     }
 }

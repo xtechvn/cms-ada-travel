@@ -8,9 +8,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PuppeteerSharp;
 using Repositories.IRepositories;
-using System.Linq;
+using SharpCompress.Common;
+using System.Buffers.Text;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Text;
 using Utilities;
 using Utilities.Contants;
@@ -46,11 +48,11 @@ namespace WEB.Adavigo.CMS.Service
         private readonly IAttachFileRepository _AttachFileRepository;
         private readonly IBankingAccountRepository _bankingAccountRepository;
         private readonly APIService _APIService;
-
+        private readonly IPaymentVoucherRepository _paymentVoucherRepository;
         public EmailService(IConfiguration configuration, IHotelBookingCodeRepository hotelBookingCodeRepository, IHotelBookingRepositories hotelBookingRepositories, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository, IHotelBookingRoomRatesRepository hotelBookingRoomRatesRepository,
         IFlyBookingDetailRepository flyBookingDetailRepository, IBagageRepository bagageRepository, IPassengerRepository passengerRepository, IOrderRepository orderRepository, IContactClientRepository contactClientRepository, IHotelBookingRoomRepository hotelBookingRoomRepository, IOtherBookingRepository otherBookingRepository,
              IUserRepository userRepository, IClientRepository clientRepository, ITourRepository tourRepository, IFlightSegmentRepository flightSegmentRepository, IAirlinesRepository airlinesRepository, ISupplierRepository supplierRepository, IPaymentRequestRepository paymentRequestRepository,
-             IVinWonderBookingRepository vinWonderBookingRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, IBankingAccountRepository bankingAccountRepository)
+             IVinWonderBookingRepository vinWonderBookingRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, IBankingAccountRepository bankingAccountRepository, IPaymentVoucherRepository paymentVoucherRepository)
         {
 
             _configuration = configuration;
@@ -77,7 +79,7 @@ namespace WEB.Adavigo.CMS.Service
             _bankingAccountRepository = bankingAccountRepository;
             _contractPayRepository = contractPayRepository;
             _APIService = new APIService(configuration, userRepository);
-
+            _paymentVoucherRepository = paymentVoucherRepository;
         }
         public async Task<bool> SendEmail(SendEmailViewModel model, List<AttachfileViewModel> attach_file)
         {
@@ -4098,7 +4100,139 @@ namespace WEB.Adavigo.CMS.Service
             }
         }
 
+        public async Task<string> GetTemplatePaymentVoucher(int paymentVoucherId)
+        {
+            try
+            {
+                string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var template = workingDirectory + @"\EmailTemplate\PaymentRequestTemplate.html";
+                string body = File.ReadAllText(template);
+                var model = _paymentVoucherRepository.GetDetail(paymentVoucherId);
+                var list_id = model.RequestId.Split(',');
+                var booking = string.Empty;
+                foreach(var item in list_id)
+                {
+                    var detail = _paymentRequestRepository.GetById(Convert.ToInt32(item));
+                    if (detail.RelateData != null)
+                    {
+                        foreach (var item2 in detail.RelateData)
+                        {
+                            booking = item2.ServiceCode + " - " + item2.OrderNo + ",";
+                        }
+                    }
+                    
+                }
+               
+                var tile = "Adavigo thanh toán booking " + model.SupplierName + " ngày thanh toán (" + DateTime.Now.ToString("dd/MM/yyyy") + ")";
+                var nd = "Kính gửi quý khách sạn:"+ model.SupplierName + " Adavigo gửi thông tin Thanh toán phòng cho booking " + booking.TrimEnd(',');
+                body = body.Replace("{{tile}}", tile);
+                body = body.Replace("{{nd}}", nd);
+                return body;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetTemplatePaymentRequest - MailService: " + ex.ToString());
+                return null;
+            }
+        }
+        public async Task<bool> SendEmailpaymentVoucher(int paymentVoucherId, List<AttachFile> attach_file)
+        {
+            bool ressult = true;
+            try
+            {
+                //AccountClient orderInfo = JsonConvert.DeserializeObject<AccountClient>(objectStr);
 
+                MailMessage message = new MailMessage();
+                var model = _paymentVoucherRepository.GetDetail(paymentVoucherId);
+                message.Subject = "Adavigo thanh toán booking " + model.SupplierName + " ngày thanh toán (" + DateTime.Now.ToString("dd/MM/yyyy") + ")"; ;
+                //config send email
+                string from_mail = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["FROM_MAIL"];
+                string account = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["USERNAME"];
+                string password = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["PASSWORD"];
+                string host = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["HOST"];
+                string port = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["PORT"];
+                //string Email_KIEMSOAT = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["Email_KIEMSOAT"];
+                //string Email_KETOAN = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["Email_KETOAN"];
+                message.IsBodyHtml = true;
+                message.From = new MailAddress(from_mail, new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["STMP_USERNAME_Email"]);
 
+                message.Body = await GetTemplatePaymentVoucher(paymentVoucherId);
+                //attachment 
+
+                string sendEmailsFrom = account;
+                string sendEmailsFromPassword = password;
+                SmtpClient smtp = new SmtpClient(host, Convert.ToInt32(port));
+                smtp.EnableSsl = true;
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.Credentials = new NetworkCredential(sendEmailsFrom, sendEmailsFromPassword);
+                smtp.Timeout = 50000;
+
+                var Supplier = _supplierRepository.GetById((int)model.SupplierId);
+                message.To.Add(Supplier.Email);
+                //message.To.Add("anhhieuk50@gmail.com");
+
+                if (attach_file != null && attach_file.Count > 0)
+                    if (model != null && model.AttachFile != null && model.AttachFile.Count > 0)
+                    {
+                        foreach (var item in model.AttachFile)
+                        {
+                            var file_name = item.Path.Remove(0, item.Path.LastIndexOf('/') + 1);
+                            string fileName = file_name.Substring(0, file_name.Length <= 100 ? file_name.Length : 100);
+                            var Base64urlpath = StringHelpers.ConvertImageURLToBase64(item.Path);
+                            Byte[] bytes = Convert.FromBase64String(Cleaning(Base64urlpath)); // clean Base64 then convert it
+                            MemoryStream ms = new MemoryStream(bytes); // create MemoryStrem
+                            Attachment data = new Attachment(ms, fileName);
+
+                            message.Attachments.Add(data);
+
+                        }
+                    }
+                //Bcc
+                var list_id = model.RequestId.Split(',');
+                var booking = string.Empty;
+                foreach (var item in list_id)
+                {
+                    var detail = _paymentRequestRepository.GetById(Convert.ToInt32(item));
+                    if (detail.RelateData != null)
+                    {
+                        foreach (var item2 in detail.RelateData)
+                        {
+                            var user = await _userRepository.GetDetailUser((int)item2.CreatedBy);
+                            message.CC.Add(user.Entity.Email);
+                        }
+                    }
+
+                }
+                //if (model.CC_Email != null && model.CC_Email.Trim() != "")
+                //{
+                //    var cc_split = model.CC_Email.Split(",");
+                //    foreach (var cc in cc_split)
+                //    {
+                //        message.CC.Add(cc);
+                //    }
+                //}
+               
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SendEmailpaymentVoucher - MailService: " + ex + "paymentVoucherId:" + paymentVoucherId);
+                ressult = false;
+            }
+            return ressult;
+        }
+        public static string Cleaning(string img)
+        {
+            var Base64 = img.Split(',')[1];
+            StringBuilder sb = new StringBuilder(Base64, Base64.Length);
+            sb.Replace("\r\n", string.Empty);
+            sb.Replace(" ", string.Empty);
+            return sb.ToString();
+        }
     }
 }

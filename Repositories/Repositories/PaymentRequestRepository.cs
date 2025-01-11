@@ -296,6 +296,7 @@ namespace Repositories.Repositories
                           ProcedureConstants.Sp_GetDetailServiceById).ToList<PaymentRequestViewModel>().FirstOrDefault();
                         model.ServiceAmount = serviceInfo != null ? serviceInfo.Amount : 0;
                         model.ServicePrice = serviceInfo != null ? serviceInfo.Price : 0;
+                        model.CreatedBy = item.CreatedBy;
                         requestInfo.RelateData.Add(model);
                     }
                 }
@@ -318,6 +319,7 @@ namespace Repositories.Repositories
                             servicePrice = GetAmontRequestForSupplier(item.ServiceId, item.ServiceType, requestInfo.SupplierId.Value, serviceInfo.Price);
                         }
                         model.ServicePrice = servicePrice;
+                        model.CreatedBy = requestInfo.CreatedBy;
                         requestInfo.RelateData.Add(model);
                     }
                 }

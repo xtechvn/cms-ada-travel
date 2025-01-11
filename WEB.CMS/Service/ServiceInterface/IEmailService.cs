@@ -1,4 +1,5 @@
-﻿using Entities.ViewModels.Attachment;
+﻿using Entities.Models;
+using Entities.ViewModels.Attachment;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.VinWonder;
 using Microsoft.Extensions.Configuration;
@@ -24,5 +25,7 @@ namespace WEB.Adavigo.CMS.Service.ServiceInterface
         Task<string> UploadImageBase64(string base64, string extension, string file_path);
         Task<string> GetTemplateVinWordbookingTC(long orderid);
         Task<bool> SendEmailVinwonderTicket(long orderid, long booking_id, string subject, List<string> to_email, List<string> cc_email, List<string> bcc_email);
+        Task<string> GetTemplatePaymentVoucher(int paymentVoucherId);
+        Task<bool> SendEmailpaymentVoucher(int paymentVoucherId, List<AttachFile> attach_file);
     }
 }

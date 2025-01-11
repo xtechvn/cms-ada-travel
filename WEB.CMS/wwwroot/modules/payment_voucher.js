@@ -330,4 +330,31 @@ var _payment_voucher_service = {
     FileAttachment: function (data_id, type, readonly = false, allowPreview = true) {
         _global_function.RenderFileAttachment($('.attachment_file'), data_id, type, readonly, allowPreview)
     },
+    EmalPaymentVoucher: function () {
+        let title = '';
+        let url = '/PaymentVoucher/ViewEmailPayment';
+        var param = {
+            id: $('#paymentVoucherId').val()
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    SendEmail: function () {
+        $.ajax({
+            url: "/PaymentVoucher/SendEmail",
+            type: "Post",
+            data: { id: $('#paymentVoucherId').val() },
+            success: function (result) {
+                if (result.status === 0) {
+                    _global_function.RemoveLoading()
+                    _msgalert.success(result.msg);
+                    $.magnificPopup.close();
+                }
+                else {
+                    _global_function.RemoveLoading()
+                    _msgalert.error(result.msg);
+                  
+                }
+            }
+        });
+    },
 }

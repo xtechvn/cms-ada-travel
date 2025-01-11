@@ -37,6 +37,9 @@
     <None Update="EmailTemplate\OtherSupplierTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="EmailTemplate\PaymentRequestTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="EmailTemplate\SupplierTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
