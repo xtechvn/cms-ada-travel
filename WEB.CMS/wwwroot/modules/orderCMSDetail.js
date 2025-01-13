@@ -215,24 +215,47 @@ var _orderDetail = {
         _magnific.OpenSmallPopup(title, url, param);
     },
     CommitSendEmailCode: function (Id, OrderId) {
-      
-        $.ajax({
-            url: "/Order/CommitSendEmailCode",
-            type: "Post",
-            data: { Id: Id, OrderId: OrderId },
-            success: function (result) {
-             
-                if (result.status === 0) {
-                    _msgalert.success(result.msg);
-                    $.magnificPopup.close();
-                }
-                else {
-                    _global_function.RemoveLoading()
-                    _msgalert.error(result.msg);
+     
+        let FromCreateCode = $('#form-send-email-code');
+        FromCreateCode.validate({
+            rules: {
 
-                }
+                "Subject": "required",
+                "To_Email": "required",
+                "Email": "required",
+            },
+            messages: {
+                "Subject": "Tiêu đề không được bỏ trống",
+                "To_Email": "Nhân viên nhận không được bỏ trống",
+                "Email": "Email khách hàng không được bỏ trống",
             }
         });
+        if (FromCreateCode.valid()) {
+            var subject_name = $('#Subject').val()
+
+            var CC_Email = $("#CC_Email").val()
+            var To_Email = $("#To_Email").val()
+            var BCC_Email = $("#BCC_Email").val()
+            var Email = $("#Email").val()
+            $.ajax({
+                url: "/Order/CommitSendEmailCode",
+                type: "Post",
+                data: { Id: Id, OrderId: OrderId, CC_Email: CC_Email, BCC_Email: BCC_Email, Email: Email, To_Email: To_Email, subject_name: subject_name },
+                success: function (result) {
+
+                    if (result.status === 0) {
+                        _msgalert.success(result.msg);
+                        $.magnificPopup.close();
+                    }
+                    else {
+                        _global_function.RemoveLoading()
+                        _msgalert.error(result.msg);
+
+                    }
+                }
+            });
+        }
+        
     },
     PopupSendEmail: function () {
         let title = 'Gửi email đơn hàng';

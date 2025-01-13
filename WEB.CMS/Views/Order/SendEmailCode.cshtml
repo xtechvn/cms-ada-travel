@@ -1,17 +1,60 @@
-﻿<div>
-    <label class="lbl">Nội dung Email</label>
-    <div class="wrap_input">
-        @Html.Raw(ViewBag.EmailBody)
+﻿<form id="form-send-email-code" onsubmit="return false">
+
+    <div>
+        <label class="lbl">Tiêu đề <sup class="red">*</sup></label>
+        <div class="wrap_input">
+            <input type="text" class="form-control" id="Subject" name="Subject" value="Adavigo gửi code đơn hàng  @ViewBag.OrderNo" placeholder="Tên tiêu đề">
+        </div>
     </div>
-</div>
-<div class="attachment-email border pd10">
-  
-</div>
-<div class="text-right">
-    <button type="submit" class="btn btn-default cancel" onclick="$.magnificPopup.close();">Đóng</button>
+    <div>
+        <label class="lbl">Nhân viên nhận <sup class="red">*</sup></label>
+        <div class="wrap_input">
+            <select class="select2 js-example-basic-multiple" id="To_Email" name="To_Email" multiple="multiple" style="width:100% !important">
+                @if (User != null)
+                {
+                    <option selected="selected" value="@ViewBag.userEmail">@ViewBag.fullName - @ViewBag.userEmail </option>
+                }
+            </select>
+            <label id="To_Email-error" class="error" for="To_Email" style="display: none;"></label>
+        </div>
+        <label class="lbl">CC</label>
+        <div class="wrap_input">
+            <select class="select2 " id="CC_Email" multiple="multiple" style="width:100% !important">
+            </select>
+            <label id="CC_Email-error" class="error" for="CC_Email" style="display: none;"></label>
+        </div>
+        <label class="lbl">BCC</label>
+        <div class="wrap_input">
+            <select class="select2" id="BCC_Email" multiple="multiple" style="width:100% !important">
+            </select>
+            <label id="BCC_Email-error" class="error" for="BCC_Email" style="display: none;"></label>
+        </div>
+    </div>
+    <div>
+        <label class="lbl">khách hàng </label>
+        <div class="wrap_input">
+            <input type="text" id="Email" name="Email" value="@ViewBag.ClientEmail" />
+        </div>
+        
+    </div>
 
-    <button type="submit" id="SendEmailDv" class="btn btn-default" onclick="_orderDetail.CommitSendEmailCode(@ViewBag.id,@ViewBag.OrderId)">Gửi</button>
+    <div>
+        <label class="lbl">Nội dung Email</label>
+        <div class="wrap_input">
+            @Html.Raw(ViewBag.EmailBody)
+        </div>
+    </div>
 
+    <div class="text-right">
+        <button type="submit" class="btn btn-default cancel" onclick="$.magnificPopup.close();">Đóng</button>
 
+        <button type="submit" id="SendEmailDv" class="btn btn-default" onclick="_orderDetail.CommitSendEmailCode(@ViewBag.id,@ViewBag.OrderId)">Gửi</button>
+    </div>
+</form>
+<script>
 
-</div>
+    _OrderDetail_Sendemail.Select2WithUserSuggesstionEmail1($("#To_Email"))
+    _OrderDetail_Sendemail.Select2WithUserSuggesstionEmail($("#CC_Email"))
+    _OrderDetail_Sendemail.Select2WithUserSuggesstionEmail($("#BCC_Email"))
+
+</script>

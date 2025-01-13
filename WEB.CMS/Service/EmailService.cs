@@ -4125,7 +4125,7 @@ namespace WEB.Adavigo.CMS.Service
                 }
 
                 var tile = "Adavigo thanh toán booking " + model.SupplierName + " ngày thanh toán (" + ((DateTime)model.CreatedDate).ToString("dd/MM/yyyy") + ")";
-                var nd =  booking.TrimEnd(',');
+                var nd = booking.TrimEnd(',');
                 body = body.Replace("{{tile}}", tile);
                 body = body.Replace("{{nd}}", nd);
                 body = body.Replace("{{amount}}", model.Amount.ToString("N0"));
@@ -4138,7 +4138,7 @@ namespace WEB.Adavigo.CMS.Service
                 return null;
             }
         }
-        public async Task<bool> SendEmailpaymentVoucher(int paymentVoucherId, List<AttachFile> attach_file)
+        public async Task<bool> SendEmailpaymentVoucher(int paymentVoucherId, List<AttachFile> attach_file, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name)
         {
             bool ressult = true;
             try
@@ -4175,9 +4175,27 @@ namespace WEB.Adavigo.CMS.Service
                 smtp.Credentials = new NetworkCredential(sendEmailsFrom, sendEmailsFromPassword);
                 smtp.Timeout = 50000;
 
-                var Supplier = _supplierRepository.GetById((int)model.SupplierId);
-                message.To.Add(Supplier.Email);
+
+                message.To.Add(Email);
                 //message.To.Add("anhhieuk50@gmail.com");
+                if (CC_Email != null && CC_Email.Count > 0)
+                {
+                    foreach (var item in CC_Email)
+                    {
+                        if (item != null)
+                            message.CC.Add(item);
+                    }
+
+                }
+                if (BCC_Email != null && BCC_Email.Count > 0)
+                {
+                    foreach (var item in BCC_Email)
+                    {
+                        if (item != null)
+                            message.Bcc.Add(item);
+                    }
+
+                }
 
                 if (attach_file != null && attach_file.Count > 0)
                     if (model != null && model.AttachFile != null && model.AttachFile.Count > 0)
@@ -4196,21 +4214,21 @@ namespace WEB.Adavigo.CMS.Service
                         }
                     }
                 //Bcc
-                var list_id = model.RequestId.Split(',');
-                var booking = string.Empty;
-                foreach (var item in list_id)
-                {
-                    var detail = _paymentRequestRepository.GetById(Convert.ToInt32(item));
-                    if (detail.RelateData != null)
-                    {
-                        foreach (var item2 in detail.RelateData)
-                        {
-                            var user = await _userRepository.GetDetailUser((int)item2.CreatedBy);
-                            message.CC.Add(user.Entity.Email);
-                        }
-                    }
+                //var list_id = model.RequestId.Split(',');
+                //var booking = string.Empty;
+                //foreach (var item in list_id)
+                //{
+                //    var detail = _paymentRequestRepository.GetById(Convert.ToInt32(item));
+                //    if (detail.RelateData != null)
+                //    {
+                //        foreach (var item2 in detail.RelateData)
+                //        {
+                //            var user = await _userRepository.GetDetailUser((int)item2.CreatedBy);
+                //            message.CC.Add(user.Entity.Email);
+                //        }
+                //    }
 
-                }
+                //}
                 smtp.Send(message);
             }
             catch (Exception ex)
@@ -4222,11 +4240,21 @@ namespace WEB.Adavigo.CMS.Service
         }
         public static string Cleaning(string img)
         {
-            var Base64 = img.Split(',')[1];
-            StringBuilder sb = new StringBuilder(Base64, Base64.Length);
-            sb.Replace("", string.Empty);
-            sb.Replace(" ", string.Empty);
-            return sb.ToString();
+            try
+            {
+                var Base64 = img.Split(',')[1];
+                StringBuilder sb = new StringBuilder(Base64, Base64.Length);
+                
+                sb.Replace(" ", string.Empty);
+                return sb.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Cleaning - MailService: " + ex);
+            }
+            return null;
+
         }
         public async Task<string> GetTemplateHotelBookingCode(long Id, long OrderId)
         {
@@ -4310,13 +4338,13 @@ namespace WEB.Adavigo.CMS.Service
                                     "" + p.RatePlanCode + "" +
                                     "</div>";
                                 date_html += "<div class='d-flex align-center form-control'>" +
-                                    ""+(p.StartDate == null ? "":((DateTime)p.StartDate).ToString("dd/MM/yyyy")+" - " )+ (p.EndDate==null? "": ((DateTime)p.EndDate).ToString("dd/MM/yyyy"))+ "" +
+                                    "" + (p.StartDate == null ? "" : ((DateTime)p.StartDate).ToString("dd/MM/yyyy") + " - ") + (p.EndDate == null ? "" : ((DateTime)p.EndDate).ToString("dd/MM/yyyy")) + "" +
                                     "</div>";
                                 price_html += "<div class='d-flex align-center form-control'>" +
-                                    ""+( p.SalePrice == null ? "0" : ((double)p.SalePrice).ToString("N0")) + "" +
+                                    "" + (p.SalePrice == null ? "0" : ((double)p.SalePrice).ToString("N0")) + "" +
                                     "</div>";
                                 Nights_html += "<div class='d-flex align-center form-control'>  " +
-                                   "" + (p.Nights == null ? "0" : ((double)p.Nights).ToString("N0") )+ "" +
+                                   "" + (p.Nights == null ? "0" : ((double)p.Nights).ToString("N0")) + "" +
                                    "</div>";
                                 TotalAmount_html += "<div class='d-flex align-center form-control'>" +
                                    "" + p.TotalAmount.ToString("N0") + "" +
@@ -4343,10 +4371,10 @@ namespace WEB.Adavigo.CMS.Service
                         extra_package_html += "<tr>" +
                             "<td style=\"border: 1px solid #999; padding: 5px;\">" + item.PackageCode + "</td>" +
                             "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + item.PackageId + "</td>" +
-                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + (item.StartDate == null ? "" : ((DateTime)item.StartDate).ToString("dd/MM/yyyy") + " -"+item.EndDate == null ? "" : ((DateTime)item.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + (item.StartDate == null ? "" : ((DateTime)item.StartDate).ToString("dd/MM/yyyy") + " -" + item.EndDate == null ? "" : ((DateTime)item.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
                             "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + (item.SalePrice != null ? ((double)item.SalePrice).ToString("N0") : ((double)item.Amount - (double)item.Profit).ToString("N0")) + "</td>" +
-                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + ( item.Nights != null ? ((double)item.Nights).ToString("N0") : "1") + "</td>" +
-                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + ( item.Quantity != null ? ((double)item.Quantity).ToString("N0") : "1" )+ "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + (item.Nights != null ? ((double)item.Nights).ToString("N0") : "1") + "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + (item.Quantity != null ? ((double)item.Quantity).ToString("N0") : "1") + "</td>" +
                             "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + ((double)item.Amount).ToString("N0") + "</td>" +
                             "</tr>";
                     }
@@ -4372,7 +4400,7 @@ namespace WEB.Adavigo.CMS.Service
                 return null;
             }
         }
-        public async Task<bool> SendEmailBookingCode(long Id, long OrderId)
+        public async Task<bool> SendEmailBookingCode(long Id, long OrderId, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name)
         {
             bool ressult = true;
             try
@@ -4381,7 +4409,7 @@ namespace WEB.Adavigo.CMS.Service
 
                 MailMessage message = new MailMessage();
                 var order = await _orderRepository.GetOrderByID(OrderId);
-                message.Subject = "Adavigo gửi code đơn hàng " + order.OrderNo  ;
+                message.Subject = subject_name;
                 //config send email
                 string from_mail = new ConfigurationBuilder().AddJsonFile("appsettings.json")
                     .Build().GetSection("MAIL_CONFIG")["FROM_MAIL"];
@@ -4398,7 +4426,7 @@ namespace WEB.Adavigo.CMS.Service
                 message.IsBodyHtml = true;
                 message.From = new MailAddress(from_mail, new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["STMP_USERNAME_Email"]);
 
-                message.Body = await GetTemplateHotelBookingCode(Id,OrderId);
+                message.Body = await GetTemplateHotelBookingCode(Id, OrderId);
                 //attachment 
 
                 string sendEmailsFrom = account;
@@ -4410,34 +4438,44 @@ namespace WEB.Adavigo.CMS.Service
                 smtp.Timeout = 50000;
                 var dataBookingCode = await _hotelBookingCodeRepository.GetListHotelBookingCodeByOrderId(OrderId);
                 var BookingCode = dataBookingCode.FirstOrDefault(s => s.Id == Id);
-                var attach_file =await _AttachFileRepository.GetListByType(Id, (int)AttachmentType.ServiceCode_HotelRent);
-                if (order.ClientId != null)
+                var attach_file = await _AttachFileRepository.GetListByType(Id, (int)AttachmentType.ServiceCode_HotelRent);
+
+                message.To.Add(Email);
+                message.CC.Add(To_Email);
+                if (CC_Email != null && CC_Email.Count > 0)
                 {
-                    var client = await _clientRepository.GetClientDetailByClientId((int)order.ClientId);
-                    message.To.Add(client.Email);
+                    foreach (var item in CC_Email)
+                    {
+                        message.CC.Add(item);
+                    }
+
+                }
+                if (BCC_Email != null && BCC_Email.Count > 0)
+                {
+                    foreach (var item in BCC_Email)
+                    {
+                        message.Bcc.Add(item);
+                    }
+
                 }
 
                 if (attach_file != null && attach_file.Count > 0)
-                    {
-                        foreach (var item in attach_file)
-                        {
-                            var file_name = item.Path.Remove(0, item.Path.LastIndexOf('/') + 1);
-                            string fileName = file_name.Substring(0, file_name.Length <= 100 ? file_name.Length : 100);
-                            var Base64urlpath = StringHelpers.ConvertImageURLToBase64(item.Path);
-                            Byte[] bytes = Convert.FromBase64String(Cleaning(Base64urlpath)); // clean Base64 then convert it
-                            MemoryStream ms = new MemoryStream(bytes); // create MemoryStrem
-                            Attachment data = new Attachment(ms, fileName);
-
-                            message.Attachments.Add(data);
-
-                        }
-                    }
-                //Bcc
-                if (order.SalerId != null)
                 {
-                    var user = await _userRepository.GetDetailUser((int)order.SalerId);
-                    message.CC.Add(user.Entity.Email);
+                    foreach (var item in attach_file)
+                    {
+                        var file_name = item.Path.Remove(0, item.Path.LastIndexOf('/') + 1);
+                        string fileName = file_name.Substring(0, file_name.Length <= 100 ? file_name.Length : 100);
+                        var Base64urlpath = StringHelpers.ConvertImageURLToBase64(item.Path);
+                        Byte[] bytes = Convert.FromBase64String(Cleaning(Base64urlpath)); // clean Base64 then convert it
+                        MemoryStream ms = new MemoryStream(bytes); // create MemoryStrem
+                        Attachment data = new Attachment(ms, fileName);
+
+                        message.Attachments.Add(data);
+
+                    }
                 }
+
+
                 smtp.Send(message);
             }
             catch (Exception ex)

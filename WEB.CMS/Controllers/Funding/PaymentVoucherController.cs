@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Repositories.IRepositories;
+using Repositories.Repositories;
 using System.Security.Claims;
+using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service.ServiceInterface;
@@ -25,9 +27,11 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         private readonly string _UrlStaticImage;
         private readonly WEB.CMS.Models.AppSettings config;
         private readonly IEmailService _emailService;
+        private readonly IUserRepository _userRepository;
+        private readonly ISupplierRepository _supplierRepository;
 
         public PaymentVoucherController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment,
-           IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository, IEmailService emailService)
+           IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository, IEmailService emailService, IUserRepository userRepository, ISupplierRepository supplierRepository)
         {
             _WebHostEnvironment = hostEnvironment;
             _allCodeRepository = allCodeRepository;
@@ -35,6 +39,8 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             _paymentVoucherRepository = paymentVoucherRepository;
             config = ReadFile.LoadConfig();
             _emailService = emailService;
+            _userRepository = userRepository;
+            _supplierRepository = supplierRepository;
         }
 
         public IActionResult Index()
@@ -480,11 +486,29 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         {
             ViewBag.id = id;
             var model = _paymentVoucherRepository.GetDetail(id);
-            
+            var list_id = model.RequestId.Split(',');
+            var booking = string.Empty;
+            var List_user = new List<Entities.Models.User>();
+            foreach (var item in list_id)
+            {
+                var detail = _paymentRequestRepository.GetById(Convert.ToInt32(item));
+                if (detail.RelateData != null)
+                {
+                    foreach (var item2 in detail.RelateData)
+                    {
+                        var user = await _userRepository.GetDetailUser((int)item2.CreatedBy);
+                        List_user.Add(user.Entity);
+                    }
+                }
+
+            }
+            ViewBag.List_user = List_user;
+            var Supplier = _supplierRepository.GetById((int)model.SupplierId);
+            ViewBag.email = Supplier.Email;
             ViewBag.EmailBody = await _emailService.GetTemplatePaymentVoucher(id); ;
             return PartialView();
         }
-        public async Task<IActionResult> SendEmail(int id)
+        public async Task<IActionResult> SendEmail(int id, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name)
         {
             var status = (int)ResponseType.ERROR;
             var msg = "Không thành công";
@@ -493,7 +517,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 var model = _paymentVoucherRepository.GetDetail(id);
                 if (model != null)
                 {
-                    bool resulstSendMail = await _emailService.SendEmailpaymentVoucher(id, model.AttachFile);
+                    bool resulstSendMail = await _emailService.SendEmailpaymentVoucher(id, model.AttachFile, CC_Email, BCC_Email, Email, To_Email, subject_name);
                     if (resulstSendMail)
                     {
                         status = (int)ResponseType.SUCCESS;

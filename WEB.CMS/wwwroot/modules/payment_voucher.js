@@ -339,22 +339,115 @@ var _payment_voucher_service = {
         _magnific.OpenSmallPopup(title, url, param);
     },
     SendEmail: function () {
-        $.ajax({
-            url: "/PaymentVoucher/SendEmail",
-            type: "Post",
-            data: { id: $('#paymentVoucherId').val() },
-            success: function (result) {
-                if (result.status === 0) {
-                    _global_function.RemoveLoading()
-                    _msgalert.success(result.msg);
-                    $.magnificPopup.close();
+
+        let FromCreatePaymentVoucher = $('#form-send-email-payment-voucher');
+        FromCreatePaymentVoucher.validate({
+            rules: {
+
+                "Subject": "required",
+                "To_Email": "required",
+                "Email": "required",
+            },
+            messages: {
+                "Subject": "Tiêu đề không được bỏ trống",
+                "To_Email": "Nhân viên nhận không được bỏ trống",
+                "Email": "Email khách hàng không được bỏ trống",
+            }
+        });
+        if (FromCreatePaymentVoucher.valid()) {
+            var subject_name = $('#Subject').val()
+
+            var CC_Email = $("#CC_Email").val()
+            var To_Email = $("#To_Email").val()
+            var BCC_Email = $("#BCC_Email").val()
+            var Email = $("#Email").val()
+            $.ajax({
+                url: "/PaymentVoucher/SendEmail",
+                type: "Post",
+                data: { id: $('#paymentVoucherId').val(), CC_Email: CC_Email, BCC_Email: BCC_Email, Email: Email, To_Email: To_Email, subject_name: subject_name},
+                success: function (result) {
+                    if (result.status === 0) {
+                        _global_function.RemoveLoading()
+                        _msgalert.success(result.msg);
+                        $.magnificPopup.close();
+                    }
+                    else {
+                        _global_function.RemoveLoading()
+                        _msgalert.error(result.msg);
+
+                    }
                 }
-                else {
-                    _global_function.RemoveLoading()
-                    _msgalert.error(result.msg);
-                  
-                }
+            });
+        }
+       
+    },
+    Select2WithUserSuggesstionEmail: function (element) {
+        element.select2({
+            theme: 'bootstrap4',
+            placeholder: "Chọn Email",
+            tags: true,
+            ajax: {
+                url: "/Order/UserSuggestion",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        txt_search: params.term,
+                    }
+                    return query;
+                },
+                processResults: function (response) {
+                    return {
+                        results: $.map(response.data, function (item) {
+                            return {
+                                text: item.fullname + ' - ' + item.email,
+                                id: item.email,
+                            }
+                        })
+                    };
+                },
+                createTag: function (params) {
+                    let term = $.trim(params.term);
+                    return {
+                        id: term,
+                        text: term,
+                        newTag: true,
+                    }
+                },
+                cache: true
             }
         });
     },
+    Select2WithUserSuggesstionEmail1: function (element) {
+        element.select2({
+            theme: 'bootstrap4',
+            placeholder: "Chọn Email",
+
+            ajax: {
+                url: "/Order/UserSuggestion",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        txt_search: params.term,
+                    }
+                    return query;
+                },
+                processResults: function (response) {
+                    return {
+                        results: $.map(response.data, function (item) {
+                            return {
+                                text: item.fullname + ' - ' + item.email,
+                                id: item.email,
+                            }
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+    },
+
 }
