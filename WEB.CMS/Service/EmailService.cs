@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PuppeteerSharp;
 using Repositories.IRepositories;
+using Repositories.Repositories;
 using SharpCompress.Common;
 using System.Buffers.Text;
 using System.Net;
@@ -1636,7 +1637,7 @@ namespace WEB.Adavigo.CMS.Service
                     string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
                     var tourdetail = await _tourRepository.ListTourPackagesByTourId(id);
-                    var template = workingDirectory + @"\EmailTemplate\TourServiceCodeTemplate.html";
+                    var template = workingDirectory + @"\EmailTemplateourServiceCodeTemplate.html";
                     string body = File.ReadAllText(template);
                     if (order.ContactClientId != null && order.ContactClientId != 0)
                     {
@@ -1760,7 +1761,7 @@ namespace WEB.Adavigo.CMS.Service
                     string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
                     var tourdetail = await _tourRepository.ListTourPackagesByTourId(id);
-                    var template = workingDirectory + @"\EmailTemplate\TourServiceCodeTemplate.html";
+                    var template = workingDirectory + @"\EmailTemplateourServiceCodeTemplate.html";
                     string body = File.ReadAllText(template);
 
                     string Packagesdata = string.Empty;
@@ -3345,7 +3346,7 @@ namespace WEB.Adavigo.CMS.Service
                     string thang = "Tháng " + model.CreatedDate.Value.Month.ToString();
                     string nam = "Năm " + model.CreatedDate.Value.Year.ToString();
                     string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    var template = workingDirectory + @"\EmailTemplate\TemplatePaymentRequest.html";
+                    var template = workingDirectory + @"\EmailTemplateemplatePaymentRequest.html";
                     string body = File.ReadAllText(template);
                     if (type != 1)
                     {
@@ -3427,7 +3428,7 @@ namespace WEB.Adavigo.CMS.Service
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
 
                     string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    var template = workingDirectory + @"\EmailTemplate\TemplatePaymentRequest.html";
+                    var template = workingDirectory + @"\EmailTemplateemplatePaymentRequest.html";
                     string ngay = "Ngày " + model.CreatedDate.Value.Day.ToString();
                     string thang = "Tháng " + model.CreatedDate.Value.Month.ToString();
                     string nam = "Năm " + model.CreatedDate.Value.Year.ToString();
@@ -4110,7 +4111,7 @@ namespace WEB.Adavigo.CMS.Service
                 var model = _paymentVoucherRepository.GetDetail(paymentVoucherId);
                 var list_id = model.RequestId.Split(',');
                 var booking = string.Empty;
-                foreach(var item in list_id)
+                foreach (var item in list_id)
                 {
                     var detail = _paymentRequestRepository.GetById(Convert.ToInt32(item));
                     if (detail.RelateData != null)
@@ -4120,13 +4121,15 @@ namespace WEB.Adavigo.CMS.Service
                             booking = item2.ServiceCode + " - " + item2.OrderNo + ",";
                         }
                     }
-                    
+
                 }
-               
-                var tile = "Adavigo thanh toán booking " + model.SupplierName + " ngày thanh toán (" + DateTime.Now.ToString("dd/MM/yyyy") + ")";
-                var nd = "Kính gửi quý khách sạn:"+ model.SupplierName + " Adavigo gửi thông tin Thanh toán phòng cho booking " + booking.TrimEnd(',');
+
+                var tile = "Adavigo thanh toán booking " + model.SupplierName + " ngày thanh toán (" + ((DateTime)model.CreatedDate).ToString("dd/MM/yyyy") + ")";
+                var nd =  booking.TrimEnd(',');
                 body = body.Replace("{{tile}}", tile);
                 body = body.Replace("{{nd}}", nd);
+                body = body.Replace("{{amount}}", model.Amount.ToString("N0"));
+                body = body.Replace("{{date_time}}", ((DateTime)model.CreatedDate).ToString("dd/MM/yyyy HH:mm"));
                 return body;
             }
             catch (Exception ex)
@@ -4208,15 +4211,6 @@ namespace WEB.Adavigo.CMS.Service
                     }
 
                 }
-                //if (model.CC_Email != null && model.CC_Email.Trim() != "")
-                //{
-                //    var cc_split = model.CC_Email.Split(",");
-                //    foreach (var cc in cc_split)
-                //    {
-                //        message.CC.Add(cc);
-                //    }
-                //}
-               
                 smtp.Send(message);
             }
             catch (Exception ex)
@@ -4230,9 +4224,228 @@ namespace WEB.Adavigo.CMS.Service
         {
             var Base64 = img.Split(',')[1];
             StringBuilder sb = new StringBuilder(Base64, Base64.Length);
-            sb.Replace("\r\n", string.Empty);
+            sb.Replace("", string.Empty);
             sb.Replace(" ", string.Empty);
             return sb.ToString();
+        }
+        public async Task<string> GetTemplateHotelBookingCode(long Id, long OrderId)
+        {
+            try
+            {
+                string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var template = workingDirectory + @"\EmailTemplate\CodeHotelTemplate.html";
+                string body = File.ReadAllText(template);
+
+                var order = await _orderRepository.GetOrderByID(OrderId);
+                var HotelBooking = await _hotelBookingRepositories.GetHotelBookingByOrderID(OrderId);
+                var client = await _clientRepository.GetClientDetailByClientId((long)order.ClientId);
+                var data = await _hotelBookingCodeRepository.GetListHotelBookingCodeByOrderId(OrderId);
+                var BookingCode = data.FirstOrDefault(s => s.Id == Id);
+                var HotelBookingDetail = HotelBooking.FirstOrDefault(s => s.Id == BookingCode.ServiceId);
+                var rooms_html = string.Empty;
+                var extra_package_html = string.Empty;
+                var rooms = await _hotelBookingRoomRepository.GetByHotelBookingID((long)BookingCode.ServiceId);
+                var packages = await _hotelBookingRoomRatesRepository.GetByHotelBookingID((long)BookingCode.ServiceId);
+                List<HotelBookingRoomRates> package_daterange = new List<HotelBookingRoomRates>();
+                if (packages != null && packages.Count > 0)
+                {
+                    foreach (var p in packages)
+                    {
+                        if (p.StartDate == null && p.EndDate == null)
+                        {
+                            if (packages.Count < 1 || !package_daterange.Any(x => x.HotelBookingRoomId == p.HotelBookingRoomId && x.RatePlanId == p.RatePlanId))
+                            {
+                                var add_value = p;
+                                add_value.StartDate = add_value.StayDate;
+                                add_value.EndDate = add_value.StayDate.AddDays(1);
+                                p.StayDate = (DateTime)add_value.StartDate;
+                                p.SalePrice = p.TotalAmount;
+                                p.OperatorPrice = p.Price;
+                                package_daterange.Add(add_value);
+                            }
+                            else
+                            {
+                                var p_d = package_daterange.FirstOrDefault(x => x.HotelBookingRoomId == p.HotelBookingRoomId && x.RatePlanId == p.RatePlanId && ((DateTime)x.EndDate).Date == p.StayDate.Date);
+                                if (p_d != null)
+                                {
+
+                                    if (p_d.StartDate == null || p_d.StartDate > p.StayDate)
+                                        p_d.StartDate = p.StayDate;
+                                    p_d.EndDate = p.StayDate.AddDays(1);
+                                }
+                                else
+                                {
+                                    var add_value = p;
+                                    add_value.StartDate = add_value.StayDate;
+                                    add_value.EndDate = add_value.StayDate.AddDays(1);
+                                    p.StayDate = (DateTime)add_value.StartDate;
+                                    p.SalePrice = p.TotalAmount;
+                                    p.OperatorPrice = p.Price;
+                                    package_daterange.Add(add_value);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            package_daterange.Add(p);
+                        }
+                    }
+                }
+                if (rooms != null && rooms.Count > 0)
+                {
+                    foreach (var item in rooms)
+                    {
+                        var RatePlanCode_html = string.Empty;
+                        var date_html = string.Empty;
+                        var price_html = string.Empty;
+                        var Nights_html = string.Empty;
+                        var TotalAmount_html = string.Empty;
+                        var package_by_room_id = packages.Where(x => x.HotelBookingRoomId == item.Id);
+                        if (package_by_room_id != null && package_by_room_id.Count() > 0)
+                        {
+                            package_by_room_id = package_by_room_id.OrderBy(x => x.Id);
+                            foreach (var p in package_by_room_id)
+                            {
+                                RatePlanCode_html += "<div class='d-flex align-center form-control'>" +
+                                    "" + p.RatePlanCode + "" +
+                                    "</div>";
+                                date_html += "<div class='d-flex align-center form-control'>" +
+                                    ""+(p.StartDate == null ? "":((DateTime)p.StartDate).ToString("dd/MM/yyyy")+" - " )+ (p.EndDate==null? "": ((DateTime)p.EndDate).ToString("dd/MM/yyyy"))+ "" +
+                                    "</div>";
+                                price_html += "<div class='d-flex align-center form-control'>" +
+                                    ""+( p.SalePrice == null ? "0" : ((double)p.SalePrice).ToString("N0")) + "" +
+                                    "</div>";
+                                Nights_html += "<div class='d-flex align-center form-control'>  " +
+                                   "" + (p.Nights == null ? "0" : ((double)p.Nights).ToString("N0") )+ "" +
+                                   "</div>";
+                                TotalAmount_html += "<div class='d-flex align-center form-control'>" +
+                                   "" + p.TotalAmount.ToString("N0") + "" +
+                                   "</div>";
+                            }
+                        }
+
+                        rooms_html += "<tr>" +
+                            "<td style='border: 1px solid #999; padding: 5px;'>" + item.RoomTypeName + "</td>" +
+                            "<td style='border: 1px solid #999; padding: 5px;text-align:center;'>" + RatePlanCode_html + "</td>" +
+                            "<td style='border: 1px solid #999; padding: 5px;text-align:center;'>" + date_html + "</td>" +
+                            "<td style='border: 1px solid #999; padding: 5px;text-align:center;'>" + price_html + "</td>" +
+                            "<td style='border: 1px solid #999; padding: 5px;text-align:center;'>" + Nights_html + "</td>" +
+                            "<td style='border: 1px solid #999; padding: 5px;text-align:center;'>" + (item.NumberOfRooms == null ? "1" : ((double)item.NumberOfRooms).ToString("N0")) + "</td>" +
+                            "<td style='border: 1px solid #999; padding: 5px;text-align:center;'>" + TotalAmount_html + "</td>" +
+                            "</tr>";
+                    }
+                }
+                var extra_package = await _hotelBookingRoomExtraPackageRepository.GetByBookingID((long)BookingCode.ServiceId);
+                if (extra_package != null && extra_package.Count > 0)
+                {
+                    foreach (var item in extra_package)
+                    {
+                        extra_package_html += "<tr>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;\">" + item.PackageCode + "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + item.PackageId + "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + (item.StartDate == null ? "" : ((DateTime)item.StartDate).ToString("dd/MM/yyyy") + " -"+item.EndDate == null ? "" : ((DateTime)item.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + (item.SalePrice != null ? ((double)item.SalePrice).ToString("N0") : ((double)item.Amount - (double)item.Profit).ToString("N0")) + "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + ( item.Nights != null ? ((double)item.Nights).ToString("N0") : "1") + "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + ( item.Quantity != null ? ((double)item.Quantity).ToString("N0") : "1" )+ "</td>" +
+                            "<td style=\"border: 1px solid #999; padding: 5px;text-align:center;\">" + ((double)item.Amount).ToString("N0") + "</td>" +
+                            "</tr>";
+                    }
+                }
+                else
+                {
+                    body = body.Replace("{{style_extra_package}}", "display:none;");
+                }
+                body = body.Replace("{{tile}}", HotelBookingDetail.HotelName);
+                body = body.Replace("{{orderNo}}", order.OrderNo);
+                body = body.Replace("{{bookingCode}}", BookingCode.BookingCode);
+                body = body.Replace("{{clientName}}", client.ClientName);
+                body = body.Replace("{{ArrivalDate}}", HotelBookingDetail.ArrivalDate.ToString("dd/MM/yyyy"));
+                body = body.Replace("{{DepartureDate}}", HotelBookingDetail.DepartureDate.ToString("dd/MM/yyyy"));
+                body = body.Replace("{{totalAmount}}", HotelBookingDetail.TotalAmount.ToString("N0"));
+                body = body.Replace("{{rooms}}", rooms_html);
+                body = body.Replace("{{extra_package}}", extra_package_html);
+                return body;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetTemplatePaymentRequest - MailService: " + ex.ToString());
+                return null;
+            }
+        }
+        public async Task<bool> SendEmailBookingCode(long Id, long OrderId)
+        {
+            bool ressult = true;
+            try
+            {
+                //AccountClient orderInfo = JsonConvert.DeserializeObject<AccountClient>(objectStr);
+
+                MailMessage message = new MailMessage();
+                var order = await _orderRepository.GetOrderByID(OrderId);
+                message.Subject = "Adavigo gửi code đơn hàng " + order.OrderNo  ;
+                //config send email
+                string from_mail = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["FROM_MAIL"];
+                string account = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["USERNAME"];
+                string password = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["PASSWORD"];
+                string host = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["HOST"];
+                string port = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["PORT"];
+                //string Email_KIEMSOAT = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["Email_KIEMSOAT"];
+                //string Email_KETOAN = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["Email_KETOAN"];
+                message.IsBodyHtml = true;
+                message.From = new MailAddress(from_mail, new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["STMP_USERNAME_Email"]);
+
+                message.Body = await GetTemplateHotelBookingCode(Id,OrderId);
+                //attachment 
+
+                string sendEmailsFrom = account;
+                string sendEmailsFromPassword = password;
+                SmtpClient smtp = new SmtpClient(host, Convert.ToInt32(port));
+                smtp.EnableSsl = true;
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.Credentials = new NetworkCredential(sendEmailsFrom, sendEmailsFromPassword);
+                smtp.Timeout = 50000;
+                var dataBookingCode = await _hotelBookingCodeRepository.GetListHotelBookingCodeByOrderId(OrderId);
+                var BookingCode = dataBookingCode.FirstOrDefault(s => s.Id == Id);
+                var attach_file =await _AttachFileRepository.GetListByType(Id, (int)AttachmentType.ServiceCode_HotelRent);
+                if (order.ClientId != null)
+                {
+                    var client = await _clientRepository.GetClientDetailByClientId((int)order.ClientId);
+                    message.To.Add(client.Email);
+                }
+
+                if (attach_file != null && attach_file.Count > 0)
+                    {
+                        foreach (var item in attach_file)
+                        {
+                            var file_name = item.Path.Remove(0, item.Path.LastIndexOf('/') + 1);
+                            string fileName = file_name.Substring(0, file_name.Length <= 100 ? file_name.Length : 100);
+                            var Base64urlpath = StringHelpers.ConvertImageURLToBase64(item.Path);
+                            Byte[] bytes = Convert.FromBase64String(Cleaning(Base64urlpath)); // clean Base64 then convert it
+                            MemoryStream ms = new MemoryStream(bytes); // create MemoryStrem
+                            Attachment data = new Attachment(ms, fileName);
+
+                            message.Attachments.Add(data);
+
+                        }
+                    }
+                //Bcc
+                if (order.SalerId != null)
+                {
+                    var user = await _userRepository.GetDetailUser((int)order.SalerId);
+                    message.CC.Add(user.Entity.Email);
+                }
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SendEmailpaymentVoucher - MailService: " + ex + "orderid:" + OrderId);
+                ressult = false;
+            }
+            return ressult;
         }
     }
 }

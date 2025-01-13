@@ -46,10 +46,10 @@
                                        class="mce-item-table" data-mce-selected="1">
                                     <tbody>
                                         <tr style="font-weight: 600;" data-mce-style="font-weight: 600;">
-                                            <td style="border: 1px solid #999; padding: 5px;">
+                                            <td colspan="2" style="border: 1px solid #999; padding: 5px;">
                                                 <img width="120" src="https://static-image.adavigo.com/uploads/images/logo.png">
                                             </td>
-                                            <td colspan="3" style="border: 1px solid #999; padding: 5px;font-weight: 400;">
+                                            <td colspan="5" style="border: 1px solid #999; padding: 5px;font-weight: 400;">
                                                 <div style="font-size: 15px;margin-bottom: 15px;font-weight: bold;">CÔNG TY CỔ PHẦN THƯƠNG MẠI VÀ DỊCH VỤ QUỐC TẾ ĐẠI VIỆT</div>
                                                 <div>VPGD Hà Nội : 289A, Khuất Duy Tiến, Thanh Xuân, Hà Nội</div>
                                                 <div>VPGD Hồ Chí Minh : Số 138 Lê Văn Sỹ, P. 10, Q. Phú Nhuận, Tp. Hồ Chí Minh</div>
@@ -61,20 +61,55 @@
                                         </tr>
                                         <tr>
 
-                                            <td colspan="5" style="text-align:center;border: 1px solid #999; padding: 5px;font-weight: bold;">{{tile}}</td>
+                                            <td colspan="7" style="text-align:center;border: 1px solid #999; padding: 5px;font-weight: bold;">{{tile}}</td>
                                         </tr>
 									
                                         <tr>
-                                            <td style="border: 1px solid #999; padding: 5px; font-weight: bold;">Mã booking:</td>
-                                            <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{nd}}</td>
+                                
+                                            <td colspan="2" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Mã đơn hàng:</td>
+                                            <td colspan="5" style="border: 1px solid #999; padding: 5px;">{{orderNo}}</td>
                                         </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #999; padding: 5px; font-weight: bold;">Số tiền thanh toán:</td>
-                                            <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{amount}}</td>
+										<tr>
+                                
+                                            <td colspan="2" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Mã code:</td>
+                                            <td colspan="5" style="border: 1px solid #999; padding: 5px;">{{bookingCode}}</td>
                                         </tr>
-                                        <tr>
-                                            <td style="border: 1px solid #999; padding: 5px; font-weight: bold;">Ngày thanh toán:</td>
-                                            <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{date_time}}</td>
+										<tr>
+                                
+                                            <td colspan="2" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Đại diện:</td>
+                                            <td colspan="5" style="border: 1px solid #999; padding: 5px;">{{clientName}}</td>
+                                        </tr>
+										<tr>
+                                            <td colspan="3" style="border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;">Ngày nhận: {{ArrivalDate}}</td>
+											
+                                            <td colspan="4" style="border: 1px solid #999; padding: 5px;font-weight: bold;text-align: center;">Ngày trả: {{DepartureDate}}</td>
+                                        </tr>
+										<tr>
+                                            <td style="border: 1px solid #999; padding: 5px; font-weight: bold;">Hạng phòng</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Gói</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Thời gian sử dụng</td>
+											<td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Giá</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số đêm</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số lượng phòng</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Thành tiền</td>
+                                        </tr>
+									
+										{{rooms}}
+										<tr style="{{style_extra_package}}">
+                                            <td style="border: 1px solid #999; padding: 5px; font-weight: bold;">Dịch vụ</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Gói</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Thời gian sử dụng</td>
+											<td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Giá</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số ngày</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số lượng</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Thành tiền</td>
+                                        </tr>
+									
+										{{extra_package}}
+										<tr>
+                                
+                                            <td colspan="5" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Tổng phí dịch vụ</td>
+                                            <td colspan="2" style="border: 1px solid #999; padding: 5px; text-align: center;">{{totalAmount}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -82,14 +117,8 @@
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <div style="margin-bottom: 10px;">
-                                                    Vui lòng phản hồi giúp Adavigo nếu đã nhận được khoản thanh toán của booking này
-                                                </div>
-                                                <div style="margin-bottom: 10px;">
-                                                    Nếu có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, Quý khách vui lòng liên hệ lại với chúng tôi qua email này
-                                                </div>
-                                                <div style="margin-bottom: 10px;">Trân trọng cảm ơn!</div>
-                                                <div style="margin-bottom: 10px;">Đội ngũ Adavigo</div>
+                                              
+                                                <div style="margin-bottom: 10px;">Trân trọng!</div>
                                             </td>
                                         </tr>
                                     </tbody>

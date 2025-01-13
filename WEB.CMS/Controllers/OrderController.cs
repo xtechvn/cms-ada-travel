@@ -2518,6 +2518,41 @@ namespace WEB.Adavigo.CMS.Controllers
             }
             return PartialView();
         }
+        public async Task<IActionResult> SendEmailCode(long Id,long OrderId)
+        {
+
+            try
+            {
+                ViewBag.id = Id;
+                ViewBag.OrderId = OrderId;
+                ViewBag.EmailBody = await _emailService.GetTemplateHotelBookingCode(Id, OrderId);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SendEmail - OrderController: " + ex);
+            }
+            return PartialView();
+        }
+        public async Task<IActionResult> CommitSendEmailCode(long Id,long OrderId)
+        {
+            var status = (int)ResponseType.ERROR;
+            var msg = "Không thành công";
+            try
+            {
+                bool resulstSendMail = await _emailService.SendEmailBookingCode(Id, OrderId);
+                if (resulstSendMail)
+                {
+                    status = (int)ResponseType.SUCCESS;
+                    msg = "Gửi email thành công";
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SendEmail - OrderController: " + ex);
+            }
+            return PartialView();
+        }
     }
 }
 

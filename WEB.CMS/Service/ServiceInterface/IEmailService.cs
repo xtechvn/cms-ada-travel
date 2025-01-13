@@ -3,6 +3,8 @@ using Entities.ViewModels.Attachment;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.VinWonder;
 using Microsoft.Extensions.Configuration;
+using Nest;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,5 +29,7 @@ namespace WEB.Adavigo.CMS.Service.ServiceInterface
         Task<bool> SendEmailVinwonderTicket(long orderid, long booking_id, string subject, List<string> to_email, List<string> cc_email, List<string> bcc_email);
         Task<string> GetTemplatePaymentVoucher(int paymentVoucherId);
         Task<bool> SendEmailpaymentVoucher(int paymentVoucherId, List<AttachFile> attach_file);
+        Task<string> GetTemplateHotelBookingCode(long ServiceId, long OrderId);
+        Task<bool> SendEmailBookingCode(long Id, long OrderId);
     }
 }

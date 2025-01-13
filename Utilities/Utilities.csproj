@@ -31,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="EmailTemplate\CodeHotelTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="EmailTemplate\FlyBookingServiceCodeTemplate.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

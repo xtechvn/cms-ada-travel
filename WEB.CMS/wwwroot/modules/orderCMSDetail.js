@@ -204,6 +204,36 @@ var _orderDetail = {
             }
         });
     },
+    PopupSendEmailCode: function (Id, OrderId) {
+        let title = '';
+        let url = '/Order/SendEmailCode';
+        let param = {
+            Id: Id,
+            OrderId: OrderId,
+           
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    CommitSendEmailCode: function (Id, OrderId) {
+      
+        $.ajax({
+            url: "/Order/CommitSendEmailCode",
+            type: "Post",
+            data: { Id: Id, OrderId: OrderId },
+            success: function (result) {
+             
+                if (result.status === 0) {
+                    _msgalert.success(result.msg);
+                    $.magnificPopup.close();
+                }
+                else {
+                    _global_function.RemoveLoading()
+                    _msgalert.error(result.msg);
+
+                }
+            }
+        });
+    },
     PopupSendEmail: function () {
         let title = 'Gửi email đơn hàng';
         let url = '/Order/SendEmail';
