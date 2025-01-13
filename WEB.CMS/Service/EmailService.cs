@@ -4244,7 +4244,7 @@ namespace WEB.Adavigo.CMS.Service
             {
                 var Base64 = img.Split(',')[1];
                 StringBuilder sb = new StringBuilder(Base64, Base64.Length);
-                
+
                 sb.Replace(" ", string.Empty);
                 return sb.ToString();
 
@@ -4446,7 +4446,8 @@ namespace WEB.Adavigo.CMS.Service
                 {
                     foreach (var item in CC_Email)
                     {
-                        message.CC.Add(item);
+                        if (item != null)
+                            message.CC.Add(item);
                     }
 
                 }
@@ -4454,7 +4455,8 @@ namespace WEB.Adavigo.CMS.Service
                 {
                     foreach (var item in BCC_Email)
                     {
-                        message.Bcc.Add(item);
+                        if (item != null)
+                            message.Bcc.Add(item);
                     }
 
                 }
