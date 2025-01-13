@@ -2558,7 +2558,11 @@ namespace WEB.Adavigo.CMS.Controllers
             {
                 LogHelper.InsertLogTelegram("SendEmail - OrderController: " + ex);
             }
-            return PartialView();
+            return Ok(new
+            {
+                status = status,
+                msg = msg
+            });
         }
     }
 }
