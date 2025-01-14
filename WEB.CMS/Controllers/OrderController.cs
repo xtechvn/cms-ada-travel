@@ -15,6 +15,7 @@ using MongoDB.Driver.Linq;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
 using System.Diagnostics;
+using System.Linq;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
@@ -1090,7 +1091,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     var data = _iOrderRepositories.GetByOrderId(orderId);
                     if (data.SalerId != null)
                     {
-                     if(_UserId != data.SalerId && current_user.UserUnderList.Contains(data.SalerId.ToString()))
+                     if((_UserId != data.SalerId && current_user.UserUnderList.Contains(data.SalerId.ToString()))|| current_user.Role.Contains(((int)RoleType.Admin).ToString()))
                         {
                             ViewBag.IsEdit = true;
                         }
