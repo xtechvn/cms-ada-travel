@@ -177,8 +177,8 @@ namespace Repositories.Repositories
                         if (rate.id != 0)
                         {
                             var detailhotelBookingRoomRates = await _hotelBookingRoomRatesDAL.GetById(rate.id);
-                            if(detailhotelBookingRoomRates!=null && rate.package_code == detailhotelBookingRoomRates.RatePlanCode)
-                            rate_id= detailhotelBookingRoomRates.RatePlanId;
+                            if (detailhotelBookingRoomRates != null && rate.package_code == detailhotelBookingRoomRates.RatePlanCode)
+                                rate_id = detailhotelBookingRoomRates.RatePlanId;
                             AllotmentId = detailhotelBookingRoomRates.AllotmentId;
                             PackagesInclude = detailhotelBookingRoomRates.PackagesInclude;
                         }
@@ -331,7 +331,8 @@ namespace Repositories.Repositories
                     model_summit.detail.Price = total_price + extra_package_amount_total - extra_package_profit_total;
                 }
                 var id = await _hotelBookingDAL.UpdateHotelBooking(model_summit, user_id);
-                await _hotelBookingDAL.SummitHotelBookingRoomOptional(model_summit, user_id);
+                if (data.hotel.id == 0)
+                    await _hotelBookingDAL.SummitHotelBookingRoomOptional(model_summit, user_id);
 
                 return id;
             }
@@ -908,7 +909,7 @@ namespace Repositories.Repositories
                         ws.Cells["C" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["D" + RowIndex].PutValue(item.Price.ToString("N0"));
                         ws.Cells["D" + RowIndex].SetStyle(numberStyle);
-                        ws.Cells["E" + RowIndex].PutValue((item.RoomNights*item.NumberOfRoom).ToString("N0"));
+                        ws.Cells["E" + RowIndex].PutValue((item.RoomNights * item.NumberOfRoom).ToString("N0"));
                         ws.Cells["E" + RowIndex].SetStyle(numberStyle);
                     }
                     #endregion
