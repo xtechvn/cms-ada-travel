@@ -2533,7 +2533,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 ViewBag.ClientEmail = Client.Email;
                 ViewBag.id = Id;
                 ViewBag.OrderId = OrderId;
-                ViewBag.EmailBody = await _emailService.GetTemplateHotelBookingCode(Id, OrderId);
+                ViewBag.EmailBody = await _emailService.GetTemplateHotelBookingCode(Id, OrderId,null);
             }
             catch (Exception ex)
             {
@@ -2541,13 +2541,17 @@ namespace WEB.Adavigo.CMS.Controllers
             }
             return PartialView();
         }
-        public async Task<IActionResult> CommitSendEmailCode(long Id,long OrderId,List<string> CC_Email, List<string> BCC_Email,string Email,string To_Email,string subject_name)
+        public async Task<IActionResult> CommitSendEmailCode(long Id,long OrderId,List<string> CC_Email, List<string> BCC_Email,string Email,string To_Email,string subject_name, string Note)
         {
             var status = (int)ResponseType.ERROR;
             var msg = "Không thành công";
             try
             {
-                bool resulstSendMail = await _emailService.SendEmailBookingCode(Id, OrderId, CC_Email, BCC_Email, Email, To_Email, subject_name);
+                if (Note == null)
+                {
+                    Note = "";
+                }
+                bool resulstSendMail = await _emailService.SendEmailBookingCode(Id, OrderId, CC_Email, BCC_Email, Email, To_Email, subject_name, Note);
                 if (resulstSendMail)
                 {
                     status = (int)ResponseType.SUCCESS;

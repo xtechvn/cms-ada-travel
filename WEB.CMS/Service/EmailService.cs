@@ -4256,7 +4256,7 @@ namespace WEB.Adavigo.CMS.Service
             return null;
 
         }
-        public async Task<string> GetTemplateHotelBookingCode(long Id, long OrderId)
+        public async Task<string> GetTemplateHotelBookingCode(long Id, long OrderId,string Note)
         {
             try
             {
@@ -4393,7 +4393,16 @@ namespace WEB.Adavigo.CMS.Service
                 body = body.Replace("{{rooms}}", rooms_html);
                 body = body.Replace("{{extra_package}}", extra_package_html);
                 body = body.Replace("{{noidung}}", BookingCode.Description);
-                body = body.Replace("{{note}}", BookingCode.Note);
+                if(Note!=null )
+                {
+                    body = body.Replace("{{note}}", Note);
+
+                }
+                else
+                {
+                    body = body.Replace("{{note}}", "<textarea type=\"text\" style=\"min-height: 120px;\" id=\"Note\" value=\"\"></textarea>");
+
+                }
                 return body;
             }
             catch (Exception ex)
@@ -4402,7 +4411,7 @@ namespace WEB.Adavigo.CMS.Service
                 return null;
             }
         }
-        public async Task<bool> SendEmailBookingCode(long Id, long OrderId, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name)
+        public async Task<bool> SendEmailBookingCode(long Id, long OrderId, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name, string Note)
         {
             bool ressult = true;
             try
@@ -4428,7 +4437,7 @@ namespace WEB.Adavigo.CMS.Service
                 message.IsBodyHtml = true;
                 message.From = new MailAddress(from_mail, new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["STMP_USERNAME_Email"]);
 
-                message.Body = await GetTemplateHotelBookingCode(Id, OrderId);
+                message.Body = await GetTemplateHotelBookingCode(Id, OrderId, Note);
                 //attachment 
 
                 string sendEmailsFrom = account;

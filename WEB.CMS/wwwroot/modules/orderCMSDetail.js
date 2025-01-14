@@ -237,10 +237,11 @@ var _orderDetail = {
             var To_Email = $("#To_Email").val()
             var BCC_Email = $("#BCC_Email").val()
             var Email = $("#Email").val()
+            var Note = $("#Note").val()
             $.ajax({
                 url: "/Order/CommitSendEmailCode",
                 type: "Post",
-                data: { Id: Id, OrderId: OrderId, CC_Email: CC_Email, BCC_Email: BCC_Email, Email: Email, To_Email: To_Email, subject_name: subject_name },
+                data: { Id: Id, OrderId: OrderId, CC_Email: CC_Email, BCC_Email: BCC_Email, Email: Email, To_Email: To_Email, subject_name: subject_name, Note: Note },
                 success: function (result) {
 
                     if (result.status === 0) {
