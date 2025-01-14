@@ -4392,6 +4392,8 @@ namespace WEB.Adavigo.CMS.Service
                 body = body.Replace("{{totalAmount}}", HotelBookingDetail.TotalAmount.ToString("N0"));
                 body = body.Replace("{{rooms}}", rooms_html);
                 body = body.Replace("{{extra_package}}", extra_package_html);
+                body = body.Replace("{{noidung}}", BookingCode.Description);
+                body = body.Replace("{{note}}", BookingCode.Note);
                 return body;
             }
             catch (Exception ex)

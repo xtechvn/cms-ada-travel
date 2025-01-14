@@ -63,51 +63,61 @@
 
                                             <td colspan="7" style="text-align:center;border: 1px solid #999; padding: 5px;font-weight: bold;">{{tile}}</td>
                                         </tr>
-									
+
                                         <tr>
-                                
+
                                             <td colspan="2" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Mã đơn hàng:</td>
                                             <td colspan="5" style="border: 1px solid #999; padding: 5px;">{{orderNo}}</td>
                                         </tr>
-										<tr>
-                                
+                                        <tr>
+
                                             <td colspan="2" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Mã code:</td>
                                             <td colspan="5" style="border: 1px solid #999; padding: 5px;">{{bookingCode}}</td>
                                         </tr>
-										<tr>
-                                
+                                        <tr>
+
+                                            <td colspan="2" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Nội dung:</td>
+                                            <td colspan="5" style="border: 1px solid #999; padding: 5px;">{{noidung}}</td>
+                                        </tr>
+                                        <tr>
+
+                                            <td colspan="2" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Chi chu:</td>
+                                            <td colspan="5" style="border: 1px solid #999; padding: 5px;">{{note}}</td>
+                                        </tr>
+                                        <tr>
+
                                             <td colspan="2" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Đại diện:</td>
                                             <td colspan="5" style="border: 1px solid #999; padding: 5px;">{{clientName}}</td>
                                         </tr>
-										<tr>
+                                        <tr>
                                             <td colspan="3" style="border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;">Ngày nhận: {{ArrivalDate}}</td>
-											
+
                                             <td colspan="4" style="border: 1px solid #999; padding: 5px;font-weight: bold;text-align: center;">Ngày trả: {{DepartureDate}}</td>
                                         </tr>
-										<tr>
+                                        <tr>
                                             <td style="border: 1px solid #999; padding: 5px; font-weight: bold;">Hạng phòng</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Gói</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Thời gian sử dụng</td>
-											<td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Giá</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Giá</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số đêm</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số lượng phòng</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Thành tiền</td>
                                         </tr>
-									
-										{{rooms}}
-										<tr style="{{style_extra_package}}">
+
+                                        {{rooms}}
+                                        <tr style="{{style_extra_package}}">
                                             <td style="border: 1px solid #999; padding: 5px; font-weight: bold;">Dịch vụ</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Gói</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Thời gian sử dụng</td>
-											<td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Giá</td>
+                                            <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Giá</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số ngày</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số lượng</td>
                                             <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Thành tiền</td>
                                         </tr>
-									
-										{{extra_package}}
-										<tr>
-                                
+
+                                        {{extra_package}}
+                                        <tr>
+
                                             <td colspan="5" style="border: 1px solid #999; padding: 5px; font-weight: bold;">Tổng phí dịch vụ</td>
                                             <td colspan="2" style="border: 1px solid #999; padding: 5px; text-align: center;">{{totalAmount}}</td>
                                         </tr>
