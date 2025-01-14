@@ -361,6 +361,7 @@ var _payment_voucher_service = {
             var To_Email = $("#To_Email").val()
             var BCC_Email = $("#BCC_Email").val()
             var Email = $("#Email").val()
+            _global_function.AddLoading()
             $.ajax({
                 url: "/PaymentVoucher/SendEmail",
                 type: "Post",

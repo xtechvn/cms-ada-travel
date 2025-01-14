@@ -238,6 +238,7 @@ var _orderDetail = {
             var BCC_Email = $("#BCC_Email").val()
             var Email = $("#Email").val()
             var Note = $("#Note").val()
+            _global_function.AddLoading()
             $.ajax({
                 url: "/Order/CommitSendEmailCode",
                 type: "Post",
@@ -245,6 +246,7 @@ var _orderDetail = {
                 success: function (result) {
 
                     if (result.status === 0) {
+                        _global_function.RemoveLoading()
                         _msgalert.success(result.msg);
                         $.magnificPopup.close();
                     }
