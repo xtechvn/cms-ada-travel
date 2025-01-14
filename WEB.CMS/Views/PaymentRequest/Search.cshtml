@@ -117,19 +117,51 @@ else
                             <td class=" text-break" style="min-width: 130px;">
                                 @if (item.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET) || item.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))
                                 {
-                                    <span class="status-wait">@item.PaymentRequestStatus</span>
+                                    if (item.IsSupplierDebt == true)
+                                    {
+                                        <span class="status-wait">@item.PaymentRequestStatus - Công nợ</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-wait">@item.PaymentRequestStatus</span>
+                                    }
+                                   
                                 }
                                 @if (item.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_CHI) || item.Status == (int)(PAYMENT_REQUEST_STATUS.DA_CHI))
                                 {
-                                    <span class="status-approve">@item.PaymentRequestStatus</span>
+                                    if (item.IsSupplierDebt == true)
+                                    {
+                                        <span class="status-approve">@item.PaymentRequestStatus - Công nợ</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-approve">@item.PaymentRequestStatus</span>
+                                    }
+
                                 }
                                 @if (item.Status == (int)(PAYMENT_REQUEST_STATUS.TU_CHOI))
                                 {
-                                    <span class="status-reject">@item.PaymentRequestStatus</span>
+                                    if (item.IsSupplierDebt == true)
+                                    {
+                                        <span class="status-reject">@item.PaymentRequestStatus - Công nợ</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-reject">@item.PaymentRequestStatus</span>
+                                    }
+
                                 }
                                 @if (item.Status == (int)(PAYMENT_REQUEST_STATUS.LUU_NHAP))
                                 {
-                                    <span class="status-draft">@item.PaymentRequestStatus</span>
+                                    if (item.IsSupplierDebt == true)
+                                    {
+                                        <span class="status-draft">@item.PaymentRequestStatus - Công nợ</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-draft">@item.PaymentRequestStatus</span>
+                                    }
+
                                 }
                             </td>
                             <td class=" text-break">
