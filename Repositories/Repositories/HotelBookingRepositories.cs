@@ -331,8 +331,7 @@ namespace Repositories.Repositories
                     model_summit.detail.Price = total_price + extra_package_amount_total - extra_package_profit_total;
                 }
                 var id = await _hotelBookingDAL.UpdateHotelBooking(model_summit, user_id);
-                if (data.hotel.id == 0)
-                    await _hotelBookingDAL.SummitHotelBookingRoomOptional(model_summit, user_id);
+                await _hotelBookingDAL.SummitHotelBookingRoomOptional(model_summit, user_id);
 
                 return id;
             }
