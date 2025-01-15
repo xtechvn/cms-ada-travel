@@ -3346,7 +3346,7 @@ namespace WEB.Adavigo.CMS.Service
                     string thang = "Tháng " + model.CreatedDate.Value.Month.ToString();
                     string nam = "Năm " + model.CreatedDate.Value.Year.ToString();
                     string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    var template = workingDirectory + @"\TemplatePaymentRequest.html";
+                    var template = workingDirectory + @"EmailTemplate\TemplatePaymentRequest.html";
                     string body = File.ReadAllText(template);
                     if (type != 1)
                     {
@@ -3428,7 +3428,7 @@ namespace WEB.Adavigo.CMS.Service
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
 
                     string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    var template = workingDirectory + @"\TemplatePaymentRequest.html";
+                    var template = workingDirectory + @"EmailTemplate\TemplatePaymentRequest.html";
                     string ngay = "Ngày " + model.CreatedDate.Value.Day.ToString();
                     string thang = "Tháng " + model.CreatedDate.Value.Month.ToString();
                     string nam = "Năm " + model.CreatedDate.Value.Year.ToString();
