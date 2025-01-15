@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Repositories.Repositories;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -202,7 +203,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
 
             return PartialView(model);
         }
-   
+
         public async Task<IActionResult> VerifyHotelServiceDetai(int id)
         {
             try
@@ -662,7 +663,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 ViewBag.isAdmin = isAdmin;
             }
             var data = _paymentRequestRepository.GetRequestByClientId(clientId, orderId);
-            if(data!= null && data.Count > 0)
+            if (data != null && data.Count > 0)
             {
                 data = data.Where(s => s.ServiceType == serviceType).ToList();
             }
@@ -996,7 +997,14 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                     var data = await _hotelBookingCodeRepository.InsertHotelBookingCode(model);
                     if (data != 0 && data > 0)
                     {
+                        if (type == (int)ServiceType.BOOK_HOTEL_ROOM_VIN || type == (int)ServiceType.BOOK_HOTEL_ROOM)
+                        {
+                            var current_user = _ManagementUser.GetCurrentUser();
+                            var order = _orderRepositor.GetByOrderId(model.OrderId);
+                            string link = "/Order/" + model.OrderId;
+                            apiService.SendMessage(user_id.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TRA_CODE).ToString(), order.OrderNo, link, current_user.Role.ToString(), model.BookingCode);
 
+                        }
                         sst_status = (int)ResponseType.SUCCESS;
                         smg = "Thêm mới thành công";
                         id = data;
@@ -1845,7 +1853,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 try
                 {
                     hotel = _HotelRepository.GetHotelByHotelID(hotel_booking.PropertyId);
-                    if (hotel.Id > 0 && (hotel.IsVinHotel == null|| hotel.IsVinHotel==false))
+                    if (hotel.Id > 0 && (hotel.IsVinHotel == null || hotel.IsVinHotel == false))
                     {
                         return new JsonResult(new
                         {
@@ -1860,11 +1868,11 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 }
                 var order = await _orderRepository.GetOrderByID(hotel_booking.OrderId);
                 var hotel_booking_room = await _hotelBookingRoomRepository.GetByHotelBookingID(booking_id);
-                var contact_client =  _contactClientRepository.GetByContactClientId((long)order.ContactClientId);
+                var contact_client = _contactClientRepository.GetByContactClientId((long)order.ContactClientId);
                 var client = await _clientRepository.GetClientDetailByClientId(contact_client.ClientId);
                 var hotel_booking_rates = await _hotelBookingRoomRatesRepository.GetByHotelBookingID(booking_id);
                 var hotel_booking_guest = await _hotelBookingGuestRepository.GetByHotelBookingID(booking_id);
-                var hotel_booking_mongo =  hotelBookingMongoService.GetBookingById(hotel_booking.BookingId);
+                var hotel_booking_mongo = hotelBookingMongoService.GetBookingById(hotel_booking.BookingId);
 
                 var commit_booking = new ENTITIES.ViewModels.Hotel.MongoBookingData()
                 {
@@ -1878,22 +1886,22 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
 
                     },
                 };
-                foreach(var room in hotel_booking_room)
+                foreach (var room in hotel_booking_room)
                 {
                     var split_name = contact_client.Name.Split(" ");
-                    var first_name= contact_client.Name;
-                    var last_name="";
+                    var first_name = contact_client.Name;
+                    var last_name = "";
                     if (split_name.Count() > 1)
                     {
-                        first_name= split_name[1];
+                        first_name = split_name[1];
                         last_name = split_name[0];
                     }
                     var item = new ENTITIES.ViewModels.Hotel.HotelMongoReservation()
                     {
                         roomOccupancy = new ENTITIES.ViewModels.Hotel.HotelMongoRoomOccupancy()
                         {
-                            numberOfAdult = (room.NumberOfAdult==null?1:(int)room.NumberOfAdult),
-                             otherOccupancies=new List<ENTITIES.ViewModels.Hotel.HotelMongoOtherOccupancy>()
+                            numberOfAdult = (room.NumberOfAdult == null ? 1 : (int)room.NumberOfAdult),
+                            otherOccupancies = new List<ENTITIES.ViewModels.Hotel.HotelMongoOtherOccupancy>()
                              {
                                  new ENTITIES.ViewModels.Hotel.HotelMongoOtherOccupancy()
                                  {
@@ -1909,9 +1917,9 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                  }
                              }
                         },
-                        isPackagesSpecified=false,
-                        isProfilesSpecified=true,
-                        profiles=new List<ENTITIES.ViewModels.Hotel.HotelMongoProfile>()
+                        isPackagesSpecified = false,
+                        isProfilesSpecified = true,
+                        profiles = new List<ENTITIES.ViewModels.Hotel.HotelMongoProfile>()
                         {
                             new ENTITIES.ViewModels.Hotel.HotelMongoProfile()
                             {
@@ -1971,27 +1979,27 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                  country= hotel_booking_mongo.booking_b2b_data.contact.country,
                             }
                         },
-                        isRoomRatesSpecified=true,
-                        isSpecialRequestSpecified=false,
-                        numberOfRoom=(int)room.NumberOfRooms,
-                        specialRequests=new List<ENTITIES.ViewModels.Hotel.HotelMongoSpecialRequest>(),
-                        totalAmount=new ENTITIES.ViewModels.Hotel.HotelMongoTotalAmount()
+                        isRoomRatesSpecified = true,
+                        isSpecialRequestSpecified = false,
+                        numberOfRoom = (int)room.NumberOfRooms,
+                        specialRequests = new List<ENTITIES.ViewModels.Hotel.HotelMongoSpecialRequest>(),
+                        totalAmount = new ENTITIES.ViewModels.Hotel.HotelMongoTotalAmount()
                         {
-                            currencyCode="VND",
-                            amount= (room.TotalUnitPrice!=null && room.TotalUnitPrice>0)? Convert.ToInt32(room.TotalUnitPrice) : Convert.ToInt32(room.Price)
+                            currencyCode = "VND",
+                            amount = (room.TotalUnitPrice != null && room.TotalUnitPrice > 0) ? Convert.ToInt32(room.TotalUnitPrice) : Convert.ToInt32(room.Price)
                         },
-                        packages=new List<ENTITIES.ViewModels.Hotel.HotelMongoPackage>(),
-                        roomRates=new List<ENTITIES.ViewModels.Hotel.HotelMongoRoomRate>()
+                        packages = new List<ENTITIES.ViewModels.Hotel.HotelMongoPackage>(),
+                        roomRates = new List<ENTITIES.ViewModels.Hotel.HotelMongoRoomRate>()
                         {
 
                         }
                     };
                     var rate_by_room = hotel_booking_rates.Where(x => x.HotelBookingRoomId == room.Id);
-                    if(rate_by_room!=null && rate_by_room.Count() > 0)
+                    if (rate_by_room != null && rate_by_room.Count() > 0)
                     {
-                        foreach(var rate in rate_by_room)
+                        foreach (var rate in rate_by_room)
                         {
-                            for(int i = 1; i <= rate.Nights; i++)
+                            for (int i = 1; i <= rate.Nights; i++)
                             {
                                 item.roomRates.Add(new ENTITIES.ViewModels.Hotel.HotelMongoRoomRate()
                                 {
@@ -2000,10 +2008,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                     ratePlanRefID = rate.RatePlanId,
                                     roomTypeCode = room.RoomTypeCode,
                                     roomTypeRefID = room.RoomTypeId,
-                                    stayDate = ((DateTime)rate.StartDate).AddDays(i-1).ToString("yyyy-MM-dd")
+                                    stayDate = ((DateTime)rate.StartDate).AddDays(i - 1).ToString("yyyy-MM-dd")
                                 });
                             }
-                           
+
                         }
                     }
                     commit_booking.reservations.Add(item);
@@ -2011,8 +2019,8 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 VinpearlLib vinpearlLib = new VinpearlLib(_configuration);
                 var commit_input = JsonConvert.SerializeObject(commit_booking);
                 //--Create Booking
-                var commit= await vinpearlLib.getVinpearlCreateBooking(commit_input);
-                if(commit!=null && commit.isSuccess == true && commit.data.reservations.Count>0)
+                var commit = await vinpearlLib.getVinpearlCreateBooking(commit_input);
+                if (commit != null && commit.isSuccess == true && commit.data.reservations.Count > 0)
                 {
                     HotelBookingCodeViewModel order_code = new HotelBookingCodeViewModel()
                     {
@@ -2024,9 +2032,9 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                         HotelBookingId = booking_id,
                         Id = 0,
                         IsDelete = 0,
-                        Note = "ReservationId: "+ commit.data.reservations[0].reservationID 
-                        + "\n GuaranteePolicyId: " + (commit.data.reservations[0].guaranteePolicies!=null && commit.data.reservations[0].guaranteePolicies.Count>0? commit.data.reservations[0].guaranteePolicies[0].id:"NULL" ) 
-                        + "\n GuaranteePolicyId: " + (commit.data.reservations[0].guaranteePolicies!=null && commit.data.reservations[0].guaranteePolicies.Count>0? commit.data.reservations[0].guaranteePolicies[0].id:"NULL" ) ,
+                        Note = "ReservationId: " + commit.data.reservations[0].reservationID
+                        + "\n GuaranteePolicyId: " + (commit.data.reservations[0].guaranteePolicies != null && commit.data.reservations[0].guaranteePolicies.Count > 0 ? commit.data.reservations[0].guaranteePolicies[0].id : "NULL")
+                        + "\n GuaranteePolicyId: " + (commit.data.reservations[0].guaranteePolicies != null && commit.data.reservations[0].guaranteePolicies.Count > 0 ? commit.data.reservations[0].guaranteePolicies[0].id : "NULL"),
                         Type = (int)ServiceType.BOOK_HOTEL_ROOM_VIN,
                         UpdatedBy = 18,
                         UpdatedDate = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")
@@ -2037,23 +2045,23 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                         organization = "vinpearl"
                     };
                     var guarantee_method = await vinpearlLib.getGuaranteeMethods(commit.data.reservations[0].reservationID, JsonConvert.SerializeObject(guarantee_input));
-                    if(guarantee_method!=null && guarantee_method.isSuccess== true && guarantee_method.data.guaranteeMethods!=null && guarantee_method.data.guaranteeMethods.Count > 0)
+                    if (guarantee_method != null && guarantee_method.isSuccess == true && guarantee_method.data.guaranteeMethods != null && guarantee_method.data.guaranteeMethods.Count > 0)
                     {
                         var confirm_commit = new List<object>();
-                        foreach(var method in guarantee_method.data.guaranteeMethods)
+                        foreach (var method in guarantee_method.data.guaranteeMethods)
                         {
                             confirm_commit.Add(new
                             {
-                                guaranteeRefID= "00000001-0000-0000-0000-000000000000",
-                                guaranteePolicyId= method.id,
-                                guaranteeValue=method.amount.amount.amount
+                                guaranteeRefID = "00000001-0000-0000-0000-000000000000",
+                                guaranteePolicyId = method.id,
+                                guaranteeValue = method.amount.amount.amount
                             });
                         }
                         var commit_result = await vinpearlLib.CommitBooking(commit.data.reservations[0].reservationID, JsonConvert.SerializeObject(new
                         {
-                            guaranteeInfos= confirm_commit
+                            guaranteeInfos = confirm_commit
                         }));
-                        order_code.Description += "\n Result CommitBooking: "+ commit_result;
+                        order_code.Description += "\n Result CommitBooking: " + commit_result;
                     }
                     var id = await _hotelBookingCodeRepository.InsertHotelBookingCode(order_code);
 
