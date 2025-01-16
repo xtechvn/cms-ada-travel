@@ -1100,7 +1100,7 @@ namespace DAL
                             exists.NumberOfRooms = room_optional.NumberOfRooms;
                             exists.Price = room_optional.Price;
                             exists.Profit = room_optional.Profit;
-                            exists.SupplierId = room_optional.SupplierId <=0 ? exists.SupplierId: room_optional.SupplierId;
+                           // exists.SupplierId = room_optional.SupplierId <=0 ? exists.SupplierId: room_optional.SupplierId;
                             exists.TotalAmount = room_optional.TotalAmount;
                             exists.UpdatedBy = room_optional.UpdatedBy;
                             exists.UpdatedDate = room_optional.UpdatedDate;
@@ -1131,7 +1131,7 @@ namespace DAL
                                     exists_rate_optional.TotalAmount = rate_optional.TotalAmount;
                                     exists_rate_optional.UpdatedBy = rate_optional.UpdatedBy;
                                     exists_rate_optional.UpdatedDate = rate_optional.UpdatedDate;
-                                    exists_rate_optional.OperatorPrice = rate_optional.OperatorPrice;
+                                   // exists_rate_optional.OperatorPrice = rate_optional.OperatorPrice;
                                     UpdateHotelBookingRoomsRateOptional(exists_rate_optional);
                                 }
                                 else
