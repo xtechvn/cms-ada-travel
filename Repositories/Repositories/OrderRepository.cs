@@ -8,8 +8,11 @@ using Entities.ViewModels.Funding;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.Report;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using Nest;
 using Newtonsoft.Json;
+using PdfSharp;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -1185,6 +1188,25 @@ namespace Repositories.Repositories
         {
            
             return  _OrderDal.CountOrderInYear();
+        }
+        public async Task<long> CheckAmountRemainBySalerId(long SalerId)
+        {
+            try
+            {
+                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+
+                   return dt.Rows[0]["AmountRemain"].Equals(DBNull.Value) ? 0 : Convert.ToInt32(dt.Rows[0]["AmountRemain"]);
+                
+                }
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("CheckAmountRemainBySalerId - OrderRepository: " + ex);
+            }
+            return -1;
         }
     }
 }

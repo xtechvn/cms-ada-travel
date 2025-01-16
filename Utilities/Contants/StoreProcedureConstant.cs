@@ -290,6 +290,8 @@ namespace Utilities.Contants
         public static string SP_GetListClientCustomerCareFund = "SP_GetListClientCustomerCareFund";
         public static string GetDetailAccountClientByClientId = "SP_GetDetailAccountClientByClientId";
 
+        public static string SP_CheckAmountRemainBySalerId = "SP_CheckAmountRemainBySalerId";
+
 
         #region vin wonder
         public static string sp_InsertCampaign = "sp_InsertCampaign";

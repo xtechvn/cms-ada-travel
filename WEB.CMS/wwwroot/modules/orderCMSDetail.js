@@ -758,6 +758,33 @@ var _orderDetail = {
            
         );
     },
+    SaleUpdateOrderFinishPayment: function (Orderid, type, SalerId, Amount) {
+        var ServiceCode = $('#ServiceCode').val();
+        var title = 'Xác nhận đơn hàng được công nợ';
+
+        _msgconfirm.openDialog(title, 'Xác nhận đơn hàng được công nợ?', function () {
+            _global_function.AddLoading()
+            $.ajax({
+                url: "/Order/SaleUpdateOrderFinishPayment",
+                type: "Post",
+                data: { OrderId: Orderid, type: type, SalerId: SalerId, Amount: Amount, },
+                success: function (result) {
+                    if (result.sst_status === 0) {
+                        _global_function.RemoveLoading()
+                        _msgalert.success(result.smg);
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 300);
+                    }
+                    else {
+                        _global_function.RemoveLoading()
+                        _msgalert.error(result.smg);
+
+                    }
+                }
+            });
+        });
+    },
 }
 var _OrderDetail_Sendemail = {
     loadformSenmail: function () {

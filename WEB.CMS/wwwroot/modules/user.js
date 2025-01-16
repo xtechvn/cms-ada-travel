@@ -418,10 +418,12 @@ var _user = {
             var formData = new FormData(form);
             let roles = $('#RoleId').val();
             let UserPositionId = $('#UserPositionId').val();
+            let DebtLimit = $('#DebtLimit').val();
             let Rank = $('#UserPositionId').find(':selected').attr('data-lvl');
             formData.set("RoleId", roles != null ? roles.join(',') : "");
             formData.set("UserPositionId", UserPositionId != null ? UserPositionId : 0);
             formData.set("Rank", Rank != null ? Rank : 0);
+            formData.set("DebtLimit", DebtLimit != null ? DebtLimit : 0);
             var company_type = ''
             $('.company-type:checked').each(function (index, item) {
                 var element = $(this)

@@ -38,17 +38,17 @@
 
                 @*@await Component.InvokeAsync("Payment", order)*@
                 <div id="grid_data_ContractPay">
-                     <partial name="_Skeleton" />
+                    <partial name="_Skeleton" />
                 </div>
 
                 @*@await Component.InvokeAsync("Pay", order)*@
                 <div id="grid_data_BillVAT">
-                     <partial name="_Skeleton" />
+                    <partial name="_Skeleton" />
                 </div>
 
                 @*@await Component.InvokeAsync("ListPassenger", order)*@
                 <div id="grid_data_ListPassenger">
-                     <partial name="_Skeleton" />
+                    <partial name="_Skeleton" />
                 </div>
 
             </div>
@@ -56,13 +56,13 @@
 
                 @*@await Component.InvokeAsync("SingleInformation", order)*@
                 <div id="grid_data_SingleInformation">
-                     <partial name="_Skeleton" />
+                    <partial name="_Skeleton" />
                 </div>
 
 
                 @*@await Component.InvokeAsync("PersonInCharge", order)*@
                 <div id="grid_data_PersonInCharge">
-                     <partial name="_Skeleton" />
+                    <partial name="_Skeleton" />
                 </div>
 
 
@@ -74,11 +74,16 @@
 
                 @*@await Component.InvokeAsync("SystemInformation", order)*@
                 <div id="grid_data_SystemInformation">
-                     <partial name="_Skeleton" />
+                    <partial name="_Skeleton" />
                 </div>
 
                 <div class="form-group align-right mt20 block pin-btn-bottom ">
                     <b class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</b>
+                    @if (ViewBag.sale == 1 && ViewBag.ServiceStatus == 1 && ViewBag.sale == 1)
+                    {
+                        <button type="button" class="btn btn-default ml-1" onclick="_orderDetail.SaleUpdateOrderFinishPayment(@ViewBag.OrderId,@ViewBag.ServiceStatus2,@ViewBag.SalerId,@ViewBag.Amount);">Bảo lãnh công nợ</button>
+
+                    }
                     @if (ViewBag.IsLock == true && ViewBag.RoleKTTruong == 1)
                     {
                         <button type="button" class="btn btn-default ml-1" onclick="_orderDetail.IsLockOrder(@ViewBag.OrderId,'@ViewBag.OrderNo',0)">Mở khóa sổ</button>

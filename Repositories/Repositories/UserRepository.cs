@@ -212,7 +212,7 @@ namespace Repositories.Repositories
                     Manager = model.Manager,
                     UserMapId = model.UserMapId,
                     NickName = model.NickName,
-                    //UserRole = model.UserRole
+                    DebtLimit = model.DebtLimit
                 };
 
                 // Check exist User Name or Email
@@ -340,6 +340,7 @@ namespace Repositories.Repositories
                 entity.UserPositionId = model.UserPositionId;
                 entity.Level = model.Level == null ? entity.Level : model.Level;
                 entity.NickName = model.NickName;
+                entity.DebtLimit = model.DebtLimit;
 
 
                 await _UserDAL.UpdateAsync(entity);

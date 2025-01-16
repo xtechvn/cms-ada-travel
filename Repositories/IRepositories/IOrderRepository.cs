@@ -49,5 +49,6 @@ namespace Repositories.IRepositories
         Task<long> UpdateOrderAmountFundCustomer(long order_id);
         Task<List<OrderBookClosingRequestViewModel>> GetListOrderBookClosingByOrderId(long OrderId);
         Task<long> CountOrderInYear();
+        Task<long> CheckAmountRemainBySalerId(long SalerId);
     }
 }

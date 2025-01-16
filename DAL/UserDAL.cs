@@ -250,7 +250,8 @@ namespace DAL
                                       UserPositionId = u.UserPositionId,
                                       Level = u.Level,
                                       NickName=u.NickName,
-                                      Password=u.Password
+                                      Password=u.Password,
+                                      DebtLimit=u.DebtLimit,
                                   }).FirstOrDefaultAsync();
                 }
             }

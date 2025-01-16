@@ -1081,6 +1081,19 @@ namespace DAL
             }
             return null;
         }
-   
+        public async Task<DataTable> CheckAmountRemainBySalerId(long SalerId)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[1];
+                objParam[0] = new SqlParameter("@SalerId", SalerId);
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_CheckAmountRemainBySalerId, objParam);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("CheckAmountRemainBySalerId - OrderDal: " + ex);
+            }
+            return null ;
+        }
     }
 }

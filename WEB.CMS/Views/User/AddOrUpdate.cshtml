@@ -168,6 +168,12 @@
                             <input type="text" class="form-control" asp-for="@Model.NickName">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="lbl">Bảo lãnh công nợ</label>
+                        <div class="wrap_input">
+                            <input type="text" class="form-control currency" asp-for="@Model.DebtLimit">
+                        </div>
+                    </div>
                     <div class="form-group male">
                         <label class="lbl">Giới tính</label>
                         <label class="radio-inline"><input type="radio" asp-for="@Model.Gender" value="1">Nam</label>
@@ -306,6 +312,12 @@
                         <label class="lbl">Tài khoản Telegram</label>
                         <div class="wrap_input">
                             <input type="text" class="form-control" asp-for="@Model.NickName">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="lbl">Bảo lãnh công nợ</label>
+                        <div class="wrap_input">
+                            <input type="text" class="form-control currency" asp-for="@Model.DebtLimit">
                         </div>
                     </div>
                     <div class="form-group male">
