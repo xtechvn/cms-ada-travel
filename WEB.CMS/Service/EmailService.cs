@@ -4256,7 +4256,7 @@ namespace WEB.Adavigo.CMS.Service
             return null;
 
         }
-        public async Task<string> GetTemplateHotelBookingCode(long Id, long OrderId,string Note)
+        public async Task<string> GetTemplateHotelBookingCode(long Id, long OrderId, string Note, string Description)
         {
             try
             {
@@ -4392,8 +4392,18 @@ namespace WEB.Adavigo.CMS.Service
                 body = body.Replace("{{totalAmount}}", HotelBookingDetail.TotalAmount.ToString("N0"));
                 body = body.Replace("{{rooms}}", rooms_html);
                 body = body.Replace("{{extra_package}}", extra_package_html);
-                body = body.Replace("{{noidung}}", BookingCode.Description);
-                if(Note!=null )
+                if (Description == null)
+                {
+                    body = body.Replace("{{noidung}}", BookingCode.Description);
+                }
+                else
+                {
+                    body = body.Replace("{{noidung}}", Description);
+                    body = body.Replace(" {{disabled}}", "disabled");
+
+                }
+
+                if (Note != null)
                 {
                     body = body.Replace("{{note}}", Note);
 
@@ -4411,7 +4421,7 @@ namespace WEB.Adavigo.CMS.Service
                 return null;
             }
         }
-        public async Task<bool> SendEmailBookingCode(long Id, long OrderId, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name, string Note)
+        public async Task<bool> SendEmailBookingCode(long Id, long OrderId, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name, string Note, string Description)
         {
             bool ressult = true;
             try
@@ -4437,7 +4447,7 @@ namespace WEB.Adavigo.CMS.Service
                 message.IsBodyHtml = true;
                 message.From = new MailAddress(from_mail, new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["STMP_USERNAME_Email"]);
 
-                message.Body = await GetTemplateHotelBookingCode(Id, OrderId, Note);
+                message.Body = await GetTemplateHotelBookingCode(Id, OrderId, Note, Description);
                 //attachment 
 
                 string sendEmailsFrom = account;
@@ -4471,7 +4481,15 @@ namespace WEB.Adavigo.CMS.Service
                     }
 
                 }
-
+                var Leaderid = await _userRepository.GetLeaderByUserId((long)order.SalerId);
+                if (Leaderid != 0)
+                {
+                    var Leader = await _userRepository.GetById(Leaderid);
+                    if (Leader != null)
+                    {
+                        message.CC.Add(Leader.Email);
+                    }
+                }
                 if (attach_file != null && attach_file.Count > 0)
                 {
                     foreach (var item in attach_file)

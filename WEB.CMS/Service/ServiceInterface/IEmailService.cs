@@ -29,7 +29,7 @@ namespace WEB.Adavigo.CMS.Service.ServiceInterface
         Task<bool> SendEmailVinwonderTicket(long orderid, long booking_id, string subject, List<string> to_email, List<string> cc_email, List<string> bcc_email);
         Task<string> GetTemplatePaymentVoucher(int paymentVoucherId);
         Task<bool> SendEmailpaymentVoucher(int paymentVoucherId, List<AttachFile> attach_file, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name);
-        Task<string> GetTemplateHotelBookingCode(long ServiceId, long OrderId,string Note);
-        Task<bool> SendEmailBookingCode(long Id, long OrderId, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name, string Note);
+        Task<string> GetTemplateHotelBookingCode(long ServiceId, long OrderId,string Note, string Description);
+        Task<bool> SendEmailBookingCode(long Id, long OrderId, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name, string Note, string Description);
     }
 }
