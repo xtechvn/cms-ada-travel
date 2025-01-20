@@ -801,7 +801,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateTourFundCustomer(int id,long OrderId, int type)
+        public async Task<IActionResult> UpdateTourFundCustomer(int id, long OrderId, int type)
         {
             var sst_status = (int)ResponseType.SUCCESS;
             var msg = "Không thành công";
@@ -813,6 +813,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
                 {
                     var Tour_detail = await _tourRepository.GetDetailTourByID(Convert.ToInt32(id));
                     model.FundCustomerCare = (Tour_detail.Profit - (Tour_detail.Profit * 0.08)) * 0.03;
+                    model.Profit = model.Profit - model.FundCustomerCare == null ? 0 : model.FundCustomerCare;
                 }
                 else
                 {
