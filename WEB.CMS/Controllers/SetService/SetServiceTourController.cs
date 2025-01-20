@@ -809,14 +809,15 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
             {
 
                 var model = new Entities.Models.Tour();
+                var Tour_detail = await _tourRepository.GetDetailTourByID(Convert.ToInt32(id));
                 if (type == 1)
                 {
-                    var Tour_detail = await _tourRepository.GetDetailTourByID(Convert.ToInt32(id));
                     model.FundCustomerCare = (Tour_detail.Profit - (Tour_detail.Profit * 0.08)) * 0.03;
-                    model.Profit = model.Profit - model.FundCustomerCare == null ? 0 : model.FundCustomerCare;
+                    model.Profit = Tour_detail.Profit - (model.FundCustomerCare == null ? 0 : model.FundCustomerCare);
                 }
                 else
                 {
+                    model.Profit = Tour_detail.Profit + (Tour_detail.FundCustomerCare == null ? 0 : Tour_detail.FundCustomerCare);
                     model.FundCustomerCare = 0;
                 }
                 model.Id = id;
