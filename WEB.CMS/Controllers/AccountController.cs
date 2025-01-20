@@ -15,6 +15,7 @@ using WEB.CMS.Models;
 using Newtonsoft.Json.Linq;
 using WEB.Adavigo.CMS.Service;
 using Caching.RedisWorker;
+using Telegram.Bot.Types;
 
 namespace WEB.CMS.Controllers
 {
@@ -122,7 +123,7 @@ namespace WEB.CMS.Controllers
                     {
                         var user_exists = await _UserRepository.GetById(user_id);
                         var model = await _UserRepository.GetDetailUser(user_id);
-                        if (model.Entity == null) model.Entity = new User();
+                        if (model.Entity == null) model.Entity = new Entities.Models.User();
                         model.Entity.Id = user_id;
                         model.Entity.UserName = user_name;
                         model.Entity.Email = email;
@@ -263,8 +264,16 @@ namespace WEB.CMS.Controllers
 
         public IActionResult Login(string url = "/")
         {
-            ViewBag.ReturnURL = url;
-            return View();
+            if (_configuration["Config:On_QC_Environment"]==null ||_configuration["Config:On_QC_Environment"] == "0")
+            {
+                return Redirect(ReadFile.LoadConfig().LoginURL);
+            }
+            else
+            {
+                ViewBag.ReturnURL = url;
+                return View();
+            }
+         
         }
 
         /// <summary>

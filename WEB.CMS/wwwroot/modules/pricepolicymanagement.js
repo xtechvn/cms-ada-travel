@@ -14,7 +14,7 @@ var _pricepolicymanagement = {
             FromDate: '01/01/2000 00:00:00',
             ToDate: '12/31/2100 23:59:59',
             CampaginStatus: '0,1,2,3',
-            ClientType: '1,2,3,4,5,6,7,8',
+            ClientType: '1,2,3,4,5,6,7,8,10',
             ServiceType: -1
         };
         let objSearch = {
@@ -115,7 +115,7 @@ var _pricepolicymanagement = {
             objSearch.searchModel.ClientType = array_client_type.join(",");
         }
         else {
-            objSearch.searchModel.ClientType ='1,2,3,4,5,6,7,8'
+            objSearch.searchModel.ClientType ='1,2,3,4,5,6,7,8,10'
 
         }
         objSearch.searchModel.CampaginStatus = array_status.join(",");
@@ -248,7 +248,7 @@ var _pricepolicymanagement = {
             objSearch.searchModel.ClientType = array_client_type.join(",");
         }
         else {
-            objSearch.searchModel.ClientType = '1,2,3,4,5,6,7,8'
+            objSearch.searchModel.ClientType = '1,2,3,4,5,6,7,8,10'
 
         }
         objSearch.searchModel.CampaginStatus = array_status.join(",");
