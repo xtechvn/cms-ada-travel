@@ -159,11 +159,66 @@
                 </div>
                 <div class="txt_14 bold mb10"></div>
                 <div class="table-responsive table-gray" id="servicemanual-tour-total-amount-block">
-                    <div class="row">
+                    <table class="table table-nowrap">
+                        <tbody>
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold text-right">Tổng tiền dịch vụ:</td>
+                                <td class="bold text-right"><strong class="service-manual-tour-total-service-amount">0</strong>  </td>
+                                <td>
+                                </td>
+                            </tr>
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold text-right">Chi phí khác:</td>
+                                <td class="bold text-right">@(tour!=null && tour.Id>0 && tour.OthersAmount!=null?((double)tour.OthersAmount).ToString("N0"):"0")</strong></td>
+                                <td></td>
+                            </tr>
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold text-right">Hoa Hồng CTV:</td>
+                                <td class="bold text-right"><strong class="servicemanual-tour-total-commission">@(tour!=null && tour.Id>0&& tour.Commission!=null?((double)tour.Commission).ToString("N0"):"0")</strong></td>
+                                <td></td>
+                            </tr>
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold text-right">Quỹ CSKH:</td>
+                                <td class="bold text-right"><strong class="servicemanual-tour-total-fundCustomerCare">@(tour!=null && tour.Id>0&& tour.FundCustomerCare!=null?((double)tour.FundCustomerCare).ToString("N0"):"0")</strong></td>
+                                <td></td>
+                            </tr>
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold text-right">Tổng lợi nhuận dịch vụ:</td>
+                                <td class="bold text-right"><strong class="service-manual-tour-total-service-profit">0</strong></td>
+                                <td></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    @*<div class="text-right" style="margin-right:15px;">
                         <div class="col-6"></div>
-                        <div class="col-3 bold text-right">Tổng tiền dịch vụ:  &nbsp;&nbsp;&nbsp;&nbsp;<strong class="service-manual-tour-total-service-amount">0</strong> </div>
-                        <div class="col-3 bold text-right">Tổng lợi nhuận dịch vụ: &nbsp;&nbsp;&nbsp;&nbsp;<strong class="service-manual-tour-total-service-profit">0</strong></div>
-                    </div>
+
+                        <div class="bold text-right">Tổng tiền dịch vụ:  &nbsp;&nbsp;&nbsp;&nbsp;<strong class="service-manual-tour-total-service-amount">0</strong> </div>
+                        <div class="bold text-right">Chi phí khác: &nbsp;&nbsp;&nbsp;&nbsp;<strong class="servicemanual-tour-total-other-amount">@(tour!=null && tour.Id>0 && tour.OthersAmount!=null?((double)tour.OthersAmount).ToString("N0"):"0")</strong></div>
+                        <div class="bold text-right">Hoa Hồng CTV: &nbsp;&nbsp;&nbsp;&nbsp;<strong class="servicemanual-tour-total-commission">@(tour!=null && tour.Id>0&& tour.Commission!=null?((double)tour.Commission).ToString("N0"):"0")</strong></div>
+                        <div class="bold text-right">Quỹ CSKH: &nbsp;&nbsp;&nbsp;&nbsp;<strong class="servicemanual-tour-total-fundCustomerCare">@(tour!=null && tour.Id>0&& tour.FundCustomerCare!=null?((double)tour.FundCustomerCare).ToString("N0"):"0")</strong></div>
+                        <div class="bold text-right">Tổng lợi nhuận dịch vụ: &nbsp;&nbsp;&nbsp;&nbsp;<strong class="service-manual-tour-total-service-profit">0</strong></div>
+                    </div>*@
                 </div>
                 <div class="bold mb15 txt_14">Ghi chú</div>
                 <div class="form-group">

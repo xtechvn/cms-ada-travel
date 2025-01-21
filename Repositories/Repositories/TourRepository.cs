@@ -224,7 +224,7 @@ namespace Repositories.Repositories
                     SupplierId = tour_product.SupplierId,
                     Price = price,
                     Status = status,
-                    Profit = profit - data.commission - data.other_amount,
+                    Profit = profit - data.commission - data.other_amount - data.fundCustomerCare,
                     Days = (data.end_date - data.start_date).Days > 0 ? (data.end_date - data.start_date).Days : 1,
                     Image = "",
                     IsDisplayWeb = false,

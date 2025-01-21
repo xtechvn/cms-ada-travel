@@ -425,15 +425,21 @@ var _order_detail_tour = {
         $('.service-manual-tour-total-service-amount').html(amount_text)
     },
     CalucateTotalServiceProfit: function () {
+        $('.servicemanual-tour-total-other-amount').html(_global_function.Comma($('#servicemanual-tour-other-amount').val()))
+        $('.servicemanual-tour-total-commission').html(_global_function.Comma($('#servicemanual-tour-commission').val()))
+        $('.servicemanual-tour-total-fundCustomerCare').html(_global_function.Comma($('#servicemanual-tour-fundCustomerCare').val()))
         var profit_text = $('.service-tour-total-extrapackage-profit').html()
         var profit = parseFloat(profit_text.replaceAll(',', ''))
+
+        var fund_Customer_Care = $('#servicemanual-tour-fundCustomerCare').val()
+        var fundCustomerCare = parseFloat(fund_Customer_Care.replaceAll(',', ''))
 
         var other_amount_element = $('#servicemanual-tour-other-amount')
         var other_amount =  parseFloat(other_amount_element.val().replaceAll(',', ''))
 
         var discount_element = $('#servicemanual-tour-commission')
         var discount =  parseFloat(discount_element.val().replaceAll(',', ''))
-        var total_profit = profit - other_amount - discount
+        var total_profit = profit - other_amount - discount - fundCustomerCare
         $('.service-manual-tour-total-service-profit').html((total_profit >= 0 ? '' : '-') + _global_function.Comma(total_profit))
     },
     CalucateTotalServiceFundCustomerCare: function () {
@@ -732,12 +738,13 @@ var _order_detail_tour = {
         _msgconfirm.openDialog(_order_detail_html.summit_confirmbox_title, descriptiion, function () {
             $('.btn-summit-service-tour').attr('disabled', 'disabled')
             $('.btn-summit-service-tour').addClass('disabled')
-
+            _global_function.AddLoading()
             $.ajax({
                 url: "SummitTourServiceData",
                 type: "post",
                 data: { data: object_summit },
                 success: function (result) {
+                    _global_function.RemoveLoading()
                     if (result != undefined && result.status == 0) {
                         _msgalert.success(result.msg);
                         _order_detail_tour.Close();

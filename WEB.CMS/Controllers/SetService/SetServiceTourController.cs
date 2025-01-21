@@ -826,6 +826,12 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
                 if (data != 0 && data > 0)
                 {
                     _orderRepository.UpdateOrderAmountFundCustomer(OrderId);
+                    #region Update Order Amount:
+
+                    await _orderRepository.UpdateOrderDetail(OrderId, (long)model.UpdatedBy);
+                    await _orderRepository.ReCheckandUpdateOrderPayment(OrderId);
+
+                    #endregion
                     sst_status = (int)ResponseType.SUCCESS;
                     msg = "Sửa thành công";
                 }
