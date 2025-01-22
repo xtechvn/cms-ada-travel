@@ -49,11 +49,11 @@ namespace APP_CHECKOUT.RabitMQ
                 // Push message vào queue
                 var response_queue = InsertQueueSimpleDurable(_data_push, _configuration["Queue:QueueSyncES"]);
 
-                LogHelper.InsertLogTelegram("WorkQueueClient - SyncES ["+ function_name + "] [" + id + "][" + store_procedure + "] [" + index_es + "][" + project_id + "]: " + response_queue.ToString());
                 return true;
             }
             catch (Exception ex)
             {
+                LogHelper.InsertLogTelegram("WorkQueueClient - SyncES [" + function_name + "] [" + id + "][" + store_procedure + "] [" + index_es + "][" + project_id + "] ERROR: " + ex.ToString());
 
             }
             return false;
