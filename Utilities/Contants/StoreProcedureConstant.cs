@@ -291,6 +291,7 @@ namespace Utilities.Contants
         public static string GetDetailAccountClientByClientId = "SP_GetDetailAccountClientByClientId";
 
         public static string SP_CheckAmountRemainBySalerId = "SP_CheckAmountRemainBySalerId";
+        public static string SP_UpdateOrderIsSalerDebtLimit = "SP_UpdateOrderIsSalerDebtLimit";
 
 
         #region vin wonder

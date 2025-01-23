@@ -453,6 +453,7 @@ var _ordersCMS = {
             HINHTHUCTT: listHINHTHUCTT,
             Sale: null,
             BoongKingCode: null,
+            IsSalerDebtLimit: null,
             sysTemType:-1,
             StatusTab: 99,
         };
@@ -586,6 +587,7 @@ var _ordersCMS = {
         
         var objSearch = this.SearchParam;
         objSearch.searchModel.sysTemType = $('input[name="SysTemType"]:checked').val()
+        objSearch.searchModel.IsSalerDebtLimit = $('#IsSalerDebtLimit').val()
         objSearch.searchModel.HINHTHUCTT = listHINHTHUCTT;
         objSearch.searchModel.OrderNo = $('#OrderNo').find(':selected').val() == undefined || $('#OrderNo').find(':selected').val().trim() == '' ? '' : $('#OrderNo').find(':selected').val().trim(),
         objSearch.searchModel.ClientId = null;

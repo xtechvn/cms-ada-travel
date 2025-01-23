@@ -1111,7 +1111,8 @@ namespace Repositories.Repositories
             try
             {
                 return await _OrderDal.GetTotalCustomerCareFund(ids, ClientId);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetTotalCustomerCareFund in OrderRepository: " + ex);
             }
@@ -1139,7 +1140,7 @@ namespace Repositories.Repositories
             }
             return 0;
         }
-       
+
         public async Task<long> CheckBookClosingByDate(DateTime FromDate, DateTime ToDate)
         {
             try
@@ -1151,7 +1152,7 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("CheckBookClosingByDate in OrderRepository: " + ex);
             }
             return 0;
-        } 
+        }
         public async Task<long> UpdateBookClosingByOrderId(long OrderId, long IsLock, long UpdateBy)
         {
             try
@@ -1164,9 +1165,9 @@ namespace Repositories.Repositories
             }
             return 0;
         }
-        public async Task<List<OrderBookClosingRequestViewModel>> GetListOrderBookClosingByOrderId(long OrderId )
+        public async Task<List<OrderBookClosingRequestViewModel>> GetListOrderBookClosingByOrderId(long OrderId)
         {
-           
+
             try
             {
                 DataTable dt = await _OrderDal.GetListOrderBookClosingByOrderId(OrderId);
@@ -1186,10 +1187,10 @@ namespace Repositories.Repositories
         }
         public async Task<long> CountOrderInYear()
         {
-           
-            return  _OrderDal.CountOrderInYear();
+
+            return _OrderDal.CountOrderInYear();
         }
-        public async Task<long> CheckAmountRemainBySalerId(long SalerId)
+        public async Task<double> CheckAmountRemainBySalerId(long SalerId)
         {
             try
             {
@@ -1197,14 +1198,45 @@ namespace Repositories.Repositories
                 if (dt != null && dt.Rows.Count > 0)
                 {
 
-                   return dt.Rows[0]["AmountRemain"].Equals(DBNull.Value) ? 0 : Convert.ToInt32(dt.Rows[0]["AmountRemain"]);
-                
+                    return dt.Rows[0]["AmountRemain"].Equals(DBNull.Value) ? 0 : Convert.ToDouble(dt.Rows[0]["AmountRemain"]);
+
                 }
                 return -1;
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("CheckAmountRemainBySalerId - OrderRepository: " + ex);
+            }
+            return -1;
+        }
+        public async Task<int> UpdateOrderIsSalerDebtLimit(long OrderId, long IsSalerDebtLimit, long UpdatedBy, long UserVerify)
+        {
+            try
+            {
+                return await _OrderDal.UpdateOrderIsSalerDebtLimit(OrderId, IsSalerDebtLimit, UpdatedBy, UserVerify);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateOrderIsSalerDebtLimit- OrderRepository: " + ex);
+                return 0;
+            }
+        }
+        public async Task<double> AmountTotalBySalerId(long SalerId)
+        {
+            try
+            {
+                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+
+                    return dt.Rows[0]["AmountTotal"].Equals(DBNull.Value) ? 0 : Convert.ToDouble(dt.Rows[0]["AmountTotal"]);
+
+                }
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("AmountTotalBySalerId - OrderRepository: " + ex);
             }
             return -1;
         }

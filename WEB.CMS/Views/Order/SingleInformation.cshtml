@@ -20,6 +20,7 @@
 
                         <div class="status-green">@ViewBag.statusName  -  @ViewBag.PaymentStatus</div>
                         <div class="status-green">@(ViewBag.PermisionType==null? "Không công nợ" : ViewBag.PermisionType)</div> 
+                        <div class="status-green">@ViewBag.SalerDebtLimit</div> 
                      }
                     break;
                 case (int)(OrderStatus.WAITING_FOR_ACCOUNTANT):

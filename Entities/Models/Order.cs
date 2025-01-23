@@ -66,6 +66,7 @@ namespace Entities.Models
         public double? AmountFinalize { get; set; }
         public DateTime? FinalizeDate { get; set; }
         public bool? IsLock { get; set; }
+        public bool? IsSalerDebtLimit { get; set; }
 
         public virtual ContactClient ContactClient { get; set; }
         public virtual Contract Contract { get; set; }

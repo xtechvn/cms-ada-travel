@@ -127,6 +127,7 @@ namespace Entities.ViewModels
         public string ClientId { get; set; }
         public string SalerPermission { get; set; }
         public string BoongKingCode { get; set; }
+        public int? IsSalerDebtLimit { get; set; } = null;
         public int StatusTab { get; set; } = 99;
         public int PageIndex { get; set; } 
         public int pageSize { get; set; } 

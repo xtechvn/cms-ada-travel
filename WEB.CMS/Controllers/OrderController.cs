@@ -1027,6 +1027,10 @@ namespace WEB.Adavigo.CMS.Controllers
                     var client = await _clientRepository.GetClientDetailByClientId((long)dataOrder.ClientId);
                     if (dataOrder != null)
                     {
+                        if (dataOrder.IsSalerDebtLimit == true)
+                        {
+                            ViewBag.SalerDebtLimit = "Bảo lãnh công nợ";
+                        }
                         ViewBag.BranchCode = dataOrder.BranchCode;
                         ViewBag.Label = dataOrder.Label;
                         ViewBag.Note = dataOrder.Note;
@@ -2663,6 +2667,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     if (type == 0)
                     {
                         long status = Convert.ToInt32((int)OrderStatus.WAITING_FOR_OPERATOR);
+                        await _orderRepository.UpdateOrderIsSalerDebtLimit(OrderId, 1, _UserId, _UserId);
                         var data2 = await _orderRepository.UpdateOrderFinishPayment(OrderId, status);
                         if (data2 >= 0)
                         {
@@ -2735,7 +2740,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 }
                             }
                             sst_status = (int)ResponseType.SUCCESS;
-                            smg = "Công nợ thành công thành công";
+                            smg = "Công nợ thành công ";
                             LogActionMongo.InsertLog(modelLog);
                         }
                     }
@@ -2754,6 +2759,171 @@ namespace WEB.Adavigo.CMS.Controllers
                 sst_status = sst_status,
                 smg = smg
             });
+        }
+        public async Task<IActionResult> SaleDebtLimit()
+        {
+            var current_user = _ManagementUser.GetCurrentUser();
+            var user =await _userRepository.GetDetailUser(current_user.Id);
+            ViewBag.DebtLimit = ((double)user.Entity.DebtLimit).ToString("N0") ;
+            var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id);
+            ViewBag.AmountTotal = AmountTotal.ToString("N0");
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> SearchSaleDebtLimit(OrderViewSearchModel searchModel, int currentPage = 1, int pageSize = 20)
+        {
+            var model = new GenericViewModel<OrderViewModel>();
+            var model2 = new TotalCountSumOrder();
+            try
+            {
+                if (searchModel.OrderNo != null && searchModel.OrderNo.Trim() != "") searchModel.OrderNo = searchModel.OrderNo.ToUpper();
+                if (searchModel.HINHTHUCTT != null && searchModel.HINHTHUCTT[0] != null)
+                {
+                    foreach (var item in searchModel.HINHTHUCTT)
+                    {
+                        var listHINHTHUCTT = item.Split('_');
+                        if (searchModel.PermisionType == null)
+                        {
+                            searchModel.PermisionType = listHINHTHUCTT[0];
+                        }
+                        else
+                        {
+                            searchModel.PermisionType += "," + listHINHTHUCTT[0];
+                        }
+                        if (searchModel.PaymentStatus == null)
+                        {
+                            searchModel.PaymentStatus = listHINHTHUCTT[1];
+                        }
+                        else
+                        {
+                            searchModel.PaymentStatus += "," + listHINHTHUCTT[1];
+                        }
+
+                    }
+
+
+                }
+                var current_user = _ManagementUser.GetCurrentUser();
+                if (current_user != null)
+                {
+                    if (current_user.Role != "")
+                    {
+                        var list = current_user.Role.Split(',');
+                        foreach (var item in list)
+                        {
+                            bool is_admin = false;
+                            switch (Convert.ToInt32(item))
+                            {
+                                case (int)RoleType.SaleOnl:
+                                case (int)RoleType.SaleKd:
+                                case (int)RoleType.SaleTour:
+                                case (int)RoleType.TPDHKS:
+                                case (int)RoleType.TPDHVe:
+                                case (int)RoleType.TPDHTour:
+                                case (int)RoleType.TPKS:
+                                case (int)RoleType.TPTour:
+                                case (int)RoleType.TPVe:
+                                case (int)RoleType.DHPQ:
+                                case (int)RoleType.DHTour:
+                                case (int)RoleType.DHVe:
+                                case (int)RoleType.GDHN:
+                                case (int)RoleType.GDHPQ:
+                                    {
+                                        if (searchModel.SalerPermission == null || searchModel.SalerPermission.Trim() == "")
+                                        {
+                                            searchModel.SalerPermission = current_user.UserUnderList;
+                                        }
+                                        else
+                                        {
+                                            searchModel.SalerPermission += "," + current_user.UserUnderList;
+
+                                        }
+                                    }
+                                    break;
+                                case (int)RoleType.Admin:
+                                case (int)RoleType.KT:
+                                case (int)RoleType.GD:
+                                case (int)RoleType.PhoTPKeToan:
+                                    {
+                                        searchModel.Sale = null;
+                                        searchModel.SalerPermission = null;
+                                        is_admin = true;
+                                    }
+                                    break;
+                            }
+                            if (is_admin) break;
+                        }
+
+                        model = await _orderRepository.GetList(searchModel, currentPage, pageSize);
+                        model2 = await _orderRepository.GetTotalCountSumOrder(searchModel, -1, pageSize);
+                    }
+
+                }
+
+                long records;
+
+                switch (searchModel.StatusTab)
+                {
+                    case 99:
+                        records = model.TotalRecord;
+                        break;
+                    case 0:
+                        records = model.TotalRecord4;
+                        break;
+                    case 1:
+                        records = model.TotalRecord1;
+                        break;
+                    case 2:
+                        records = model.TotalRecord2;
+                        break;
+                    case 3:
+                        records = model.TotalRecord3;
+                        break;
+                    default:
+                        records = model.TotalrecordErr;
+                        break;
+                }
+                //model.TotalPage = (int)Math.Ceiling((double)records / model.PageSize);
+
+                ViewBag.FilterOrder = new FilterOrder()
+                {
+                    Totalrecord = model.TotalRecord,
+                    TotalData = records,
+                    Totalrecord1 = model.TotalRecord1,
+                    Totalrecord2 = model.TotalRecord2,
+                    Totalrecord3 = model.TotalRecord3,
+                    Totalrecord4 = model.TotalRecord4,
+                    TotalrecordErr = model.TotalrecordErr,
+                    TotalValueOrder = new TotalValueOrder()
+                    {
+                        //theo All
+                        TotalAmmount = model2.Amount.ToString("N0"),
+                        TotalDone = model?.ListData?.Sum(x => x.Amount).ToString("N0"),
+                        TotalProductService = model2.Price.ToString("N0"),
+                        TotalProfit = model2.Profit.ToString("N0")
+
+                        //theo pageSize
+                        //TotalAmmount = model?.ListData?.Sum(x => x.Amount).ToString("N0"),
+                        //TotalDone = model?.ListData?.Sum(x => x.Amount).ToString("N0"),
+                        //TotalProductService = model?.ListData?.Sum(x => x.Payment).ToString("N0"),
+                        //TotalProfit = model?.ListData?.Sum(x => x.Profit).ToString("N0")
+                    }
+                };
+                //model = await _orderRepository.GetPagingList(searchModel, currentPage, pageSize);
+                // Add Invoice Code:
+                ViewBag.Invoice = new List<InvoiceRequestViewModel>();
+                if (model != null && model.ListData != null && model.ListData.Count > 0)
+                {
+                    var order_ids = string.Join(",", model.ListData.Select(x => x.OrderId));
+                    ViewBag.Invoice = await _invoiceRepository.GetListInvoiceRequestbyOrderId(order_ids);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Search - OrderController: " + ex);
+            }
+
+            return PartialView(model);
         }
     }
 }

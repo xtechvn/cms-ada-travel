@@ -31,7 +31,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[24];
+                SqlParameter[] objParam = new SqlParameter[25];
 
 
                 objParam[0] = (CheckDate(searchModel.CreateTime) == DateTime.MinValue) ? new SqlParameter("@CreateTime", DBNull.Value) : new SqlParameter("@CreateTime", CheckDate(searchModel.CreateTime));
@@ -122,6 +122,7 @@ namespace DAL
                 }
 
                 objParam[23] = new SqlParameter("@OrderId", searchModel.BoongKingCode);
+                objParam[24] = new SqlParameter("@IsSalerDebtLimit", searchModel.IsSalerDebtLimit);
 
 
                 return _DbWorker.GetDataTable(proc, objParam);
@@ -1094,6 +1095,24 @@ namespace DAL
                 LogHelper.InsertLogTelegram("CheckAmountRemainBySalerId - OrderDal: " + ex);
             }
             return null ;
+        }
+        public async Task<int> UpdateOrderIsSalerDebtLimit(long OrderId, long Status, long UpdatedBy, long UserVerify)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[4];
+                objParam[0] = new SqlParameter("@OrderId", OrderId);
+                objParam[1] = new SqlParameter("@IsSalerDebtLimit", Status);
+                objParam[2] = new SqlParameter("@UpdatedBy", UpdatedBy);
+                objParam[3] = UserVerify == 0 ? new SqlParameter("@UserVerify", DBNull.Value) : new SqlParameter("@UserVerify", UserVerify);
+
+                return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdateOrderIsSalerDebtLimit, objParam);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetDetailOrderServiceByOrderId - OrderDal: " + ex);
+            }
+            return 0;
         }
     }
 }
