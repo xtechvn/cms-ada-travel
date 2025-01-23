@@ -10,7 +10,7 @@ namespace Caching.Elasticsearch
 {
     public class NationalESRepository : ESRepository<NationalESViewModel>
     {
-        private string index_name = "national_store";
+        private string index_name = "adavigo_sp_getnational";
         public NationalESRepository(string Host) : base(Host) { }
 
         public async Task<List<NationalESViewModel>> SearchNational(string txt_search)
@@ -26,7 +26,7 @@ namespace Caching.Elasticsearch
                 var elasticClient = new ElasticClient(connectionSettings);
 
                 var search_response = elasticClient.Search<NationalESViewModel>(s => s
-                          .Index(index_name + (_company_type.Trim() == "0" ? "" : "_" + _company_type.Trim()))
+                          .Index(index_name)
                           .Size(top)
                           .Query(q => 
                            q.Bool(
@@ -68,7 +68,7 @@ namespace Caching.Elasticsearch
                 var elasticClient = new ElasticClient(connectionSettings);
 
                 var search_response = elasticClient.Search<NationalESViewModel>(s => s
-                          .Index(index_name + (_company_type.Trim() == "0" ? "" : "_" + _company_type.Trim()))
+                          .Index(index_name)
                           .Size(top)
                           .Query(q => q
                            .Match(qs => qs
