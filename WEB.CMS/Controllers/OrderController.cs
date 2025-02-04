@@ -2804,6 +2804,7 @@ namespace WEB.Adavigo.CMS.Controllers
 
                 }
                 var current_user = _ManagementUser.GetCurrentUser();
+                searchModel.Sale = current_user.Id.ToString();
                 if (current_user != null)
                 {
                     if (current_user.Role != "")

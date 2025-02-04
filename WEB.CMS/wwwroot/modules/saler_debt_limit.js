@@ -17,7 +17,7 @@ var Saler_Dbt_Limit = {
             Status: [],
             CreateTime: null,
             CreateName: null,
-            HINHTHUCTT: [],
+            HINHTHUCTT: ['_0'],
             Sale: null,
             BoongKingCode: null,
             IsSalerDebtLimit: 1,
@@ -28,7 +28,7 @@ var Saler_Dbt_Limit = {
         let objSearch = {
             searchModel: _searchModel,
             currentPage: 1,
-            pageSize: 2
+            pageSize: 20
         };
         Saler_Dbt_Limit.Search(objSearch);
     },
