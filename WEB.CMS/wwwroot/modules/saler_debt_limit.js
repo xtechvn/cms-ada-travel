@@ -14,7 +14,7 @@ var Saler_Dbt_Limit = {
             Note: null,
             UtmSource: [],
             ServiceType: [],
-            Status: [],
+            Status: [2,3,4,5,6],
             CreateTime: null,
             CreateName: null,
             HINHTHUCTT: ['_0'],
