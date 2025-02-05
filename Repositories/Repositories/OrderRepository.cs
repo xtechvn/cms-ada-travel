@@ -55,7 +55,7 @@ namespace Repositories.Repositories
             var model = new GenericViewModel<OrderViewModel>();
             try
             {
-                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GET_TOTALCOUNT_ORDER);
+                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GET_TOTALCOUNT_ORDER);
                 if (dt != null && dt.Rows.Count > 0)
                 {
 
@@ -78,7 +78,7 @@ namespace Repositories.Repositories
             var model = new GenericViewModel<OrderViewModel>();
             try
             {
-                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GETALLORDER_SEARCH);
+                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETALLORDER_SEARCH);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     model.ListData = (from row in dt.AsEnumerable()
@@ -238,7 +238,7 @@ namespace Repositories.Repositories
             {
                 var listOrder = new List<OrderViewModel>();
                 var listOrderOutput = new List<OrderViewModel>();
-                var dt = _OrderDal.GetListOrderByClientId(clientId, ProcedureConstants.SP_GetDetailOrderByClientId, status);
+                var dt = _OrderDal.GetListOrderByClientId(clientId, StoreProcedureConstant.SP_GetDetailOrderByClientId, status);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     listOrder = (from row in dt.AsEnumerable()
@@ -459,7 +459,7 @@ namespace Repositories.Repositories
             {
                 var listOrder = new List<OrderViewModel>();
                 var listOrderOutput = new List<OrderViewModel>();
-                var dt = _OrderDal.GetListOrderByClientId(clientId, ProcedureConstants.SP_GetDetailOrderByClientId);
+                var dt = _OrderDal.GetListOrderByClientId(clientId, StoreProcedureConstant.SP_GetDetailOrderByClientId);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     listOrder = (from row in dt.AsEnumerable()
@@ -641,7 +641,7 @@ namespace Repositories.Repositories
             {
                 currentPage = -1;
                 var data = new List<OrderViewModel>();
-                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GETALLORDER_SEARCH);
+                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETALLORDER_SEARCH);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     data = (from row in dt.AsEnumerable()
@@ -1037,7 +1037,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var data = contractPayDAL.GetByOrderId(OrderId, ProcedureConstants.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
+                var data = contractPayDAL.GetByOrderId(OrderId, StoreProcedureConstant.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
                 var order = _OrderDal.GetByOrderId(OrderId);
 
                 if (order != null && order.OrderId > 0 && order.Amount > 0 && data != null && data.Count > 0 && order.Amount <= data.Sum(x => x.AmountPayDetail))
@@ -1065,7 +1065,7 @@ namespace Repositories.Repositories
                 var order = _OrderDal.GetByOrderId(order_id);
                 if (order.OrderStatus == (int)OrderStatus.CANCEL)
                 {
-                    var list_contract_pay = _contractPayDAL.GetByOrderId(order_id, ProcedureConstants.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
+                    var list_contract_pay = _contractPayDAL.GetByOrderId(order_id, StoreProcedureConstant.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
                     if (list_contract_pay != null && list_contract_pay.Count > 0)
                     {
                         //_contractPayDAL.UpdateContractPayDetail(string.Join(",", list_contract_pay.Select(x => x.PayId)), order_id, (order.Amount == null ? 0 : (double)order.Amount), user_summit);
@@ -1090,7 +1090,7 @@ namespace Repositories.Repositories
             var model = new TotalCountSumOrder();
             try
             {
-                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GET_TOTALCOUNT_ORDER);
+                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GET_TOTALCOUNT_ORDER);
                 if (dt != null && dt.Rows.Count > 0)
                 {
 

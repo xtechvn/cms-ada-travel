@@ -280,7 +280,7 @@ namespace Repositories.Repositories
             try
             {
                 var requestInfos = debtStatisticDAL.GetRequestDetail(debtStatisticId,
-                    ProcedureConstants.SP_GetDetailDebtStatistic).ToList<DebtStatisticViewModel>();
+                    StoreProcedureConstant.SP_GetDetailDebtStatistic).ToList<DebtStatisticViewModel>();
                 var requestInfo = requestInfos.FirstOrDefault();
                 requestInfo.RelateData = new List<DebtStatisticViewModel>();
                 var listOrder = GetOrderListByClientId(requestInfo.ClientId.Value, requestInfo.FromDate.Value, requestInfo.ToDate.Value, requestInfo.Id, true);
@@ -304,7 +304,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var listPaymentRequests = debtStatisticDAL.GetCountStatus(searchModel, ProcedureConstants.SP_CountListDebtStatistic).ToList<CountStatus>();
+                var listPaymentRequests = debtStatisticDAL.GetCountStatus(searchModel, StoreProcedureConstant.SP_CountListDebtStatistic).ToList<CountStatus>();
                 return listPaymentRequests;
             }
             catch (Exception ex)
@@ -320,7 +320,7 @@ namespace Repositories.Repositories
             try
             {
                 var listDebtStatistic = debtStatisticDAL.GetPagingList(searchModel, currentPage, pageSize,
-                ProcedureConstants.SP_GetListDebtStatistic).ToList<DebtStatisticViewModel>();
+                StoreProcedureConstant.SP_GetListDebtStatistic).ToList<DebtStatisticViewModel>();
 
                 //foreach (var item in listPaymentRequests)
                 //{
@@ -341,7 +341,7 @@ namespace Repositories.Repositories
             {
                 var listOutput = new List<DebtStatisticViewModel>();
                 var listOrderListByClientId = debtStatisticDAL.GetOrderListByClientId(clientId, fromDate, toDate,
-                    ProcedureConstants.SP_GetListOrder, isDetail).ToList<DebtStatisticViewModel>();
+                    StoreProcedureConstant.SP_GetListOrder, isDetail).ToList<DebtStatisticViewModel>();
                 listOutput = listOrderListByClientId;
                 if (debtStatisticId != 0)
                 {

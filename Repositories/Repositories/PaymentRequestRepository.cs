@@ -266,7 +266,7 @@ namespace Repositories.Repositories
             try
             {
                 var requestInfos = paymentRequestDAL.GetRequestDetail(paymentRequestId,
-                    ProcedureConstants.sp_GetDetailPaymentRequest).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.sp_GetDetailPaymentRequest).ToList<PaymentRequestViewModel>();
                 var requestInfo = requestInfos.FirstOrDefault();
                 if (requestInfo.PaymentVoucherId != null && requestInfo.PaymentVoucherId != 0)
                 {
@@ -293,7 +293,7 @@ namespace Repositories.Repositories
                         model.AccountNumber = item.AccountNumber;
                         model.ServiceId = (int)item.ServiceId;
                         var serviceInfo = paymentRequestDAL.GetDetailServiceById(item.ServiceId, item.ServiceType,
-                          ProcedureConstants.Sp_GetDetailServiceById).ToList<PaymentRequestViewModel>().FirstOrDefault();
+                          StoreProcedureConstant.Sp_GetDetailServiceById).ToList<PaymentRequestViewModel>().FirstOrDefault();
                         model.ServiceAmount = serviceInfo != null ? serviceInfo.Amount : 0;
                         model.ServicePrice = serviceInfo != null ? serviceInfo.Price : 0;
                         model.CreatedBy = item.CreatedBy;
@@ -303,7 +303,7 @@ namespace Repositories.Repositories
                 if (requestInfo.Type == (int)PAYMENT_VOUCHER_TYPE.THANH_TOAN_DICH_VU || requestInfo.Type == (int)PAYMENT_VOUCHER_TYPE.CHI_PHI_MARKETING)
                 {
                     var requestServiceDetails = paymentRequestDAL.GetRequestDetail(paymentRequestId,
-                        ProcedureConstants.sp_GetAllServiceByRequestiD).ToList<PaymentRequestViewModel>();
+                        StoreProcedureConstant.sp_GetAllServiceByRequestiD).ToList<PaymentRequestViewModel>();
                     foreach (var item in requestServiceDetails)
                     {
                         PaymentRequestDetailViewModel model = new PaymentRequestDetailViewModel();
@@ -311,7 +311,7 @@ namespace Repositories.Repositories
                         model.OrderId = item.OrderId;
                         model.ServiceId = (int)item.ServiceId;
                         var serviceInfo = paymentRequestDAL.GetDetailServiceById(item.ServiceId, item.ServiceType,
-                        ProcedureConstants.Sp_GetDetailServiceById).ToList<PaymentRequestViewModel>().FirstOrDefault();
+                        StoreProcedureConstant.Sp_GetDetailServiceById).ToList<PaymentRequestViewModel>().FirstOrDefault();
                         model.ServiceAmount = serviceInfo != null ? serviceInfo.Amount : 0;
                         double servicePrice = 0;
                         if (requestInfo.Type == (int)PAYMENT_VOUCHER_TYPE.THANH_TOAN_DICH_VU)
@@ -326,7 +326,7 @@ namespace Repositories.Repositories
                 //foreach (var item in requestInfo.RelateData)
                 //{
                 //    var serviceInfo = paymentRequestDAL.GetDetailServiceById(item.ServiceId, item.ServiceType,
-                //        ProcedureConstants.sp_GetAllServiceByRequestiD).ToList<PaymentRequestViewModel>().FirstOrDefault();
+                //        StoreProcedureConstant.sp_GetAllServiceByRequestiD).ToList<PaymentRequestViewModel>().FirstOrDefault();
                 //    item.ServiceAmount = serviceInfo != null ? serviceInfo.Amount : 0;
                 //    item.ServicePrice = serviceInfo != null ? serviceInfo.Price : 0;
                 //}
@@ -476,7 +476,7 @@ namespace Repositories.Repositories
             try
             {
                 var listPaymentRequests = paymentRequestDAL.GetPagingList(searchModel, currentPage, pageSize,
-                ProcedureConstants.SP_GetListPaymentRequest).ToList<PaymentRequestViewModel>();
+                StoreProcedureConstant.SP_GetListPaymentRequest).ToList<PaymentRequestViewModel>();
                 if (listPaymentRequests.FirstOrDefault() != null)
                     total = listPaymentRequests.FirstOrDefault().TotalRow;
                 var listServiceFlyStr = new List<string>();
@@ -547,7 +547,7 @@ namespace Repositories.Repositories
             try
             {
                 var listPaymentRequests = paymentRequestDAL.GetCountStatus(searchModel,
-                ProcedureConstants.SP_CountPaymentRequestByStatus).ToList<CountStatus>();
+                StoreProcedureConstant.SP_CountPaymentRequestByStatus).ToList<CountStatus>();
                 return listPaymentRequests;
             }
             catch (Exception ex)
@@ -581,7 +581,7 @@ namespace Repositories.Repositories
                 //tính lại số tiền phiếu chi nếu có
                 var amountChange = entity.Amount - model.Amount;
                 var paymentVoucher = paymentVoucherDAL.CheckExistsPaymentRequest(new List<long>() { model.Id },
-                    ProcedureConstants.SP_CheckExistsPaymentVoucherByRequestId);
+                    StoreProcedureConstant.SP_CheckExistsPaymentVoucherByRequestId);
                 if (paymentVoucher.Count > 0)
                 {
                     foreach (var item in paymentVoucher)
@@ -627,7 +627,7 @@ namespace Repositories.Repositories
             {
                 var listService = new List<PaymentRequestViewModel>();
                 var listServiceOutput = paymentRequestDAL.GetServiceListBySupplierId(supplierId,
-                    ProcedureConstants.SP_GetAllServiceBySupplierId).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.SP_GetAllServiceBySupplierId).ToList<PaymentRequestViewModel>();
                 var listServiceId = listServiceOutput.Select(n => Convert.ToInt64(n.ServiceId)).ToList();
                 var listRequestDetail = paymentRequestDAL.GetByDataIds(listServiceId);
                 if (requestId == 0)
@@ -682,7 +682,7 @@ namespace Repositories.Repositories
             try
             {
                 var listServiceOutput = paymentRequestDAL.GetServiceListByClientId(clientId,
-                    ProcedureConstants.SP_GetAllServiceByClientId).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.SP_GetAllServiceByClientId).ToList<PaymentRequestViewModel>();
                 var listService = new List<PaymentRequestViewModel>();
                 var listRequestDetail = paymentRequestDAL.GetByDataIds(listServiceOutput.Select(n => Convert.ToInt64(n.OrderId)).ToList());
                 foreach (var item in listServiceOutput)
@@ -704,7 +704,7 @@ namespace Repositories.Repositories
                     if (requestId > 0)
                     {
                         var requestServiceDetails = paymentRequestDAL.GetRequestDetail(requestId,
-                       ProcedureConstants.sp_GetAllServiceByRequestiD).ToList<PaymentRequestViewModel>();
+                       StoreProcedureConstant.sp_GetAllServiceByRequestiD).ToList<PaymentRequestViewModel>();
                         foreach (var service in requestServiceDetails)
                         {
                             if (listService.FirstOrDefault(n => n.ServiceId == service.ServiceId) == null)
@@ -732,11 +732,11 @@ namespace Repositories.Repositories
         {
             try
             {
-                var listPaymentRequestByClientId = paymentRequestDAL.GetListPaymentRequestByClientId(clientId, Type, ProcedureConstants.SP_GetListPaymentRequestByClientId).ToList<PaymentRequestViewModel>();
+                var listPaymentRequestByClientId = paymentRequestDAL.GetListPaymentRequestByClientId(clientId, Type, StoreProcedureConstant.SP_GetListPaymentRequestByClientId).ToList<PaymentRequestViewModel>();
                 var listPaymentRequest = listPaymentRequestByClientId.Where(n => n.Status == (int)PAYMENT_REQUEST_STATUS.CHO_CHI).ToList();
                 var listPaymentRequestOutput = new List<PaymentRequestViewModel>();
                 var listPaymentRequestExists = paymentRequestDAL.GetPaymentRequestExists(listPaymentRequest.Select(n => n.Id).ToList(),
-                    ProcedureConstants.SP_CheckCreatePaymentVoucher).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.SP_CheckCreatePaymentVoucher).ToList<PaymentRequestViewModel>();
                 var listRequetIdExists = new List<long>();
                 foreach (var item in listPaymentRequestExists)
                 {
@@ -795,10 +795,10 @@ namespace Repositories.Repositories
             try
             {
                 var listPaymentRequest = paymentRequestDAL.GetServiceListBySupplierId(supplierId,
-                    ProcedureConstants.SP_GetListPaymentRequestBySupplierId, requestType).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.SP_GetListPaymentRequestBySupplierId, requestType).ToList<PaymentRequestViewModel>();
                 var listPaymentRequestOutput = new List<PaymentRequestViewModel>();
                 var listPaymentRequestExists = paymentRequestDAL.GetPaymentRequestExists(listPaymentRequest.Select(n => n.Id).ToList(),
-                    ProcedureConstants.SP_CheckCreatePaymentVoucher).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.SP_CheckCreatePaymentVoucher).ToList<PaymentRequestViewModel>();
                 var listRequetIdExists = new List<long>();
                 foreach (var item in listPaymentRequestExists)
                 {
@@ -857,7 +857,7 @@ namespace Repositories.Repositories
             try
             {
                 var listServiceOutput = paymentRequestDAL.GetListPaymentRequestByServiceId(serviceId, type,
-                    ProcedureConstants.sp_GetListPaymentRequestByServiceId, requestType).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.sp_GetListPaymentRequestByServiceId, requestType).ToList<PaymentRequestViewModel>();
                 foreach (var item in listServiceOutput)
                 {
                     item.ListServiceCodeAndType = new List<CountStatus>();
@@ -887,7 +887,7 @@ namespace Repositories.Repositories
             try
             {
                 var listPaymentRequest = paymentRequestDAL.GetListPaymentRequestByClientId(clientId, 3,
-                    ProcedureConstants.SP_GetListPaymentRequestByClientId).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.SP_GetListPaymentRequestByClientId).ToList<PaymentRequestViewModel>();
                 foreach (var item in listPaymentRequest)
                 {
                     item.ListServiceCodeAndType = new List<CountStatus>();

@@ -19,6 +19,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Contants;
 
 namespace Repositories
 {
@@ -40,7 +41,7 @@ namespace Repositories
             try
             {
 
-                DataTable dt = await _PolicyDAL.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.SP_GetListPolicy);
+                DataTable dt = await _PolicyDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.SP_GetListPolicy);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = (from row in dt.AsEnumerable()

@@ -79,12 +79,14 @@ namespace WEB.CMS.Controllers
         }
 
         [HttpPost]
-        public IActionResult Search(string userName, string strRoleId, int status = -1, int currentPage = 1, int pageSize = 20)
+        public IActionResult Search(string userName, int? status, int currentPage = 1, int pageSize = 20)
         {
             var model = new GenericViewModel<UserGridModel>();
             try
             {
-                model = _UserRepository.GetPagingList(userName, strRoleId, status, currentPage, pageSize);
+                if (status < 0 || status>2) status = null;
+                if (userName !=null && userName.Trim()!="") userName = CommonHelper.RemoveUnicode(userName);
+                model = _UserRepository.GetPagingList(userName, status, currentPage, pageSize);
             }
             catch (Exception ex)
             {
@@ -203,6 +205,8 @@ namespace WEB.CMS.Controllers
                     model.Id = exists_detail.Id;
                     var combine_company_type = (exists_detail.CompanyType + "," + model.CompanyType).Split(",").Where(x => x != null && x.Trim() != "").Distinct();
                     model.CompanyType = string.Join(",", combine_company_type);
+                    model.CreatedBy = exists_detail.CreatedBy;
+                    model.CreatedOn = exists_detail.CreatedOn;
                 }
                 //-- Update dbUser:
                 var success = await _aPIService.UpdateUser(model);
@@ -293,11 +297,11 @@ namespace WEB.CMS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateUserRole(int userId, int[] arrRole, int type)
+        public async Task<IActionResult> UpdateUserRole(int userId, int[] arrRole)
         {
             try
             {
-                var rs = await _UserRepository.UpdateUserRole(userId, arrRole, type);
+                var rs = await _UserRepository.UpdateUserRole(userId, arrRole);
 
                 if (rs > 0)
                 {
@@ -326,7 +330,40 @@ namespace WEB.CMS.Controllers
                 });
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> DeleteUserRole(int userId, int[] arrRole)
+        {
+            try
+            {
+                var rs = await _UserRepository.DeleteUserRole(userId, arrRole);
 
+                if (rs > 0)
+                {
+                    return new JsonResult(new
+                    {
+                        isSuccess = true,
+                        message = "Xóa thành công"
+                    });
+                }
+                else
+                {
+                    return new JsonResult(new
+                    {
+                        isSuccess = false,
+                        message = "Xóa thất bại"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("RemoveUserRole - UserController: " + ex);
+                return new JsonResult(new
+                {
+                    isSuccess = false,
+                    message = ex.Message.ToString()
+                });
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> ChangeUserStatus(int id)
         {

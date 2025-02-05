@@ -59,7 +59,7 @@ namespace DAL
                     objParam[9] = new SqlParameter("@ProviderName", DBNull.Value);
 
 
-                return _DbWorker.GetDataTable(ProcedureConstants.Campaign_Search, objParam);
+                return _DbWorker.GetDataTable(StoreProcedureConstant.Campaign_Search, objParam);
             }
             catch (Exception ex)
             {

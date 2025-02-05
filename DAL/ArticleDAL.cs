@@ -68,7 +68,7 @@ namespace DAL
                 objParam[8] = new SqlParameter("@CurentPage", currentPage);
                 objParam[9] = new SqlParameter("@PageSize", pageSize);
 
-                return _DbWorker.GetDataTable(ProcedureConstants.ARTICLE_SEARCH, objParam);
+                return _DbWorker.GetDataTable(StoreProcedureConstant.ARTICLE_SEARCH, objParam);
             }
             catch (Exception ex)
             {
