@@ -3001,7 +3001,204 @@ namespace WEB.Adavigo.CMS.Service
                             if (item.Hotel != null)
                             {
                                 string note = string.Empty;
+                                string passenger = String.Empty;
+                                string datatabledv = String.Empty;
+                                string datatabledvkhac = String.Empty;
+                                string chitietdichvu = String.Empty;
+                                string chitietdichvukhac = String.Empty;
 
+
+                                var model = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.ServiceId));
+                                var hotel = await _hotelBookingRepositories.GetHotelBookingByID(Convert.ToInt32(item.ServiceId));
+                                var datahotelbookingroomextrapackage = await _hotelBookingRoomExtraPackageRepository.Gethotelbookingroomextrapackagebyhotelbookingid(Convert.ToInt32(item.ServiceId));
+
+
+                                foreach (var item2 in datahotelbookingroomextrapackage)
+                                {
+                                    passenger += "" + item2.PackageCode + "&#10 ";
+
+                                }
+                                var rooms = await _hotelBookingRepositories.GetHotelBookingOptionalListByHotelBookingId(Convert.ToInt32(item.ServiceId));
+                                var packages = await _hotelBookingRoomRepository.GetHotelBookingRoomRatesOptionalByBookingId(Convert.ToInt32(item.ServiceId));
+                                var extra_package = await _hotelBookingRoomExtraPackageRepository.GetByBookingID(Convert.ToInt32(item.ServiceId));
+                                List<HotelBookingRoomRatesOptionalViewModel> package_daterange = new List<HotelBookingRoomRatesOptionalViewModel>();
+                                
+                                var NumberOfAdult = rooms.Sum(x => x.NumberOfAdult);
+                                var NumberOfChild = rooms.Sum(x => x.NumberOfChild);
+                                var NumberOfInfant = rooms.Sum(x => x.NumberOfInfant);
+                                var NumberOfRoom = rooms.Sum(x => x.NumberOfRooms);
+                                var sumtoday = 0;
+                                var Amount = rooms.Sum(x => x.TotalAmount);
+                                double AmountDVK = 0;
+                                double number_of_people = (double)rooms.Sum(x => x.NumberOfAdult) + (double)rooms.Sum(x => x.NumberOfChild) + (double)rooms.Sum(x => x.NumberOfInfant);
+                                if (packages != null && packages.Count > 0)
+                                {
+                                    foreach (var p in packages)
+                                    {
+                                        if (p.StartDate == null && p.EndDate == null)
+                                        {
+                                            if (packages.Count < 1 || !package_daterange.Any(x => x.HotelBookingRoomId == p.HotelBookingRoomId && x.RatePlanId == p.RatePlanId))
+                                            {
+                                                var add_value = p;
+                                                add_value.StartDate = add_value.StayDate;
+                                                add_value.EndDate = add_value.StayDate.AddDays(1);
+                                                p.StayDate = (DateTime)add_value.StartDate;
+                                                p.SalePrice = p.TotalAmount;
+                                                p.OperatorPrice = p.Price;
+                                                package_daterange.Add(add_value);
+                                            }
+                                            else
+                                            {
+                                                var p_d = package_daterange.FirstOrDefault(x => x.HotelBookingRoomId == p.HotelBookingRoomId && x.RatePlanId == p.RatePlanId && ((DateTime)x.EndDate).Date == p.StayDate.Date);
+                                                if (p_d != null)
+                                                {
+
+                                                    if (p_d.StartDate == null || p_d.StartDate > p.StayDate)
+                                                        p_d.StartDate = p.StayDate;
+                                                    p_d.EndDate = p.StayDate.AddDays(1);
+                                                }
+                                                else
+                                                {
+                                                    var add_value = p;
+                                                    add_value.StartDate = add_value.StayDate;
+                                                    add_value.EndDate = add_value.StayDate.AddDays(1);
+                                                    p.StayDate = (DateTime)add_value.StartDate;
+                                                    p.SalePrice = p.TotalAmount;
+                                                    p.OperatorPrice = p.Price;
+                                                    package_daterange.Add(add_value);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            package_daterange.Add(p);
+                                        }
+                                    }
+                                }
+                                if (rooms != null && rooms.Count > 0)
+                                    foreach (var item2 in rooms)
+                                    {
+                                        string RatePlanCode = String.Empty;
+                                        string date_time = String.Empty;
+                                        double Nights = 0;
+                                        string TotalAmount = String.Empty;
+                                        string operatorprice = String.Empty;
+                                        string Goi = String.Empty;
+                                        string TgSD = String.Empty;
+                                        string GiaN = String.Empty;
+                                        string SDem = String.Empty;
+                                        string SP = String.Empty;
+                                        string TTien = String.Empty;
+                                        double NumberOfRooms = 0;
+                                        var package_by_room_id = packages.Where(x => x.HotelBookingRoomOptionalId == item2.Id);
+                                        if (package_by_room_id != null && package_by_room_id.Count() > 0)
+                                        {
+                                            sumtoday += (int)package_by_room_id.Sum(s => s.Nights);
+                                            foreach (var p in package_by_room_id)
+                                            {
+                                                double operator_price = 0;
+                                                if (p.Price != null) operator_price = Math.Round(((double)p.SaleTotalAmount / (double)p.Nights / (double)item2.NumberOfRooms), 0);
+                                                if (operator_price <= 0) operator_price = p.SalePrice != null ? (double)p.SalePrice : 0;
+
+                                                RatePlanCode = p.RatePlanCode;
+                                                date_time = (p.StartDate == null ? "" : ((DateTime)p.StartDate).ToString("dd/MM/yyyy")) + " - " + (p.EndDate == null ? "" : ((DateTime)p.EndDate).ToString("dd/MM/yyyy"));
+                                                operatorprice = operator_price.ToString("N0");
+                                                Nights = (double)p.Nights;
+                                                TotalAmount = ((double)p.SaleTotalAmount).ToString("N0");
+                                                NumberOfRooms = item2.NumberOfRooms == null ? 1 : (double)item2.NumberOfRooms;
+                                                Goi += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</div>";
+                                                TgSD += "<div style='border: 1px solid #999; padding:2px; text-align: center;'>" + date_time + "</div>";
+                                                GiaN += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</div>";
+                                                SDem += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</div>";
+                                                SP = "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</div>";
+                                                TTien += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</div>";
+                                            }
+
+                                        }
+                                        chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.RoomTypeName + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Goi + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding:2px; text-align: center;'>" + TgSD + "</td>" +
+                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + GiaN + "</td>" +
+                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SDem + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SP + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TTien + "</td>"
+                                                                      + "</tr>";
+
+                                    }
+                                if (extra_package != null && extra_package.Count > 0)
+                                    foreach (var item2 in extra_package)
+                                    {
+                                        double operator_price = 0;
+                                        if (item2.UnitPrice == null)
+                                        {
+                                            AmountDVK += (double)(item2.Amount - item2.Profit);
+                                        }
+                                        else
+                                        {
+                                            AmountDVK += (double)item2.UnitPrice;
+                                        };
+
+                                        if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.UnitPrice / (double)item2.Nights / (double)item2.Quantity), 0);
+                                        if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
+                                        chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageCode + "</td>" +
+                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageId + "</td>" +
+                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.StartDate == null ? "" : ((DateTime)item2.StartDate).ToString("dd/MM/yyyy")) + " - " + (item2.EndDate == null ? "" : ((DateTime)item2.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
+                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operator_price.ToString("N0") + "</td>" +
+                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.Nights != null ? ((double)item2.Nights).ToString("N0") : "1") + "</td>" +
+                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.Quantity != null ? ((double)item2.Quantity).ToString("N0") : "1") + "</td>" +
+                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item2.Amount).ToString("N0") + "</td>" +
+                                                                          "</tr>";
+
+
+                                    }
+
+
+                                if (chitietdichvu != string.Empty)
+                                {
+                                    datatabledv = "<tr><td colspan='4'><table style='border-collapse: collapse;width:100%;'>" +
+                                                                "<thead>" +
+                                                                    "<tr>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Hạng phòng</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Gói</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thời gian sử dụng</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá bán</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số đêm</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số phòng</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                    "</tr> " +
+                                                                "</thead>" +
+                                                                "<tbody>" +
+                                                                    chitietdichvu +
+                                                               "</tbody>" +
+                                                           "</table></td></tr>";
+                                }
+                                else
+                                {
+                                    datatabledv = "";
+                                }
+                                if (extra_package != null && extra_package.Count > 0)
+                                {
+                                    datatabledvkhac = "<tr><td colspan='4'> <table style='border-collapse: collapse;width:100%;'>" +
+                                                            "<thead>" +
+                                                                "<tr>" +
+                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Tên dịch vụ</th>" +
+                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Gói</th>" +
+                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thời gian sử dụng</th>" +
+                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá bán</th>" +
+                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số ngày	</th>" +
+                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số lượng</th>" +
+                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                "</tr> " +
+                                                            "</thead>" +
+                                                            "<tbody>" +
+                                                                chitietdichvukhac +
+                                                           "</tbody>" +
+                                                       "</table></td></tr>";
+                                }
+                                else
+                                {
+                                    datatabledvkhac = "";
+                                }
                                 var hotedetail = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.ServiceId));
 
                                 note += "<tr>" +
@@ -3019,8 +3216,8 @@ namespace WEB.Adavigo.CMS.Service
                                 "<tr>" +
                                     "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Số đêm</td>" +
                                     "<td style='border: 1px solid #999; padding: 5px;'>" + item.Hotel[0].TotalDays + "</td>" +
-                                "</tr>" +
-
+                                "</tr>" + datatabledv
+                                + datatabledvkhac +
                                 "<tr>" +
                                     "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
                                     "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + item.Hotel[0].TotalAmount.ToString("N0") + "</td>" +

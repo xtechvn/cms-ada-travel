@@ -383,7 +383,7 @@ namespace Repositories.Repositories
             {
                 var listDepositFunding = new List<DepositFunding>();
                 var listDepositFundingOutput = new List<DepositFunding>();
-                var dt = depositHistoryDAL.GetListOrderByClientId(clientId, ProcedureConstants.SP_GetDepositHistoryByClientId);
+                var dt = depositHistoryDAL.GetListOrderByClientId(clientId, StoreProcedureConstant.SP_GetDepositHistoryByClientId);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     listDepositFunding = (from row in dt.AsEnumerable()
