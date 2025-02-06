@@ -2,7 +2,7 @@
     var _searchData = {
         userName: '',
         strRoleId: '',
-        status: -1,
+        status: null,
         currentPage: 1,
         pageSize: 20
     };
@@ -486,37 +486,22 @@ var _user = {
         }
     },
 
-    OnUpdateRole: function (userid, type) {
+    OnUpdateRole: function (userid) {
         let _arrRole = [];
         let _arrRoleData = [];
 
-        if (type === 0) {
-            $('.data-left[data-id=' + userid + '] li.active').each(function () {
-                let _roleid = $(this).data('id');
-                let _rolename = $(this).html();
-                _arrRole.push(parseInt(_roleid));
-                _arrRoleData.push({ roleid: _roleid, rolename: _rolename })
-            });
-            $('.data-right[data-id=' + userid + ']').each(function () {
-                let _roleid = $(this).data('id');
-                let _rolename = $(this).html();
-                _arrRole.push(parseInt(_roleid));
-                _arrRoleData.push({ roleid: _roleid, rolename: _rolename })
-            });
-        } else {
-            $('.data-right[data-id=' + userid + '] li.active').each(function () {
-                let _roleid = $(this).data('id');
-                let _rolename = $(this).html();
-                _arrRole.push(parseInt(_roleid));
-                _arrRoleData.push({ roleid: _roleid, rolename: _rolename })
-            });
-        }
+        $('.data-left[data-id=' + userid + '] li.active').each(function () {
+            let _roleid = $(this).data('id');
+            let _rolename = $(this).html();
+            _arrRole.push(parseInt(_roleid));
+            _arrRoleData.push({ roleid: _roleid, rolename: _rolename })
+        });
+      
 
         if (_arrRole.length > 0) {
             let input = {
                 userId: userid,
                 arrRole: _arrRole,
-                type: type
             }
             $.ajax({
                 url: "/user/UpdateUserRole",
@@ -526,18 +511,45 @@ var _user = {
                     if (result.isSuccess) {
                         let strHtml = "";
                         _arrRoleData.map((obj) => strHtml += '<li data-id="' + obj.roleid + '">' + obj.rolename + '</li>');
-                        if (type === 0) {
-                            $('.data-left[data-id=' + userid + '] li.active').remove();
-                            $('.data-right[data-id=' + userid + ']').append(strHtml);
-                        } else {
-                            $('.data-right[data-id=' + userid + '] li.active').remove();
-                            $('.data-left[data-id=' + userid + ']').append(strHtml);
-                        }
+                        $('.data-left[data-id=' + userid + '] li.active').remove();
+                        $('.data-right[data-id=' + userid + ']').append(strHtml);
                     }
                 }
             });
         }
        
+    },
+    RemoveUserRole: function (userid) {
+        let _arrRole = [];
+        let _arrRoleData = [];
+
+        $('.data-right[data-id=' + userid + '] li.active').each(function () {
+            let _roleid = $(this).data('id');
+            let _rolename = $(this).html();
+            _arrRole.push(parseInt(_roleid));
+            _arrRoleData.push({ roleid: _roleid, rolename: _rolename })
+        });
+
+        if (_arrRole.length > 0) {
+            let input = {
+                userId: userid,
+                arrRole: _arrRole,
+            }
+            $.ajax({
+                url: "/user/DeleteUserRole",
+                type: "post",
+                data: input,
+                success: function (result) {
+                    if (result.isSuccess) {
+                        let strHtml = "";
+                        _arrRoleData.map((obj) => strHtml += '<li data-id="' + obj.roleid + '">' + obj.rolename + '</li>');
+                        $('.data-right[data-id=' + userid + '] li.active').remove();
+                        $('.data-left[data-id=' + userid + ']').append(strHtml);
+                    }
+                }
+            });
+        }
+
     },
 
     OnResetPassword: function (id) {
