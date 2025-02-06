@@ -29,9 +29,11 @@ namespace Entities.ViewModels
 
     public class UserGridModel : User
     {
-        public List<Role> RoleList { get; set; }
-        public Entities.Models.Department UserDepartment { get; set; }
-        public Entities.Models.UserPosition UserPosition { get; set; }
+        public string UserRoleName { get; set; }
+        public string UserPositionName { get; set; }
+        public string UserDepartmentName { get; set; }
+      
+        public int TotalRow { get; set; }
     }
 
     public class AccountModel

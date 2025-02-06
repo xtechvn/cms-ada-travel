@@ -4,6 +4,7 @@ using Entities.Models;
 using Entities.ViewModels;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Contants;
 
 namespace DAL
 {
@@ -22,72 +24,21 @@ namespace DAL
             _DbWorker = new DbWorker(connection);
         }
 
-        public List<UserGridModel> GetUserPagingList(string userName, string strRoleId, int status, int currentPage, int pageSize, out int totalRecord)
+        public List<UserGridModel> GetUserPagingList(string name, int? status, int page_index, int page_size)
         {
-            totalRecord = 0;
             try
             {
-                using (var _DbContext = new EntityDataContext(_connection))
+                SqlParameter[] objParam = new SqlParameter[]
                 {
-                    var ListUser = _DbContext.User.AsQueryable();
-
-                    if (!string.IsNullOrEmpty(userName))
-                    {
-                        ListUser = ListUser.Where(s => s.UserName.Contains(userName) || s.FullName.Contains(userName) || s.Email.Contains(userName));
-                    }
-
-                    if (status != -1)
-                    {
-                        ListUser = ListUser.Where(s => s.Status == status);
-                    }
-
-                    if (!string.IsNullOrEmpty(strRoleId))
-                    {
-                        var ListUserId = GetListUserIdByRole(strRoleId);
-                        ListUser = ListUser.Where(s => ListUserId.Contains(s.Id));
-                    }
-
-                    totalRecord = ListUser.Count();
-                    ListUser = ListUser.OrderByDescending(s => s.CreatedOn).Skip((currentPage - 1) * pageSize).Take(pageSize);
-
-
-                    var data = ListUser.Select(s => new UserGridModel
-                    {
-                        Id = s.Id,
-                        Avata = s.Avata,
-                        UserName = s.UserName,
-                        FullName = s.FullName,
-                        Phone = s.Phone,
-                        Email = s.Email,
-                        Note = s.Note,
-                        BirthDay = s.BirthDay,
-                        Address = s.Address,
-                        Status = s.Status,
-                        CreatedOn = s.CreatedOn,
-                        RoleList = (from a in _DbContext.UserRole.Where(a => a.UserId == s.Id)
-                                    join b in _DbContext.Role on a.RoleId equals b.Id into bs
-                                    from b in bs.DefaultIfEmpty()
-                                    select new Role
-                                    {
-                                        Id = b.Id,
-                                        Name = b.Name,
-                                        Status = b.Status
-                                    }).ToList(),
-                        UserDepartment = (from a in _DbContext.Department.Where(a => a.Id == s.DepartmentId)
-                                          select new Department
-                                          {
-                                              Id = a.Id,
-                                              DepartmentName = a.DepartmentName,
-                                          }).FirstOrDefault(),
-                        UserPosition = (from a in _DbContext.UserPosition.Where(a => a.Id == s.UserPositionId)
-                                        select new UserPosition
-                                        {
-                                            Id = a.Id,
-                                            Name = a.Name,
-                                        }).FirstOrDefault(),
-
-                    }).ToList();
-                    return data;
+                    new SqlParameter("@Name", ((name==null||name.Trim()=="")? DBNull.Value: name)),
+                    new SqlParameter("@Status", (status==null? DBNull.Value: (int)status)),
+                    new SqlParameter("@PageIndex", page_index),
+                    new SqlParameter("@PageSize",page_size)
+                };
+                var dt = _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetAllUser_search, objParam);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    return dt.ToList<UserGridModel>();
                 }
             }
             catch (Exception ex)
@@ -97,83 +48,7 @@ namespace DAL
             return null;
         }
 
-        /// <summary>
-        /// UpdateUserRole
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="roleId"></param>
-        /// <param name="type">
-        /// 0 : add roles
-        /// 1 : remove roles</param>
-        /// <returns></returns>
-        public async Task UpdateUserRole(int userId, int[] arrayRole, int type = 0)
-        {
-            try
-            {
-                using (var _DbContext = new EntityDataContext(_connection))
-                {
-                    if (type == 0)
-                    {
-                        foreach (var roleId in arrayRole)
-                        {
-                            var model = await _DbContext.UserRole.Where(s => s.UserId == userId && s.RoleId == roleId).FirstOrDefaultAsync();
-                            if (model == null || model.Id <= 0)
-                            {
-                                model = new UserRole
-                                {
-                                    UserId = userId,
-                                    RoleId = roleId
-                                };
-
-                                await _DbContext.UserRole.AddAsync(model);
-                                await _DbContext.SaveChangesAsync();
-                            }
-
-                        }
-                        var list = await _DbContext.UserRole.Where(s => s.UserId == userId && !arrayRole.Contains(s.RoleId)).ToListAsync();
-                        if (list != null && list.Count > 0)
-                        {
-                            _DbContext.UserRole.RemoveRange(list);
-                            await _DbContext.SaveChangesAsync();
-                        }
-                    }
-                    else
-                    {
-                        foreach (var roleId in arrayRole)
-                        {
-                            var model = await _DbContext.UserRole.Where(s => s.UserId == userId && s.RoleId == roleId).FirstOrDefaultAsync();
-                            if (model != null)
-                            {
-                                _DbContext.UserRole.Remove(model);
-                                await _DbContext.SaveChangesAsync();
-                            }
-                        }
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("UpdateUserRole - UserDAL: " + ex);
-            }
-
-        }
-
-        public async Task<List<int>> GetUserRoleId(int userId)
-        {
-            try
-            {
-                using (var _DbContext = new EntityDataContext(_connection))
-                {
-                    return await _DbContext.UserRole.Where(x => x.UserId == userId).Select(s => s.RoleId).ToListAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("GetUserRoleId - UserDAL: " + ex);
-                return new List<int>();
-            }
-        }
+    
 
         public async Task<User> GetByUserName(string input)
         {
@@ -181,7 +56,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.FirstOrDefaultAsync(s => s.UserName.Equals(input));
+                    return await _DbContext.User.AsNoTracking().FirstOrDefaultAsync(s => s.UserName.Equals(input));
                 }
             }
             catch (Exception ex)
@@ -197,7 +72,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.Where(s => userIds.Contains(s.Id)).ToListAsync();
+                    return await _DbContext.User.AsNoTracking().Where(s => userIds.Contains(s.Id)).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -213,7 +88,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.FirstOrDefaultAsync(s => userIds == s.Id);
+                    return await _DbContext.User.AsNoTracking().FirstOrDefaultAsync(s => userIds == s.Id);
                 }
             }
             catch (Exception ex)
@@ -223,44 +98,7 @@ namespace DAL
             }
         }
 
-        public async Task<UserDataViewModel> GetUserInfoById(long user)
-        {
-            try
-            {
-                using (var _DbContext = new EntityDataContext(_connection))
-                {
-                    return await (from u in _DbContext.User
-                                  join department in _DbContext.Department on u.DepartmentId equals department.Id into dep
-                                  from subdep in dep.DefaultIfEmpty()
-                                  where u.Id == user
-                                  select new UserDataViewModel
-                                  {
-                                      Id = u.Id,
-                                      UserName = u.UserName,
-                                      FullName = u.FullName,
-                                      Email = u.Email,
-                                      Phone = u.Phone,
-                                      Address = u.Address,
-                                      Avata = u.Avata,
-                                      BirthDay = u.BirthDay,
-                                      DepartmentId = u.DepartmentId,
-                                      DepartmentName = subdep.DepartmentName,
-                                      Status = u.Status,
-                                      Gender = u.Gender,
-                                      UserPositionId = u.UserPositionId,
-                                      Level = u.Level,
-                                      NickName=u.NickName,
-                                      Password=u.Password,
-                                      DebtLimit=u.DebtLimit,
-                                  }).FirstOrDefaultAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("GetByIds - UserDAL: " + ex);
-                return null;
-            }
-        }
+       
 
         public async Task<User> GetByEmail(string input)
         {
@@ -268,7 +106,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.FirstOrDefaultAsync(s => s.Email.Equals(input));
+                    return await _DbContext.User.AsNoTracking().FirstOrDefaultAsync(s => s.Email.Equals(input));
                 }
             }
             catch (Exception ex)
@@ -278,23 +116,7 @@ namespace DAL
             }
         }
 
-        public List<int> GetListUserIdByRole(string strRoleId)
-        {
-            try
-            {
-                using (var _DbContext = new EntityDataContext(_connection))
-                {
-                    var arrRoleId = strRoleId.Split(',').Select(s => int.Parse(s)).ToArray();
-                    return _DbContext.UserRole.Where(s => arrRoleId.Contains(s.RoleId)).Select(s => s.UserId).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("GetListUserIdByRole - UserDAL: " + ex);
-                return new List<int>();
-            }
-
-        }
+     
         public User GetUserIdById(long Id)
         {
             try
@@ -302,7 +124,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.User.FirstOrDefault(s => s.Id == Id);
+                    return _DbContext.User.AsNoTracking().FirstOrDefault(s => s.Id == Id);
                 }
             }
             catch (Exception ex)
@@ -344,28 +166,29 @@ namespace DAL
             }
         }
 
-        public async Task<IEnumerable<RolePermission>> GetUserPermissionById(int user_id)
+        public async Task<List<RolePermission>> GetUserPermissionById(int user_id)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await (from a in _DbContext.RolePermission
-                                  join b in _DbContext.UserRole on a.RoleId equals b.RoleId
-                                  where b.UserId == user_id
-                                  select new RolePermission
-                                  {
-                                      MenuId = a.MenuId,
-                                      RoleId = a.RoleId,
-                                      PermissionId = a.PermissionId
-                                  }).ToListAsync();
+                     SqlParameter[] objParam = new SqlParameter[]
+                     {
+                        new SqlParameter("@UserId", user_id)
+                     };
+                    var dt = _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListUserPermissionByUserId, objParam);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        return dt.ToList<RolePermission>();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetMenuPermissionByUserId - UserDAL: " + ex);
-                return null;
             }
+            return null;
+
         }
 
         public async Task LogDepartmentOfUser(User model, int current_user_id)
@@ -411,7 +234,7 @@ namespace DAL
             {
                 SqlParameter[] objParam = new SqlParameter[1];
                 objParam[0] = new SqlParameter("@UserId", user_id);
-                DataTable dataTable = _DbWorker.GetDataTable(ProcedureConstants.SP_GetListUserByUserId, objParam);
+                DataTable dataTable = _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListUserByUserId, objParam);
 
                 if (dataTable != null && dataTable.Rows.Count > 0)
                 {
@@ -437,7 +260,7 @@ namespace DAL
                     var user_role = await _DbContext.UserRole.Where(s => s.RoleId == role_id).FirstOrDefaultAsync();
                     if (user_role != null && user_role.Id > 0)
                     {
-                        return await _DbContext.User.Where(s => s.Id == user_role.UserId && s.Status == 0).FirstOrDefaultAsync();
+                        return await _DbContext.User.AsNoTracking().Where(s => s.Id == user_role.UserId && s.Status == 0).FirstOrDefaultAsync();
                     }
                 }
             }
@@ -458,7 +281,7 @@ namespace DAL
                     var listUserId = user_role.Select(n => n.UserId).ToList();
                     if (listUserId.Count > 0)
                     {
-                        return await _DbContext.User.Where(s => listUserId.Contains(s.Id) && s.Status == 0).ToListAsync();
+                        return await _DbContext.User.AsNoTracking().Where(s => listUserId.Contains(s.Id) && s.Status == 0).ToListAsync();
                     }
                 }
             }
@@ -479,7 +302,7 @@ namespace DAL
                     var listUserId = user_role.Select(n => n.UserId).ToList();
                     if (listUserId.Count > 0)
                     {
-                        return await _DbContext.User.Where(s => listUserId.Contains(s.Id) && s.Status == 0).ToListAsync();
+                        return await _DbContext.User.AsNoTracking().Where(s => listUserId.Contains(s.Id) && s.Status == 0).ToListAsync();
                     }
                 }
             }
@@ -489,27 +312,7 @@ namespace DAL
             }
             return new List<User>();
         }
-
-        public List<User> GetListUserByRole(int role_id)
-        {
-            try
-            {
-                using (var _DbContext = new EntityDataContext(_connection))
-                {
-                    var user_role = _DbContext.UserRole.Where(s => s.RoleId == role_id).ToList();
-                    var userRoleIds = user_role.Select(n => n.UserId).ToList();
-                    if (userRoleIds.Count > 0)
-                    {
-                        return _DbContext.User.Where(s => userRoleIds.Contains(s.Id) && s.Status == 0).ToList();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("GetChiefofDepartmentByServiceType - PolicyDal: " + ex);
-            }
-            return new List<User>();
-        }
+       
         public async Task<List<User>> GetUserSuggesstion(string txt_search,List<int> ids)
         {
             try
@@ -531,7 +334,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.Where(s => ids.Contains(s.DepartmentId)).ToListAsync();
+                    return await _DbContext.User.AsNoTracking().Where(s => ids.Contains(s.DepartmentId)).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -539,6 +342,58 @@ namespace DAL
                 LogHelper.InsertLogTelegram("GetByDepartmentIds - UserDepartDAL: " + ex);
                 return null;
             }
+        }
+        public int UpsertUser(User user)
+        {
+            try
+            {
+
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserID", user.Id),
+                    new SqlParameter("@UserName", user.UserName),
+                    new SqlParameter("@FullName", user.FullName),
+                    new SqlParameter("@Password", user.Password) ,
+                    new SqlParameter("@ResetPassword",user.ResetPassword),
+                    new SqlParameter("@Phone", user.Phone),
+                    new SqlParameter("@BirthDay", user.BirthDay),
+                    new SqlParameter("@Gender", user.Gender),
+                    new SqlParameter("@Email", user.Email),
+                    new SqlParameter("@Avata", user.Avata),
+                    new SqlParameter("@Address",user.Address),
+                    new SqlParameter("@Status", user.Status),
+                    new SqlParameter("@Note",user.Note),
+                    new SqlParameter("@CreatedBy",user.CreatedBy),
+                    new SqlParameter("@CreatedOn", user.CreatedOn),
+                    new SqlParameter("@ModifiedBy", user.ModifiedBy),
+                    new SqlParameter("@ModifiedOn", user.ModifiedOn)
+                };
+                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.UpsertUser, parameters);
+                user.Id = id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpsertUser - UserDAL: " + ex);
+                return -1;
+            }
+        }
+        public List<int> GetListUserIdByRole(string strRoleId)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var arrRoleId = strRoleId.Split(',').Select(s => int.Parse(s)).ToArray();
+                    return _DbContext.UserRole.Where(s => arrRoleId.Contains(s.RoleId)).Select(s => s.UserId).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListUserIdByRole - UserRoleDAL: " + ex);
+                return new List<int>();
+            }
+
         }
     }
 }

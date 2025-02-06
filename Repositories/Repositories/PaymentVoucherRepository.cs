@@ -41,7 +41,7 @@ namespace Repositories.Repositories
             if (entity != null)
                 return -2;
             var checkExists = paymentVoucherDAL.CheckExistsPaymentRequest(model.PaymentRequestDetails.Select(n => n.Id).ToList(),
-                 ProcedureConstants.SP_CheckExistsPaymentVoucherByRequestId);
+                 StoreProcedureConstant.SP_CheckExistsPaymentVoucherByRequestId);
             if (checkExists != null && checkExists.Count > 0)
             {
                 msg = string.Join(',', checkExists.Select(n => n.PaymentCode).ToList());
@@ -179,7 +179,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var details = paymentVoucherDAL.GetDetail(paymentVoucherId, ProcedureConstants.sp_GetDetailPaymentVoucher)
+                var details = paymentVoucherDAL.GetDetail(paymentVoucherId, StoreProcedureConstant.sp_GetDetailPaymentVoucher)
                     .ToList<PaymentVoucherViewModel>();
                 PaymentVoucherViewModel model = details.FirstOrDefault();
                 model.PaymentRequestDetails = new List<PaymentRequestViewModel>();
@@ -205,7 +205,7 @@ namespace Repositories.Repositories
             try
             {
                 var listPaymentRequests = paymentVoucherDAL.GetPagingList(searchModel, currentPage, pageSize,
-                ProcedureConstants.SP_GetListPaymentVoucher).ToList<PaymentVoucherViewModel>();
+                StoreProcedureConstant.SP_GetListPaymentVoucher).ToList<PaymentVoucherViewModel>();
                 var listPaymentRequestCode = new List<string>();
                 foreach (var item in listPaymentRequests)
                 {

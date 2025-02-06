@@ -219,7 +219,7 @@ namespace Repositories.Repositories
             var model = new GenericViewModel<CustomerManagerViewModel>();
             try
             {
-                DataTable dt = await _ClientDAL.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GETGetAllClient_Search);
+                DataTable dt = await _ClientDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETGetAllClient_Search);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = (from row in dt.AsEnumerable()
@@ -316,7 +316,7 @@ namespace Repositories.Repositories
             try
             {
                 var data = new List<CustomerManagerViewModel>();
-                DataTable dt = await _ClientDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize, ProcedureConstants.GETGetAllClient_Search);
+                DataTable dt = await _ClientDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize, StoreProcedureConstant.GETGetAllClient_Search);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     data = (from row in dt.AsEnumerable()

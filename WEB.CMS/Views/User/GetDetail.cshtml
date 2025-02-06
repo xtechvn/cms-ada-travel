@@ -155,10 +155,10 @@
                             </ul>
                         </div>
                         <div class="changer_bnt">
-                            <a class="changer next" onclick="_user.OnUpdateRole('@Model.Id',0)">
+                            <a class="changer next" onclick="_user.OnUpdateRole('@Model.Id')">
                                 <i class="fa fa-angle-right"></i>
                             </a>
-                            <a class="changer prev" onclick="_user.OnUpdateRole('@Model.Id',1)">
+                            <a class="changer prev" onclick="_user.RemoveUserRole('@Model.Id')">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         </div>

@@ -412,5 +412,20 @@ namespace DAL
             }
             return null;
         }
+        public async Task<Department> GetById(int id)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    return await _DbContext.Department.AsNoTracking().FirstOrDefaultAsync(s => id == s.Id);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetByIds - UserDAL: " + ex);
+                return null;
+            }
+        }
     }
 }
