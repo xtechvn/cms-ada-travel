@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     public class ClientController : Controller
     {

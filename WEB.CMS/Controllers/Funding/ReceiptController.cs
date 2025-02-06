@@ -19,12 +19,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     [CustomAuthorize]
 
@@ -616,12 +616,12 @@ namespace WEB.Adavigo.CMS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetListBankAccountAdavigo()
+        public async Task<IActionResult> GetListBankAccountDeepSeekTravel()
         {
             try
             {
-                var supplierAdavigoId = _supplierRepository.GetByIDOrName(0, "adavigo");
-                var listBankAccount = _allCodeRepository.GetBankingAccountsBySupplierId(supplierAdavigoId);
+                var supplierDeepSeekTravelId = _supplierRepository.GetByIDOrName(0, "adavigo");
+                var listBankAccount = _allCodeRepository.GetBankingAccountsBySupplierId(supplierDeepSeekTravelId);
                 return Ok(new
                 {
                     isSuccess = true,
@@ -631,7 +631,7 @@ namespace WEB.Adavigo.CMS.Controllers
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("GetListBankAccountAdavigo - ReceiptController: " + ex);
+                LogHelper.InsertLogTelegram("GetListBankAccountDeepSeekTravel - ReceiptController: " + ex);
                 return Ok(new
                 {
                     isSuccess = false,

@@ -66,10 +66,14 @@
                                     <label class="lbl">
                                         <span class="col-4">Vai trò:</span>
                                         <span class="col-8">
-                                            @foreach (var item in _RoleList.Where(s => Model.RoleIdList.Contains(s.Id)))
+                                            @if (_RoleList != null && _RoleList.Count > 0 && Model!=null && Model.RoleIdList != null && Model.RoleIdList.Count > 0)
                                             {
-                                                <p>@item.Name</p>
+                                                @foreach (var item in _RoleList.Where(s => Model.RoleIdList.Contains(s.Id)))
+                                                {
+                                                    <p>@item.Name</p>
+                                                }
                                             }
+                                            
                                         </span>
                                     </label>
                                 </div>
@@ -111,12 +115,7 @@
                                         <span class="col-8">@(Model.BirthDay == null ? "N/A" : ((DateTime)Model.BirthDay).ToString("dd/MM/yyyy"))</span>
                                     </label>
                                 </div>  
-                                <div class="form-group">
-                                    <label class="lbl">
-                                        <span class="col-4">Bảo lãnh công nợ:</span>
-                                        <span class="col-8">@(Model.DebtLimit == null ? "0" : ((double)Model.DebtLimit).ToString("N0"))</span>
-                                    </label>
-                                </div>
+                              
 
                             </div>
                         </div>
@@ -148,9 +147,12 @@
                         <div class="col-md-5">
                             <label>Danh sách vai trò</label>
                             <ul class="list scrollbar-inner data-left" data-id="@Model.Id" style="overflow-y:auto;">
-                                @foreach (var item in _RoleList.Where(s => !Model.RoleIdList.Contains(s.Id)))
+                                @if (_RoleList != null && _RoleList.Count > 0 && Model != null && Model.RoleIdList != null && Model.RoleIdList.Count > 0)
                                 {
-                                    <li data-id="@item.Id">@item.Name</li>
+                                    @foreach (var item in _RoleList.Where(s => Model.RoleIdList.Contains(s.Id)))
+                                    {
+                                        <p>@item.Name</p>
+                                    }
                                 }
                             </ul>
                         </div>
@@ -165,9 +167,12 @@
                         <div class="col-md-5">
                             <label>Vai trò hiện tại</label>
                             <ul class="list scrollbar-inner data-right" data-id="@Model.Id" style="overflow-y:auto;">
-                                @foreach (var item in _RoleList.Where(s => Model.RoleIdList.Contains(s.Id)))
+                                @if (_RoleList != null && _RoleList.Count > 0 && Model != null && Model.RoleIdList != null && Model.RoleIdList.Count > 0)
                                 {
-                                    <li data-id="@item.Id">@item.Name</li>
+                                    @foreach (var item in _RoleList.Where(s => Model.RoleIdList.Contains(s.Id)))
+                                    {
+                                        <p>@item.Name</p>
+                                    }
                                 }
                             </ul>
                         </div>

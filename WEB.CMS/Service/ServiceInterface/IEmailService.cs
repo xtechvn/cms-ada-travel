@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WEB.Adavigo.CMS.Service.ServiceInterface
+namespace WEB.DeepSeekTravel.CMS.Service.ServiceInterface
 {
     public interface IEmailService
     {

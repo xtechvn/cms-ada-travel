@@ -5,7 +5,7 @@
 @{
     var allCode_PAY_TYPE = (List<AllCode>)ViewBag.allCode_PAY_TYPE;
     var allCode_PAYMENT_VOUCHER_TYPE = (List<AllCode>)ViewBag.allCode_PAYMENT_VOUCHER_TYPE;
-    var listBankingAccountAdavigo = (List<BankingAccount>)ViewBag.listBankingAccountAdavigo;
+    var listBankingAccountDeepSeekTravel = (List<BankingAccount>)ViewBag.listBankingAccountDeepSeekTravel;
 }
 
 <section style=" overflow-x: hidden;">
@@ -75,7 +75,7 @@
                 <div class="form-group mb10 mr-2" style="min-width: 200px;">
                     <select class="form-control select2" id="bankingAccountSource">
                         <option value="-1" disabled selected>Tất cả tài khoản nguồn </option>
-                        @foreach (var item in listBankingAccountAdavigo)
+                        @foreach (var item in listBankingAccountDeepSeekTravel)
                         {
                             <option value="@item.Id">@item.BankId - @item.AccountNumber - @item.AccountName</option>
                         }

@@ -18,13 +18,13 @@ using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 using static Utilities.DepositHistoryConstant;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.VinWonder
 {
     public class SetServiceController : Controller
     {
@@ -858,7 +858,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
                         }
 
                     }
-                    mail.subject = "[Adavigo] Vé Điện Tử Vinwonder Của Quý Khách - Mã Đơn hàng " + order.OrderNo;
+                    mail.subject = "[DeepSeekTravel] Vé Điện Tử Vinwonder Của Quý Khách - Mã Đơn hàng " + order.OrderNo;
                 }
             }
             catch (Exception ex)

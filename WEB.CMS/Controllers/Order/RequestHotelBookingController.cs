@@ -15,12 +15,12 @@ using System.Collections.Concurrent;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Service;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
-namespace WEB.Adavigo.CMS.Controllers.Order
+namespace WEB.DeepSeekTravel.CMS.Controllers.Order
 {
     [CustomAuthorize]
     public class RequestHotelBookingController : Controller

@@ -13,7 +13,7 @@ using Repositories.IRepositories;
 using Repositories.Repositories;
 using Utilities;
 
-namespace WEB.Adavigo.CMS.Controllers.Report
+namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 {
     public class ReportHotelRevenueController : Controller
     {

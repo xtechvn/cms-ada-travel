@@ -14,11 +14,11 @@ using Repositories.IRepositories;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.Order
+namespace WEB.DeepSeekTravel.CMS.Controllers.Order
 {
     [CustomAuthorize]
 
@@ -1135,15 +1135,10 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                int company_type = 0;
-                try
-                {
-                    company_type = Convert.ToInt32(_configuration["CompanyType"]);
-                }
-                catch { }
+               
                 Entities.Models.Order order = new Entities.Models.Order()
                 {
-                    OrderNo = await _indentiferService.buildOrderManual(company_type),
+                    OrderNo = await _indentiferService.buildOrderManual(),
                     SalerId = model.main_sale_id,
                     SalerGroupId = string.Join(",", model.sub_sale_id),
                     Note = model.note,

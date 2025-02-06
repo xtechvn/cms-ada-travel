@@ -12,7 +12,7 @@ using Utilities;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.Order
+namespace WEB.DeepSeekTravel.CMS.Controllers.Order
 {
     [CustomAuthorize]
     public class SupplierController : Controller

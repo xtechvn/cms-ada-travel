@@ -12,7 +12,7 @@ using Repositories.IRepositories;
 using Utilities;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.Report
+namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 {
     [CustomAuthorize]
     public class ReportEmployeeRevenueController : Controller

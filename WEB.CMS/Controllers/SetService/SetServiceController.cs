@@ -27,14 +27,14 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 using static Utilities.Contants.OrderConstants;
 using static Utilities.DepositHistoryConstant;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
 {
     [CustomAuthorize]
 
@@ -1925,7 +1925,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                             {
                                 birthday="",
                                 email=_configuration["config_api_vinpearl:OPERATOR_EMAIL"],
-                                firstName="Adavigo",
+                                firstName="DeepSeekTravel",
                                 lastName="Travel",
                                 isPrimary=true,
                                  phoneNumber="",

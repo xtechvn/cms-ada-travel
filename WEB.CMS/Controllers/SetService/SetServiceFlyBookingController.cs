@@ -18,11 +18,11 @@ using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using static Utilities.DepositHistoryConstant;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Fly
 {
     [CustomAuthorize]
     public class SetServiceController : Controller

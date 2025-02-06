@@ -3,7 +3,7 @@ using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
 
-namespace WEB.Adavigo.CMS.Service
+namespace WEB.DeepSeekTravel.CMS.Service
 {
     public class IndentiferService
     {
@@ -43,7 +43,7 @@ namespace WEB.Adavigo.CMS.Service
                 return service_name;
             }
         }
-        public async Task<string> buildOrderManual(int company_type)
+        public async Task<string> buildOrderManual()
         {
             string order_no = string.Empty;
             try
@@ -51,28 +51,9 @@ namespace WEB.Adavigo.CMS.Service
                 var months = new Dictionary<int, string> { { 1, "A" }, { 2, "B" }, { 3, "C" }, { 4, "D" }, { 5, "E" }, { 6, "F" }, { 7, "G" }, { 8, "H" }, { 9, "K" }, { 10, "L" }, { 11, "M" }, { 12, "N" } };
                 var current_date = DateTime.Now;
 
-                switch (company_type)
-                {
-                    case 0:
-                        {
-                            order_no += "A";
+                order_no += "D";
 
-                        }break;
-                    case 1:
-                        {
-                            order_no += "P";
 
-                        }
-                        break;
-                    case 2:
-                        {
-                            order_no += "D";
-
-                        }
-                        break;
-                }
-
-                
                 //3. 2 số cuối của năm
                 order_no += current_date.Year.ToString().Substring(current_date.Year.ToString().Length - 2, 2);
 

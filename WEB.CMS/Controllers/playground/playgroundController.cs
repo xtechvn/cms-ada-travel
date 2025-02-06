@@ -17,11 +17,11 @@ using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.playground
+namespace WEB.DeepSeekTravel.CMS.Controllers.playground
 {
     [CustomAuthorize]
 

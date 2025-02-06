@@ -20,7 +20,7 @@ using WEB.CMS.Customize;
 using WEB.CMS.Models;
 using HotelModel = Entities.ViewModels.Programs.HotelModel;
 
-namespace WEB.Adavigo.CMS.Controllers.Programs
+namespace WEB.DeepSeekTravel.CMS.Controllers.Programs
 {
     [CustomAuthorize]
     public class ProgramsController : Controller

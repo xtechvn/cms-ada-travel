@@ -16,12 +16,12 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.Funding
+namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
 {
     [CustomAuthorize]
 
@@ -124,7 +124,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                      {"SourceID", (int)LogSource.BACKEND},
                      {"KeyID", model.OrderId.ToString()},
                      {"Type", LogType.ACTIVITY},
-                     {"CompanyType", LogHelper.CompanyTypeInt},
+                     {"CompanyType", "0"},
                      {"ObjectType", ObjectType.DEBTBRICKLOG_ORDER},
                      {"Log", JsonConvert.SerializeObject(debtBrickLogViewModel)},
                 };
@@ -372,7 +372,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                      {"SourceID", (int)LogSource.BACKEND},
                      {"KeyID", model[0].OrderId.ToString()},
                      {"ObjectType", ObjectType.UNDO_DEBTBRICKLOG_ORDER},
-                     {"CompanyType", LogHelper.CompanyTypeInt},
+                     {"CompanyType", "0"},
                      {"Type", LogType.ACTIVITY},
                      {"Log", JsonConvert.SerializeObject(undoDebtBrickLogViewModel)},
                 };
@@ -587,7 +587,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                      {"SourceID", (int)LogSource.BACKEND},
                      {"KeyID", model.ContractPayId.ToString()},
                      {"Type", LogType.ACTIVITY},
-                     {"CompanyType", LogHelper.CompanyTypeInt},
+                     {"CompanyType", "0"},
                      {"ObjectType", ObjectType.DEBTBRICKLOG_CONTRACTPAY},
                      {"Log", JsonConvert.SerializeObject(debtBrickLogViewModel)},
                 };
@@ -669,7 +669,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                      {"SourceID", (int)LogSource.BACKEND},
                      {"KeyID", model[0].PayId.ToString()},
                      {"ObjectType", ObjectType.UNDO_DEBTBRICKLOG_CONTRACTPAY},
-                     {"CompanyType", LogHelper.CompanyTypeInt},
+                     {"CompanyType", "0"},
                      {"Type", LogType.ACTIVITY},
                      {"Log", JsonConvert.SerializeObject(undoDebtBrickLogViewModel)},
                 };

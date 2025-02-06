@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
 
-namespace WEB.Adavigo.CMS.Service
+namespace WEB.DeepSeekTravel.CMS.Service
 {
     public class LogActionMongoService
     {

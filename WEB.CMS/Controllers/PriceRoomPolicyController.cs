@@ -16,7 +16,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
 
     public partial class PricePolicyController : Controller

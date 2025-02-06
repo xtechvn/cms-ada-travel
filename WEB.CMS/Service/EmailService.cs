@@ -17,10 +17,10 @@ using System.Net.Mime;
 using System.Text;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Service
+namespace WEB.DeepSeekTravel.CMS.Service
 {
     public class EmailService : IEmailService
     {
@@ -3865,7 +3865,7 @@ namespace WEB.Adavigo.CMS.Service
                 var order = await _orderRepository.GetOrderByID(orderid);
                 MailMessage message = new MailMessage();
                 if (string.IsNullOrEmpty(subject))
-                    subject = "[Adavigo] Vé Điện Tử Vinwonder Của Quý Khách - Mã Đơn hàng " + order.OrderNo;
+                    subject = "[DeepSeekTravel] Vé Điện Tử Vinwonder Của Quý Khách - Mã Đơn hàng " + order.OrderNo;
                 message.Subject = subject;
                 //config send email
                 string from_mail = new ConfigurationBuilder().AddJsonFile("appsettings.json")
@@ -4321,7 +4321,7 @@ namespace WEB.Adavigo.CMS.Service
 
                 }
 
-                var tile = "Adavigo thanh toán booking " + model.SupplierName + " ngày thanh toán (" + ((DateTime)model.CreatedDate).ToString("dd/MM/yyyy") + ")";
+                var tile = "DeepSeekTravel thanh toán booking " + model.SupplierName + " ngày thanh toán (" + ((DateTime)model.CreatedDate).ToString("dd/MM/yyyy") + ")";
                 var nd = booking.TrimEnd(',');
                 body = body.Replace("{{tile}}", tile);
                 body = body.Replace("{{nd}}", nd);
@@ -4344,7 +4344,7 @@ namespace WEB.Adavigo.CMS.Service
 
                 MailMessage message = new MailMessage();
                 var model = _paymentVoucherRepository.GetDetail(paymentVoucherId);
-                message.Subject = "Adavigo thanh toán booking " + model.SupplierName + " ngày thanh toán (" + DateTime.Now.ToString("dd/MM/yyyy") + ")"; ;
+                message.Subject = "DeepSeekTravel thanh toán booking " + model.SupplierName + " ngày thanh toán (" + DateTime.Now.ToString("dd/MM/yyyy") + ")"; ;
                 //config send email
                 string from_mail = new ConfigurationBuilder().AddJsonFile("appsettings.json")
                     .Build().GetSection("MAIL_CONFIG")["FROM_MAIL"];

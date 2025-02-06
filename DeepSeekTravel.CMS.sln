@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "Utilities\Util
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Caching", "Caching\Caching.csproj", "{EBD2488D-1AA8-4BBC-89DC-80D84C7610D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Adavigo.CMS", "WEB.CMS\Web.Adavigo.CMS.csproj", "{A108CDC6-9339-45EF-8FEB-1A2747B06BD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.DeepSeekTravel.CMS", "WEB.CMS\Web.DeepSeekTravel.CMS.csproj", "{A108CDC6-9339-45EF-8FEB-1A2747B06BD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

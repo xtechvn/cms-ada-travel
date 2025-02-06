@@ -151,7 +151,7 @@ namespace Repositories.Repositories
                     SupplierId = 0,
                     UpdatedBy = user_id,
                     UpdatedDate = DateTime.Now,
-                    AdavigoBookingId= exists_booking==null || exists_booking.AdavigoBookingId==null || exists_booking.AdavigoBookingId.Trim()==""?"": exists_booking.AdavigoBookingId,
+                    AdavigoBookingId= exists_booking==null || exists_booking.AdavigoBookingId == null || exists_booking.AdavigoBookingId.Trim()==""?"": exists_booking.AdavigoBookingId,
                     Amount = amount,
                     Note=data.note,
                     OrderId=data.order_id,

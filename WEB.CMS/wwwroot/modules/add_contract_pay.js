@@ -293,7 +293,7 @@ var _contract_pay_create = {
             //    clientId = client[0]
             //}
         }
-        _contract_pay_create.GetListBankAccountAdavigo()
+        _contract_pay_create.GetListBankAccountDeepSeekTravel()
         if (contract_type === '1') {
             _contract_pay_create.GetOrderListByClientId(clientId, isEdit);
         }
@@ -309,7 +309,7 @@ var _contract_pay_create = {
                 supplierId = supplier[0]
             }
         }
-        _contract_pay_create.GetListBankAccountAdavigo(supplierId)
+        _contract_pay_create.GetListBankAccountDeepSeekTravel(supplierId)
         if (contract_type !== null && contract_type !== '' && parseInt(contract_type) == contractpay_type_other) return
         if (parseInt(contract_type) === 3) {
             _contract_pay_create.GetServiceListBySupplierId(supplierId, isEdit);
@@ -1052,7 +1052,7 @@ var _contract_pay_create = {
             if (client_id !== null && client_id !== undefined && client_id !== '') {
                 _contract_pay_create.GetDataByClientId(client_id, true)
             }
-            _contract_pay_create.GetListBankAccountAdavigo()
+            _contract_pay_create.GetListBankAccountDeepSeekTravel()
         }
         if (contract_type !== null && contract_type !== '' && parseInt(contract_type) == contractpay_type_deposit) {//thu tiền ký quỹ
             setTimeout(function () {
@@ -1076,7 +1076,7 @@ var _contract_pay_create = {
             if (client_id !== null && client_id !== undefined && client_id !== '') {
                 _contract_pay_create.GetDataByClientId(client_id, true)
             }
-            _contract_pay_create.GetListBankAccountAdavigo()
+            _contract_pay_create.GetListBankAccountDeepSeekTravel()
         }
         if (contract_type !== null && contract_type !== '' && parseInt(contract_type) == contractpay_type_supplier_refund) {//thu tiền NCC hoàn trả
             $('#divSupplier').show()
@@ -1097,7 +1097,7 @@ var _contract_pay_create = {
                 var newOption = new Option($('#supplier_name_hide').val(), supplierId, true, true);
                 $('#supplier-select').append(newOption).trigger('change');
             }, 500)
-            _contract_pay_create.GetListBankAccountAdavigo(supplierId)
+            _contract_pay_create.GetListBankAccountDeepSeekTravel(supplierId)
             if (supplierId !== null && supplierId !== undefined && supplierId !== '') {
                 _contract_pay_create.GetServiceListBySupplierId(supplierId, true)
             }
@@ -1121,7 +1121,7 @@ var _contract_pay_create = {
                 var newOption = new Option($('#supplier_name_hide').val(), supplierId, true, true);
                 $('#supplier-select').append(newOption).trigger('change');
             }, 500)
-            _contract_pay_create.GetListBankAccountAdavigo(supplierId)
+            _contract_pay_create.GetListBankAccountDeepSeekTravel(supplierId)
             if (supplierId !== null && supplierId !== undefined && supplierId !== '') {
                 _contract_pay_create.GetServiceListBySupplierId(supplierId, true, true)
             }
@@ -1154,7 +1154,7 @@ var _contract_pay_create = {
                     var newOption = new Option($('#client_name_hide').val(), client_id, true, true);
                     $('#client-select').append(newOption).trigger('change');
                 }, 500)
-                _contract_pay_create.GetListBankAccountAdavigo(client_id)
+                _contract_pay_create.GetListBankAccountDeepSeekTravel(client_id)
             }
             if (objectType == 2) {
                 $('#divSupplier').show()
@@ -1164,7 +1164,7 @@ var _contract_pay_create = {
                     var newOption = new Option($('#supplier_name_hide').val(), supplierId, true, true);
                     $('#supplier-select').append(newOption).trigger('change');
                 }, 500)
-                _contract_pay_create.GetListBankAccountAdavigo(supplierId)
+                _contract_pay_create.GetListBankAccountDeepSeekTravel(supplierId)
             }
             if (objectType == 3) {
                 $('#divEmployee').show()
@@ -1174,7 +1174,7 @@ var _contract_pay_create = {
                     var newOption = new Option($('#employee_name_hide').val(), employeeId, true, true);
                     $('#createdBy').append(newOption).trigger('change');
                 }, 500)
-                _contract_pay_create.GetListBankAccountAdavigo()
+                _contract_pay_create.GetListBankAccountDeepSeekTravel()
             }
 
         }
@@ -1274,7 +1274,7 @@ var _contract_pay_create = {
             var contract_type = $('#contract-type').val()
             if (contract_type !== null && contract_type !== '' && (parseInt(contract_type) == contractpay_type_order
                 || parseInt(contract_type) == contractpay_type_deposit)) {
-                _contract_pay_create.GetListBankAccountAdavigo()
+                _contract_pay_create.GetListBankAccountDeepSeekTravel()
             }
             //if (contract_type !== null && contract_type !== '' && (parseInt(contract_type) == contractpay_type_supplier_commision
             //    || parseInt(contract_type) == contractpay_type_supplier_refund)) {
@@ -1675,10 +1675,10 @@ var _contract_pay_create = {
             }
         });
     },
-    GetListBankAccountAdavigo: function (supplierId) {
+    GetListBankAccountDeepSeekTravel: function (supplierId) {
         _global_function.AddLoading()
         $.ajax({
-            url: "/Receipt/GetListBankAccountAdavigo",
+            url: "/Receipt/GetListBankAccountDeepSeekTravel",
             type: "Post",
             data: {
                 'supplierId': supplierId,

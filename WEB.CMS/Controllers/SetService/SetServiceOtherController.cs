@@ -15,11 +15,11 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using static Utilities.DepositHistoryConstant;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService.Other
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Other
 {
 
     [CustomAuthorize]

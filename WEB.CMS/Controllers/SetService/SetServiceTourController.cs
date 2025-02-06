@@ -17,12 +17,12 @@ using Caching.Elasticsearch;
 using Entities.ViewModels.ElasticSearch;
 using static Utilities.Contants.OrderConstants;
 using MongoDB.Driver.Linq;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using static Utilities.DepositHistoryConstant;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Tour
 {
     [CustomAuthorize]
     public class SetServiceController : Controller

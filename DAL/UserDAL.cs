@@ -1,7 +1,9 @@
 ﻿using DAL.Generic;
 using DAL.StoreProcedure;
+using Elasticsearch.Net;
 using Entities.Models;
 using Entities.ViewModels;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Nest;
@@ -9,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
+using System.Numerics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
@@ -343,38 +348,84 @@ namespace DAL
                 return null;
             }
         }
-        public int UpsertUser(User user)
+        public int InsertUser(User user)
         {
             try
             {
 
-                var parameters = new SqlParameter[]
-                {
-                    new SqlParameter("@UserID", user.Id),
+                SqlParameter[] parameters = new SqlParameter[]
+                 {
+                    new SqlParameter("@UserMapId", user.UserMapId),
                     new SqlParameter("@UserName", user.UserName),
                     new SqlParameter("@FullName", user.FullName),
-                    new SqlParameter("@Password", user.Password) ,
-                    new SqlParameter("@ResetPassword",user.ResetPassword),
+                    new SqlParameter("@Password",user.Password),
+                    new SqlParameter("@ResetPassword", user.ResetPassword),
                     new SqlParameter("@Phone", user.Phone),
                     new SqlParameter("@BirthDay", user.BirthDay),
                     new SqlParameter("@Gender", user.Gender),
-                    new SqlParameter("@Email", user.Email),
+                    new SqlParameter("@Email",user.Email),
                     new SqlParameter("@Avata", user.Avata),
-                    new SqlParameter("@Address",user.Address),
-                    new SqlParameter("@Status", user.Status),
-                    new SqlParameter("@Note",user.Note),
-                    new SqlParameter("@CreatedBy",user.CreatedBy),
-                    new SqlParameter("@CreatedOn", user.CreatedOn),
-                    new SqlParameter("@ModifiedBy", user.ModifiedBy),
-                    new SqlParameter("@ModifiedOn", user.ModifiedOn)
-                };
-                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.UpsertUser, parameters);
+                    new SqlParameter("@Address", user.Address),
+                    new SqlParameter("@Status",user.Status),
+                    new SqlParameter("@Note", user.Note),
+                    new SqlParameter("@Manager", user.Manager),
+                    new SqlParameter("@DepartmentId", user.DepartmentId),
+                    new SqlParameter("@Level", user.Level),
+                    new SqlParameter("@UserPositionId", user.UserPositionId),
+                    new SqlParameter("@CompanyType", DBNull.Value),
+                    new SqlParameter("@NickName", user.NickName),
+                    new SqlParameter("@TenantId",user.TenantId),
+                    new SqlParameter("@Type", user.Type),
+                    new SqlParameter("@CreatedBy", user.CreatedBy),
+                 };
+                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.InsertUser, parameters);
                 user.Id = id;
                 return id;
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("UpsertUser - UserDAL: " + ex);
+                LogHelper.InsertLogTelegram("InsertUser - UserDAL: " + ex);
+                return -1;
+            }
+        }
+        public int UpdateUser(User user)
+        {
+            try
+            {
+
+                SqlParameter[] parameters = new SqlParameter[]
+               {
+                    new SqlParameter("@Id", user.Id),
+                    new SqlParameter("@UserMapId", user.UserMapId),
+                    new SqlParameter("@UserName", user.UserName),
+                    new SqlParameter("@FullName", user.FullName),
+                    new SqlParameter("@Password",user.Password),
+                    new SqlParameter("@ResetPassword", user.ResetPassword),
+                    new SqlParameter("@Phone", user.Phone),
+                    new SqlParameter("@BirthDay", user.BirthDay),
+                    new SqlParameter("@Gender", user.Gender),
+                    new SqlParameter("@Email",user.Email),
+                    new SqlParameter("@Avata", user.Avata),
+                    new SqlParameter("@Address", user.Address),
+                    new SqlParameter("@Status",user.Status),
+                    new SqlParameter("@Note", user.Note),
+                    new SqlParameter("@Manager", user.Manager),
+                    new SqlParameter("@DepartmentId", user.DepartmentId),
+                    new SqlParameter("@Level", user.Level),
+                    new SqlParameter("@UserPositionId", user.UserPositionId),
+                    new SqlParameter("@CompanyType", DBNull.Value),
+                    new SqlParameter("@NickName", user.NickName),
+                    new SqlParameter("@TenantId",user.TenantId),
+                    new SqlParameter("@Type", user.Type),
+                    new SqlParameter("@CreatedBy", user.CreatedBy),
+               };
+                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.UpdateUser, parameters);
+                user.Id = id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateUser - UserDAL: " + ex);
                 return -1;
             }
         }

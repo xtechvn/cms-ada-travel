@@ -45,7 +45,7 @@ namespace Repositories.Repositories.BaseRepos
 
                     _redisConn = new RedisConn(configuration);
                     _redisConn.Connect();
-                    string data_json = _redisConn.Get(CacheName.USER_ROLE + user_id + "_" + configuration["CompanyType"], Convert.ToInt32(configuration["Redis:Database:db_common"]));
+                    string data_json = _redisConn.Get(CacheName.USER_ROLE + user_id, Convert.ToInt32(configuration["Redis:Database:db_common"]));
                     if (data_json != null && data_json.Trim() != "")
                     {
                         JArray objParr = null;
@@ -102,7 +102,7 @@ namespace Repositories.Repositories.BaseRepos
                 };
                 try
                 {
-                    _redisConn.Set(CacheName.USER_ROLE + user_id + "_" + configuration["CompanyType"], token, Convert.ToInt32(configuration["Redis:Database:db_common"]));
+                    _redisConn.Set(CacheName.USER_ROLE + user_id, token, Convert.ToInt32(configuration["Redis:Database:db_common"]));
                 }
                 catch (Exception ex)
                 {

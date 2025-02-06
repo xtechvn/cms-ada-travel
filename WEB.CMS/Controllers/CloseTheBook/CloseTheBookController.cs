@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
 
-namespace WEB.Adavigo.CMS.Controllers.CloseTheBook
+namespace WEB.DeepSeekTravel.CMS.Controllers.CloseTheBook
 {
     public class CloseTheBookController : Controller
     {

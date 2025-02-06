@@ -19,12 +19,12 @@ using System.Linq;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     [CustomAuthorize]
     public class OrderController : Controller
@@ -2764,7 +2764,6 @@ namespace WEB.Adavigo.CMS.Controllers
         {
             var current_user = _ManagementUser.GetCurrentUser();
             var user =await _userRepository.GetDetailUser(current_user.Id);
-            ViewBag.DebtLimit = ((double)user.Entity.DebtLimit).ToString("N0") ;
             var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id);
             ViewBag.AmountTotal = AmountTotal.ToString("N0");
             return View();

@@ -37,17 +37,17 @@ namespace APP_CHECKOUT.RabitMQ
         {
             try
             {
-                var j_param = new Dictionary<string, object>
-                              {
-                              { "store_name", store_procedure },
-                              { "index_es", index_es },
-                              {"project_type", project_id },
-                              {"id" , id }
+                //var j_param = new Dictionary<string, object>
+                //              {
+                //              { "store_name", store_procedure },
+                //              { "index_es", index_es },
+                //              {"project_type", project_id },
+                //              {"id" , id }
 
-                              };
-                var _data_push = JsonConvert.SerializeObject(j_param);
-                // Push message vào queue
-                var response_queue = InsertQueueSimpleDurable(_data_push, _configuration["Queue:QueueSyncES"]);
+                //              };
+                //var _data_push = JsonConvert.SerializeObject(j_param);
+                //// Push message vào queue
+                //var response_queue = InsertQueueSimpleDurable(_data_push, _configuration["Queue:QueueSyncES"]);
 
                 return true;
             }

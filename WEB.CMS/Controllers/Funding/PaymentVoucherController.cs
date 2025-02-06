@@ -10,11 +10,11 @@ using System.Security.Claims;
 using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.Funding
+namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
 {
     [CustomAuthorize]
 
@@ -47,7 +47,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         {
             ViewBag.allCode_PAY_TYPE = _allCodeRepository.GetListByType(AllCodeType.PAY_TYPE);
             ViewBag.allCode_PAYMENT_VOUCHER_TYPE = _allCodeRepository.GetListByType(AllCodeType.PAYMENT_VOUCHER_TYPE);
-            ViewBag.listBankingAccountAdavigo = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
+            ViewBag.listBankingAccountDeepSeekTravel = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
            (long)config.SUPPLIERID_ADAVIGO).ToList();
             return View();
         }
@@ -89,7 +89,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             }
             ViewBag.UserId = userLogin;
             ViewBag.Type = (int)AttachmentType.Payment_Voucher;
-            ViewBag.listBankingAccountAdavigo = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
+            ViewBag.listBankingAccountDeepSeekTravel = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
            (long)config.SUPPLIERID_ADAVIGO).ToList();
             return PartialView();
         }
@@ -107,7 +107,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             }
             ViewBag.UserId = userLogin;
             ViewBag.Type = (int)AttachmentType.Payment_Voucher;
-            ViewBag.listBankingAccountAdavigo = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
+            ViewBag.listBankingAccountDeepSeekTravel = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
          (long)config.SUPPLIERID_ADAVIGO).ToList();
             return PartialView(detail);
         }

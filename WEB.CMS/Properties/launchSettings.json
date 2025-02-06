@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Web.Adavigo.CMS": {
+    "Web.DeepSeekTravel.CMS": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

@@ -15,11 +15,11 @@ using Newtonsoft.Json.Linq;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.Funding
+namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
 {
     public class DebtStatisticController : Controller
     {
@@ -355,7 +355,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                              {"SourceID", (int)LogSource.BACKEND},
                              {"KeyID", result},
                              {"Type", LogType.ACTIVITY},
-                             {"CompanyType", LogHelper.CompanyTypeInt},
+                             {"CompanyType", "0"},
                              {"ObjectType", ObjectType.DEBT_STATISTIC_LOG},
                              {"Log", JsonConvert.SerializeObject(debtStatisticLogViewModel)},
                         };
@@ -437,7 +437,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                              {"SourceID", (int)LogSource.BACKEND},
                              {"KeyID", result},
                              {"Type", LogType.ACTIVITY},
-                             {"CompanyType", LogHelper.CompanyTypeInt},
+                             {"CompanyType", "0"},
                              {"ObjectType", ObjectType.DEBT_STATISTIC_LOG},
                              {"Log", JsonConvert.SerializeObject(debtStatisticLogViewModel)},
                         };
@@ -536,7 +536,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                      {"SourceID", (int)LogSource.BACKEND},
                      {"KeyID", requestId},
                      {"Type", LogType.ACTIVITY},
-                     {"CompanyType", LogHelper.CompanyTypeInt},
+                     {"CompanyType", "0"},
                      {"ObjectType", ObjectType.DEBT_STATISTIC_LOG},
                      {"Log", JsonConvert.SerializeObject(debtStatisticLogViewModel)},
                 };
@@ -651,7 +651,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                      {"SourceID", (int)LogSource.BACKEND},
                      {"KeyID", requestId},
                      {"Type", LogType.ACTIVITY},
-                     {"CompanyType", LogHelper.CompanyTypeInt},
+                     {"CompanyType", "0"},
                      {"ObjectType", ObjectType.DEBT_STATISTIC_LOG},
                      {"Log", JsonConvert.SerializeObject(debtStatisticLogViewModel)},
                 };
@@ -728,7 +728,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                      {"SourceID", (int)LogSource.BACKEND},
                      {"KeyID", requestId},
                      {"Type", LogType.ACTIVITY},
-                     {"CompanyType", LogHelper.CompanyTypeInt},
+                     {"CompanyType", "0"},
                      {"ObjectType", ObjectType.DEBT_STATISTIC_LOG},
                      {"Log", JsonConvert.SerializeObject(debtStatisticLogViewModel)},
                 };

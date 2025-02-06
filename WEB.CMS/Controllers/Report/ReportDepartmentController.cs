@@ -17,7 +17,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.Report
+namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 {
     [CustomAuthorize]
     public class ReportDepartmentController : Controller

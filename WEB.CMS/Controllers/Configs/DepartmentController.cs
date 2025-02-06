@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.Configs
+namespace WEB.DeepSeekTravel.CMS.Controllers.Configs
 {
     [CustomAuthorize]
 

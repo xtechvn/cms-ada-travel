@@ -444,8 +444,10 @@ namespace Utilities.Contants
         public const string SP_GetAllUser_search = "SP_GetAllUser_search";
         public const string SP_GetListUserPermissionByUserId = "SP_GetListUserPermissionByUserId";
 
-        public static string UpsertUser = "sp_UpsertUser";
-        public static string UpsertUserRole = "sp_UpsertUserRole";
+        public static string UpdateUser = "sp_UpdateUser";
+        public static string InsertUser = "sp_InsertUser";
+        public static string InsertUserRole = "SP_InsertUserRole";
+        public static string UpdateUserRole = "SP_UpdateUserRole";
         public static string DeleteUserRole = "sp_DeleteUserRole";
     }
 }

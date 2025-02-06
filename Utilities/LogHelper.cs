@@ -15,8 +15,6 @@ namespace Utilities
         public static string botToken = "5321912147:AAFhcJ9DolwPWL74WbMjOOyP6-0G7w88PWY";
         public static string group_Id = "-739120187";
         public static string enviromment = "DEV";
-        public static string CompanyType = " ";
-        public static int CompanyTypeInt = 0;
 
        
         private static void LoadConfig()
@@ -30,29 +28,7 @@ namespace Utilities
                 enviromment = _appconfig.BotSetting.environment;
                 botToken = _appconfig.BotSetting.bot_token;
                 group_Id = _appconfig.BotSetting.bot_group_id;
-                string company_type = _appconfig.CompanyType;
-                if (company_type!=null && company_type.Trim()!="")
-                {
-                    CompanyTypeInt = Convert.ToInt32(company_type);
-                    switch (CompanyTypeInt)
-                    {
-                        case 0:
-                            {
-                                CompanyType = " Travel ";
-                            }
-                            break;
-                        case 1:
-                            {
-                                CompanyType = " Phu Quoc ";
-                            }
-                            break;
-                        case 2:
-                            {
-                                CompanyType = " Dai Viet ";
-                            }
-                            break;
-                    }
-                }
+               
             }
         }
         public static int InsertLogTelegram(string message)
@@ -62,7 +38,7 @@ namespace Utilities
             {
                 LoadConfig();
                 TelegramBotClient alertMsgBot = new TelegramBotClient(botToken);
-                var rs_push=  alertMsgBot.SendTextMessageAsync(group_Id, "[" + enviromment + "-"+CompanyType+"] - " + message).Result;
+                var rs_push=  alertMsgBot.SendTextMessageAsync(group_Id, "[" + enviromment +"] - " + message).Result;
             }
             catch (Exception ex)
             {
@@ -87,7 +63,7 @@ namespace Utilities
             try
             {
                 TelegramBotClient alertMsgBot = new TelegramBotClient(botToken);
-                alertMsgBot.SendTextMessageAsync(group_Id, "AdavigoCMS - " + message);
+                alertMsgBot.SendTextMessageAsync(group_Id, "DeepSeekTravelCMS - " + message);
             }
             catch (Exception ex)
             {
@@ -180,7 +156,6 @@ namespace Utilities
     public class AppSettings
     {
         public BotSetting BotSetting { get; set; }
-        public string CompanyType { get; set; }
       
     }
 

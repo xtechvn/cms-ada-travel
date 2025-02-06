@@ -48,7 +48,7 @@ namespace WEB.CMS.Customize
                 string data_json = "";
                 try
                 {
-                    data_json = _redisConn.Get(CacheName.USER_ROLE + user_id + "_" + _configuration["CompanyType"], Convert.ToInt32(_configuration["Redis:Database:db_common"]));
+                    data_json = _redisConn.Get(CacheName.USER_ROLE + user_id, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
                 }
                 catch
                 {
@@ -89,7 +89,7 @@ namespace WEB.CMS.Customize
                     //string token = data_encode;
                     try
                     {
-                        _redisConn.Set(CacheName.USER_ROLE + user_id + "_" + _configuration["CompanyType"], token, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
+                        _redisConn.Set(CacheName.USER_ROLE + user_id, token, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
                     }
                     catch { }
                 }

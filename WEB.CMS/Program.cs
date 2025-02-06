@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Repositories;
 using Repositories.IRepositories;
 using Repositories.Repositories;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,8 +20,8 @@ builder.Services.Configure<FormOptions>(options =>
 });
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {
-    options.AccessDeniedPath = new PathString("/Account/RedirectLogin");
-    options.LoginPath = new PathString("/Account/RedirectLogin");
+    options.AccessDeniedPath = new PathString("/Account/login");
+    options.LoginPath = new PathString("/Account/login");
     options.ReturnUrlParameter = "url";
     options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // nếu dùng ExpireTimeSpan thì  SlidingExpiration phải set là false. Như vậy cho dù tương tác hay k tương tác thì đều timeout theo thời gian đã set
     options.SlidingExpiration = true; //được sử dụng để thiết lập thời gian sống của cookie dựa trên thời gian cuối cùng mà người dùng đã tương tác với ứng dụng . Nếu người dùng tiếp tục tương tác với ứng dụng trước khi cookie hết hạn, thời gian sống của cookie sẽ được gia hạn thêm.

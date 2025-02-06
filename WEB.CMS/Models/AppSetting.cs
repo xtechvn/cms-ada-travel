@@ -61,7 +61,6 @@ namespace WEB.CMS.Models
         public int Programs_Menuid { get; set; }
         public string API_UpdateUser { get; set; }
         public string API_GetUserDetail { get; set; }
-        public string LoginURL { get; set; }
         public string API_Gen_Qr { get; set; }
         public string API_ADAVIGO_URL_LOGIN { get; set; }
         public int LoginTokenExprire { get; set; }

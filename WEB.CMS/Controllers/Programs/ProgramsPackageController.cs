@@ -12,12 +12,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 using static Entities.ViewModels.Programs.InsertProgramsPackageViewModel;
 
-namespace WEB.Adavigo.CMS.Controllers.Programs
+namespace WEB.DeepSeekTravel.CMS.Controllers.Programs
 {
     [CustomAuthorize]
     public class ProgramsPackageController : Controller

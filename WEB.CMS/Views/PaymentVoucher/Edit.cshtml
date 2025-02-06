@@ -6,7 +6,7 @@
 @{
     var allCode_PAY_TYPE = (List<AllCode>)ViewBag.allCode_PAY_TYPE;
     var allCode_PAYMENT_VOUCHER_TYPE = (List<AllCode>)ViewBag.allCode_PAYMENT_VOUCHER_TYPE;
-    var listBankingAccountAdavigo = (List<BankingAccount>)ViewBag.listBankingAccountAdavigo;
+    var listBankingAccountDeepSeekTravel = (List<BankingAccount>)ViewBag.listBankingAccountDeepSeekTravel;
     var listBankingAccount = (List<BankingAccount>)ViewBag.listBankingAccount;
     var clientId = 0;
     long bankingAccountId = Model.BankingAccountId;
@@ -157,7 +157,7 @@
         <div class="col-md-12 mb10 ">
             <select class="form-control" style="width: 100%; height: 34px ;" id="bankingAccountSource" asp-for="@Model.SourceAccount">
                 <option value="-1" disabled selected>Chọn</option>
-                @foreach (var item in listBankingAccountAdavigo)
+                @foreach (var item in listBankingAccountDeepSeekTravel)
                 {
                     <option value="@item.Id">@item.BankId - @item.AccountNumber - @item.AccountName</option>
                 }

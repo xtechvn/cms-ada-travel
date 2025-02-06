@@ -19,7 +19,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
 {
     [CustomAuthorize]
     public class TourProductController : Controller

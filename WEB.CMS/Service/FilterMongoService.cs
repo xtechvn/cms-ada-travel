@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Utilities;
 
-namespace WEB.Adavigo.CMS.Service
+namespace WEB.DeepSeekTravel.CMS.Service
 {
     public class FilterMongoService
     {
@@ -23,7 +23,7 @@ namespace WEB.Adavigo.CMS.Service
                 var filter = Builders<SystemLog>.Filter.Empty;
                 filter &= Builders<SystemLog>.Filter.Eq(n => n.KeyID, keyId.ToString());
                 filter &= Builders<SystemLog>.Filter.In(n => n.ObjectType, objectType);
-                filter &= Builders<SystemLog>.Filter.Eq(n => n.CompanyType, LogHelper.CompanyTypeInt);
+                filter &= Builders<SystemLog>.Filter.Eq(n => n.CompanyType, 0);
                 var S = Builders<SystemLog>.Sort.Descending("_id");
                 listDebtBrickLog = collection.Find(filter).Sort(S).ToList();
             }

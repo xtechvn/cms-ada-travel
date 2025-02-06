@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Utilities;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     [CustomAuthorize]
     public class VinWonderPolicyController : Controller
