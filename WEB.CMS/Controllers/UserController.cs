@@ -132,8 +132,17 @@ namespace WEB.CMS.Controllers
                 {
                     model.Gender = 1;
                 }
-
-                ViewBag.DepartmentList = await _DepartmentRepository.GetAll(String.Empty);
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                ViewBag.DepartmentList = await _DepartmentRepository.Listing(null,tenant_id);
                 ViewBag.RoleList = await _RoleRepository.GetAll();
                 ViewBag.UserPosition = _UserRepository.GetUserPositions();
                 return View(model);
@@ -192,6 +201,18 @@ namespace WEB.CMS.Controllers
                 if (model.Avata == null) model.Avata = "";
                 if (model.Address == null) model.Address = "";
                 if (model.NickName == null) model.NickName = "";
+                //--Tenant
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                model.TenantId = tenant_id;
                 //-- check exists:
                 var exists = await _UserRepository.GetById(model.Id);
                 if (exists == null || exists.Id <= 0)

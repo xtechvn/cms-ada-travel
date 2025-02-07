@@ -516,12 +516,11 @@ namespace Repositories.Repositories
                 return null;
             }
         }
-        public async Task<List<User>> GetUserSuggesstion(string txt_search)
+        public async Task<List<User>> GetUserSuggesstion(string txt_search, int? tenant_id = null)
         {
             try
             {
-                if (txt_search == null) txt_search = "";
-                return await _UserDAL.GetUserSuggesstion(txt_search);
+                return JsonConvert.DeserializeObject<List<User>>( JsonConvert.SerializeObject(_UserDAL.GetUserPagingList(txt_search, null, 1, 50, tenant_id)));
             }
             catch (Exception ex)
             {
@@ -529,12 +528,11 @@ namespace Repositories.Repositories
                 return null;
             }
         }
-        public async Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids)
+        public async Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids,int? tenant_id = null)
         {
             try
             {
-                if (txt_search == null) txt_search = "";
-                return await _UserDAL.GetUserSuggesstion(txt_search, ids);
+                return JsonConvert.DeserializeObject<List<User>>(JsonConvert.SerializeObject(_UserDAL.GetUserPagingList(txt_search, null, 1, 50, tenant_id)));
             }
             catch (Exception ex)
             {

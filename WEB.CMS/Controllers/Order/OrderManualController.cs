@@ -1168,6 +1168,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                         order_id = -1
                     });
                 }
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                order.TenantId = tenant_id;
                 var result = await _orderRepository.CreateOrder(order);
                 var current_user = _ManagementUser.GetCurrentUser();
                

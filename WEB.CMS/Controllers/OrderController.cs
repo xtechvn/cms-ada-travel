@@ -225,7 +225,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                             }
                             if (is_admin) break;
                         }
-
+                        int? tenant_id = null;
+                        if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                        {
+                            try
+                            {
+                                tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                            }
+                            catch { }
+                            if (tenant_id <= 0) tenant_id = null;
+                        }
+                        searchModel.TenantId = tenant_id;
                         model = await _orderRepository.GetList(searchModel, currentPage, pageSize);
                         model2 = await _orderRepository.GetTotalCountSumOrder(searchModel, -1, pageSize);
                     }
@@ -1027,10 +1037,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     var client = await _clientRepository.GetClientDetailByClientId((long)dataOrder.ClientId);
                     if (dataOrder != null)
                     {
-                        if (dataOrder.IsSalerDebtLimit == true)
-                        {
-                            ViewBag.SalerDebtLimit = "Bảo lãnh công nợ";
-                        }
+                        ViewBag.SalerDebtLimit = "";
+
                         ViewBag.BranchCode = dataOrder.BranchCode;
                         ViewBag.Label = dataOrder.Label;
                         ViewBag.Note = dataOrder.Note;
@@ -1308,7 +1316,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     mdoelLog.Type = (int)AttachmentType.OrderDetail; ;
                     mdoelLog.Note = user.FullName + " cập nhật thông tin đơn ";
                     mdoelLog.CreatedUserName = user.FullName;
-
+                    int? tenant_id = null;
+                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                    {
+                        try
+                        {
+                            tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                        }
+                        catch { }
+                        if (tenant_id <= 0) tenant_id = null;
+                    }
+                    model.TenantId = tenant_id;
 
                     var data2 = _orderRepository.UpdateOrder(model);
                     if (data2 > 0)
@@ -2286,6 +2304,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     modelOrder.OrderId = Convert.ToInt32(model.OrderId);
                     modelOrder.OrderStatus = (byte?)Convert.ToInt32(model.OrderStatus);
                     modelOrder.PaymentStatus = Convert.ToInt32(model.PaymentStatus);
+                    int? tenant_id = null;
+                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                    {
+                        try
+                        {
+                            tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                        }
+                        catch { }
+                        if (tenant_id <= 0) tenant_id = null;
+                    }
+                    modelOrder.TenantId = tenant_id;
                     var updateOrder = _orderRepository.UpdateOrder(modelOrder);
                     //var data2 = await _orderRepository.UpdateOrderStatus(Convert.ToInt32(model.OrderId), Convert.ToInt32(model.OrderStatus), UpdatedBy, UserVerify);
                     if (updateOrder > 0)

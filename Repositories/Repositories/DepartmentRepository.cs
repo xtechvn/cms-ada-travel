@@ -83,25 +83,11 @@ namespace Repositories.IRepositories
             }
         }
 
-        public async Task<IEnumerable<Department>> GetAll(string name)
+        public async Task<List<Department>> Listing(string name, int? tenant_id = null, int? status = null)
         {
             try
             {
-                var datas = await _DepartmentDAL.GetByConditionAsync(s => s.IsDelete == false);
-
-
-                if (!String.IsNullOrEmpty(name))
-                {
-                    List<Department> result = datas.Where(s => s.DepartmentName.ToLower().Contains(name.ToLower())).ToList();
-                    var full_parent_ids = result.Select(s => s.FullParent).Where(s => !string.IsNullOrEmpty(s))
-                        .SelectMany(s => s.Split(',')).Select(s => int.Parse(s)).Distinct().ToList();
-
-                    result.AddRange(datas.Where(s => full_parent_ids.Contains(s.Id)));
-
-                    return result.Distinct();
-                }
-
-                return datas;
+                return  _DepartmentDAL.Listing(name,status,tenant_id);
             }
             catch
             {

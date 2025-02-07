@@ -23,8 +23,8 @@ namespace Repositories.IRepositories
         Task<string> ResetPasswordByUserId(int userId);
         Task<int> ChangePassword(UserPasswordModel model);
         List<User> GetAll();
-        Task<List<User>> GetUserSuggesstion(string txt_search);
-        Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids);
+        Task<List<User>> GetUserSuggesstion(string txt_search, int? tenant_id = null);
+        Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids, int? tenant_id = null);
         Task<User> GetClientDetailAsync(long clientId);
         Task<List<RolePermission>> GetUserPermissionById(int Id);
         public List<UserPosition> GetUserPositions();

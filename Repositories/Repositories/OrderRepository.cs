@@ -203,7 +203,7 @@ namespace Repositories.Repositories
             try
             {
 
-                var id = await _OrderDal.CreateOrder(order);
+                var id =  _OrderDal.InsertOrder(order);
                 if (order.OrderId > 0)
                 {
                     return order;

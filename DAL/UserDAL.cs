@@ -418,7 +418,7 @@ namespace DAL
                     new SqlParameter("@NickName", user.NickName),
                     new SqlParameter("@TenantId",user.TenantId),
                     new SqlParameter("@Type", user.Type),
-                    new SqlParameter("@CreatedBy", user.CreatedBy),
+                    new SqlParameter("@ModifiedBy", user.ModifiedBy),
                };
                 var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.UpdateUser, parameters);
                 user.Id = id;

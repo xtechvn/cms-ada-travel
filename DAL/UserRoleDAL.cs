@@ -159,7 +159,7 @@ namespace DAL
                 var parameters = new SqlParameter[]
                 {
                     new SqlParameter("@UserID", role.UserId),
-                    new SqlParameter("@UserRole", role.RoleId)
+                    new SqlParameter("@RoleId", role.RoleId)
                 };
                 var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.InsertUserRole, parameters);
                 role.Id = id;

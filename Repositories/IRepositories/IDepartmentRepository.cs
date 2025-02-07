@@ -13,7 +13,7 @@ namespace Repositories.IRepositories
         Task<long> Create(Department model);
         Task<long> Update(Department model);
         Task<Department> GetById(int id);
-        Task<IEnumerable<Department>> GetAll(string name);
+        Task<List<Department>> Listing(string name=null, int? tenant_id = null, int? status = null);
         Task<long> Delete(int id);
         Task<GenericViewModel<SearchReportDepartmentViewModel>> GetReportDepartment(ReportDepartmentViewModel searchModel);
         Task<string> ExportDeposit(ReportDepartmentViewModel searchModel, string FilePath);

@@ -131,6 +131,7 @@ namespace Entities.ViewModels
         public int StatusTab { get; set; } = 99;
         public int PageIndex { get; set; } 
         public int pageSize { get; set; } 
+        public int? TenantId { get; set; } 
     }
     public class SearchOrder
     {
