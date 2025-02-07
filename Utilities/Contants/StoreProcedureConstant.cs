@@ -449,5 +449,7 @@ namespace Utilities.Contants
         public static string InsertUserRole = "SP_InsertUserRole";
         public static string UpdateUserRole = "SP_UpdateUserRole";
         public static string DeleteUserRole = "sp_DeleteUserRole";
+        public static string InsertDepartment = "sp_InsertDepartment";
+        public static string UpdateDepartment = "sp_UpdateDepartment";
     }
 }

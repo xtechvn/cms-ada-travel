@@ -9,7 +9,7 @@ namespace Repositories.IRepositories
     {
         Task<UserDetailViewModel> CheckExistAccount(AccountModel entity);
         Task<bool> ResetPassword(string input);
-        GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize);
+        GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize, int? tenant_id = null);
         Task<UserDetailViewModel> GetDetailUser(int Id);
         Task<UserDataViewModel> GetUser(int Id);
         Task<int> Create(UserViewModel model);

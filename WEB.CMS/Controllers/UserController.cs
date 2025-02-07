@@ -76,7 +76,17 @@ namespace WEB.CMS.Controllers
             {
                 if (status < 0 || status>2) status = null;
                 if (userName !=null && userName.Trim()!="") userName = CommonHelper.RemoveUnicode(userName);
-                model = _UserRepository.GetPagingList(userName, status, currentPage, pageSize);
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                model = _UserRepository.GetPagingList(userName, status, currentPage, pageSize, tenant_id);
             }
             catch (Exception ex)
             {

@@ -29,7 +29,7 @@ namespace DAL
             _DbWorker = new DbWorker(connection);
         }
 
-        public List<UserGridModel> GetUserPagingList(string name, int? status, int page_index, int page_size)
+        public List<UserGridModel> GetUserPagingList(string name, int? status, int page_index, int page_size, int? tenant_id = null)
         {
             try
             {
@@ -37,6 +37,7 @@ namespace DAL
                 {
                     new SqlParameter("@Name", ((name==null||name.Trim()=="")? DBNull.Value: name)),
                     new SqlParameter("@Status", (status==null? DBNull.Value: (int)status)),
+                    new SqlParameter("@TenantId", (tenant_id==null? DBNull.Value: (int)tenant_id)),
                     new SqlParameter("@PageIndex", page_index),
                     new SqlParameter("@PageSize",page_size)
                 };

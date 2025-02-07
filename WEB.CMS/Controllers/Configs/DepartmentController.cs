@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Repositories.IRepositories;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities.Contants;
 using WEB.CMS.Customize;
@@ -66,6 +67,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Configs
             {
                 long result = 0;
                 string action = string.Empty;
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                model.TenantId = tenant_id;
                 if (model.Id > 0)
                 {
                     action = "Cập nhật";

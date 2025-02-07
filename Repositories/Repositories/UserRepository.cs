@@ -169,7 +169,7 @@ namespace Repositories.Repositories
             return model;
         }
 
-        public GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize)
+        public GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize, int? tenant_id = null)
         {
             var model = new GenericViewModel<UserGridModel>()
             {
@@ -180,7 +180,7 @@ namespace Repositories.Repositories
             try
             {
                 
-                model.ListData = _UserDAL.GetUserPagingList(userName,  status, currentPage, pageSize);
+                model.ListData = _UserDAL.GetUserPagingList(userName,  status, currentPage, pageSize,tenant_id);
                 if(model.ListData!=null && model.ListData.Count > 0)
                 {
                     model.PageSize = pageSize;

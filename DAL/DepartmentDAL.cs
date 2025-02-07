@@ -427,5 +427,67 @@ namespace DAL
                 return null;
             }
         }
+        public int InsertDepartment(Department department)
+        {
+            try
+            {
+
+                 SqlParameter[] parameters = new SqlParameter[]
+                 {
+                    new SqlParameter("@DepartmentName", department.DepartmentName),
+                    new SqlParameter("@DepartmentCode", department.DepartmentCode),
+                    new SqlParameter("@ParentId", department.ParentId),
+                    new SqlParameter("@FullParent",  department.FullParent),
+                    new SqlParameter("@IsDelete",  department.IsDelete),
+                    new SqlParameter("@Status", department.Status),
+                    new SqlParameter("@Sort", department.Sort),
+                    new SqlParameter("@Description", department.Description),
+                    new SqlParameter("@Branch",  department.Branch),
+                    new SqlParameter("@IsReport",  department.IsReport),
+                    new SqlParameter("@CreatedBy", department.CreatedBy),
+                    new SqlParameter("@CreatedDate", department.CreatedDate),
+                    new SqlParameter("@TenantId", department.TenantId),
+                 };
+                var id = DbWorker.ExecuteNonQuery(StoreProcedureConstant.InsertDepartment, parameters);
+                department.Id = id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertDepartment - DepartmentDAL: " + ex);
+                return -1;
+            }
+        }
+        public int UpdateDepartment(Department department)
+        {
+            try
+            {
+                SqlParameter[] parameters = new SqlParameter[]
+                                {
+                    new SqlParameter("@Id", department.Id),
+                    new SqlParameter("@DepartmentName", department.DepartmentName),
+                    new SqlParameter("@DepartmentCode", department.DepartmentCode),
+                    new SqlParameter("@ParentId", department.ParentId),
+                    new SqlParameter("@FullParent",  department.FullParent),
+                    new SqlParameter("@IsDelete",  department.IsDelete),
+                    new SqlParameter("@Status", department.Status),
+                    new SqlParameter("@Sort", department.Sort),
+                    new SqlParameter("@Description", department.Description),
+                    new SqlParameter("@Branch",  department.Branch),
+                    new SqlParameter("@IsReport",  department.IsReport),
+                    new SqlParameter("@CreatedBy", department.CreatedBy),
+                    new SqlParameter("@CreatedDate", department.CreatedDate),
+                    new SqlParameter("@TenantId", department.TenantId),
+                                };
+                var id = DbWorker.ExecuteNonQuery(StoreProcedureConstant.UpdateDepartment, parameters);
+                department.Id = id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateDepartment - DepartmentDAL: " + ex);
+                return -1;
+            }
+        }
     }
 }

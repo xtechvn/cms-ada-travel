@@ -12,6 +12,8 @@ namespace Entities.Models
         public string FullParent { get; set; }
         public bool? IsDelete { get; set; }
         public int? Status { get; set; }
+        public int? Sort { get; set; }
+        public int? TenantId { get; set; }
         public string Description { get; set; }
         public int? Branch { get; set; }
         public bool? IsReport { get; set; }

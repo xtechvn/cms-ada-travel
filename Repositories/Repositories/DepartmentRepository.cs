@@ -43,10 +43,10 @@ namespace Repositories.IRepositories
                 model.Status = 0;
                 model.CreatedDate = DateTime.Now;
                 model.CreatedBy = _SysUserModel.Id;
-                var data = await _DepartmentDAL.CreateAsync(model);
+                var data =  _DepartmentDAL.InsertDepartment(model);
                 var update = await GetById(model.Id);
                 update.FullParent += ","+data;
-                await _DepartmentDAL.UpdateAsync(update);
+                 _DepartmentDAL.UpdateDepartment(update);
                 return data;
             }
             catch
@@ -74,7 +74,7 @@ namespace Repositories.IRepositories
                 data.UpdatedBy = _SysUserModel.Id;
                 data.Branch = model.Branch;
 
-                await _DepartmentDAL.UpdateAsync(data);
+                 _DepartmentDAL.UpdateDepartment(data);
                 return model.Id;
             }
             catch
@@ -124,7 +124,7 @@ namespace Repositories.IRepositories
 
                 var data = await GetById(id);
                 data.IsDelete = true;
-                await _DepartmentDAL.UpdateAsync(data);
+                _DepartmentDAL.UpdateDepartment(data);
                 return id;
             }
             catch
