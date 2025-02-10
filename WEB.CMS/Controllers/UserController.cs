@@ -227,7 +227,7 @@ namespace WEB.CMS.Controllers
                 }
                 if (rs > 0)
                 {
-                    _workQueueClient.SyncES(rs, _configuration["DataBaseConfig:Elastic:SP:sp_GetUser"], _configuration["DataBaseConfig:Elastic:Index:User"], ProjectType.ADAVIGO_CMS, "UpSert UserController");
+                    _workQueueClient.SyncES(rs, _configuration["DataBaseConfig:Elastic:SP:sp_GetUser"], _configuration["DataBaseConfig:Elastic:Index:User"]);
 
                     return new JsonResult(new
                     {

@@ -26,16 +26,7 @@ namespace WEB.CMS.Controllers
         {
             try
             {
-                var j_param = new Dictionary<string, object>
-                {
-                    { "store_name", request.StoreName },
-                    { "index_es", "adavigo_" + request.StoreName.ToLower() },
-                    { "project_type", Convert.ToInt16(ProjectType.ADAVIGO_CMS) },
-                    { "id", request.Id }
-                };
-
-                var _data_push = JsonConvert.SerializeObject(j_param);
-                var response_queue = work_queue.InsertQueueSimple(_data_push, "SYNC_DATA_TO_ES");
+                var response_queue = work_queue.SyncES(request.Id,request.StoreName, "deepseektravel_" + request.StoreName.ToLower());
 
                 if (response_queue)
                 {

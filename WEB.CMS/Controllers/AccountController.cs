@@ -167,7 +167,7 @@ namespace WEB.CMS.Controllers
                     });
                 }
                 //-- Nếu môi trường QC
-                if (_configuration["Config:On_QC_Environment"] == "1")
+                if (_configuration["Config:Environment"] == "QC")
                 {
                     await CreateCookieAuthenticate(user);
                     return Ok(new

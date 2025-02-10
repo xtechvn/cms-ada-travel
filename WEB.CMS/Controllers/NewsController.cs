@@ -179,7 +179,7 @@ namespace WEB.CMS.Controllers
                         strCategories = string.Join(",", model.Categories);
 
                     await ClearCacheArticle(articleId, strCategories);
-                    workQueueClient.SyncES(articleId, _configuration["DataBaseConfig:Elastic:SP:sp_GetArticle"], _configuration["DataBaseConfig:Elastic:Index:Article"], ProjectType.ADAVIGO_CMS);
+                    workQueueClient.SyncES(articleId, _configuration["DataBaseConfig:Elastic:SP:sp_GetArticle"], _configuration["DataBaseConfig:Elastic:Index:Article"]);
 
                     return new JsonResult(new
                     {

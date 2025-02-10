@@ -8,5 +8,6 @@
         public const int ADAVIGO_CMS_PQ = 4;
         public const int HOANBDS = 3;
         public const int ADAVIGO_CMS_PHUQUOC = 4;
+        public const int DEEPSEEK_CMS = 5;
     }
 }

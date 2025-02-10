@@ -489,7 +489,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     var data = await _contractRepository.CreateContact(model);
                     if (data != 0)
                     {
-                        _workQueueClient.SyncES(data, _configuration["DataBaseConfig:Elastic:SP:Sp_GetContract"], _configuration["DataBaseConfig:Elastic:Index:contract"], ProjectType.ADAVIGO_CMS, "Setup ContractController");
+                        _workQueueClient.SyncES(data, _configuration["DataBaseConfig:Elastic:SP:Sp_GetContract"], _configuration["DataBaseConfig:Elastic:Index:contract"]);
 
                         //var SendMessage = apiService.SendMessage(userId, ModuleType.HOP_DONG.ToString(), ActionType.TAO_MOI.ToString(), model.ContractNo);
                         stt_code = (int)ResponseType.SUCCESS;

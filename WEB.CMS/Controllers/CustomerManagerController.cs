@@ -296,7 +296,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                         else
                         {
                             var  clientdetail = await _clientRepository.GetClientByClientCode(DataModel.ClientCode);
-                            _workQueueClient.SyncES(clientdetail.Id,  _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
+                            _workQueueClient.SyncES(clientdetail.Id,  _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"]);
 
                             //var SendMail = await apiService.SendMailResetPassword(DataModel.email);
                             stt_code = (int)ResponseType.SUCCESS;
@@ -316,7 +316,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     var Result = _customerManagerRepositories.SetUpClient(DataModel);
                     if (Result == 1)
                     {
-                        _workQueueClient.SyncES(DataModel.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
+                        _workQueueClient.SyncES(DataModel.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"]);
 
                         stt_code = (int)ResponseType.SUCCESS;
                         msg = "Cập nhật thông tin thành công";

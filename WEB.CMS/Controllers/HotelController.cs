@@ -170,7 +170,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     int db_index = Convert.ToInt32(_configuration["Redis:Database:db_search_result"]);
                     string cache_name = CacheName.HotelExclusiveListB2C_POSITION + model.City.Trim();
                     _redisService.DeleteCacheByKeyword(cache_name, db_index);
-                    _workQueueClient.SyncES(result, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotel"], _configuration["DataBaseConfig:Elastic:Index:Hotel"], ProjectType.ADAVIGO_CMS, "SetUpHotel HotelController");
+                    _workQueueClient.SyncES(result, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotel"], _configuration["DataBaseConfig:Elastic:Index:Hotel"]);
 
                     return new JsonResult(new
                     {
@@ -890,7 +890,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                         Hotel.SupplierId = createsupplier;
                         Hotel.HotelId = "0";
                         int hotel_id = await _hotelBookingRepositories.CreateHotel(Hotel);
-                        _workQueueClient.SyncES(hotel_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotel"], _configuration["DataBaseConfig:Elastic:Index:Hotel"], ProjectType.ADAVIGO_CMS, "SetUpHotel HotelController");
+                        _workQueueClient.SyncES(hotel_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotel"], _configuration["DataBaseConfig:Elastic:Index:Hotel"]);
 
                         if (hotel_id > 0)
                         {

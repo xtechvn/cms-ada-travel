@@ -364,7 +364,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Programs
                     var data = await _programsReprository.InsertPrograms(model);
                     if (data > 0)
                     {
-                        _workQueueClient.SyncES(data, _configuration["DataBaseConfig:Elastic:SP:sp_GetPrograms"], _configuration["DataBaseConfig:Elastic:Index:Program"], ProjectType.ADAVIGO_CMS, "SummitPrograms ProgramsController");
+                        _workQueueClient.SyncES(data, _configuration["DataBaseConfig:Elastic:SP:sp_GetPrograms"], _configuration["DataBaseConfig:Elastic:Index:Program"]);
 
                         return Ok(new
                         {
@@ -389,7 +389,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Programs
                     var data = await _programsReprository.UpdatePrograms(model);
                     if (data > 0)
                     {
-                        _workQueueClient.SyncES(model.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetPrograms"], _configuration["DataBaseConfig:Elastic:Index:Program"], ProjectType.ADAVIGO_CMS, "SummitPrograms ProgramsController");
+                        _workQueueClient.SyncES(model.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetPrograms"], _configuration["DataBaseConfig:Elastic:Index:Program"]);
 
                         return Ok(new
                         {

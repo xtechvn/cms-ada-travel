@@ -609,7 +609,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                     });
 
                 }
-                workQueueClient.SyncES(id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"], ProjectType.ADAVIGO_CMS, "SummitHotelServiceData OrderManualController");
+                workQueueClient.SyncES(id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"]);
 
 
                 #region Update Order Amount:
@@ -1083,7 +1083,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                             };
                             await _hotelBookingCodeRepository.InsertHotelBookingCode(hotel_code_view_model);
                         }
-                        workQueueClient.SyncES(route.Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "SummitFlyBookingServiceData OrderManualController");
+                        workQueueClient.SyncES(route.Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
 
                     }
                     if (detail.Count < 2)
@@ -1184,7 +1184,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                
                 string link = "/Order/" + result.OrderId;
                  apiService.SendMessage( _UserId.ToString(),((int) ModuleType.DON_HANG).ToString(), ((int)ActionType.TAO_MOI).ToString(), order.OrderNo, link, current_user==null? "0": current_user.Role);
-                workQueueClient.SyncES(result.OrderId, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"], ProjectType.ADAVIGO_CMS, "CreateManualOrder OrderManualController");
+                workQueueClient.SyncES(result.OrderId, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"]);
 
                 //-- Bo sung tao contact client:
                 //-- Get Contract va bo sung contractID
@@ -1496,7 +1496,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 }
                 //-- Notify
 
-                workQueueClient.SyncES(id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS, "SummitTourServiceData OrderManualController");
+                workQueueClient.SyncES(id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"]);
 
                 #region Update Order Amount:
 

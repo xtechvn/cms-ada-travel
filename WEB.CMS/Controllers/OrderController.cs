@@ -1331,7 +1331,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     var data2 = _orderRepository.UpdateOrder(model);
                     if (data2 > 0)
                     {
-                        workQueueClient.SyncES(data2, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"], ProjectType.ADAVIGO_CMS, "UpdateOrder OrderController");
+                        workQueueClient.SyncES(data2, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"]);
                         if (model.SalerId != null && order.SalerId != model.SalerId)
                         {
                             var sale1 = await _userRepository.GetById((long)order.SalerId);
@@ -1788,7 +1788,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                                 order_id = (long)hotel.OrderId;
                             }
                             var success = await _hotelBookingRepositories.DeleteHotelBookingByID(hotel_booking_id);
-                            workQueueClient.SyncES(hotel_booking_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"], ProjectType.ADAVIGO_CMS, "DeleteService OrderController");
+                            workQueueClient.SyncES(hotel_booking_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"]);
 
                             break;
                         }
@@ -1799,10 +1799,10 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                             if (fly != null && fly.Count > 0 && fly[0].Id > 0)
                             {
                                 order_id = (long)fly[0].OrderId;
-                                workQueueClient.SyncES(fly[0].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "DeleteService OrderController");
+                                workQueueClient.SyncES(fly[0].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
                                 if (fly.Count > 1)
                                 {
-                                    workQueueClient.SyncES(fly[1].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "DeleteService OrderController");
+                                    workQueueClient.SyncES(fly[1].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
 
                                 }
                             }
@@ -1824,7 +1824,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                                 order_id = (long)tour.OrderId;
                             }
                             var success = await _tourRepository.DeleteTourByID(tour_id);
-                            workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS);
+                            workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"]);
 
                             break;
                         }
@@ -1931,7 +1931,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                                 //        _contractPayRepository.UndoContractPayByCancelService(contract.PayId, (long)hotel.OrderId, _UserLogin);
                                 //    }
                                 //}
-                                workQueueClient.SyncES(hotel_booking_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"], ProjectType.ADAVIGO_CMS, "CancelService OrderController");
+                                workQueueClient.SyncES(hotel_booking_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"]    );
 
                             }
 
@@ -1945,10 +1945,10 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                             {
                                 order_id = (long)fly[0].OrderId;
                                 var success = await _flyBookingDetailRepository.CancelHotelBookingByID(id, _UserLogin);
-                                workQueueClient.SyncES(fly[0].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "CancelService OrderController");
+                                workQueueClient.SyncES(fly[0].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
                                 if (fly.Count > 1)
                                 {
-                                    workQueueClient.SyncES(fly[1].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "CancelService OrderController");
+                                    workQueueClient.SyncES(fly[1].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
 
                                 }
                             }
@@ -1967,7 +1967,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                             {
                                 order_id = (long)tour.OrderId;
                                 var success = await _tourRepository.CancelTourByID(tour_id, _UserLogin);
-                                workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS, "CancelService OrderController");
+                                workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"]);
 
                             }
                             break;
