@@ -29,7 +29,6 @@ namespace WEB.CMS.Models
         public string KEY_TOKEN_API_B2B { get; set; }
         public string API_GET_OTHERS_HOTELS { get; set; }
         public string API_GET_VIN_HOTELS { get; set; }
-        public string API_GET_HOTEL_ROOM_DETAIL { get; set; }
         public string API_CLEAR_CACHE_BY_KEY { get; set; }
         public string Catalog_General { get; set; }
         public string Collection_RoomProviders { get; set; }

@@ -59,72 +59,7 @@ namespace WEB.CMS.Controllers
 
         }
 
-        /// <summary>
-        /// Login with token
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("login/check-login")]
-        public async Task<IActionResult> CheckIfUserLogged([FromForm]string token)
-        {
-            try
-            {
-                JArray objParr = null;
-                #region Test:
-
-                //var input_test = new
-                //{
-                //    user_id = 18,
-
-                //};
-                //var data_product = JsonConvert.SerializeObject(input_test);
-                //token = CommonHelper.Encode(data_product, _configuration["DataBaseConfig:key_api:api_manual"]);
-                //token = token.Replace("//", "_").Replace("+", "-");
-
-
-                #endregion
-                token = token.Replace("_", "//").Replace("-", "+");
-                if (CommonHelper.GetParamWithKey(token, out objParr, _configuration["DataBaseConfig:key_api:api_manual"]))
-                {
-                    int user_id = user_id = Convert.ToInt32(objParr[0]["user_id"].ToString());
-                    int _UserId = 0;
-
-                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                    {
-                        _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                    }
-                    if (_UserId>0 && _UserId == user_id)
-                    {
-                        return Ok(new
-                        {
-                            status = (int)ResponseType.SUCCESS,
-                            Logged = 1
-                        });
-                    }
-                    else
-                    {
-                        return Ok(new
-                        {
-                            status = (int)ResponseType.FAILED,
-                            Logged = 0
-                        });
-                    }
-                }
-               
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("CheckIfUserLogged - AccountController" + ex);
-
-            }
-            return Ok(new
-            {
-                status = (int)ResponseType.FAILED,
-                Logged = -1
-            });
-        }
+       
         private async Task CreateCookieAuthenticate(UserDetailViewModel model)
         {
             try

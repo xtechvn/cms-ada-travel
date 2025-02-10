@@ -14,7 +14,6 @@
   "API_GET_VIN_HOTELS": "/api/room/vin/vinpearl/get-hotel.json",
   "API_GET_VIN_HOTELS_ROOM": "/api/room/vin/vinpearl/get-hotel.json",
   "API_GET_OTHERS_HOTELS_ROOM": "/api/room/other/get-hotel.json",
-  "API_GET_HOTEL_ROOM_DETAIL": "/api/v1/internal/hotels/<hotel_id>?api_token=W45PJABnxYXd7PPVPrbdgGwrUENYBL4S35ttutP&departureDate=<departure_date>&returnDate=<return_date>&numRoom=<num_of_room>",
   "Catalog_General": "DeepSeekTravel",
   "API_CLEAR_CACHE_BY_KEY": "/api/cache/clear_cache_by_key.json",
   "Collection_RoomProviders": "RoomProviders",
