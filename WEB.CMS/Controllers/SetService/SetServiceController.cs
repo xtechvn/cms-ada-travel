@@ -880,9 +880,19 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
                 if (txt_search != null)
                 {
-                    var data = await _HotelBookingESRepository.GetListProduct(txt_search.Trim());
+                    var data = await _HotelBookingESRepository.GetListProduct(txt_search.Trim(), tenant_id);
                     return Ok(new
                     {
                         status = (int)ResponseType.SUCCESS,

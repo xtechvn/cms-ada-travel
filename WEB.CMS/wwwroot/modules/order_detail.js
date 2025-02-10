@@ -9,7 +9,7 @@
         _order_detail_create.UserSuggesstion();
     },
     ClientSuggesstion: function () {
-        $("#client-select").select2({
+        $("#client-select-create-order-manual").select2({
             ajax: {
                 url: "/Contract/ClientSuggestion",
                 type: "post",
@@ -23,52 +23,78 @@
                     return query;
                 },
                 processResults: function (response) {
-                    
-                    var data_modified = $.map(response.data, function (obj) {
-                        /*
-                        if (obj.clienttype <= 0 || obj.clienttype == undefined) {
-                            obj.disabled = true; // or use logical statement
-                            return null;
-                        }*/
-                        return obj;
-                    });
-                    return { results: data_modified };
-
+                    var data_modified = $.map(response.data, function (item) {
+                        item.text = item.clientname + ' - ' + item.email + ' - ' + item.phone
+                        item.id = item.id
+                        return item
+                    })
+                   
+                    return {
+                        results: $.map(response.data, function (item) {
+                           //item.text = item.clientname + ' - ' + item.email + ' - ' + item.phone
+                           // item.id = item.id
+                            return item
+                        })
+                    };
                 },
-                cache: true
+                //cache: true
             },
-            escapeMarkup: function (markup) { return markup; },
+           //escapeMarkup: function (markup) { return markup; },
             minimumInputLength: 1,
-            templateResult: _order_detail_create.ClientTemplateResult,
-            templateSelection: _order_detail_create.ClientTemplateSelection
+           // templateResult: _order_detail_create.ClientTemplateResult,
+           // templateSelection: _order_detail_create.ClientTemplateSelection
 
         });
-        
+        $("body").on('select2:select', "#client-select-create-order-manual", function (ev, picker) {
+            var element=$(this)
+            $.ajax({
+                url: "/order/GetActiveContractByClientId",
+                type: "post",
+                data: { client_id: element.find(':selected').val() },
+                success: function (result) {
+
+                    if (result != undefined && result.status == 0) {
+                        $('.error_client_select').hide()
+                        $('#btn_summit_order').removeAttr('disabled')
+                    }
+                    else {
+                        $('.error_client_select').show()
+                        $('#btn_summit_order').attr('disabled', 'disabled');
+                    }
+
+                }
+            });
+        });
     },
     ClientTemplateResult: function (item) {
         if (item.loading) {
             return item.text;
         }
-        var type_name = '';
+        var type_name = 'Khách hàng';
         var color_text = '';
 
-        if ([1, 2, 3, 4].includes(item.clienttype)) {
-            type_name = 'Khách hàng B2B'
-        }
-        else if (item.clienttype == 5) type_name = 'Khách hàng B2C'
-        else if (item.clienttype == 6) type_name = 'Saler'
+        //if ([1, 2, 3, 4].includes(item.clienttype)) {
+        //    type_name = 'Khách hàng B2B'
+        //}
+        //else if (item.clienttype == 5) type_name = 'Khách hàng B2C'
+        //else if (item.clienttype == 6) type_name = 'Saler'
         var $container = $(
-            _order_detail_html.html_option_client_suggesstion.replaceAll('{if_danger}', color_text).replaceAll('{Name}', item.clientname).replaceAll('{ClientType}', type_name).replaceAll('{Email}', item.email).replaceAll('{phone}', item.phone)
+            _order_detail_html.html_option_client_suggesstion.replaceAll('{if_danger}', color_text)
+                .replaceAll('{Name}', item.clientname ?? '')
+                .replaceAll('{ClientType}', type_name ?? '')
+                .replaceAll('{Email}', item.email ?? '')
+                .replaceAll('{phone}', item.phone ?? '')
         );
         return $container;
 
     },
     ClientTemplateSelection: function (item) {
         $.ajax({
-            url: "GetActiveContractByClientId",
+            url: "/order/GetActiveContractByClientId",
             type: "post",
             data: { client_id: item.id},
             success: function (result) {
+
                 if (result != undefined && result.status == 0) {
                     $('.error_client_select').hide()
                     $('#btn_summit_order').removeAttr('disabled')
@@ -81,8 +107,8 @@
 
             }
         });
+        return (item.clientname + ' ( ' + item.phone + ' - ' + item.email + ' )')
 
-       return (item.clientname + ' ( ' + item.phone + ' - ' + item.email + ' )')
     },
     ClientPreOptionSuggesstion: function (item) {
         if (item.loading) {
@@ -120,7 +146,7 @@
 
         });
 
-        if ($('#client-select').find(':selected').val() == undefined || parseInt($('#client-select').find(':selected').val()) <= 0) {
+        if ($('#client-select-create-order-manual').find(':selected').val() == undefined || parseInt($('#client-select').find(':selected').val()) <= 0) {
             _msgalert.error("Vui lòng nhập / chọn đúng khách hàng cho đơn hàng này");
             return;
         }
@@ -143,7 +169,7 @@
         $('.img_loading_summit').show();
 
         var summit_model = {
-            client_id: $('#client-select').val(),
+            client_id: $('#client-select-create-order-manual').val(),
             main_sale_id: $("#main-staff").select2("val"),
             sub_sale_id: $("#sub-staff").select2("val"),
             branch: $('#branch').find(":selected").val(),

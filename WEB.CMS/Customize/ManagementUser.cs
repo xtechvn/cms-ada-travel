@@ -37,18 +37,17 @@ namespace WEB.CMS.Customize
             try
             {
                 Claim ClaimDepartmentId = _HttpContext.HttpContext.User.FindFirst("DepartmentId");
-                IEnumerable<PermissionData> permissions = null;
+                List<PermissionData> permissions = new List<PermissionData>();
                 int user_id = int.Parse(_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 string role = _HttpContext.HttpContext.User.FindFirst(ClaimTypes.Role) != null ? _HttpContext.HttpContext.User.FindFirst(ClaimTypes.Role).Value : "";
                 string ClaimUserUnderList = "";
 
                 //-- Get From Cache
-                permissions = Enumerable.Empty<PermissionData>();
                 UserRoleCacheModel user_role_cache = new UserRoleCacheModel();
                 string data_json = "";
                 try
                 {
-                    data_json = _redisConn.Get(CacheName.USER_ROLE + user_id, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
+                    //data_json = _redisConn.Get(CacheName.USER_ROLE + user_id, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
                 }
                 catch
                 {
@@ -77,11 +76,11 @@ namespace WEB.CMS.Customize
                             MenuId = s.MenuId,
                             RoleId = s.RoleId,
                             PermissionId = s.PermissionId
-                        });
+                        }).ToList();
                     }
                     else
                     {
-                        user_role_cache.Permission = Enumerable.Empty<PermissionData>();
+                        user_role_cache.Permission = new List<PermissionData>();
                     }
                     user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id);
                     var data_encode = JsonConvert.SerializeObject(user_role_cache);
@@ -101,7 +100,7 @@ namespace WEB.CMS.Customize
                     Email = _HttpContext.HttpContext.User.FindFirst(ClaimTypes.Email).Value,
                     Role = role,
                     DepartmentId = ClaimDepartmentId != null ? int.Parse(ClaimDepartmentId.Value) : 0,
-                    Permissions = permissions,
+                    Permissions = user_role_cache.Permission,
                     UserUnderList = ClaimUserUnderList != null ? ClaimUserUnderList : String.Empty
                 };
             }

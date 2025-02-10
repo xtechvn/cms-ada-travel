@@ -59,7 +59,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Fly
             _orderESRepository = new OrderESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _flyBookingESRepository = new FlyBookingESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _allCodeRepository = allcodeRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _userRepository = userRepository;
             _passengerRepository = passengerRepository;
             _airlinesRepository = airlinesRepository;
@@ -597,10 +597,20 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Fly
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
                 if (txt_search != null)
                 {
                     var data_order = new List<OrderSelectViewModel>();
-                    var data = await _orderESRepository.GetOrderNoSuggesstion(txt_search);
+                    var data = await _orderESRepository.GetOrderNoSuggesstion(txt_search, tenant_id);
                     data_order.AddRange(data.Select(s => new OrderSelectViewModel { orderid = s.id, orderno = s.orderno }));
                     return Ok(new
                     {
@@ -640,9 +650,19 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Fly
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
                 if (txt_search != null)
                 {
-                    var data = await _flyBookingESRepository.GetFlyBookingSuggesstion(txt_search);
+                    var data = await _flyBookingESRepository.GetFlyBookingSuggesstion(txt_search, tenant_id);
                     return Ok(new
                     {
                         status = (int)ResponseType.SUCCESS,

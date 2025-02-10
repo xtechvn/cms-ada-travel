@@ -16,5 +16,6 @@ namespace Entities.ViewModels.ElasticSearch
         public string fullname { get; set; }
         public string email { get; set; }
         public string phone { get; set; }
+        public int? tenantid { get; set; }
     }
 }

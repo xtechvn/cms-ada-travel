@@ -38,10 +38,10 @@ namespace APP_CHECKOUT.RabitMQ
             };
             factory_sync_es = new ConnectionFactory()
             {
-                HostName = queue_setting.host,
-                UserName = queue_setting.username,
-                Password = queue_setting.password,
-                VirtualHost = queue_setting.v_host,
+                HostName = queue_synces_setting.host,
+                UserName = queue_synces_setting.username,
+                Password = queue_synces_setting.password,
+                VirtualHost = queue_synces_setting.v_host,
                 Port = Protocols.DefaultProtocol.DefaultPort
             };factory = new ConnectionFactory()
             {

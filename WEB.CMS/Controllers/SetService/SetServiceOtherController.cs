@@ -57,7 +57,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Other
             _orderESRepository = new OrderESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _flyBookingESRepository = new FlyBookingESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _allCodeRepository = allcodeRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _userRepository = userRepository;
             _passengerRepository = passengerRepository;
             _airlinesRepository = airlinesRepository;

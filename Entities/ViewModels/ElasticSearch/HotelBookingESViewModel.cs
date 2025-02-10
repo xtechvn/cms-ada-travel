@@ -8,5 +8,7 @@ namespace Entities.ViewModels.ElasticSearch
     {
         public int id { get; set; }
         public string servicecode { get; set; }
+        public int? tenantid { get; set; }
+
     }
 }

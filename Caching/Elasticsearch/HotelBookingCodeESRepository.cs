@@ -13,14 +13,14 @@ namespace Caching.Elasticsearch
    public class HotelBookingCodeESRepository : ESRepository<HotelBookingCodeESViewModel>
     {
         private readonly IConfiguration _configuration;
-        private readonly string index_name = "adavigo_sp_gethotelbookingcode";
+        private readonly string index_name = "deepseektravel_sp_gethotelbookingcode";
         public HotelBookingCodeESRepository(string Host, IConfiguration configuration) : base(Host)
         {
 
             _configuration = configuration;
             index_name = configuration["DataBaseConfig:Elastic:Index:HotelBookingCode"];
         }
-        public async Task<List<HotelBookingCodeESViewModel>> BoongKingCodeSuggesstion(string txt_search)
+        public async Task<List<HotelBookingCodeESViewModel>> BoongKingCodeSuggesstion(string txt_search, int? tenant_id = null)
         {
             List<HotelBookingCodeESViewModel> result = new List<HotelBookingCodeESViewModel>();
             try
@@ -38,12 +38,16 @@ namespace Caching.Elasticsearch
                            q.Bool(
                                qb => qb.Must(
                                   q => q.Term("isdelete", false),
-                                   sh => sh.QueryString(qs => qs
+                                   q => q.QueryString(qs => qs
                                    .Fields(new[] { "bookingcode" })
                                    .Query("*" + txt_search.ToUpper() + "*")
-                                   .Analyzer("standard")
+                                   .Analyzer("standard")),
+                                    mu => mu.Term(t => t
+                                                .Field("tenantid")
+                                                .Value(tenant_id)
+                                            )
 
-                            )
+                           
                            )
                           )));
 

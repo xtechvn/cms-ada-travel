@@ -52,7 +52,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             _configuration = configuration;
             _allCodeRepository = allCodeRepository;
             _contractRepository = contractRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             _contractESRepository = new ContractESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _clientRepository = clientRepository;

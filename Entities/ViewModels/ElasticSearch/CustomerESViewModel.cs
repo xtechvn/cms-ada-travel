@@ -7,11 +7,12 @@ namespace Entities.ViewModels.ElasticSearch
 {
     public class CustomerESViewModel
     {
-        public long _id { get; set; } // ID ElasticSearch
+        //public long _id { get; set; } // ID ElasticSearch
         [PropertyName("id")]
         public long id { get; set; } // ID customer
         [PropertyName("clientname")]
-        public string clientname { get; set; }  
+        public string clientname { get; set; }
+
         [PropertyName("clientcode")]
         public string clientcode { get; set; }
         [PropertyName("email")]

@@ -77,7 +77,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
             _userRepository = userRepository;
             _identifierServiceRepository = identifierServiceRepository;
             _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             _nationalESRepository = new NationalESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _accountClientRepository = accountClientRepository;
@@ -347,13 +347,23 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
                 if (txt_search == null) txt_search = "";
-                var data = await _userESRepository.GetUserSuggesstion(txt_search);
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                var data = await _userESRepository.GetUserSuggesstion(txt_search, tenant_id);
 
                 if (service_type <= 0)
                 {
                     if (data == null || data.Count <= 0)
                     {
-                        var data_sql = await _userRepository.GetUserSuggesstion(txt_search);
+                        var data_sql = await _userRepository.GetUserSuggesstion(txt_search, tenant_id);
                         data = new List<UserESViewModel>();
                         if (data_sql != null && data_sql.Count > 0)
                         {

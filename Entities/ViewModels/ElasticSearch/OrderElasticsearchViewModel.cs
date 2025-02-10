@@ -21,6 +21,8 @@ namespace ENTITIES.ViewModels.ElasticSearch
             string datetime = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + DateTime.Now.Millisecond.ToString() + (new Random().Next(100, 999)).ToString();
             id = Convert.ToInt64(datetime);
         }
+        public int? tenantid { get; set; }
+
     }
     public class OrderSelectViewModel
     {

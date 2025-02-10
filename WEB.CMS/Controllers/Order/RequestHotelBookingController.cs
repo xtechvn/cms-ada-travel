@@ -45,7 +45,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
             _configuration = configuration;
             _userRepository = userRepository;
             _hotelBookingRepository = hotelBookingRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _requestRepository = requestRepository;
             _clientRepository = clientRepository;

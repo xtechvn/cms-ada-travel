@@ -36,7 +36,7 @@ namespace Repositories.Repositories.BaseRepos
                 UserRoleCacheModel user_role_cache = new UserRoleCacheModel()
                 {
                     Role = role,
-                    Permission = Enumerable.Empty<PermissionData>(),
+                    Permission = new List<PermissionData>(),
                     UserUnderList = ""
                 };
                 //-- Get From Cache
@@ -73,7 +73,7 @@ namespace Repositories.Repositories.BaseRepos
 
                 }
                 //-- Get from Db:
-                user_role_cache.Permission = Enumerable.Empty<PermissionData>();
+                user_role_cache.Permission = new List<PermissionData>();
                 var permission = _UserRepository.GetUserPermissionById(user_id).Result;
                 if (permission != null && permission.Any())
                 {
@@ -82,11 +82,11 @@ namespace Repositories.Repositories.BaseRepos
                         MenuId = s.MenuId,
                         RoleId = s.RoleId,
                         PermissionId = s.PermissionId
-                    });
+                    }).ToList();
                 }
                 else
                 {
-                    user_role_cache.Permission = Enumerable.Empty<PermissionData>();
+                    user_role_cache.Permission = new List<PermissionData>();
                 }
                 user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id);
                 string token = CommonHelper.Encode(JsonConvert.SerializeObject(user_role_cache), configuration["DataBaseConfig:key_api:api_manual"]);

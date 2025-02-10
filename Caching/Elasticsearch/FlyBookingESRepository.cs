@@ -13,7 +13,7 @@ namespace Caching.Elasticsearch
     public class FlyBookingESRepository : ESRepository<FlyBookingESViewModel>
     {
         private readonly IConfiguration _configuration;
-        private readonly string index_name = "adavigo_sp_getdetailflybookingdetail";
+        private readonly string index_name = "deepseektravel_sp_getdetailflybookingdetail";
         public FlyBookingESRepository(string Host, IConfiguration configuration) : base(Host)
         {
 
@@ -21,7 +21,7 @@ namespace Caching.Elasticsearch
             index_name = configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"];
         }
 
-        public async Task<List<FlyBookingESViewModel>> GetFlyBookingSuggesstion(string txt_search, string index_name = "fly_booking_detail_store")
+        public async Task<List<FlyBookingESViewModel>> GetFlyBookingSuggesstion(string txt_search, int? tenant_id = null, string index_name = "fly_booking_detail_store")
         {
             List<FlyBookingESViewModel> result = new List<FlyBookingESViewModel>();
             try
@@ -35,12 +35,21 @@ namespace Caching.Elasticsearch
                            .Index(index_name)
                            .Size(top)
                            .Query(q =>
-                              q.QueryString(qs => qs
+                                 q.Bool(
+                               qb => qb.Must(
+                                  q => q.Term("isdelete", false),
+                                   q => q.QueryString(qs => qs
                                 .Fields(new[] { "servicecode" })
                                 .Query("*" + txt_search.ToUpper() + "*")
-                                .Analyzer("standard")
+                                .Analyzer("standard")),
+                                mu => mu.Term(t => t
+                                                .Field("tenantid")
+                                                .Value(tenant_id)
+                                            )
+
                             )
-                           ));
+                           
+                            )));
                 if (!search_response.IsValid)
                 {
                     var debug = search_response.DebugInformation;

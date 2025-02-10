@@ -39,7 +39,7 @@ namespace WEB.CMS.Controllers
             _orderRepository = orderRepository;
             _configuration = configuration;
             _workQueueClient = new WorkQueueClient(configuration);
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
         }
 
         public IActionResult Index()
@@ -51,7 +51,17 @@ namespace WEB.CMS.Controllers
         {
             try
             {
-                var userlist = await _userESRepository.GetUserSuggesstion(name);
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                var userlist = await _userESRepository.GetUserSuggesstion(name, tenant_id);
                 var suggestionlist = userlist.Select(s => new
                 {
                     id = s.id,

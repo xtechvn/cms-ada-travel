@@ -19,7 +19,7 @@ namespace Caching.Elasticsearch
         public ClientESRepository(string Host) : base(Host) { }
 
 
-        public async Task<List<CustomerESViewModel>> GetClientSuggesstion(string txt_search, string index_name = "adavigo_sp_getclient")
+        public async Task<List<CustomerESViewModel>> GetClientSuggesstion(string txt_search, string index_name = "deepseektravel_sp_getclient")
         {
             List<CustomerESViewModel> result = new List<CustomerESViewModel>();
             try
@@ -79,7 +79,7 @@ namespace Caching.Elasticsearch
 
         }
     
-        public int UpSert(ClientESViewModel entity, string index_name = "adavigo_sp_getclient")
+        public int UpSert(ClientESViewModel entity, string index_name = "deepseektravel_sp_getclient")
         {
             try
             {

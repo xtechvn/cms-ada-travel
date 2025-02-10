@@ -692,33 +692,28 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
                 if (txt_search != null)
                 {
                     var data_order = new List<OrderSelectViewModel>();
 
-                    if (Convert.ToInt32(systemtype) < 0 || systemtype == "")
+                    var data = await _orderESRepository.GetOrderNoSuggesstion(txt_search, tenant_id);
+                    data_order= data.Select(s => new OrderSelectViewModel { orderid = s.id, orderno = s.orderno }).ToList();
+                    return Ok(new
                     {
-                        var data = await _orderESRepository.GetOrderNoSuggesstion(txt_search);
-                        data_order.AddRange(data.Select(s => new OrderSelectViewModel { orderid = s.id, orderno = s.orderno }));
-                        return Ok(new
-                        {
-                            status = (int)ResponseType.SUCCESS,
-                            data = data_order,
-                            selected = _UserId
-                        });
-                    }
-                    else
-                    {
-                        var data = await _orderESRepository.GetOrderNoSuggesstion2(txt_search, Convert.ToInt32(systemtype));
-                        data_order.AddRange(data.Select(s => new OrderSelectViewModel { orderid = s.orderid, orderno = s.orderno }));
-
-                        return Ok(new
-                        {
-                            status = (int)ResponseType.SUCCESS,
-                            data = data_order,
-                            selected = _UserId
-                        });
-                    }
+                        status = (int)ResponseType.SUCCESS,
+                        data = data_order,
+                        selected = _UserId
+                    });
                 }
                 else
                 {
@@ -2422,10 +2417,20 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
                 if (txt_search != null)
                 {
 
-                    var data = await _boongKingCodeESRepository.BoongKingCodeSuggesstion(txt_search);
+                    var data = await _boongKingCodeESRepository.BoongKingCodeSuggesstion(txt_search, tenant_id);
                     var data2 = data.GroupBy(s => s.bookingcode).Select(i => i.First()).ToList();
                     foreach (var item in data2)
                     {
@@ -2954,6 +2959,96 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
 
             return PartialView(model);
         }
+        public async Task<IActionResult> GetActiveContractByClientId(long client_id)
+        {
+
+            try
+            {
+                string msg = "Khách hàng chưa được kích hoạt";
+                if (client_id <= 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        detail = "",
+                        msg,
+
+
+                    });
+                }
+                var client = await _clientRepository.GetClientDetailByClientId(client_id);
+                if (client != null && client.Id > 0 && client.ClientType != null && client.ClientType > 0)
+                {
+                    switch ((int)client.ClientType)
+                    {
+                        case (int)ClientTypeEnum.DALC1:
+                        case (int)ClientTypeEnum.DALC2:
+                        case (int)ClientTypeEnum.DLC3:
+                        case (int)ClientTypeEnum.DL:
+                        case (int)ClientTypeEnum.DN:
+                        case (int)ClientTypeEnum.CTV:
+                            {
+                                var contract = await _contractRepository.GetActiveContractByClientId(client_id);
+                                if (contract != null && contract.ContractId > 0)
+                                {
+                                    return Ok(new
+                                    {
+                                        status = (int)ResponseType.SUCCESS,
+                                        detail = "[B2B] " + client.ClientName + "(" + client.Phone + " - " + client.Email + ")",
+                                        msg = ""
+                                    });
+                                }
+                                else
+                                {
+                                    return Ok(new
+                                    {
+                                        status = (int)ResponseType.FAILED,
+                                        detail = client.ClientName + "(" + client.Phone + " - " + client.Email + ")",
+                                        msg = "[B2B] Khách hàng " + client.ClientName + " (" + client.Email + ") chưa có / chưa được xét duyệt hợp đồng",
+                                    });
+                                }
+                            }
+                        case (int)ClientTypeEnum.kl:
+                            {
+                                return Ok(new
+                                {
+                                    status = (int)ResponseType.SUCCESS,
+                                    detail = "[B2C] " + client.ClientName + "(" + client.Phone + " - " + client.Email + ")",
+                                    msg = ""
+                                });
+                            }
+                        default:
+                            {
+                                return Ok(new
+                                {
+                                    status = (int)ResponseType.SUCCESS,
+                                    detail = "[] " + client.ClientName + "(" + client.Phone + " - " + client.Email + ")",
+                                    msg = ""
+                                });
+                            }
+                    }
+
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        detail = "Khách hàng không tồn tại / chưa được phân loại, vui lòng chọn khách hàng khác",
+                        msg = ""
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetActiveContractByClientId - OrderManualController: " + ex.ToString());
+                return Ok(new
+                {
+                    status = (int)ResponseType.ERROR,
+                });
+            }
+        }
+
     }
 }
 

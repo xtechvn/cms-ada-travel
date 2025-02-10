@@ -85,11 +85,11 @@ namespace WEB.CMS.Controllers
                         MenuId = s.MenuId,
                         RoleId = s.RoleId,
                         PermissionId = s.PermissionId
-                    });
+                    }).ToList();
                 }
                 else
                 {
-                    user_role_cache.Permission = Enumerable.Empty<PermissionData>();
+                    user_role_cache.Permission = new List<PermissionData>();
                 }
                 user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(model.Entity.Id);
                 var data_encode = JsonConvert.SerializeObject(user_role_cache);
