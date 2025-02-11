@@ -72,5 +72,6 @@ namespace Entities.ViewModels.Funding
         public string VerifyDateToStr { get; set; }
         public bool? IsSupplierDebt { get; set; }
         public bool? IsPaymentBefore { get; set; }
+        public int? TenantId { get; set; }
     }
 }

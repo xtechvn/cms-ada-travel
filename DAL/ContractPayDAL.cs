@@ -612,7 +612,7 @@ namespace DAL
             try
             {
                 int id = 0;
-                SqlParameter[] objParam_contractPay = new SqlParameter[16];
+                SqlParameter[] objParam_contractPay = new SqlParameter[17];
                 objParam_contractPay[0] = new SqlParameter("@BillNo", model.BillNo);
                 if (model.ClientId == null || model.ClientId == 0)
                     objParam_contractPay[1] = new SqlParameter("@ClientId", Convert.ToInt32(0));
@@ -641,6 +641,7 @@ namespace DAL
                 objParam_contractPay[13] = new SqlParameter("@SupplierId", Convert.ToInt32(model.SupplierId));
                 objParam_contractPay[14] = new SqlParameter("@ObjectType", Convert.ToInt32(model.ObjectType));
                 objParam_contractPay[15] = new SqlParameter("@EmployeeId", Convert.ToInt32(model.EmployeeId));
+                objParam_contractPay[16] = new SqlParameter("@TenantId", DBNull.Value);
                 id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdateContractPay, objParam_contractPay);
                 foreach (var item in model.ContractPayDetails)
                 {
