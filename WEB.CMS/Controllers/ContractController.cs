@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using APP_CHECKOUT.RabitMQ;
 using Caching.Elasticsearch;
 using Entities.Models;
@@ -12,9 +7,6 @@ using Entities.ViewModels;
 using Entities.ViewModels.Contract;
 using Entities.ViewModels.ElasticSearch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
@@ -44,15 +36,16 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         private IUserRepository _userRepository;
         private APIService apiService;
         private ICustomerManagerRepository _customerManagerRepository;
+        private IIdentifierServiceRepository _identifierServiceRepository;
         private readonly WorkQueueClient _workQueueClient;
         public ContractController(IConfiguration configuration, IAllCodeRepository allCodeRepository, IContractRepository contractRepository, ManagementUser ManagementUser, IUserRepository userRepository,
-            IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IPolicyRepository policyRepository, ICustomerManagerRepository customerManagerRepository)
+            IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IPolicyRepository policyRepository, ICustomerManagerRepository customerManagerRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
 
             _configuration = configuration;
             _allCodeRepository = allCodeRepository;
             _contractRepository = contractRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _contractESRepository = new ContractESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _clientRepository = clientRepository;
@@ -63,6 +56,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             apiService = new APIService(configuration, userRepository);
             _customerManagerRepository = customerManagerRepository;
             _workQueueClient = new WorkQueueClient(configuration);
+            _identifierServiceRepository = identifierServiceRepository;
         }
         public async Task<IActionResult> Index()
         {
@@ -462,13 +456,12 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             {
                 string userId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value).ToString();
 
-                APIService apiService = new APIService(_configuration, _userRepository);
                 var userAgent = _userAgentRepository.GetUserAgentClient(model.ClientId);
                 model.UserIdCreate = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-                if (model.ContractNo == null)
+                if (model.ContractNo == null|| model.ContractNo.Trim()=="")
                 {
-                    model.ContractNo = await apiService.buildContractNo();
+                    model.ContractNo = await _identifierServiceRepository.buildContractNo();
 
                 }
 

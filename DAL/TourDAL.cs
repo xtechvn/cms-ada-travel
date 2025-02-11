@@ -6,6 +6,7 @@ using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.Tour;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -659,7 +660,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam_order = new SqlParameter[23];
+                SqlParameter[] objParam_order = new SqlParameter[24];
                 objParam_order[0] = new SqlParameter("@ServiceCode", model.ServiceCode);
                 objParam_order[1] = new SqlParameter("@OrderCode", model.OrderCode);
                 objParam_order[2] = new SqlParameter("@StatusBooking", model.StatusBooking);
@@ -683,6 +684,8 @@ namespace DAL
                 objParam_order[20] = new SqlParameter("@PageSize", model.PageSize);
                 objParam_order[21] = new SqlParameter("@SalerPermission", model.SalerPermission);
                 objParam_order[22] = new SqlParameter("@BookingCode", model.BookingCode);
+                objParam_order[23] = new SqlParameter("@TenantId", (model.TenantId == null ? DBNull.Value : (int)model.TenantId));
+
                 return dbWorker.GetDataTable(StoreProcedureConstant.SP_GetListTour, objParam_order);
             }
             catch (Exception ex)

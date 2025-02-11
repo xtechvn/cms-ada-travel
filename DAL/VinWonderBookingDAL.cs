@@ -554,7 +554,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[14];
+                SqlParameter[] objParam = new SqlParameter[15];
                 if (searchModel.ServiceCode != null)
                 {
                     objParam[0] = new SqlParameter("@ServiceCode", searchModel.ServiceCode);
@@ -658,10 +658,10 @@ namespace DAL
                     objParam[13] = new SqlParameter("@BookingCode", DBNull.Value);
 
                 }
+                objParam[14] = new SqlParameter("@TenantId", (searchModel.TenantId == null ? DBNull.Value : (int)searchModel.TenantId));
 
-                string procedure = StoreProcedureConstant.GetListVinWonderBooking;
 
-                return dbWorker.GetDataTable(procedure, objParam);
+                return dbWorker.GetDataTable(StoreProcedureConstant.GetListVinWonderBooking, objParam);
             }
             catch (Exception ex)
             {

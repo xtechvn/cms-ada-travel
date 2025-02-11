@@ -56,6 +56,8 @@ namespace Entities.ViewModels.Tour
         public int OperatorId { get; set; } = -1;
         public int PageIndex { get; set; } = -1;
         public int PageSize { get; set; } = -1;
+        public int? TenantId { get; set; }
+
     }
     public class TourGetListViewModel
     {

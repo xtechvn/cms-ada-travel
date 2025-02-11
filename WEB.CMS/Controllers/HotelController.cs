@@ -63,6 +63,22 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         #region hotel management
         public async Task<IActionResult> Index()
         {
+            #region Validate SuperUser:
+            int? tenant_id = null;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                try
+                {
+                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                }
+                catch { }
+                if (tenant_id <= 0) tenant_id = null;
+            }
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
+            #endregion
             ViewBag.Provinces = await _commonRepository.GetProvinceList();
             ViewBag.Brands = await _brandRepository.GetAll();
             return View();
@@ -71,6 +87,22 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         [HttpPost]
         public IActionResult Search(HotelFilterModel searchModel)
         {
+            #region Validate SuperUser:
+            int? tenant_id = null;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                try
+                {
+                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                }
+                catch { }
+                if (tenant_id <= 0) tenant_id = null;
+            }
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
+            #endregion
             var model = new GenericViewModel<HotelGridModel>();
             try
             {
@@ -96,7 +128,22 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             {
                 IsDisplayWebsite = false
             };
-
+            #region Validate SuperUser:
+            int? tenant_id = null;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                try
+                {
+                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                }
+                catch { }
+                if (tenant_id <= 0) tenant_id = null;
+            }
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
+            #endregion
             if (id > 0)
             {
                 var hotelPosition =  _HotelRepository.GetListHotelPosition(id);
@@ -781,6 +828,20 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         {
             try
             {
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                if (tenant_id != null && tenant_id > 0)
+                {
+                    return RedirectToAction("error", "Home");
+                }
                 return PartialView();
             }
             catch (Exception ex)

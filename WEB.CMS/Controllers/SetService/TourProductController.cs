@@ -48,6 +48,23 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
 
         public async Task<IActionResult> Index()
         {
+            #region Validate SuperUser:
+            int? tenant_id = null;
+
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                try
+                {
+                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                }
+                catch { }
+                if (tenant_id <= 0) tenant_id = null;
+            }
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
+            #endregion
             ViewBag.TourTypes = _allCodeRepository.GetListByType("TOUR_TYPE");
             ViewBag.OrganizingTypes = _allCodeRepository.GetListByType("ORGANIZING_TYPE");
             ViewBag.Provinces = await _commonRepository.GetProvinceList();
@@ -58,6 +75,20 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
         public IActionResult Search(TourProductSearchModel searchModel)
         {
             var model = new GenericViewModel<TourProductGridModel>();
+            int? tenant_id = null;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                try
+                {
+                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                }
+                catch { }
+                if (tenant_id <= 0) tenant_id = null;
+            }
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
             try
             {
                 searchModel.IsSelfDesign = false;
@@ -81,7 +112,22 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
             {
                 IsDisplayWeb = false
             };
-
+            #region Validate SuperUser:
+            int? tenant_id = null;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                try
+                {
+                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                }
+                catch { }
+                if (tenant_id <= 0) tenant_id = null;
+            }
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
+            #endregion
             if (id > 0)
             {
                 var tourProduct = await _TourRepository.GetTourProductById(id);

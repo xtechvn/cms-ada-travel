@@ -160,7 +160,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[17];
+                SqlParameter[] objParam = new SqlParameter[18];
                 if (searchModel.ServiceCode != null)
                 {
                     objParam[0] = new SqlParameter("@ServiceCode", searchModel.ServiceCode);
@@ -290,9 +290,10 @@ namespace DAL
                     objParam[16] = new SqlParameter("@ServiceType", DBNull.Value);
 
                 }
-                string procedure = StoreProcedureConstant.GetListOtherBooking;
+                objParam[17] = new SqlParameter("@TenantId", (searchModel.TenantId == null ? DBNull.Value : (int)searchModel.TenantId));
 
-                return dbWorker.GetDataTable(procedure, objParam);
+
+                return dbWorker.GetDataTable(StoreProcedureConstant.GetListOtherBooking, objParam);
             }
             catch (Exception ex)
             {

@@ -39,13 +39,14 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IContractRepository _contractRepository;
         private readonly IWebHostEnvironment _WebHostEnvironment;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         private ManagementUser _ManagementUser;
         private IBankingAccountRepository _bankingAccountRepository;
         private IAccountClientRepository _accountClientRepository;
         private readonly WorkQueueClient _workQueueClient;
 
         public CustomerManagerController(IConfiguration configuration, ICustomerManagerRepository customerManagerRepositories, IDepositHistoryRepository depositHistoryRepository, ManagementUser ManagementUser, IWebHostEnvironment WebHostEnvironment, IAccountClientRepository accountClientRepository,
-        IOrderRepositor orderRepositor, IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IPaymentAccountRepository paymentAccountRepository, IClientRepository clientRepository, IUserRepository userRepository, IContractRepository contractRepository, IBankingAccountRepository bankingAccountRepository)
+        IOrderRepositor orderRepositor, IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IPaymentAccountRepository paymentAccountRepository, IClientRepository clientRepository, IUserRepository userRepository, IContractRepository contractRepository, IBankingAccountRepository bankingAccountRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
             _customerManagerRepositories = customerManagerRepositories;
             _depositHistoryRepository = depositHistoryRepository;
@@ -62,6 +63,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             _bankingAccountRepository = bankingAccountRepository;
             _accountClientRepository = accountClientRepository;
             _workQueueClient = new WorkQueueClient(configuration);
+            _identifierServiceRepository = identifierServiceRepository;
         }
         public async Task<IActionResult> Index()
         {
@@ -282,8 +284,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
 
                 if (email == null && DataModel.Id == 0)
                 {
-                    APIService apiService = new APIService(_configuration, _userRepository);
-                    DataModel.ClientCode = await apiService.buildClientCode(DataModel.id_ClientType);
+                    DataModel.ClientCode = await _identifierServiceRepository.buildClientNo(Convert.ToInt32(DataModel.id_ClientType));
                     var Result = _customerManagerRepositories.SetUpClient(DataModel);
                     if (Result != 0)
                     {
@@ -298,7 +299,6 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                             var  clientdetail = await _clientRepository.GetClientByClientCode(DataModel.ClientCode);
                             _workQueueClient.SyncES(clientdetail.Id,  _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"]);
 
-                            //var SendMail = await apiService.SendMailResetPassword(DataModel.email);
                             stt_code = (int)ResponseType.SUCCESS;
                             msg = "Thêm mới thông tin thành công";
                         }
