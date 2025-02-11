@@ -1255,6 +1255,21 @@ namespace DAL
             }
             catch (Exception ex)
             {
+                LogHelper.InsertLogTelegram("CountPaymentRequest - ContractPayDAL: " + ex.ToString());
+                return -1;
+            }
+        }
+        public long CountPaymentVoucherInYear()
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    return _DbContext.PaymentVoucher.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year).Count();
+                }
+            }
+            catch (Exception ex)
+            {
                 LogHelper.InsertLogTelegram("CountPaymentVoucherInYear - ContractPayDAL: " + ex.ToString());
                 return -1;
             }

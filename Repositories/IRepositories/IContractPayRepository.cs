@@ -37,5 +37,6 @@ namespace Repositories.IRepositories
         long CountPaymentRequest();
         long CountContractPayInYear();
         Task<string> getContractPayByBillNo(string bill_no);
+        long CountPaymentVoucherInYear();
     }
 }

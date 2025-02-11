@@ -13,6 +13,8 @@ using Utilities.Contants;
 using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
+using WEB.DeepSeekTravel.CMS.Service;
+using Caching.Elasticsearch;
 
 namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
 {
@@ -29,9 +31,10 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
         private readonly IEmailService _emailService;
         private readonly IUserRepository _userRepository;
         private readonly ISupplierRepository _supplierRepository;
-
+        private IndentiferService _indentiferService;
         public PaymentVoucherController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment,
-           IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository, IEmailService emailService, IUserRepository userRepository, ISupplierRepository supplierRepository)
+           IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository, IEmailService emailService, 
+           IUserRepository userRepository, ISupplierRepository supplierRepository, IConfiguration configuration, IIdentifierServiceRepository identifierServiceRepository, IContractPayRepository contractPayRepository, IOrderRepository orderRepository)
         {
             _WebHostEnvironment = hostEnvironment;
             _allCodeRepository = allCodeRepository;
@@ -41,6 +44,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
             _emailService = emailService;
             _userRepository = userRepository;
             _supplierRepository = supplierRepository;
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
         }
 
         public IActionResult Index()
@@ -58,6 +62,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
             var model = new GenericViewModel<PaymentVoucherViewModel>();
             try
             {
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                searchModel.TenantId = tenant_id;
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (!string.IsNullOrEmpty(searchModel.PaymentCode))
                     searchModel.PaymentCode = searchModel.PaymentCode.Trim();
@@ -191,24 +206,25 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
                         message = messages
                     });
                 }
-                var client = new HttpClient();
-                var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
-                var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
-                HttpClient httpClient = new HttpClient();
-                JObject jsonObject = new JObject(
-                   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_CHI).ToString())
-                );
-                var j_param = new Dictionary<string, object>
-                 {
-                     { "key",jsonObject}
-                 };
-                var data_product = JsonConvert.SerializeObject(j_param);
-                var token = CommonHelper.Encode(data_product, key_token_api);
-                var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
-                var response = await httpClient.PostAsync(apiPrefix, content);
-                var resultAPI = await response.Content.ReadAsStringAsync();
-                var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.PaymentCode = output.code;
+                //var client = new HttpClient();
+                //var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
+                //var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
+                //HttpClient httpClient = new HttpClient();
+                //JObject jsonObject = new JObject(
+                //   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_CHI).ToString())
+                //);
+                //var j_param = new Dictionary<string, object>
+                // {
+                //     { "key",jsonObject}
+                // };
+                //var data_product = JsonConvert.SerializeObject(j_param);
+                //var token = CommonHelper.Encode(data_product, key_token_api);
+                //var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
+                //var response = await httpClient.PostAsync(apiPrefix, content);
+                //var resultAPI = await response.Content.ReadAsStringAsync();
+                //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
+
+                model.PaymentCode =await _indentiferService.BuildPaymentVoucher();
                 var result = _paymentVoucherRepository.CreatePaymentVoucher(model, out string msg);
                 if (result == -3)
                     return Ok(new

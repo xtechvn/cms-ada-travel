@@ -1037,5 +1037,9 @@ namespace Repositories.Repositories
         {
             return await _contractPayDAL.getContractPayByBillNo(bill_no);
         }
+        public long CountPaymentVoucherInYear()
+        {
+            return _contractPayDAL.CountPaymentVoucherInYear();
+        }
     }
 }
