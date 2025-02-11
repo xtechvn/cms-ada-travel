@@ -265,7 +265,18 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 //var response = await httpClient.PostAsync(apiPrefix, content);
                 //var resultAPI = await response.Content.ReadAsStringAsync();
                 //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.BillNo = _indentiferService.buildContractPay;
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                model.TenantId = tenant_id;
+                model.BillNo =await _indentiferService.buildContractPay();
                 var contractPayId = _contractPayRepository.CreateContractPay(model);
                 if (contractPayId == -2)
                     return Ok(new
