@@ -292,7 +292,7 @@ namespace DAL
                     objParam[12] = new SqlParameter("@ServiceCode", DBNull.Value);
                 else
                     objParam[12] = new SqlParameter("@ServiceCode", searchModel.ServiceCode);
-                objParam[13] = new SqlParameter("@@TenantId", searchModel.TenantId);
+                objParam[13] = new SqlParameter("@TenantId", searchModel.TenantId);
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)
