@@ -254,7 +254,7 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[13];
+                SqlParameter[] objParam = new SqlParameter[14];
                 objParam[0] = new SqlParameter("@BillNo", searchModel.BillNo);
                 objParam[1] = new SqlParameter("@Description", searchModel.Content);
                 objParam[2] = new SqlParameter("@ContractPayType", searchModel.Type);
@@ -292,6 +292,7 @@ namespace DAL
                     objParam[12] = new SqlParameter("@ServiceCode", DBNull.Value);
                 else
                     objParam[12] = new SqlParameter("@ServiceCode", searchModel.ServiceCode);
+                objParam[13] = new SqlParameter("@@TenantId", searchModel.TenantId);
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)

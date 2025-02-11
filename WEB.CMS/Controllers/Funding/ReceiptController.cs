@@ -85,11 +85,22 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             var model = new GenericViewModel<ContractPayViewModel>();
             try
             {
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (!string.IsNullOrEmpty(searchModel.BillNo))
                     searchModel.BillNo = searchModel.BillNo.Trim();
                 if (!string.IsNullOrEmpty(searchModel.Content))
                     searchModel.Content = searchModel.Content.Trim();
+                searchModel.TenantId = tenant_id;
                 var listContractPays = _contractPayRepository.GetListContractPay(searchModel, out long total, currentPage, pageSize);
                 model.CurrentPage = currentPage;
                 model.ListData = listContractPays;
