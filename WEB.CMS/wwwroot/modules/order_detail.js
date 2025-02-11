@@ -23,11 +23,11 @@
                     return query;
                 },
                 processResults: function (response) {
-                    var data_modified = $.map(response.data, function (item) {
-                        item.text = item.clientname + ' - ' + item.email + ' - ' + item.phone
-                        item.id = item.id
-                        return item
-                    })
+                    //var data_modified = $.map(response.data, function (item) {
+                    //    item.text = item.clientname + ' - ' + item.email + ' - ' + item.phone
+                    //    item.id = item.id
+                    //    return item
+                    //})
                    
                     return {
                         results: $.map(response.data, function (item) {
@@ -37,34 +37,34 @@
                         })
                     };
                 },
-                //cache: true
+                cache: true
             },
-           //escapeMarkup: function (markup) { return markup; },
-            minimumInputLength: 1,
-           // templateResult: _order_detail_create.ClientTemplateResult,
-           // templateSelection: _order_detail_create.ClientTemplateSelection
+            escapeMarkup: function (markup) { return markup; },
+            minimumInputLength: 2,
+            templateResult: _order_detail_create.ClientTemplateResult,
+            templateSelection: _order_detail_create.ClientTemplateSelection
 
         });
-        $("body").on('select2:select', "#client-select-create-order-manual", function (ev, picker) {
-            var element=$(this)
-            $.ajax({
-                url: "/order/GetActiveContractByClientId",
-                type: "post",
-                data: { client_id: element.find(':selected').val() },
-                success: function (result) {
+        //$("body").on('select2:select', "#client-select-create-order-manual", function (ev, picker) {
+        //    var element=$(this)
+        //    $.ajax({
+        //        url: "/order/GetActiveContractByClientId",
+        //        type: "post",
+        //        data: { client_id: element.find(':selected').val() },
+        //        success: function (result) {
 
-                    if (result != undefined && result.status == 0) {
-                        $('.error_client_select').hide()
-                        $('#btn_summit_order').removeAttr('disabled')
-                    }
-                    else {
-                        $('.error_client_select').show()
-                        $('#btn_summit_order').attr('disabled', 'disabled');
-                    }
+        //            if (result != undefined && result.status == 0) {
+        //                $('.error_client_select').hide()
+        //                $('#btn_summit_order').removeAttr('disabled')
+        //            }
+        //            else {
+        //                $('.error_client_select').show()
+        //                $('#btn_summit_order').attr('disabled', 'disabled');
+        //            }
 
-                }
-            });
-        });
+        //        }
+        //    });
+        //});
     },
     ClientTemplateResult: function (item) {
         if (item.loading) {
