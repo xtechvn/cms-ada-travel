@@ -67,7 +67,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             return Ok(new
             {
                 status = (int)ResponseType.EMPTY,
-                msg = "Không có dữ liệu nào thỏa mãn từ khóa " + txt_search
+                msg = "Không có dữ liệu nào thỏa mãn từ khóa "  +  txt_search
             });
         }
     }
