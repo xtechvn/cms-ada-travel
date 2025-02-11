@@ -46,11 +46,12 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly IPaymentRequestRepository _paymentRequestRepository;
         private readonly ISupplierRepository _supplierRepository;
+        private IndentiferService _indentiferService;
 
         public ReceiptController(IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, IHotelBookingRepositories hotelBookingRepositories, ITourRepository tourRepository,
             IClientRepository clientRepository, IDepositHistoryRepository depositHistoryRepository, IOrderRepository orderRepository, ManagementUser ManagementUser,
              IUserRepository userRepository,  IPaymentRequestRepository paymentRequestRepository,
-             IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService)
+             IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService, IIdentifierServiceRepository identifierServiceRepository)
         {
             _supplierRepository = supplierRepository;
             _WebHostEnvironment = hostEnvironment;
@@ -68,6 +69,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             _emailService = emailService;
             _configuration = configuration;
             config = ReadFile.LoadConfig();
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
         }
 
         public IActionResult Index()
@@ -250,20 +252,20 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
                 var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
                 HttpClient httpClient = new HttpClient();
-                JObject jsonObject = new JObject(
-                   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_THU).ToString())
-                );
-                var j_param = new Dictionary<string, object>
-                 {
-                     { "key",jsonObject}
-                 };
-                var data_product = JsonConvert.SerializeObject(j_param);
-                var token = CommonHelper.Encode(data_product, key_token_api);
-                var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
-                var response = await httpClient.PostAsync(apiPrefix, content);
-                var resultAPI = await response.Content.ReadAsStringAsync();
-                var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.BillNo = output.code;
+                //JObject jsonObject = new JObject(
+                //   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_THU).ToString())
+                //);
+                //var j_param = new Dictionary<string, object>
+                // {
+                //     { "key",jsonObject}
+                // };
+                //var data_product = JsonConvert.SerializeObject(j_param);
+                //var token = CommonHelper.Encode(data_product, key_token_api);
+                //var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
+                //var response = await httpClient.PostAsync(apiPrefix, content);
+                //var resultAPI = await response.Content.ReadAsStringAsync();
+                //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
+                model.BillNo = _indentiferService.buildContractPay;
                 var contractPayId = _contractPayRepository.CreateContractPay(model);
                 if (contractPayId == -2)
                     return Ok(new

@@ -1029,5 +1029,13 @@ namespace Repositories.Repositories
         {
             return _contractPayDAL.CountPaymentRequest();
         }
+        public long CountContractPayInYear()
+        {
+            return _contractPayDAL.CountContractPayInYear();
+        }
+        public async Task<string> getContractPayByBillNo(string bill_no)
+        {
+            return await _contractPayDAL.getContractPayByBillNo(bill_no);
+        }
     }
 }

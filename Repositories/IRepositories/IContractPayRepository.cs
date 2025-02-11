@@ -35,5 +35,7 @@ namespace Repositories.IRepositories
         PaymentRequestViewModel GetServiceDetail(string serviceCode);
         double GetTotalAmountContractPayByServiceId(string ServiceId, long ServiceType, long ContractPayType);
         long CountPaymentRequest();
+        long CountContractPayInYear();
+        Task<string> getContractPayByBillNo(string bill_no);
     }
 }
