@@ -232,6 +232,7 @@ namespace Repositories.Repositories
                     Manager = model.Manager,
                     UserMapId = model.UserMapId,
                     NickName = model.NickName,
+                    TenantId= model.TenantId,
                 };
 
                 // Check exist User Name or Email
