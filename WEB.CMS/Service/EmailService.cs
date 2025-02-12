@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Aspose.Cells;
+using Entities.Models;
 using Entities.ViewModels.Attachment;
 using Entities.ViewModels.Funding;
 using Entities.ViewModels.HotelBookingCode;
@@ -3022,7 +3023,7 @@ namespace WEB.Adavigo.CMS.Service
                                 var packages = await _hotelBookingRoomRepository.GetHotelBookingRoomRatesOptionalByBookingId(Convert.ToInt32(item.ServiceId));
                                 var extra_package = await _hotelBookingRoomExtraPackageRepository.GetByBookingID(Convert.ToInt32(item.ServiceId));
                                 List<HotelBookingRoomRatesOptionalViewModel> package_daterange = new List<HotelBookingRoomRatesOptionalViewModel>();
-                                
+
                                 var NumberOfAdult = rooms.Sum(x => x.NumberOfAdult);
                                 var NumberOfChild = rooms.Sum(x => x.NumberOfChild);
                                 var NumberOfInfant = rooms.Sum(x => x.NumberOfInfant);
@@ -3094,8 +3095,15 @@ namespace WEB.Adavigo.CMS.Service
                                         if (package_by_room_id != null && package_by_room_id.Count() > 0)
                                         {
                                             sumtoday += (int)package_by_room_id.Sum(s => s.Nights);
+                                            var row = 1;
                                             foreach (var p in package_by_room_id)
                                             {
+                                                row++;
+                                                var style_row ="";
+                                                if (row > 2)
+                                                {
+                                                    style_row = "display: none;";
+                                                }
                                                 double operator_price = 0;
                                                 if (p.Price != null) operator_price = Math.Round(((double)p.SaleTotalAmount / (double)p.Nights / (double)item2.NumberOfRooms), 0);
                                                 if (operator_price <= 0) operator_price = p.SalePrice != null ? (double)p.SalePrice : 0;
@@ -3106,23 +3114,39 @@ namespace WEB.Adavigo.CMS.Service
                                                 Nights = (double)p.Nights;
                                                 TotalAmount = ((double)p.SaleTotalAmount).ToString("N0");
                                                 NumberOfRooms = item2.NumberOfRooms == null ? 1 : (double)item2.NumberOfRooms;
-                                                Goi += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</div>";
-                                                TgSD += "<div style='border: 1px solid #999; padding:2px; text-align: center;'>" + date_time + "</div>";
-                                                GiaN += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</div>";
-                                                SDem += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</div>";
-                                                SP = "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</div>";
-                                                TTien += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</div>";
+                                                //Goi += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</div>";
+                                                //TgSD += "<div style='border: 1px solid #999; padding:2px; text-align: center;'>" + date_time + "</div>";
+                                                //GiaN += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</div>";
+                                                //SDem += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</div>";
+                                                //SP = "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</div>";
+                                                //TTien += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</div>";
+
+                                                Goi = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</td>";
+                                                TgSD = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + date_time + "</td>";
+                                                GiaN = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</td>";
+                                                SDem = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</td>";
+                                                SP = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</td>";
+                                                TTien = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</td>";
+
+                                                chitietdichvu += "<tr><td rowspan='" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style='border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + item2.RoomTypeName + "</td>" +
+                                                                  Goi +
+                                                                  TgSD +
+                                                                  GiaN +
+                                                                  SDem +
+                                                                  "<td rowspan = '" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style = 'border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + NumberOfRooms + " </td> "+
+                                                                  TTien
+                                                                   + "</tr>";
                                             }
 
                                         }
-                                        chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.RoomTypeName + "</td>" +
-                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Goi + "</td>" +
-                                                                      "<td style='border: 1px solid #999; padding:2px; text-align: center;'>" + TgSD + "</td>" +
-                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + GiaN + "</td>" +
-                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SDem + "</td>" +
-                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SP + "</td>" +
-                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TTien + "</td>"
-                                                                      + "</tr>";
+                                        //chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.RoomTypeName + "</td>" +
+                                        //                            "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Goi + "</td>" +
+                                        //                              "<td style='border: 1px solid #999; padding:2px; text-align: center;'>" + TgSD + "</td>" +
+                                        //                             "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + GiaN + "</td>" +
+                                        //                             "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SDem + "</td>" +
+                                        //                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SP + "</td>" +
+                                        //                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TTien + "</td>"
+                                        //                              + "</tr>";
 
                                     }
                                 if (extra_package != null && extra_package.Count > 0)
@@ -3157,14 +3181,14 @@ namespace WEB.Adavigo.CMS.Service
                                 {
                                     datatabledv = "<tr><td colspan='4'><table style='border-collapse: collapse;width:100%;'>" +
                                                                 "<thead>" +
-                                                                    "<tr>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Hạng phòng</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Gói</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thời gian sử dụng</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá bán</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số đêm</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số phòng</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                    "<tr style='background: #F5F7FB;text-align: center;color: #00264D;'>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Hạng phòng</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Giá bán</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Số đêm</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Số phòng</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Thành tiền</th>" +
                                                                     "</tr> " +
                                                                 "</thead>" +
                                                                 "<tbody>" +
@@ -3180,14 +3204,14 @@ namespace WEB.Adavigo.CMS.Service
                                 {
                                     datatabledvkhac = "<tr><td colspan='4'> <table style='border-collapse: collapse;width:100%;'>" +
                                                             "<thead>" +
-                                                                "<tr>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Tên dịch vụ</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Gói</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thời gian sử dụng</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá bán</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số ngày	</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số lượng</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                "<tr style='background: #F5F7FB;text-align: center;color: #00264D;'>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Tên dịch vụ</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Giá bán</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Số ngày	</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Số lượng</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Thành tiền</th>" +
                                                                 "</tr> " +
                                                             "</thead>" +
                                                             "<tbody>" +
@@ -3218,9 +3242,9 @@ namespace WEB.Adavigo.CMS.Service
                                     "<td style='border: 1px solid #999; padding: 5px;'>" + item.Hotel[0].TotalDays + "</td>" +
                                 "</tr>" + datatabledv
                                 + datatabledvkhac +
-                                "<tr>" +
-                                    "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
-                                    "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + item.Hotel[0].TotalAmount.ToString("N0") + "</td>" +
+                                "<tr style='color: #00264D;background: #F5F7FB;font-weight: bold;'>" +
+                                    "<td >Tổng tiền phòng:</td>" +
+                                    "<td colspan='3' style ='text-align: right;' >" + item.Hotel[0].TotalAmount.ToString("N0") + "</td>" +
                                "</tr>";
 
 
@@ -3229,8 +3253,8 @@ namespace WEB.Adavigo.CMS.Service
                                                 "" + note + "" +
                                                       "<tr>" +
                                                       "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
-                                                      "<td colspan='3' style='border: 1px solid #999; padding: 5px;'>" + hotel.Note + "</td></tr>";
-                                
+                                                      "<td colspan='3' style='border: 1px solid #999; padding: 5px;'><textarea type='text' style='min-height: 120px;width: 100%;'disabled value=" + hotel.Note + ">"+ hotel.Note+"</textarea></td></tr>";
+
                             }
                         }
                         if (item.Type.Equals("Vé máy bay"))
