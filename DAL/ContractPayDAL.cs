@@ -5,6 +5,7 @@ using Entities.ViewModels;
 using Entities.ViewModels.Funding;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -292,7 +293,7 @@ namespace DAL
                     objParam[12] = new SqlParameter("@ServiceCode", DBNull.Value);
                 else
                     objParam[12] = new SqlParameter("@ServiceCode", searchModel.ServiceCode);
-                objParam[13] = new SqlParameter("@TenantId", searchModel.TenantId);
+                objParam[13] = new SqlParameter("@TenantId", searchModel.TenantId==null?DBNull.Value: searchModel.TenantId);
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)
@@ -471,7 +472,7 @@ namespace DAL
                 objParam_contractPay[13] = new SqlParameter("@SupplierId", Convert.ToInt32(model.SupplierId));
                 objParam_contractPay[14] = new SqlParameter("@ObjectType", Convert.ToInt32(model.ObjectType));
                 objParam_contractPay[15] = new SqlParameter("@EmployeeId", Convert.ToInt32(model.EmployeeId));
-                objParam_contractPay[16] = new SqlParameter("@TenantId", model.TenantId);
+                objParam_contractPay[16] = new SqlParameter("@TenantId", model.TenantId==null ? DBNull.Value: model.TenantId);
                 id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_InsertContractPay, objParam_contractPay);
                 if (id > 0)
                 {
