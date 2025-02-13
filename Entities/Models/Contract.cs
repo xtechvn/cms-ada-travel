@@ -33,7 +33,7 @@ namespace Entities.Models
         public int? ClientType { get; set; }
         public int? PermisionType { get; set; }
         public bool? IsDelete { get; set; }
-
+        public int? TenantId { get; set; }
         public virtual ICollection<Order> Order { get; set; }
     }
 }
