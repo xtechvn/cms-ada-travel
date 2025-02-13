@@ -218,6 +218,7 @@ namespace Repositories.Repositories
                 Contract_model.ContractNo = model.ContractNo;
                 Contract_model.ExpireDate = model.ExpireDate;
                 Contract_model.SalerId = model.SalerId;
+                Contract_model.TenantId = model.TenantId;
 
                 if (model.IsPrivate == 1 && model.PolicyId == 0)
                 {

@@ -74,7 +74,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             ViewBag.ContractStatus = ContractStatus;//loại kh
             ViewBag.DEBT_TYPE = DEBT_TYPE;//loại kh
             var searchModel = new ContractSearchViewModel();
-
+            int? tenant_id = null;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                try
+                {
+                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                }
+                catch { }
+                if (tenant_id <= 0) tenant_id = null;
+            }
+            searchModel.TenantId=tenant_id;
             ViewBag.PermissionsStatus = 0;
             var current_user = _ManagementUser.GetCurrentUser();
             if (current_user != null)
@@ -466,6 +476,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             string msg = "Error On Excution";
             try
             {
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                model.TenantId = tenant_id;
                 string userId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value).ToString();
 
                 var userAgent = _userAgentRepository.GetUserAgentClient(model.ClientId);
@@ -815,6 +836,18 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
+                    //tenantid
+                    int? tenant_id = null;
+                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                    {
+                        try
+                        {
+                            tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                        }
+                        catch { }
+                        if (tenant_id <= 0) tenant_id = null;
+                    }
+                    searchModel.TenantId = tenant_id;
                     var i = 0;
                     if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
                     {

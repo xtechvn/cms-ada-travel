@@ -82,7 +82,18 @@ namespace WEB.CMS.Customize
                     {
                         user_role_cache.Permission = new List<PermissionData>();
                     }
-                    user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id);
+                    //--Tenant
+                    int tenant_id = 0;
+                    if (_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                    {
+                        try
+                        {
+                            tenant_id = Convert.ToInt32(_HttpContext.HttpContext.User.FindFirst("TenantId").Value);
+                        }
+                        catch { }
+                        if (tenant_id <= 0) tenant_id = 0;
+                    }
+                    user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id, tenant_id);
                     var data_encode = JsonConvert.SerializeObject(user_role_cache);
                     string token = CommonHelper.Encode(data_encode, _configuration["DataBaseConfig:key_api:api_manual"]);
                     //string token = data_encode;

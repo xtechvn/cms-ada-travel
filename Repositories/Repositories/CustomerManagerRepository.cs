@@ -79,6 +79,7 @@ namespace Repositories.Repositories
                         ClientCode = model.ClientCode,
                         SaleMapId = (int?)model.UserId,
                         ParentId = -1,
+                        TenantId=model.TenantId,
 
                     };
                     var CreateClient = _ClientDAL.SetUpClient(Client);

@@ -234,12 +234,13 @@ namespace DAL
             }
         }
 
-        public string GetListUserByUserId(int user_id)
+        public string GetListUserByUserId(int user_id,int TenantId)
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[1];
+                SqlParameter[] objParam = new SqlParameter[2];
                 objParam[0] = new SqlParameter("@UserId", user_id);
+                objParam[1] = new SqlParameter("@TenantId", TenantId);
                 DataTable dataTable = _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListUserByUserId, objParam);
 
                 if (dataTable != null && dataTable.Rows.Count > 0)

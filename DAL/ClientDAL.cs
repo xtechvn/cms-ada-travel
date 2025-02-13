@@ -341,7 +341,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[16];
+                SqlParameter[] objParam = new SqlParameter[17];
                 objParam[0] = new SqlParameter("@MaKH", searchModel.MaKH);
                 objParam[1] = new SqlParameter("@TenKH", searchModel.TenKH);
                 objParam[2] = new SqlParameter("@Email", searchModel.Email);
@@ -358,6 +358,7 @@ namespace DAL
                 objParam[13] = new SqlParameter("@MaxAmount", searchModel.MaxAmount);
                 objParam[14] = new SqlParameter("@CreatedBy", searchModel.CreatedBy);
                 objParam[15] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
+                objParam[16] = new SqlParameter("@TenantId", searchModel.TenantId);
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)

@@ -606,11 +606,11 @@ namespace Repositories.Repositories
             }
         }
 
-        public string GetListUserByUserId(int user_id)
+        public string GetListUserByUserId(int user_id, int TenantId)
         {
             try
             {
-                return _UserDAL.GetListUserByUserId(user_id);
+                return _UserDAL.GetListUserByUserId(user_id, TenantId);
             }
             catch
             {

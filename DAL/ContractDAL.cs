@@ -89,7 +89,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[22];
+                SqlParameter[] objParam = new SqlParameter[23];
                 objParam[0] = new SqlParameter("@ClientId", searchModel.ClientId);
                 objParam[1] = new SqlParameter("@ContractNo", searchModel.ContractNo);
                 objParam[2] = new SqlParameter("@ClientName", searchModel.ClientName);
@@ -112,6 +112,7 @@ namespace DAL
                 objParam[19] = (CheckDate(searchModel.VerifyDateFrom) == DateTime.MinValue) ? new SqlParameter("@VerifyDateFrom", DBNull.Value) : new SqlParameter("@VerifyDateFrom", CheckDate(searchModel.VerifyDateFrom));
                 objParam[20] = (CheckDate(searchModel.VerifyDateTo) == DateTime.MinValue) ? new SqlParameter("@VerifyDateTo", DBNull.Value) : new SqlParameter("@VerifyDateTo", CheckDate(searchModel.VerifyDateTo));
                 objParam[21] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
+                objParam[22] = new SqlParameter("@TenantId", searchModel.TenantId==null ? DBNull.Value : searchModel.TenantId);
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)
@@ -159,7 +160,7 @@ namespace DAL
                         //_DbContext.Contract.Add(model);
                         //await _DbContext.SaveChangesAsync();
                         //return 1;
-                        SqlParameter[] objParam = new SqlParameter[18];
+                        SqlParameter[] objParam = new SqlParameter[19];
                         objParam[0] = model.ContractNo==null? new SqlParameter("@ContractNo", DBNull.Value):new SqlParameter("@ContractNo", model.ContractNo);
                         objParam[1] = model.ContractDate == null ? new SqlParameter("@ContractDate", DBNull.Value) : new SqlParameter("@ContractDate", model.ContractDate);
                         objParam[2] = model.ExpireDate == null ? new SqlParameter("@ExpireDate", DBNull.Value) : new SqlParameter("@ExpireDate", model.ExpireDate);
@@ -178,6 +179,7 @@ namespace DAL
                         objParam[15] = model.Note == null ? new SqlParameter("@Note", DBNull.Value) : new SqlParameter("@Note", model.Note);
                         objParam[16] = model.ClientType == null ? new SqlParameter("@ClientType", DBNull.Value) : new SqlParameter("@ClientType", model.ClientType);
                         objParam[17] = model.PermisionType == null ? new SqlParameter("@PermisionType", DBNull.Value) : new SqlParameter("@PermisionType", model.PermisionType);
+                        objParam[18] = model.TenantId == null ? new SqlParameter("@TenantId", DBNull.Value) : new SqlParameter("@TenantId", model.TenantId);
                        return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.InsertContract, objParam);
                     }
                     else
