@@ -82,8 +82,7 @@ namespace WEB.CMS.Customize
                     {
                         user_role_cache.Permission = new List<PermissionData>();
                     }
-                    //--Tenant
-                    int tenant_id = 0;
+					int? tenant_id = null;
                     if (_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                     {
                         try
@@ -91,12 +90,14 @@ namespace WEB.CMS.Customize
                             tenant_id = Convert.ToInt32(_HttpContext.HttpContext.User.FindFirst("TenantId").Value);
                         }
                         catch { }
-                        if (tenant_id <= 0) tenant_id = 0;
+						if (tenant_id <= 0) tenant_id = null;
                     }
+
                     user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id, tenant_id);
+                    permissions = user_role_cache.Permission;
+                    ClaimUserUnderList = user_role_cache.UserUnderList;
                     var data_encode = JsonConvert.SerializeObject(user_role_cache);
                     string token = CommonHelper.Encode(data_encode, _configuration["DataBaseConfig:key_api:api_manual"]);
-                    //string token = data_encode;
                     try
                     {
                         _redisConn.Set(CacheName.USER_ROLE + user_id, token, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
@@ -112,7 +113,7 @@ namespace WEB.CMS.Customize
                     Role = role,
                     DepartmentId = ClaimDepartmentId != null ? int.Parse(ClaimDepartmentId.Value) : 0,
                     Permissions = user_role_cache.Permission,
-                    UserUnderList = ClaimUserUnderList != null ? ClaimUserUnderList : String.Empty
+                    UserUnderList = ClaimUserUnderList ?? String.Empty
                 };
             }
             catch (Exception ex)

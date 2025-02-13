@@ -91,8 +91,8 @@ namespace WEB.CMS.Controllers
                 {
                     user_role_cache.Permission = new List<PermissionData>();
                 }
-
                 user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(model.Entity.Id, tenant_id);
+
                 var data_encode = JsonConvert.SerializeObject(user_role_cache);
                 string token = CommonHelper.Encode(data_encode, _configuration["DataBaseConfig:key_api:api_manual"]);
                 //string token = data_encode;

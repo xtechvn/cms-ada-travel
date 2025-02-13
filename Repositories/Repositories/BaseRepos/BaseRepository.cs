@@ -89,16 +89,15 @@ namespace Repositories.Repositories.BaseRepos
                 {
                     user_role_cache.Permission = new List<PermissionData>();
                 }
-                //--Tenant
-                int tenant_id = 0;
-                if (context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+				                int? tenant_id = null;
+				if (context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                 {
                     try
                     {
                         tenant_id = Convert.ToInt32(context.HttpContext.User.FindFirst("TenantId").Value);
                     }
                     catch { }
-                    if (tenant_id <= 0) tenant_id = 0;
+					   if (tenant_id <= 0) tenant_id = null;
                 }
                 user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id, tenant_id);
                 string token = CommonHelper.Encode(JsonConvert.SerializeObject(user_role_cache), configuration["DataBaseConfig:key_api:api_manual"]);

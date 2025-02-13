@@ -605,12 +605,11 @@ namespace Repositories.Repositories
                 return null;
             }
         }
-
-        public string GetListUserByUserId(int user_id, int TenantId)
+		 public string GetListUserByUserId(int user_id, int tenant_id= null)
         {
             try
             {
-                return _UserDAL.GetListUserByUserId(user_id, TenantId);
+                return _UserDAL.GetListUserByUserId(user_id, tenant_id);
             }
             catch
             {
