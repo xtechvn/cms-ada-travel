@@ -1,7 +1,7 @@
 ﻿@using Entities.ViewModels
 @using  Entities.ViewModels.Report
 @model GenericViewModel<SearchRevenueBySupplierViewModel>
-@if (Model.ListData == null)
+@if (Model.ListData == null || Model.ListData.Count<=0)
 {
 <div class="search-null center mb40">
     <div class="mb24">
