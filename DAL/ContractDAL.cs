@@ -46,7 +46,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[24];
+                SqlParameter[] objParam = new SqlParameter[25];
                 objParam[0] = new SqlParameter("@ClientId", searchModel.ClientId);
                 objParam[1] = new SqlParameter("@ContractNo", searchModel.ContractNo);
                 objParam[2] = new SqlParameter("@ClientName", searchModel.ClientName);
@@ -71,6 +71,7 @@ namespace DAL
                 objParam[21] = new SqlParameter("@PageIndex", searchModel.PageIndex);
                 objParam[22] = new SqlParameter("@PageSize", searchModel.PageSize);
                 objParam[23] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
+                objParam[24] = new SqlParameter("@TenantId", searchModel.TenantId);
              
           
                 

@@ -146,7 +146,19 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             {
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
-                {
+                { 
+                    //--Tenant
+                    int? tenant_id = null;
+                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                    {
+                        try
+                        {
+                            tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                        }
+                        catch { }
+                        if (tenant_id <= 0) tenant_id = null;
+                    }
+                    searchModel.TenantId = tenant_id;
                     var i = 0;
                     if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
                     {

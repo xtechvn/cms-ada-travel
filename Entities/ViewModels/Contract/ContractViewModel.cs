@@ -72,6 +72,7 @@ namespace Entities.ViewModels.Contract
 	
 		public int PageIndex { get; set; } = -1;
 		public int PageSize { get; set; } = -1;
+		public int? TenantId { get; set; } 
 
 	}
 	public class ContractModel {
