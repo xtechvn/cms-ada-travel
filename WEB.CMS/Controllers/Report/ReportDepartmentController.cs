@@ -103,7 +103,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var data = new List<SearchReportDepartmentViewModel>();
                     var model = new GenericViewModel<SearchReportDepartmentViewModel>();
                     model = await _DepartmentRepository.GetReportDepartment(searchModel);
@@ -244,7 +244,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
 
                     var model = new GenericViewModel<ListReportDepartmentViewModel>();
                     model = await _DepartmentRepository.GetReportDepartmentsaler(searchModel);
@@ -289,7 +289,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var model = await _DepartmentRepository.GetRevenueBySupplier(searchModel);
                     return PartialView(model);
                 }
@@ -313,7 +313,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var model = await _DepartmentRepository.GetRevenueByClient(searchModel);
                     return PartialView(model);
                 }
@@ -333,7 +333,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
 
                     var data = new List<DetailRevenueByDepartmentViewModel>();
                     var model = new GenericViewModel<DetailRevenueByDepartmentViewModel>();
@@ -453,7 +453,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var model = new GenericViewModel<ListDetailRevenueByDepartmentViewModel>();
                     model = await _DepartmentRepository.GetListDetailRevenueBySaler(searchModel);
                     return PartialView(model);
@@ -475,7 +475,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var model = await _DepartmentRepository.GetListDetailRevenueBySupplier(searchModel);
                     return PartialView(model);
 
@@ -497,7 +497,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var model = await _DepartmentRepository.GetListDetailRevenueByClient(searchModel);
                     return PartialView(model);
 
@@ -527,7 +527,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var model = await _DepartmentRepository.GetListOrder(searchModel);
                     return PartialView(model);
                 }
@@ -551,7 +551,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
 
                     string _FileName_Base = "Doanh thu tổng theo phòng ban bán hàng";
                     if (searchModel.Type == 1)
@@ -671,7 +671,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                 }
                 if (!Directory.Exists(_UploadDirectory))
                 {
@@ -804,7 +804,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                    ))
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var model = await _reportRepository.GetOperatorReport(searchModel, 1, 20000);
                     ViewBag.Model = model;
                     SumOperatorReportViewModel sum = new SumOperatorReportViewModel();
@@ -874,7 +874,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                   ))
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     string folder = @"\wwwroot\Template\Export\" + _UserId;
                     string full_path = Directory.GetCurrentDirectory() + folder;
                     string file_name = StringHelpers.GenFileName("Doanh thu theo Phát sinh chi tiết đơn hàng", current_user.Id, "xlsx");
@@ -930,7 +930,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                     var model = await _DepartmentRepository.GetDepartmentBysaler(searchModel);
                     return PartialView(model);
 
@@ -952,7 +952,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
 
                     var model = await _DepartmentRepository.DetailDepartmentBysale(searchModel);
                     ViewBag.saleid = searchModel.SalerId;
@@ -980,7 +980,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 string _FileName = StringHelpers.GenFileName("Danh sách báo cáo phòng ban sale", current_user.Id, "xlsx");
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
 
 
                 }
@@ -1046,7 +1046,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                 if (current_user != null)
                 {
-                    searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                 }
 
                 if (!Directory.Exists(_UploadDirectory))

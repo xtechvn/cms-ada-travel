@@ -74,7 +74,6 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                     ))
                 {
-
                     var model = await _reportRepository.GetTotalDebtRevenueByClient(searchModel);
                     ReportClientDebtSearchModel sum_search_model = searchModel;
                     sum_search_model.PageIndex = -1;
