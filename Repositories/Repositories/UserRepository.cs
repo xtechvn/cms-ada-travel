@@ -605,7 +605,7 @@ namespace Repositories.Repositories
                 return null;
             }
         }
-		 public string GetListUserByUserId(int user_id, int tenant_id= null)
+		 public string GetListUserByUserId(int user_id, int? tenant_id= null)
         {
             try
             {

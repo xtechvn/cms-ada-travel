@@ -30,7 +30,7 @@ namespace Repositories.IRepositories
         public List<UserPosition> GetUserPositions();
         public Task<UserPosition> GetUserPositionsByID(int id);
         Task<List<Role>> GetUserActiveRoleList(int user_id);
-        string GetListUserByUserId(int user_id,int TenantId);
+        string GetListUserByUserId(int user_id,int? tenant_id=null);
 
         Task<bool> CheckRolePermissionByUserAndRole(int UserId, int RoleId, int PermissionId, int MenuId);
         Task<bool> CheckRolePermissionByUserAndRole(int UserId, List<long> RoleIds, int PermissionId, int MenuId);
