@@ -3179,9 +3179,9 @@ namespace WEB.Adavigo.CMS.Service
 
                                 if (chitietdichvu != string.Empty)
                                 {
-                                    datatabledv = "<tr><td colspan='4'><table style='border-collapse: collapse;width:100%;'>" +
+                                    datatabledv = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'><table style='border-collapse: collapse;width:100%;'>" +
                                                                 "<thead>" +
-                                                                    "<tr style='background: #F5F7FB;text-align: center;color: #00264D;'>" +
+                                                                    "<tr style='background: #F5F7FB;text-align: center;color: #00264D;height: 35px;'>" +
                                                                         "<th style='padding:2px 5px;font-weight: bold;'>Hạng phòng</th>" +
                                                                         "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
                                                                         "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
@@ -3202,9 +3202,9 @@ namespace WEB.Adavigo.CMS.Service
                                 }
                                 if (extra_package != null && extra_package.Count > 0)
                                 {
-                                    datatabledvkhac = "<tr><td colspan='4'> <table style='border-collapse: collapse;width:100%;'>" +
+                                    datatabledvkhac = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'> <table style='border-collapse: collapse;width:100%;'>" +
                                                             "<thead>" +
-                                                                "<tr style='background: #F5F7FB;text-align: center;color: #00264D;'>" +
+                                                                "<tr style='background: #F5F7FB;text-align: center;color: #00264D;height: 35px;'>" +
                                                                     "<th style='padding:2px 5px;font-weight: bold;'>Tên dịch vụ</th>" +
                                                                     "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
                                                                     "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
@@ -3242,14 +3242,14 @@ namespace WEB.Adavigo.CMS.Service
                                     "<td style='border: 1px solid #999; padding: 5px;'>" + item.Hotel[0].TotalDays + "</td>" +
                                 "</tr>" + datatabledv
                                 + datatabledvkhac +
-                                "<tr style='color: #00264D;background: #F5F7FB;font-weight: bold;'>" +
+                                "<tr style='color: #00264D;background: #F5F7FB;font-weight: bold;padding: 4px;height: 35px;'>" +
                                     "<td >Tổng tiền phòng:</td>" +
-                                    "<td colspan='3' style ='text-align: right;' >" + item.Hotel[0].TotalAmount.ToString("N0") + "</td>" +
+                                    "<td colspan='3' style ='text-align: right;padding: 4px;' >" + item.Hotel[0].TotalAmount.ToString("N0") + "</td>" +
                                "</tr>";
 
 
 
-                                Packagesdetail = "<tr><td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "</ td ></tr> " +
+                                Packagesdetail = "<tr><td colspan='4' style = 'padding: 5px; font-weight: bold;text-align: center;background:#f5f7fb;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "</ td ></tr> " +
                                                 "" + note + "" +
                                                       "<tr>" +
                                                       "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
