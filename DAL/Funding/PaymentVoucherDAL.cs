@@ -160,7 +160,7 @@ namespace DAL.Funding
             int id = 0;
             try
             {
-                SqlParameter[] objParam_PaymentVoucher = new SqlParameter[16];
+                SqlParameter[] objParam_PaymentVoucher = new SqlParameter[17];
                 objParam_PaymentVoucher[0] = new SqlParameter("@PaymentCode", model.PaymentCode);
                 objParam_PaymentVoucher[1] = new SqlParameter("@Type", model.Type);
                 objParam_PaymentVoucher[2] = new SqlParameter("@RequestId",
@@ -198,6 +198,7 @@ namespace DAL.Funding
                     objParam_PaymentVoucher[15] = new SqlParameter("@SourceAccount", DBNull.Value);
                 else
                     objParam_PaymentVoucher[15] = new SqlParameter("@SourceAccount", Convert.ToInt32(model.SourceAccount));
+                objParam_PaymentVoucher[16] = new SqlParameter("@TenantId", model.TenantId==null?DBNull.Value: model.TenantId);
                 id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_InsertPaymentVoucher, objParam_PaymentVoucher);
                 UpdatePaymentRequestStatus(model.PaymentRequestDetails.Select(n => n.Id).ToList());
                 if (model.Type == (int)PAYMENT_VOUCHER_TYPE.HOAN_TRA_KHACH_HANG)
