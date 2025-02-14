@@ -73,6 +73,8 @@ namespace WEB.CMS.Controllers
                 claims.Add(new Claim(ClaimTypes.Email, model.Entity.Email));
                 claims.Add(new Claim(ClaimTypes.Role, string.Join(",", model.RoleIdList)));
                 claims.Add(new Claim("TenantId", tenant_id.ToString()));
+                claims.Add(new Claim("FullName", model.Entity.FullName));
+                claims.Add(new Claim("Email", model.Entity.Email));
                 claims.Add(new Claim("Type", type.ToString()));
 
                 //--Get and Cache Permission:

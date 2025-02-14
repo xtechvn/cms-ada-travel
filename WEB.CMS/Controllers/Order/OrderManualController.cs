@@ -110,9 +110,44 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
         }
 
         [HttpPost]
-        public IActionResult CreateOrderManual()
+        public  IActionResult CreateOrderManual()
         {
-            ViewBag.Branch = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
+            ViewBag.Branch = new List<AllCode>();
+            ViewBag.FullName = "";
+            ViewBag.Email = "";
+            ViewBag.UserId = 0;
+            try
+            {
+                int _UserId = 0;
+                string fullname = "";
+                string email = "";
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                    try
+                    {
+                        fullname = HttpContext.User.FindFirst("FullName").Value.ToString();
+                        email = HttpContext.User.FindFirst("Email").Value.ToString();
+                    }
+                    catch { 
+                    
+                        var  user= _userRepository.GetById(_UserId).Result;
+                        if (user != null && user.Id>0) {
+                            fullname = user.FullName;
+                            email=user.Email;
+                        }
+                    }
+                }
+                
+                ViewBag.Branch = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
+                ViewBag.FullName = fullname;
+                ViewBag.Email = email;
+                ViewBag.UserId = _UserId;
+            }
+            catch (Exception ex) { 
+            
+            
+            }
             return View();
         }
         [HttpPost]
