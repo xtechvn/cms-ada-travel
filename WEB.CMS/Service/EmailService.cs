@@ -3181,7 +3181,7 @@ namespace WEB.Adavigo.CMS.Service
                                 {
                                     datatabledv = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'><table style='border-collapse: collapse;width:100%;'>" +
                                                                 "<thead>" +
-                                                                    "<tr style='background: #F5F7FB;text-align: center;color: #00264D;height: 35px;'>" +
+                                                                    "<tr style='background: #D6E1EB;text-align: center;color: #00264D;height: 35px;'>" +
                                                                         "<th style='padding:2px 5px;font-weight: bold;'>Hạng phòng</th>" +
                                                                         "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
                                                                         "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
@@ -3204,7 +3204,7 @@ namespace WEB.Adavigo.CMS.Service
                                 {
                                     datatabledvkhac = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'> <table style='border-collapse: collapse;width:100%;'>" +
                                                             "<thead>" +
-                                                                "<tr style='background: #F5F7FB;text-align: center;color: #00264D;height: 35px;'>" +
+                                                                "<tr style='background: #D6E1EB;text-align: center;color: #00264D;height: 35px;'>" +
                                                                     "<th style='padding:2px 5px;font-weight: bold;'>Tên dịch vụ</th>" +
                                                                     "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
                                                                     "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
@@ -3249,7 +3249,7 @@ namespace WEB.Adavigo.CMS.Service
 
 
 
-                                Packagesdetail = "<tr><td colspan='4' style = 'padding: 5px; font-weight: bold;text-align: center;background:#f5f7fb;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "</ td ></tr> " +
+                                Packagesdetail = "<tr><td colspan='4' style = 'padding: 5px; font-weight: bold;text-align: center;background:#CBD3DB;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "</ td ></tr> " +
                                                 "" + note + "" +
                                                       "<tr>" +
                                                       "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
