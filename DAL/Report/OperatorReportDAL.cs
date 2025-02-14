@@ -304,7 +304,7 @@ namespace DAL.Report
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[6];
+                SqlParameter[] objParam = new SqlParameter[7];
                 if (searchModel.FromDate != null)
                 {
                     objParam[0] = new SqlParameter("@FromDate", searchModel.FromDate);
@@ -360,6 +360,15 @@ namespace DAL.Report
                 else
                 {
                     objParam[5] = new SqlParameter("@PageSize", DBNull.Value);
+                }
+                  
+                if (searchModel.SalerPermission != null && searchModel.SalerPermission.Trim()!="")
+                {
+                    objParam[6] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
+                }
+                else
+                {
+                    objParam[6] = new SqlParameter("@SalerPermission", DBNull.Value);
                 }
 
                

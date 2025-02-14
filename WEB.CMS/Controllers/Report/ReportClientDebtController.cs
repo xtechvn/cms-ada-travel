@@ -74,10 +74,13 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                     ))
                 {
+                    searchModel.SalerPermission += _UserId;
+                    searchModel.SalerPermission += "," + current_user.UserUnderList;
+
                     var model = await _reportRepository.GetTotalDebtRevenueByClient(searchModel);
                     ReportClientDebtSearchModel sum_search_model = searchModel;
                     sum_search_model.PageIndex = -1;
-                    sum_search_model.PageSize = 99999;
+                    sum_search_model.PageSize = 50000;
                     var sum_model = await _reportRepository.GetTotalDebtRevenueByClient(sum_search_model);
                     ViewBag.Model = model;
                     var sum = new SumReportClientDebtViewModel();
@@ -126,6 +129,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                        ))
                 {
+                    searchModel.SalerPermission += _UserId;
+                    searchModel.SalerPermission += "," + current_user.UserUnderList;
                     string folder = @"\Template\Export\";
                     string file_name = StringHelpers.GenFileName("Tổng hợp nợ phải thu của Khách hàng", _UserId, "xlsx");
                     string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, folder);
@@ -187,6 +192,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                        ))
                 {
+                   
                     var model = await _reportRepository.GetDetailDebtRevenueByClient(searchModel);
                     var sum = await _reportRepository.GetTotalDebtRevenueByClient(new ReportClientDebtSearchModel()
                     {

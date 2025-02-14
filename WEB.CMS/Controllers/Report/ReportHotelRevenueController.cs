@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Entities.ViewModels;
 using Entities.ViewModels.Funding;
@@ -37,6 +38,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
             var model = new GenericViewModel<ReportHotelRevenueViewModel>();
             try
             {
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                searchModel.TenantId = tenant_id;
                 searchModel.PageSize = pageSize;
                 searchModel.PageIndex = currentPage;
                 if (searchModel.HotelIds == null) searchModel.HotelIds = new List<string>();
@@ -84,6 +96,17 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 string FilePath = Path.Combine(_UploadDirectory, _FileName);
                 searchModel.PageIndex = -1;
                 searchModel.PageSize = -1;
+                int? tenant_id = null;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+                    if (tenant_id <= 0) tenant_id = null;
+                }
+                searchModel.TenantId = tenant_id;
                 var rsPath = _hotelBookingRepositories.ExportHotelRevenue(searchModel, FilePath);
 
                 if (!string.IsNullOrEmpty(rsPath))
