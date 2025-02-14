@@ -815,7 +815,7 @@
             html_append = _order_detail_html.html_service_hotel_newroom.replaceAll('{{new_room_id}}', '0').replaceAll('{{room_order}}', '' + (lastest_order + 1)).replaceAll('{{new_rate_id}}', '0').replaceAll('{date_range}', min_time + ' - ' + max_time)
 
         } else {
-            html_append = _order_detail_html.html_service_hotel_newroom.replaceAll('{{new_room_id}}', '0').replaceAll('{{room_order}}', '' + (lastest_order + 1)).replaceAll('{{new_rate_id}}', '0').replaceAll('{date_range}', min_time + ' - ' + max_time).replaceAll('{available}', 'display:none;')
+            html_append = _order_detail_html.html_service_hotel_newroom_request.replaceAll('{{new_room_id}}', '0').replaceAll('{{room_order}}', '' + (lastest_order + 1)).replaceAll('{{new_rate_id}}', '0').replaceAll('{date_range}', min_time + ' - ' + max_time).replaceAll('{available}', 'display:none;')
 
         }
         $('.servicemanual-hotel-room-total-summary').before(html_append)
