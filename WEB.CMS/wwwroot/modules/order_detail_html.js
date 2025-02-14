@@ -65,7 +65,12 @@
                 <input class="form-control currency servicemanual-hotel-room-number-of-rooms text-right" type="text" name="servicemanual-hotel-room-number-of-rooms" value="1">
             </div>
         </td>
-      
+        <td class="servicemanual-hotel-room-td-room-available" style="{available}">
+          <select class="form-control  servicemanual-hotel-room-available" style="width:100% !important">
+             <option value="1">Còn phòng</option>
+             <option value="2">Hết phòng</option>
+          </select>
+        </td>
         <td class="servicemanual-hotel-room-td-rates-operator-amount">
                     <div class="d-flex align-center">
                         <input class="input-disabled-background form-control currency servicemanual-hotel-room-rates-operator-amount text-right" data-rate-id="{{new_rate_id}}" type="text" name="servicemanual-hotel-room-rates-operator-amount" disabled value="0">
@@ -289,65 +294,4 @@
             </td>
         </tr>
 `,
-    html_service_hotel_newroom_request: `
-        <tr class="servicemanual-hotel-room-tr" data-room-id="{{new_room_id}}" data-room-type-id="" data-room-type-code="">
-        <td class="servicemanual-hotel-room-td-order">{{room_order}}</td>
-        <td> <input class="form-control servicemanual-hotel-room-type-name" type="text" name="servicemanual-hotel-room-code" placeholder="Nhập tên hạng phòng" value=""> </td>
-        <td class="servicemanual-hotel-room-td-rates-code">
-            <div class="d-flex align-center servicemanual-hotel-room-div-code">
-                <a class="fa fa-trash-o txt_14 mr-2 delete-room-rates-button" style="display: none;" href="javascript:;"></a>
-                <a class="fa fa-plus-circle green mr-1 green add-room-rates-button" href="javascript:;"></a>
-                <input class="form-control servicemanual-hotel-room-rates-code" type="text" data-rate-id="{{new_rate_id}}" name="servicemanual-hotel-room-rates-code" placeholder="Nhập tên gói" value="">
-            </div>
-        </td>
-        <td class="servicemanual-hotel-room-td-rates-daterange">
-            <div class="d-flex align-center"> <input class="form-control servicemanual-hotel-room-rates-daterange" type="text" data-rate-id="{{new_rate_id}}" name="servicemanual-hotel-room-rates-daterange" value=""> </div>
-        </td>
-        <td class="servicemanual-hotel-room-td-rates-operator-price">
-            <div class="d-flex align-center">
-                <input class="form-control currency servicemanual-hotel-room-rates-operator-price text-right" data-rate-id="{{new_rate_id}}" type="text" name="servicemanual-hotel-room-rates-operator-price" placeholder="Nhập giá nhập vào">
-            </div>
-        </td>
-        <td class="servicemanual-hotel-room-td-rates-sale-price">
-            <div class="d-flex align-center">
-                <input class="form-control currency servicemanual-hotel-room-rates-sale-price text-right" data-rate-id="{{new_rate_id}}" type="text" name="servicemanual-hotel-room-rates-sale-price" placeholder="Nhập giá bán">
-            </div>
-        </td>
-        <td class="servicemanual-hotel-room-td-rates-nights">
-            <div class="d-flex align-center">
-                <input class="form-control currency servicemanual-hotel-room-rates-nights text-right input-disabled-background" data-rate-id="{{new_rate_id}}" type="text" name="servicemanual-hotel-room-rates-nights" disabled value="0">
-            </div>
-        </td>
-        <td class="servicemanual-hotel-room-td-number-of-rooms">
-            <div class="d-flex align-center">
-                <input class="form-control currency servicemanual-hotel-room-number-of-rooms text-right" type="text" name="servicemanual-hotel-room-number-of-rooms" value="1">
-            </div>
-        </td>
-        <td class="servicemanual-hotel-room-td-room-available" style="{available}">
-          <select class="form-control  servicemanual-hotel-room-available" style="width:100% !important">
-             <option value="1">Còn phòng</option>
-             <option value="2">Hết phòng</option>
-          </select>
-        </td>
-        <td class="servicemanual-hotel-room-td-rates-operator-amount">
-                    <div class="d-flex align-center">
-                        <input class="input-disabled-background form-control currency servicemanual-hotel-room-rates-operator-amount text-right" data-rate-id="{{new_rate_id}}" type="text" name="servicemanual-hotel-room-rates-operator-amount" disabled value="0">
-                    </div>
-                </td>
-        <td class="servicemanual-hotel-room-td-rates-total-amount">
-            <div class="d-flex align-center">
-                <input class="form-control currency servicemanual-hotel-room-rates-total-amount text-right input-disabled-background" data-rate-id="{{new_rate_id}}" type="text" name="servicemanual-hotel-room-rates-total-amount" disabled value="0">
-            </div>
-        </td>
-        <td class="servicemanual-hotel-room-td-rates-profit">
-            <div class="d-flex align-center">
-                <input class="form-control currency servicemanual-hotel-room-rates-profit text-right input-disabled-background" data-rate-id="{{new_rate_id}}" type="text" name="servicemanual-hotel-room-rates-profit" disabled value="0">
-            </div>
-        </td>
-        <td class="txt_14">
-            <a class="fa fa-files-o mr-1 servicemanual-hotel-room-clone-room" href="javascript:;"></a>
-            <a class="fa fa-trash-o servicemanual-hotel-room-delete-room" href="javascript:;"></a>
-        </td>
-    </tr>
-    `,
 }
