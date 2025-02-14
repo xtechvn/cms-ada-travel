@@ -1167,12 +1167,28 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
 
             try
             {
-                if (model == null || model.client_id <= 0 || model.branch <= 0 || model.main_sale_id <= 0)
+                if (model == null)
                 {
                     return Ok(new
                     {
                         status = (int)ResponseType.FAILED,
-                        msg = "Dữ liệu gửi lên không chính xác, vui lòng kiểm tra lại"
+                        msg = "Có lỗi trong quá trình xử lý, vui lòng liên hệ IT [ModelNULL]"
+                    });
+                }
+                else if (model.client_id <= 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        msg = "Vui lòng chọn khách hàng cho đơn hàng"
+                    });
+                }
+                else if (model.main_sale_id <= 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        msg = "Vui lòng chọn nhân viên chính cho đơn hàng"
                     });
                 }
                 long _UserId = 0;
