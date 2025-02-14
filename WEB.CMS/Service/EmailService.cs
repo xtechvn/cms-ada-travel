@@ -3249,7 +3249,7 @@ namespace WEB.Adavigo.CMS.Service
 
 
 
-                                Packagesdetail = "<tr><td colspan='4' style = 'padding: 5px; font-weight: bold;text-align: center;background:#CBD3DB;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "</ td ></tr> " +
+                                Packagesdetail = "<tr><td colspan='4' style = 'padding: 5px; font-weight: bold;text-align: center;background:#a8c7fa;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "</ td ></tr> " +
                                                 "" + note + "" +
                                                       "<tr>" +
                                                       "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
