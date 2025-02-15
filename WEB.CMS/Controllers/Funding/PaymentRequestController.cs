@@ -77,16 +77,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
             var model = new GenericViewModel<PaymentRequestViewModel>();
             try
             {
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 searchModel.TenantId = tenant_id;
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (searchModel.PaymentTypeMulti == null) searchModel.PaymentTypeMulti = new List<int>();
@@ -193,16 +185,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
         {
             try
             {
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 searchModel.TenantId = tenant_id;
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (searchModel.PaymentTypeMulti == null) searchModel.PaymentTypeMulti = new List<int>();
@@ -464,16 +448,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
         {
             try
             {
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 model.TenantId = tenant_id;
                 var userLogin = 0;
                 if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
@@ -510,7 +486,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
                 //var response = await httpClient.PostAsync(apiPrefix, content);
                 //var resultAPI = await response.Content.ReadAsStringAsync();
                 //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.PaymentCode =await _identifierServiceRepository.BuildPaymentRequest();
+                model.PaymentCode =await _identifierServiceRepository.BuildPaymentRequest(tenant_id);
                 var result = _paymentRequestRepository.CreatePaymentRequest(model);
                 if (result == -2)
                     return Ok(new

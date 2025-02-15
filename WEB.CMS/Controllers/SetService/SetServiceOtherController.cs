@@ -145,16 +145,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Other
                             }
                             if (is_admin_or_department) break;
                         }
-                        int? tenant_id = null;
-                        if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                        {
-                            try
-                            {
-                                tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                            }
-                            catch { }
-                            if (tenant_id <= 0) tenant_id = null;
-                        }
+                        int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                         searchModel.TenantId = tenant_id;
                         ViewBag.Model = await _otherBookingRepository.GetPagingList(searchModel, searchModel.PageIndex, searchModel.pageSize);
                     }
@@ -333,11 +325,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Other
                         msg = "Dữ liệu gửi lên không chính xác, vui lòng kiểm tra lại"
                     });
                 }
-                int _UserId = 0;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
+                int _UserId = _ManagementUser.GetCurrentUserId();
+                
                 var success = await _otherBookingRepository.UpdateServiceOperator(booking_id, user_id, _UserId);
 
                 return Ok(new
@@ -376,11 +365,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Other
                 double profit = 0;
                 if (other_booking != null && other_booking.Id > 0)
                 {
-                    int _UserId = 0;
-                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                    {
-                        _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                    }
+                    int _UserId = _ManagementUser.GetCurrentUserId();
+
                     var id = await _otherBookingRepository.UpdateOtherBookingOptional(data, data[0].BookingId, _UserId);
                     other_booking = await _otherBookingRepository.GetOtherBookingById(data[0].BookingId);
                     amount = other_booking.Amount;
@@ -488,11 +474,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Other
                         msg = "Nhận đặt dịch vụ thất bại, vui lòng tải lại trang và thử lại"
                     });
                 }
-                int _UserId = 0;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
+                int _UserId = _ManagementUser.GetCurrentUserId();
+
                 var id = await _otherBookingRepository.UpdateServiceOperator(booking_id, _UserId);
                 if (id > 0)
                 {
@@ -529,11 +512,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Other
                         msg = "Dữ liệu gửi lên không chính xác, vui lòng kiểm tra lại"
                     });
                 }
-                int _UserId = 0;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
+                int _UserId = _ManagementUser.GetCurrentUserId();
+
                 var hotelBookingCode = await _hotelBookingCodeRepository.GetListlBookingCodeByHotelBookingId(booking_id, (int)ServicesType.Other);
                 if (hotelBookingCode != null && hotelBookingCode.Count > 0)
                 {
@@ -587,11 +567,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Other
                         msg = "Dữ liệu gửi lên không chính xác, vui lòng kiểm tra lại"
                     });
                 }
-                int _UserId = 0;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
+                int _UserId = _ManagementUser.GetCurrentUserId();
+
                 var payment_request = _paymentRequestRepository.GetByServiceId(booking_id, (int)ServicesType.Other);
                 if (payment_request == null || payment_request.Count <= 0)
                 {

@@ -82,16 +82,7 @@ namespace WEB.CMS.Customize
                     {
                         user_role_cache.Permission = new List<PermissionData>();
                     }
-					int? tenant_id = null;
-                    if (_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                    {
-                        try
-                        {
-                            tenant_id = Convert.ToInt32(_HttpContext.HttpContext.User.FindFirst("TenantId").Value);
-                        }
-                        catch { }
-						if (tenant_id <= 0) tenant_id = null;
-                    }
+                    int? tenant_id = GetCurrentTenantId();
 
                     user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id, tenant_id);
                     permissions = user_role_cache.Permission;
@@ -121,6 +112,42 @@ namespace WEB.CMS.Customize
                 LogHelper.InsertLogTelegram("GetCurrentUser - ManagementUser: " + ex.ToString());
                 return null;
             }
+        }
+        public int GetCurrentUserId()
+        {
+            int _UserId = -1;
+            try
+            {
+                if (_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt32(_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetCurrentUserId - ManagementUser: " + ex.ToString());
+            }
+            return _UserId;
+
+        }
+        public int? GetCurrentTenantId()
+        {
+            int? tenant_id = -1;
+            try
+            {
+                if (_HttpContext.HttpContext.User.FindFirst("TenantId") != null)
+                {
+                    tenant_id = Convert.ToInt32(_HttpContext.HttpContext.User.FindFirst("TenantId").Value);
+                    if (tenant_id <= 0) tenant_id = null;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetCurrentTenantId - ManagementUser: " + ex.ToString());
+            }
+            return tenant_id;
+
         }
     }
 }

@@ -223,16 +223,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                             }
                             if (is_admin) break;
                         }
-                        int? tenant_id = null;
-                        if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                        {
-                            try
-                            {
-                                tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                            }
-                            catch { }
-                            if (tenant_id <= 0) tenant_id = null;
-                        }
+                        int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                         searchModel.TenantId = tenant_id;
                         model = await _orderRepository.GetList(searchModel, currentPage, pageSize);
                         model2 = await _orderRepository.GetTotalCountSumOrder(searchModel, -1, pageSize);
@@ -690,16 +682,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
                     var data_order = new List<OrderSelectViewModel>();
@@ -1309,16 +1293,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     mdoelLog.Type = (int)AttachmentType.OrderDetail; ;
                     mdoelLog.Note = user.FullName + " cập nhật thông tin đơn ";
                     mdoelLog.CreatedUserName = user.FullName;
-                    int? tenant_id = null;
-                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                    {
-                        try
-                        {
-                            tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                        }
-                        catch { }
-                        if (tenant_id <= 0) tenant_id = null;
-                    }
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                     model.TenantId = tenant_id;
 
                     var data2 = _orderRepository.UpdateOrder(model);
@@ -2297,16 +2273,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     modelOrder.OrderId = Convert.ToInt32(model.OrderId);
                     modelOrder.OrderStatus = (byte?)Convert.ToInt32(model.OrderStatus);
                     modelOrder.PaymentStatus = Convert.ToInt32(model.PaymentStatus);
-                    int? tenant_id = null;
-                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                    {
-                        try
-                        {
-                            tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                        }
-                        catch { }
-                        if (tenant_id <= 0) tenant_id = null;
-                    }
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                     modelOrder.TenantId = tenant_id;
                     var updateOrder = _orderRepository.UpdateOrder(modelOrder);
                     //var data2 = await _orderRepository.UpdateOrderStatus(Convert.ToInt32(model.OrderId), Convert.ToInt32(model.OrderStatus), UpdatedBy, UserVerify);
@@ -2415,16 +2383,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
 

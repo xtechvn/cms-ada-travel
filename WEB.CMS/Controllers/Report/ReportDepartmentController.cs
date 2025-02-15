@@ -51,16 +51,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
         }
         public async Task<IActionResult> Index()
         {
-            int? tenant_id = null;
-            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-            {
-                try
-                {
-                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                }
-                catch { }
-                if (tenant_id <= 0) tenant_id = null;
-            }
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
             var departments = await _DepartmentRepository.Listing(null,tenant_id);
             var orderStatus = _allCodeRepository.GetListByType(AllCodeType.ORDER_STATUS);
             var branchs = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
@@ -828,16 +820,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                         sum = await _reportRepository.GetSumOperatorReport(searchModel);
                     }
                     ViewBag.Sum = sum;
-                    int? tenant_id = null;
-                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                    {
-                        try
-                        {
-                            tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                        }
-                        catch { }
-                        if (tenant_id <= 0) tenant_id = null;
-                    }
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                     var departments = await _DepartmentRepository.Listing(null, tenant_id);
                     ViewBag.Department = departments.ToList();
                 }

@@ -155,16 +155,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {//--Tenant
-                    int? tenant_id = null;
-                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                    {
-                        try
-                        {
-                            tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                        }
-                        catch { }
-                        if (tenant_id <= 0) tenant_id = null;
-                    }
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                     searchModel.TenantId = tenant_id;
                     var i = 0;
                     if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
@@ -280,16 +272,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 var DataModel = JsonConvert.DeserializeObject<CustomerManagerView>(data);
                 DataModel.UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 //--Tenant
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 DataModel.TenantId = tenant_id;
                 Regex regexemail = new Regex(@"^(\s*)([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)(\s*)|((\.(\w){2,})+)(\s*)$");
                 if (!regexemail.IsMatch(DataModel.email))
@@ -306,7 +290,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
 
                 if (email == null && DataModel.Id == 0)
                 {
-                    DataModel.ClientCode = await _identifierServiceRepository.buildClientNo(Convert.ToInt32(DataModel.id_ClientType));
+                    DataModel.ClientCode = await _identifierServiceRepository.buildClientNo(Convert.ToInt32(DataModel.id_ClientType),tenant_id);
                     var Result = _customerManagerRepositories.SetUpClient(DataModel);
                     if (Result != 0)
                     {

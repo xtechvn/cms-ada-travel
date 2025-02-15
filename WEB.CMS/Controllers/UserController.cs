@@ -51,16 +51,9 @@ namespace WEB.CMS.Controllers
         {
             try
             {
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 var userlist = await _userESRepository.GetUserSuggesstion(name, tenant_id);
                 var suggestionlist = userlist.Select(s => new
                 {
@@ -86,16 +79,9 @@ namespace WEB.CMS.Controllers
             {
                 if (status < 0 || status>2) status = null;
                 if (userName !=null && userName.Trim()!="") userName = CommonHelper.RemoveUnicode(userName);
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 model = _UserRepository.GetPagingList(userName, status, currentPage, pageSize, tenant_id);
             }
             catch (Exception ex)
@@ -142,16 +128,9 @@ namespace WEB.CMS.Controllers
                 {
                     model.Gender = 1;
                 }
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 ViewBag.DepartmentList = await _DepartmentRepository.Listing(null,tenant_id);
                 ViewBag.RoleList = await _RoleRepository.GetAll();
                 ViewBag.UserPosition = _UserRepository.GetUserPositions();
@@ -200,28 +179,18 @@ namespace WEB.CMS.Controllers
                     var active_position = await _UserRepository.GetUserPositionsByID((int)model.UserPositionId);
                     if (active_position != null) model.Level = active_position.Rank;
                 }
-                var _UserLogin = 0;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserLogin = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
-                model.CreatedBy = _UserLogin;
-                model.ModifiedBy = _UserLogin;
+                int _UserId = _ManagementUser.GetCurrentUserId();
+
+                model.CreatedBy = _UserId;
+                model.ModifiedBy = _UserId;
                 if (model.Phone == null) model.Phone = "";
                 if (model.Avata == null) model.Avata = "";
                 if (model.Address == null) model.Address = "";
                 if (model.NickName == null) model.NickName = "";
                 //--Tenant
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 model.TenantId = tenant_id;
                 //-- check exists:
                 var exists = await _UserRepository.GetById(model.Id);
@@ -523,15 +492,11 @@ namespace WEB.CMS.Controllers
                 var order = _orderRepository.GetAllOrderIDs();
                 if (order != null && order.Count > 0)
                 {
-                    var _UserLogin = 0;
-                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                    {
-                        _UserLogin = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                    }
+                    int _UserId = _ManagementUser.GetCurrentUserId();
 
                     foreach (var id in order)
                     {
-                        await _orderRepository.UpdateOrderDetail(id, _UserLogin);
+                        await _orderRepository.UpdateOrderDetail(id, _UserId);
                     }
                 }
                 return Ok(new

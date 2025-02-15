@@ -15,12 +15,13 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Configs
     {
         private readonly IDepartmentRepository _DepartmentRepository;
         private readonly IAllCodeRepository _allCodeRepository;
-       
+        private ManagementUser _ManagementUser;
 
-        public DepartmentController(IDepartmentRepository departmentRepository, IAllCodeRepository allCodeRepository)
+        public DepartmentController(IDepartmentRepository departmentRepository, IAllCodeRepository allCodeRepository, ManagementUser managementUser)
         {
             _DepartmentRepository = departmentRepository;
             _allCodeRepository = allCodeRepository;
+            _ManagementUser = managementUser;
         }
 
         public IActionResult Index()
@@ -31,16 +32,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Configs
         [HttpPost]
         public async Task<IActionResult> Search(string name)
         {
-            int? tenant_id = null;
-            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-            {
-                try
-                {
-                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                }
-                catch { }
-                if (tenant_id <= 0) tenant_id = null;
-            }
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
             var departments = await _DepartmentRepository.Listing(name,tenant_id);
             return View(departments);
         }
@@ -77,16 +70,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Configs
             {
                 long result = 0;
                 string action = string.Empty;
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 model.TenantId = tenant_id;
                 if (model.Id > 0)
                 {

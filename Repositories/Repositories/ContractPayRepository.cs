@@ -1025,21 +1025,7 @@ namespace Repositories.Repositories
             }
             return 0;
         }
-        public long CountPaymentRequest()
-        {
-            return _contractPayDAL.CountPaymentRequest();
-        }
-        public long CountContractPayInYear()
-        {
-            return _contractPayDAL.CountContractPayInYear();
-        }
-        public async Task<string> getContractPayByBillNo(string bill_no)
-        {
-            return await _contractPayDAL.getContractPayByBillNo(bill_no);
-        }
-        public long CountPaymentVoucherInYear()
-        {
-            return _contractPayDAL.CountPaymentVoucherInYear();
-        }
+       
+      
     }
 }

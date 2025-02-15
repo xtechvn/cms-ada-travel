@@ -37,15 +37,16 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
         private readonly CommentService _commentService;
         private readonly ISubscriber _subscriber;
         private readonly IVoucherRepository _voucherRepository;
+        private readonly ManagementUser _ManagementUser;
         private readonly IIdentifierServiceRepository _identifierServiceRepository;
         public RequestHotelBookingController(IConfiguration configuration, IUserRepository userRepository, IHotelBookingRepositories hotelBookingRepository,
             IRequestRepository requestRepository,IIdentifierServiceRepository identifierServiceRepository, IClientRepository clientRepository, IOrderRepository orderRepository, IHotelRepository hotelRepository,
-            IHttpContextAccessor httpContextAccessor, IVoucherRepository voucherRepository, IContractPayRepository contractPayRepository)
+            IHttpContextAccessor httpContextAccessor, IVoucherRepository voucherRepository, IContractPayRepository contractPayRepository, ManagementUser managementUser)
         {
             _configuration = configuration;
             _userRepository = userRepository;
             _hotelBookingRepository = hotelBookingRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _requestRepository = requestRepository;
             _clientRepository = clientRepository;
@@ -56,6 +57,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
             _subscriber = connection.GetSubscriber();
             _voucherRepository = voucherRepository;
             _identifierServiceRepository = identifierServiceRepository;
+            _ManagementUser = managementUser;
         }
         public IActionResult Index()
         {
@@ -207,6 +209,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                         msg = "You do not have permission to do this."
                     });
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 //-- Check if order is manual Order:
                 var exists_order = await _orderRepository.GetOrderByID(data.order_id);
 
@@ -230,7 +234,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
 
                 if (data.hotel.id <= 0 || data.hotel.service_code == null || data.hotel.service_code.Trim() == "")
                 {
-                    data.hotel.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.VINHotelRent);
+                    data.hotel.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.VINHotelRent, tenant_id);
                 }
 
                 #region Check Client Debt:

@@ -31,12 +31,13 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
         private readonly IEmailService _emailService;
         private readonly IUserRepository _userRepository;
         private readonly ISupplierRepository _supplierRepository;
+        private readonly ManagementUser _ManagementUser;
         private readonly IIdentifierServiceRepository _identifierServiceRepository;
 
         public PaymentVoucherController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment,
            IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository, IEmailService emailService, 
            IUserRepository userRepository, ISupplierRepository supplierRepository, IConfiguration configuration,
-           IIdentifierServiceRepository identifierServiceRepository, IContractPayRepository contractPayRepository, IOrderRepository orderRepository)
+           IIdentifierServiceRepository identifierServiceRepository, IContractPayRepository contractPayRepository, IOrderRepository orderRepository, ManagementUser managementUser)
         {
             _WebHostEnvironment = hostEnvironment;
             _allCodeRepository = allCodeRepository;
@@ -47,6 +48,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
             _userRepository = userRepository;
             _supplierRepository = supplierRepository;
             _identifierServiceRepository = identifierServiceRepository;
+            _ManagementUser = managementUser;
         }
 
         public IActionResult Index()
@@ -64,16 +66,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
             var model = new GenericViewModel<PaymentVoucherViewModel>();
             try
             {
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 searchModel.TenantId = tenant_id;
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (!string.IsNullOrEmpty(searchModel.PaymentCode))
@@ -192,16 +186,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
         {
             try
             {
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 model.TenantId = tenant_id;
                 var userLogin = 0;
                 if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
@@ -237,7 +223,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
                 //var resultAPI = await response.Content.ReadAsStringAsync();
                 //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
 
-                model.PaymentCode =await _identifierServiceRepository.BuildPaymentVoucher();
+                model.PaymentCode =await _identifierServiceRepository.BuildPaymentVoucher(tenant_id);
                 var result = _paymentVoucherRepository.CreatePaymentVoucher(model, out string msg);
                 if (result == -3)
                     return Ok(new

@@ -131,16 +131,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Fly
                                     break;
                             }
                         }
-                        int? tenant_id = null;
-                        if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                        {
-                            try
-                            {
-                                tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                            }
-                            catch { }
-                            if (tenant_id <= 0) tenant_id = null;
-                        }
+                        int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                         searchModel.TenantId = tenant_id;
                         model = await _flyBookingDetailRepository.GetPagingList(searchModel, searchModel.PageIndex, searchModel.pageSize);
                     }
@@ -607,16 +599,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Fly
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
                     var data_order = new List<OrderSelectViewModel>();
@@ -660,16 +644,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Fly
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
                     var data = await _flyBookingESRepository.GetFlyBookingSuggesstion(txt_search, tenant_id);

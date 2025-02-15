@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using Utilities;
+using WEB.CMS.Customize;
 
 namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 {
@@ -20,11 +21,13 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
     {
         private readonly IHotelBookingRepositories _hotelBookingRepositories;
         private readonly IWebHostEnvironment _WebHostEnvironment;
+        private ManagementUser _ManagementUser;
 
-        public ReportHotelRevenueController(IHotelBookingRepositories hotelBookingRepositories, IWebHostEnvironment hostEnvironment)
+        public ReportHotelRevenueController(IHotelBookingRepositories hotelBookingRepositories, IWebHostEnvironment hostEnvironment, ManagementUser managementUser)
         {
             _hotelBookingRepositories = hotelBookingRepositories;
             _WebHostEnvironment = hostEnvironment;
+            _ManagementUser = managementUser;
         }
 
         public IActionResult Index()
@@ -38,16 +41,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
             var model = new GenericViewModel<ReportHotelRevenueViewModel>();
             try
             {
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 searchModel.TenantId = tenant_id;
                 searchModel.PageSize = pageSize;
                 searchModel.PageIndex = currentPage;
@@ -96,16 +91,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                 string FilePath = Path.Combine(_UploadDirectory, _FileName);
                 searchModel.PageIndex = -1;
                 searchModel.PageSize = -1;
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 searchModel.TenantId = tenant_id;
                 var rsPath = _hotelBookingRepositories.ExportHotelRevenue(searchModel, FilePath);
 

@@ -380,16 +380,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
                 if (txt_search == null) txt_search = "";
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 var data = await _userESRepository.GetUserSuggesstion(txt_search, tenant_id);
 
                 if (service_type <= 0)
@@ -515,6 +507,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                         msg = "You do not have permission to do this."
                     });
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 //-- Check if order is manual Order:
                 var exists_order = await _orderRepository.GetOrderByID(data.order_id);
                
@@ -546,7 +540,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 }*/
                 if (data.hotel.id <= 0 || data.hotel.service_code == null || data.hotel.service_code.Trim() == "")
                 {
-                    data.hotel.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.VINHotelRent);
+                    data.hotel.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.VINHotelRent, tenant_id);
                 }
 
                 #region Check Client Debt:
@@ -970,7 +964,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-               
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (data.go == null || data.start_point == null || data.start_point.Trim() == "" || data.end_point == null || data.end_point.Trim() == "")
                 {
                     return Ok(new
@@ -987,7 +982,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 {
                     if (data.go == null || data.go.id <= 0)
                     {
-                        data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.FlyingTicket);
+                        data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.FlyingTicket,tenant_id);
                     }
                     else
                     {
@@ -1194,10 +1189,10 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-               
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
                 Entities.Models.Order order = new Entities.Models.Order()
                 {
-                    OrderNo = await _identifierServiceRepository.buildOrderManual(),
+                    OrderNo = await _identifierServiceRepository.buildOrderManual(tenant_id),
                     SalerId = model.main_sale_id,
                     SalerGroupId = string.Join(",", model.sub_sale_id),
                     Note = model.note,
@@ -1227,16 +1222,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                         order_id = -1
                     });
                 }
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                
                 order.TenantId = tenant_id;
                 var result = await _orderRepository.CreateOrder(order);
                 var current_user = _ManagementUser.GetCurrentUser();
@@ -1447,13 +1433,15 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 data.user_summit = (int)_UserId;
                
                 var client = await _clientRepository.GetClientDetailByClientId((long)exists_order.ClientId);
                 data.client_type = (int)client.ClientType;
                 if (data.tour_id <= 0 || data.service_code == null || data.service_code.Trim() == "")
                 {
-                    data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.Tourist);
+                    data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.Tourist,tenant_id);
                 }
 
 
@@ -2146,6 +2134,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (data.from_date >= data.to_date )
                 {
                     return Ok(new
@@ -2164,7 +2154,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 }
                 if (data.service_code == null || data.service_code.Trim() == "")
                 {
-                    data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServiceType.Other);
+                    data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServiceType.Other,tenant_id);
                 }
                 var exists_order = await _orderRepository.GetOrderByID(data.order_id);
                 int service_status = (int)ServiceStatus.OnExcution;

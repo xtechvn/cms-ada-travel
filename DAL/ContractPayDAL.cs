@@ -818,13 +818,13 @@ namespace DAL
             }
         }
 
-        public long CountContractPayInYear()
+        public long CountContractPayInYear(int? tenant_id = null)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.ContractPay.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year).Count();
+                    return _DbContext.ContractPay.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year && x.TenantId == tenant_id).Count();
                 }
             }
             catch (Exception ex)
@@ -1245,13 +1245,13 @@ namespace DAL
                 return 0;
             }
         }
-        public long CountPaymentRequest()
+        public long CountPaymentRequest(int? tenant_id=null)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.PaymentRequest.AsNoTracking().Count();
+                    return _DbContext.PaymentRequest.AsNoTracking().Where(x => x.TenantId == tenant_id).Count();
                 }
             }
             catch (Exception ex)
@@ -1260,13 +1260,13 @@ namespace DAL
                 return -1;
             }
         }
-        public long CountPaymentVoucherInYear()
+        public long CountPaymentVoucherInYear(int? tenant_id = null)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.PaymentVoucher.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year).Count();
+                    return _DbContext.PaymentVoucher.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year && x.TenantId==tenant_id).Count();
                 }
             }
             catch (Exception ex)

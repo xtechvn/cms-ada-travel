@@ -32,9 +32,10 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
         //private readonly IBrandRepository _brandRepository;
         private TourESRepository _tourESRepository;
         private readonly WorkQueueClient workQueueClient;
+        private ManagementUser _ManagementUser;
 
         public TourProductController(IAllCodeRepository allCodeRepository, ICommonRepository commonRepository, IConfiguration configuration,
-            ITourRepository tourRepository)
+            ITourRepository tourRepository, ManagementUser managementUser)
         {
             _allCodeRepository = allCodeRepository;
             _commonRepository = commonRepository;
@@ -44,22 +45,16 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
             _redisService.Connect();
             _tourESRepository = new TourESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             workQueueClient = new WorkQueueClient(configuration);
+            _ManagementUser = managementUser;
         }
 
         public async Task<IActionResult> Index()
         {
             #region Validate SuperUser:
-            int? tenant_id = null;
 
-            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-            {
-                try
-                {
-                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                }
-                catch { }
-                if (tenant_id <= 0) tenant_id = null;
-            }
+
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
             if (tenant_id != null && tenant_id > 0)
             {
                 return RedirectToAction("error", "Home");
@@ -75,16 +70,9 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
         public IActionResult Search(TourProductSearchModel searchModel)
         {
             var model = new GenericViewModel<TourProductGridModel>();
-            int? tenant_id = null;
-            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-            {
-                try
-                {
-                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                }
-                catch { }
-                if (tenant_id <= 0) tenant_id = null;
-            }
+
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
             if (tenant_id != null && tenant_id > 0)
             {
                 return RedirectToAction("error", "Home");
@@ -113,16 +101,9 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
                 IsDisplayWeb = false
             };
             #region Validate SuperUser:
-            int? tenant_id = null;
-            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-            {
-                try
-                {
-                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                }
-                catch { }
-                if (tenant_id <= 0) tenant_id = null;
-            }
+
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
             if (tenant_id != null && tenant_id > 0)
             {
                 return RedirectToAction("error", "Home");
@@ -387,11 +368,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
         {
             try
             {
-                int _UserId = 0;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
+                int _UserId = _ManagementUser.GetCurrentUserId();
+
                 var success = await _TourRepository.UpsertTourProductPrices(tour_product_id, model_upload, _UserId);
                 if (success)
                 {

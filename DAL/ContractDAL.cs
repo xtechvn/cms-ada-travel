@@ -276,13 +276,13 @@ namespace DAL
             return _date != DateTime.MinValue ? _date : DateTime.MinValue;
         }
        
-        public long CountContractInYear()
+        public long CountContractInYear(int? tenant_id = null)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Contract.AsNoTracking().Where(x => (((DateTime?)x.ContractDate) ?? DateTime.Now).Year == DateTime.Now.Year).Count();
+                    return _DbContext.Contract.AsNoTracking().Where(x => (((DateTime?)x.ContractDate) ?? DateTime.Now).Year == DateTime.Now.Year && x.TenantId==tenant_id).Count();
                 }
             }
             catch (Exception ex)

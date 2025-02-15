@@ -4,11 +4,13 @@ using DAL.StoreProcedure;
 using Entities.ConfigModels;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using Nest;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Telegram.Bot.Types.Payments;
 using Utilities;
 using Utilities.Contants;
 
@@ -32,14 +34,15 @@ namespace Repositories.Repositories
 
 
 
-        public async Task<string> buildServiceNo(int service_type)
+        public async Task<string> buildServiceNo(int service_type, int? tenant_id = null)
         {
             string service_name = ServicesTypeCode.service[Convert.ToInt16(service_type)];
             try
             {
-                int count = identifierDAL.countServiceUse(service_type);
+                int count = identifierDAL.countServiceUse(service_type,tenant_id);
                 //format numb
                 string s_format = string.Format(String.Format("{0,4:0000}", count + 1));
+                service_name += string.Format("{0:D3}", (tenant_id == null ? 0 : (int)tenant_id));
 
                 service_name += s_format;
 
@@ -63,8 +66,7 @@ namespace Repositories.Repositories
                 var months = new Dictionary<int, string> { { 1, "A" }, { 2, "B" }, { 3, "C" }, { 4, "D" }, { 5, "E" }, { 6, "F" }, { 7, "G" }, { 8, "H" }, { 9, "K" }, { 10, "L" }, { 11, "M" }, { 12, "N" } };
                 var current_date = DateTime.Now;
 
-                if (tenant_id == null) tenant_id = 0;
-
+                order_no += string.Format("{0:D3}", (tenant_id == null ? 0 : (int)tenant_id));
 
                 //3. 2 số cuối của năm
                 order_no += current_date.Year.ToString().Substring(current_date.Year.ToString().Length - 2, 2);
@@ -72,32 +74,33 @@ namespace Repositories.Repositories
                 //4. Tháng hiện tại là index tham chiếu sang bảng chữ cái lấy chữ
                 order_no += months[current_date.Month];
 
-                //5. Ngày giao dich 
-                order_no += current_date.ToString("dd");
+                ////5. Ngày giao dich 
+                //order_no += current_date.ToString("dd");
 
                 //6. Số thứ tự đơn hàng trong năm.
-                long order_count =  orderDAL.CountOrderInYear();
+                long order_count =  orderDAL.CountOrderInYear(tenant_id);
 
-                //6.1: Check số đơn hàng này có chưa
-                var order_check =  orderDAL.GetByOrderNo(order_no + order_count);
+                ////6.1: Check số đơn hàng này có chưa
+                //var order_check =  orderDAL.GetByOrderNo(order_no + order_count);
 
-                if (order_check != null && order_check.OrderId > 0)
-                {
-                    //Nếu có rồi tăng lên 1
-                    // order_no += (order_count + 1);
-                    order_no += string.Format(String.Format("{0,4:0000}", order_count + 1));
+                //if (order_check != null && order_check.OrderId > 0)
+                //{
+                //    //Nếu có rồi tăng lên 1
+                //    // order_no += (order_count + 1);
+                //    order_no += string.Format(String.Format("{0,6:D6}", order_count + 1));
 
-                }
-                else
-                {
-                    //order_no += order_count.ToString();
-                    order_no += string.Format(String.Format("{0,4:0000}", order_count));
+                //}
+                //else
+                //{
+                //    //order_no += order_count.ToString();
+                //    order_no += string.Format(String.Format("{0,6:D6}", order_count));
 
 
-                }
+                //}
 
-                order_no = string.Format(String.Format("{0,4:0000}", order_no));
+                //order_no = string.Format(String.Format("{0,4:0000}", order_no));
 
+                order_no += string.Format(String.Format("{0,6:D6}", order_count));
                 return order_no;
             }
             catch (Exception ex)
@@ -110,34 +113,16 @@ namespace Repositories.Repositories
                 return order_no;
             }
         }
-        public bool IsOrderManual(string orderNo)
+        public bool IsOrderManual(string orderNo, int? tenant_id = null)
         {
-
-            try
+            if (orderNo.Length >= 3 && char.IsDigit(orderNo[0]) && char.IsDigit(orderNo[1]) && char.IsDigit(orderNo[2]))
             {
-                if (orderNo.StartsWith("O")
-                    || orderNo.StartsWith("A")
-                    || orderNo.StartsWith("P")
-                    || orderNo.StartsWith("D")
-                    )
-                {
-                    return true;
-
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("IsOrderManual - OrderIndentiferService: " + ex.ToString());
-
-
-
-
-
+                return true;
             }
             return false;
 
         }
-        public async Task<string> BuildPaymentRequest()
+        public async Task<string> BuildPaymentRequest(int? tenant_id = null)
         {
             string bill_no = string.Empty;
             try
@@ -147,6 +132,8 @@ namespace Repositories.Repositories
                 var current_date = DateTime.Now;
                 bill_no = "YCC";
 
+                bill_no += string.Format("{0:D3}", (tenant_id == null ? 0 : (int)tenant_id));
+
                 // 2 số cuối của năm
                 bill_no += current_date.Year.ToString().Substring(current_date.Year.ToString().Length - 2, 2);
 
@@ -154,7 +141,7 @@ namespace Repositories.Repositories
                 bill_no += months[current_date.Month];
 
                 //2. Số thứ tự đã dùng.
-                long bill_count = contractPayDAL.CountPaymentRequest();
+                long bill_count = contractPayDAL.CountPaymentRequest(tenant_id);
 
                 //format numb
                 string s_bill_new = string.Format(String.Format("{0,5:00000}", bill_count + 1));
@@ -174,7 +161,7 @@ namespace Repositories.Repositories
             }
         }
 
-        public async Task<string> buildContractPay()
+        public async Task<string> buildContractPay( int? tenant_id = null)
         {
             string bill_no = string.Empty;
             try
@@ -182,11 +169,13 @@ namespace Repositories.Repositories
                 var current_date = DateTime.Now;
                 bill_no = "PT";
 
+                bill_no += string.Format("{0:D3}", (tenant_id == null ? 0 : (int)tenant_id));
+
                 //1. 2 số cuối của năm
                 bill_no += current_date.Year.ToString().Substring(current_date.Year.ToString().Length - 2, 2);
 
                 //2. Số thứ tự phiếu thu trong năm.
-                long bill_count = contractPayDAL.CountContractPayInYear();
+                long bill_count = contractPayDAL.CountContractPayInYear(tenant_id);
 
                 //format numb
                 string s_bill_new = string.Format(String.Format("{0,5:00000}", bill_count + 1));
@@ -217,7 +206,7 @@ namespace Repositories.Repositories
                 return bill_no;
             }
         }
-        public async Task<string> BuildPaymentVoucher()
+        public async Task<string> BuildPaymentVoucher(int? tenant_id = null)
         {
             string bill_no = string.Empty;
             try
@@ -225,12 +214,14 @@ namespace Repositories.Repositories
                 var current_date = DateTime.Now;
                 bill_no = "PC";
 
+                bill_no += string.Format("{0:D3}", (tenant_id == null ? 0 : (int)tenant_id));
+
                 //1. 2 số cuối của năm
                 bill_no += current_date.Year.ToString().Substring(current_date.Year.ToString().Length - 2, 2);
 
 
                 //2. Số thứ tự trong năm.
-                long bill_count = contractPayDAL.CountPaymentVoucherInYear();
+                long bill_count = contractPayDAL.CountPaymentVoucherInYear(tenant_id);
 
                 //format numb
                 string s_bill_new = string.Format(String.Format("{0,5:00000}", bill_count + 1));
@@ -249,19 +240,20 @@ namespace Repositories.Repositories
                 return bill_no;
             }
         }
-        public async Task<string> buildContractNo()
+        public async Task<string> buildContractNo( int? tenant_id = null)
         {
             string contract_no = string.Empty;
             try
             {
                 var current_date = DateTime.Now;
                 contract_no = "HD";
+                contract_no += string.Format("{0:D3}", (tenant_id == null ? 0 : (int)tenant_id));
 
                 //1. 2 số cuối của năm
                 contract_no += current_date.Year.ToString().Substring(current_date.Year.ToString().Length - 2, 2);
 
                 //2. Số thứ tự  trong năm.
-                long order_count = contractDAL.CountContractInYear();
+                long order_count = contractDAL.CountContractInYear(tenant_id);
 
                 //format numb
                 string s_format = string.Format(String.Format("{0,4:0000}", order_count + 1));
@@ -280,22 +272,24 @@ namespace Repositories.Repositories
                 return contract_no;
             }
         }
-        public async Task<string> buildClientNo(int client_type)
+        public async Task<string> buildClientNo(int client_type, int? tenant_id = null)
         {
             string code = ClientTypeName.service[Convert.ToInt16(client_type)];
 
             try
             {
                 var current_date = DateTime.Now;
-                int count = identifierDAL.countClientTypeUse(client_type);
+                int count = identifierDAL.countClientTypeUse(client_type,tenant_id);
 
                 //so tu tang
                 string s_format = string.Format(String.Format("{0,5:00000}", count + 1));
 
                 //1. 2 số cuối của năm
                 string two_year_last = current_date.Year.ToString().Substring(current_date.Year.ToString().Length - 2, 2);
+                // TenantID
+                string tenant_code = string.Format("{0:D3}", (tenant_id == null ? 0 : (int)tenant_id));
 
-                code = code + two_year_last + s_format;
+                code = code+ tenant_code + two_year_last + s_format;
 
                 return code;
             }

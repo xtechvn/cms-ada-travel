@@ -41,9 +41,11 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly RedisConn _redisService;
         private readonly WorkQueueClient _workQueueClient;
+        private ManagementUser _ManagementUser;
+
         public HotelController(IPolicyRepository policyRepository, IAllCodeRepository allCodeRepository,
         ISupplierRepository supplierRepository, ICampaignRepository campaignRepository, IBrandRepository brandRepository,
-        IHotelBookingRepositories hotelBookingRepositories, ICommonRepository commonRepository, IHotelRepository hotelRepository, IConfiguration configuration)
+        IHotelBookingRepositories hotelBookingRepositories, ICommonRepository commonRepository, IHotelRepository hotelRepository, IConfiguration configuration, ManagementUser managementUser)
         {
             _configuration = configuration;
             _PolicyRepository = policyRepository;
@@ -58,22 +60,15 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             _redisService = new RedisConn(configuration);
             _redisService.Connect();
             _workQueueClient = new WorkQueueClient(configuration);
+            _ManagementUser = managementUser;
         }
 
         #region hotel management
         public async Task<IActionResult> Index()
         {
             #region Validate SuperUser:
-            int? tenant_id = null;
-            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-            {
-                try
-                {
-                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                }
-                catch { }
-                if (tenant_id <= 0) tenant_id = null;
-            }
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
             if (tenant_id != null && tenant_id > 0)
             {
                 return RedirectToAction("error", "Home");
@@ -88,16 +83,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         public IActionResult Search(HotelFilterModel searchModel)
         {
             #region Validate SuperUser:
-            int? tenant_id = null;
-            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-            {
-                try
-                {
-                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                }
-                catch { }
-                if (tenant_id <= 0) tenant_id = null;
-            }
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
             if (tenant_id != null && tenant_id > 0)
             {
                 return RedirectToAction("error", "Home");
@@ -129,16 +116,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 IsDisplayWebsite = false
             };
             #region Validate SuperUser:
-            int? tenant_id = null;
-            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-            {
-                try
-                {
-                    tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                }
-                catch { }
-                if (tenant_id <= 0) tenant_id = null;
-            }
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
             if (tenant_id != null && tenant_id > 0)
             {
                 return RedirectToAction("error", "Home");
@@ -828,16 +807,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         {
             try
             {
-                int? tenant_id = null;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    try
-                    {
-                        tenant_id = Convert.ToInt32(HttpContext.User.FindFirst("TenantId").Value);
-                    }
-                    catch { }
-                    if (tenant_id <= 0) tenant_id = null;
-                }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (tenant_id != null && tenant_id > 0)
                 {
                     return RedirectToAction("error", "Home");

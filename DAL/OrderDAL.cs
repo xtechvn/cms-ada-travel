@@ -235,13 +235,13 @@ namespace DAL
                 return -2;
             }
         }
-        public long CountOrderInYear()
+        public long CountOrderInYear(int? tenant_id=null)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Order.AsNoTracking().Where(x => (x.CreateTime ?? DateTime.Now).Year == DateTime.Now.Year).Count();
+                    return _DbContext.Order.AsNoTracking().Where(x => (x.CreateTime ?? DateTime.Now).Year == DateTime.Now.Year &&x.TenantId== tenant_id).Count();
                 }
             }
             catch (Exception ex)
