@@ -23,6 +23,7 @@ using WEB.DeepSeekTravel.CMS.Service;
 using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
+using Repositories.Repositories;
 
 namespace WEB.DeepSeekTravel.CMS.Controllers
 {
@@ -46,7 +47,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly IPaymentRequestRepository _paymentRequestRepository;
         private readonly ISupplierRepository _supplierRepository;
-        private IndentiferService _indentiferService;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
 
         public ReceiptController(IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, IHotelBookingRepositories hotelBookingRepositories, ITourRepository tourRepository,
             IClientRepository clientRepository, IDepositHistoryRepository depositHistoryRepository, IOrderRepository orderRepository, ManagementUser ManagementUser,
@@ -69,7 +70,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             _emailService = emailService;
             _configuration = configuration;
             config = ReadFile.LoadConfig();
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
+            _identifierServiceRepository = identifierServiceRepository;
         }
 
         public IActionResult Index()
@@ -287,7 +288,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     if (tenant_id <= 0) tenant_id = null;
                 }
                 model.TenantId = tenant_id;
-                model.BillNo =await _indentiferService.buildContractPay();
+                model.BillNo =await _identifierServiceRepository.buildContractPay();
                 var contractPayId = _contractPayRepository.CreateContractPay(model);
                 if (contractPayId == -2)
                     return Ok(new

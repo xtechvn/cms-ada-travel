@@ -61,7 +61,6 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         private APIService apiService;
         private HotelBookingCodeESRepository _boongKingCodeESRepository;
         private LogActionMongoService LogActionMongo;
-        private IndentiferService _indentiferService;
 
         private readonly List<int> list_order_status_not_allow_to_edit = new List<int>() { (int)OrderStatus.FINISHED, (int)OrderStatus.CANCEL, (int)OrderStatus.WAITING_FOR_ACCOUNTANT, (int)OrderStatus.WAITING_FOR_OPERATOR };
         public OrderController(IConfiguration configuration, IOrderRepository orderRepository, IClientRepository clientRepository, IHotelBookingRepositories hotelBookingRepositories, ManagementUser managementUser, IContractRepository contractRepository,
@@ -102,7 +101,6 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             LogActionMongo = new LogActionMongoService(configuration);
             workQueueClient = new WorkQueueClient(configuration);
             _identifierServiceRepository = identifierServiceRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
         }
 
 
@@ -382,7 +380,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                         ViewBag.PermisionType = ClientDetai.PermisionType;
                     }
 
-                    if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                    if (_identifierServiceRepository.IsOrderManual(dataOrder.OrderNo))
                     {
                         ViewBag.OrderNo_Type = 1;
                     }
@@ -394,7 +392,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     ViewBag.OrderServiceType = 0;
                     ViewBag.IsB2COrder = false;
                     ViewBag.HasSaleToProgress = true;
-                    if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                    if (_identifierServiceRepository.IsOrderManual(dataOrder.OrderNo))
                     {
                         ViewBag.IsManualOrder = true;
                     }
@@ -812,7 +810,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                             is_allow_to_edit = true;
                         }
                         ViewBag.AllowToEdit = is_allow_to_edit;
-                        if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                        if (_identifierServiceRepository.IsOrderManual(dataOrder.OrderNo))
                         {
                             ViewBag.OrderNo_Type = 1;
                         }

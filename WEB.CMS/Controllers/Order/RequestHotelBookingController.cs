@@ -37,7 +37,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
         private readonly CommentService _commentService;
         private readonly ISubscriber _subscriber;
         private readonly IVoucherRepository _voucherRepository;
-        private readonly IndentiferService _indentiferService;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         public RequestHotelBookingController(IConfiguration configuration, IUserRepository userRepository, IHotelBookingRepositories hotelBookingRepository,
             IRequestRepository requestRepository,IIdentifierServiceRepository identifierServiceRepository, IClientRepository clientRepository, IOrderRepository orderRepository, IHotelRepository hotelRepository,
             IHttpContextAccessor httpContextAccessor, IVoucherRepository voucherRepository, IContractPayRepository contractPayRepository)
@@ -55,7 +55,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
             var connection = ConnectionMultiplexer.Connect(_configuration["Redis:Host"] + ":" + _configuration["Redis:Port"]);
             _subscriber = connection.GetSubscriber();
             _voucherRepository = voucherRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
+            _identifierServiceRepository = identifierServiceRepository;
         }
         public IActionResult Index()
         {
@@ -230,7 +230,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
 
                 if (data.hotel.id <= 0 || data.hotel.service_code == null || data.hotel.service_code.Trim() == "")
                 {
-                    data.hotel.service_code = await _indentiferService.buildServiceNo((int)ServicesType.VINHotelRent);
+                    data.hotel.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.VINHotelRent);
                 }
 
                 #region Check Client Debt:

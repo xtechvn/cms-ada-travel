@@ -33,12 +33,12 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
         private readonly IFlyBookingDetailRepository _flyBookingDetailRepository;
         private readonly IBankingAccountRepository _bankingAccountRepository;
         private readonly IClientRepository _clientRepository;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         private readonly WEB.CMS.Models.AppSettings config;
         private readonly IContractPayRepository _contractPayRepository;
         private ManagementUser _ManagementUser;
         private APIService apiService;
         private readonly IUserRepository _userRepository;
-        private IndentiferService _indentiferService;
         public PaymentRequestController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser,
            IPaymentRequestRepository paymentRequestRepository, ISupplierRepository supplierRepository, IUserRepository userRepository,
            ITourPackagesOptionalRepository tourPackagesOptionalRepository, IConfiguration configuration, IFlyBookingDetailRepository flyBookingDetailRepository,
@@ -60,7 +60,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
             _flyBookingDetailRepository = flyBookingDetailRepository;
             _bankingAccountRepository = bankingAccountRepository;
             _clientRepository = clientRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
+            _identifierServiceRepository = identifierServiceRepository;
         }
 
         public IActionResult Index()
@@ -510,7 +510,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
                 //var response = await httpClient.PostAsync(apiPrefix, content);
                 //var resultAPI = await response.Content.ReadAsStringAsync();
                 //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.PaymentCode =await _indentiferService.BuildPaymentRequest();
+                model.PaymentCode =await _identifierServiceRepository.BuildPaymentRequest();
                 var result = _paymentRequestRepository.CreatePaymentRequest(model);
                 if (result == -2)
                     return Ok(new

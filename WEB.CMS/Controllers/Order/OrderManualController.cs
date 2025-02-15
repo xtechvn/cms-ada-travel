@@ -32,7 +32,6 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
         private readonly IAccountClientRepository _accountClientRepository;
         private readonly IUserRepository _userRepository;
         private readonly IIdentifierServiceRepository _identifierServiceRepository;
-        private readonly IndentiferService _indentiferService;
         private ClientESRepository _clientESRepository;
         private UserESRepository _userESRepository;
         private NationalESRepository _nationalESRepository;
@@ -93,7 +92,6 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
             _tourRepository = tourRepository;
             _provinceRepository = provinceRepository;
             _nationalRepository = nationalRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository,orderRepository,contractPayRepository);
             _supplierRepository = supplierRepository;
             _ManagementUser = managementUser;
             _contractRepository = contractRepository;
@@ -548,7 +546,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 }*/
                 if (data.hotel.id <= 0 || data.hotel.service_code == null || data.hotel.service_code.Trim() == "")
                 {
-                    data.hotel.service_code = await _indentiferService.buildServiceNo((int)ServicesType.VINHotelRent);
+                    data.hotel.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.VINHotelRent);
                 }
 
                 #region Check Client Debt:
@@ -989,7 +987,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 {
                     if (data.go == null || data.go.id <= 0)
                     {
-                        data.service_code = await _indentiferService.buildServiceNo((int)ServicesType.FlyingTicket);
+                        data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.FlyingTicket);
                     }
                     else
                     {
@@ -1199,7 +1197,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                
                 Entities.Models.Order order = new Entities.Models.Order()
                 {
-                    OrderNo = await _indentiferService.buildOrderManual(),
+                    OrderNo = await _identifierServiceRepository.buildOrderManual(),
                     SalerId = model.main_sale_id,
                     SalerGroupId = string.Join(",", model.sub_sale_id),
                     Note = model.note,
@@ -1455,7 +1453,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 data.client_type = (int)client.ClientType;
                 if (data.tour_id <= 0 || data.service_code == null || data.service_code.Trim() == "")
                 {
-                    data.service_code = await _indentiferService.buildServiceNo((int)ServicesType.Tourist);
+                    data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.Tourist);
                 }
 
 
@@ -2166,7 +2164,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
                 }
                 if (data.service_code == null || data.service_code.Trim() == "")
                 {
-                    data.service_code = await _indentiferService.buildServiceNo((int)ServiceType.Other);
+                    data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServiceType.Other);
                 }
                 var exists_order = await _orderRepository.GetOrderByID(data.order_id);
                 int service_status = (int)ServiceStatus.OnExcution;
