@@ -2993,7 +2993,7 @@ namespace WEB.Adavigo.CMS.Service
                                                 "" + note + "" +
                                                 "<tr>" +
                                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
-                                                "<td colspan='3' style='border: 1px solid #999; padding: 5px;'>" + item.Note + "</td></tr>";
+                                                "<td colspan='3' style='border: 1px solid #999; padding: 5px;'>" + item.tour.Note + "</td></tr>";
 
                             }
                         }
