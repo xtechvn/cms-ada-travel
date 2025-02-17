@@ -61,6 +61,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
                 var current_user = _ManagementUser.GetCurrentUser();
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
                 //-- Check if user has role and exact role that allow to view:
                 if (current_user != null &&
                     current_user.Role != null && current_user.Role != "" &&
@@ -74,9 +75,13 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 
                     ))
                 {
+
                     searchModel.SalerPermission += _UserId;
                     searchModel.SalerPermission += "," + current_user.UserUnderList;
-
+                    if(tenant_id==null|| (int)tenant_id <= 0)
+                    {
+                        searchModel.SalerPermission = null;
+                    }
                     var model = await _reportRepository.GetTotalDebtRevenueByClient(searchModel);
                     ReportClientDebtSearchModel sum_search_model = searchModel;
                     sum_search_model.PageIndex = -1;
