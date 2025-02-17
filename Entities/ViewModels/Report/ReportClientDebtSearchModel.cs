@@ -62,5 +62,8 @@ namespace Entities.ViewModels.Report
             }
         }
         public string CheckOutDateToStr { get; set; }
+        public string SalerPermission { get; set; }
+        public int? TenantId { get; set; }
+
     }
 }

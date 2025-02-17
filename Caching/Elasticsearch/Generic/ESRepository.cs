@@ -20,13 +20,6 @@ namespace Caching.Elasticsearch
         public ESRepository(string Host)
         {
             _ElasticHost = Host;
-            AppSettings _appconfig = new AppSettings();
-            using (StreamReader r = new StreamReader("appsettings.json"))
-            {
-                string json = r.ReadToEnd();
-                _appconfig = JsonConvert.DeserializeObject<AppSettings>(json);
-                 _company_type = _appconfig.CompanyType;
-            }
                
         }
 

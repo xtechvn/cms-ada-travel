@@ -26,7 +26,10 @@ namespace Entities.ViewModels.ElasticSearch
         [PropertyName("isdelete")]
 
         public bool isdelete { get; set; }
-  
-      
+        [PropertyName("tenantid")]
+
+        public int? tenantid { get; set; }
+
+
     }
 }

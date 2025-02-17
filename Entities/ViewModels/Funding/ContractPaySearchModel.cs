@@ -48,5 +48,6 @@ namespace Entities.ViewModels.Funding
         }
         public string ToCreateDateStr { get; set; }
         public int DebtStatus { get; set; }
+        public int? TenantId { get; set; }
     }
 }

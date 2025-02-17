@@ -19,12 +19,12 @@ using System.Linq;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     [CustomAuthorize]
     public class OrderController : Controller
@@ -61,7 +61,6 @@ namespace WEB.Adavigo.CMS.Controllers
         private APIService apiService;
         private HotelBookingCodeESRepository _boongKingCodeESRepository;
         private LogActionMongoService LogActionMongo;
-        private IndentiferService _indentiferService;
 
         private readonly List<int> list_order_status_not_allow_to_edit = new List<int>() { (int)OrderStatus.FINISHED, (int)OrderStatus.CANCEL, (int)OrderStatus.WAITING_FOR_ACCOUNTANT, (int)OrderStatus.WAITING_FOR_OPERATOR };
         public OrderController(IConfiguration configuration, IOrderRepository orderRepository, IClientRepository clientRepository, IHotelBookingRepositories hotelBookingRepositories, ManagementUser managementUser, IContractRepository contractRepository,
@@ -102,7 +101,6 @@ namespace WEB.Adavigo.CMS.Controllers
             LogActionMongo = new LogActionMongoService(configuration);
             workQueueClient = new WorkQueueClient(configuration);
             _identifierServiceRepository = identifierServiceRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
         }
 
 
@@ -225,7 +223,9 @@ namespace WEB.Adavigo.CMS.Controllers
                             }
                             if (is_admin) break;
                         }
+                        int? tenant_id = _ManagementUser.GetCurrentTenantId();
 
+                        searchModel.TenantId = tenant_id;
                         model = await _orderRepository.GetList(searchModel, currentPage, pageSize);
                         model2 = await _orderRepository.GetTotalCountSumOrder(searchModel, -1, pageSize);
                     }
@@ -372,7 +372,7 @@ namespace WEB.Adavigo.CMS.Controllers
                         ViewBag.PermisionType = ClientDetai.PermisionType;
                     }
 
-                    if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                    if (_identifierServiceRepository.IsOrderManual(dataOrder.OrderNo))
                     {
                         ViewBag.OrderNo_Type = 1;
                     }
@@ -384,7 +384,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     ViewBag.OrderServiceType = 0;
                     ViewBag.IsB2COrder = false;
                     ViewBag.HasSaleToProgress = true;
-                    if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                    if (_identifierServiceRepository.IsOrderManual(dataOrder.OrderNo))
                     {
                         ViewBag.IsManualOrder = true;
                     }
@@ -682,33 +682,20 @@ namespace WEB.Adavigo.CMS.Controllers
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
                     var data_order = new List<OrderSelectViewModel>();
 
-                    if (Convert.ToInt32(systemtype) < 0 || systemtype == "")
+                    var data = await _orderESRepository.GetOrderNoSuggesstion(txt_search, tenant_id);
+                    data_order= data.Select(s => new OrderSelectViewModel { orderid = s.id, orderno = s.orderno }).ToList();
+                    return Ok(new
                     {
-                        var data = await _orderESRepository.GetOrderNoSuggesstion(txt_search);
-                        data_order.AddRange(data.Select(s => new OrderSelectViewModel { orderid = s.id, orderno = s.orderno }));
-                        return Ok(new
-                        {
-                            status = (int)ResponseType.SUCCESS,
-                            data = data_order,
-                            selected = _UserId
-                        });
-                    }
-                    else
-                    {
-                        var data = await _orderESRepository.GetOrderNoSuggesstion2(txt_search, Convert.ToInt32(systemtype));
-                        data_order.AddRange(data.Select(s => new OrderSelectViewModel { orderid = s.orderid, orderno = s.orderno }));
-
-                        return Ok(new
-                        {
-                            status = (int)ResponseType.SUCCESS,
-                            data = data_order,
-                            selected = _UserId
-                        });
-                    }
+                        status = (int)ResponseType.SUCCESS,
+                        data = data_order,
+                        selected = _UserId
+                    });
                 }
                 else
                 {
@@ -807,7 +794,7 @@ namespace WEB.Adavigo.CMS.Controllers
                             is_allow_to_edit = true;
                         }
                         ViewBag.AllowToEdit = is_allow_to_edit;
-                        if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                        if (_identifierServiceRepository.IsOrderManual(dataOrder.OrderNo))
                         {
                             ViewBag.OrderNo_Type = 1;
                         }
@@ -1027,10 +1014,8 @@ namespace WEB.Adavigo.CMS.Controllers
                     var client = await _clientRepository.GetClientDetailByClientId((long)dataOrder.ClientId);
                     if (dataOrder != null)
                     {
-                        if (dataOrder.IsSalerDebtLimit == true)
-                        {
-                            ViewBag.SalerDebtLimit = "Bảo lãnh công nợ";
-                        }
+                        ViewBag.SalerDebtLimit = "";
+
                         ViewBag.BranchCode = dataOrder.BranchCode;
                         ViewBag.Label = dataOrder.Label;
                         ViewBag.Note = dataOrder.Note;
@@ -1308,12 +1293,14 @@ namespace WEB.Adavigo.CMS.Controllers
                     mdoelLog.Type = (int)AttachmentType.OrderDetail; ;
                     mdoelLog.Note = user.FullName + " cập nhật thông tin đơn ";
                     mdoelLog.CreatedUserName = user.FullName;
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
 
+                    model.TenantId = tenant_id;
 
                     var data2 = _orderRepository.UpdateOrder(model);
                     if (data2 > 0)
                     {
-                        workQueueClient.SyncES(data2, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"], ProjectType.ADAVIGO_CMS, "UpdateOrder OrderController");
+                        workQueueClient.SyncES(data2, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"]);
                         if (model.SalerId != null && order.SalerId != model.SalerId)
                         {
                             var sale1 = await _userRepository.GetById((long)order.SalerId);
@@ -1770,7 +1757,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 order_id = (long)hotel.OrderId;
                             }
                             var success = await _hotelBookingRepositories.DeleteHotelBookingByID(hotel_booking_id);
-                            workQueueClient.SyncES(hotel_booking_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"], ProjectType.ADAVIGO_CMS, "DeleteService OrderController");
+                            workQueueClient.SyncES(hotel_booking_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"]);
 
                             break;
                         }
@@ -1781,10 +1768,10 @@ namespace WEB.Adavigo.CMS.Controllers
                             if (fly != null && fly.Count > 0 && fly[0].Id > 0)
                             {
                                 order_id = (long)fly[0].OrderId;
-                                workQueueClient.SyncES(fly[0].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "DeleteService OrderController");
+                                workQueueClient.SyncES(fly[0].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
                                 if (fly.Count > 1)
                                 {
-                                    workQueueClient.SyncES(fly[1].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "DeleteService OrderController");
+                                    workQueueClient.SyncES(fly[1].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
 
                                 }
                             }
@@ -1806,7 +1793,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 order_id = (long)tour.OrderId;
                             }
                             var success = await _tourRepository.DeleteTourByID(tour_id);
-                            workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS);
+                            workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"]);
 
                             break;
                         }
@@ -1913,7 +1900,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 //        _contractPayRepository.UndoContractPayByCancelService(contract.PayId, (long)hotel.OrderId, _UserLogin);
                                 //    }
                                 //}
-                                workQueueClient.SyncES(hotel_booking_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"], ProjectType.ADAVIGO_CMS, "CancelService OrderController");
+                                workQueueClient.SyncES(hotel_booking_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"]    );
 
                             }
 
@@ -1927,10 +1914,10 @@ namespace WEB.Adavigo.CMS.Controllers
                             {
                                 order_id = (long)fly[0].OrderId;
                                 var success = await _flyBookingDetailRepository.CancelHotelBookingByID(id, _UserLogin);
-                                workQueueClient.SyncES(fly[0].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "CancelService OrderController");
+                                workQueueClient.SyncES(fly[0].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
                                 if (fly.Count > 1)
                                 {
-                                    workQueueClient.SyncES(fly[1].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "CancelService OrderController");
+                                    workQueueClient.SyncES(fly[1].Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
 
                                 }
                             }
@@ -1949,7 +1936,7 @@ namespace WEB.Adavigo.CMS.Controllers
                             {
                                 order_id = (long)tour.OrderId;
                                 var success = await _tourRepository.CancelTourByID(tour_id, _UserLogin);
-                                workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS, "CancelService OrderController");
+                                workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"]);
 
                             }
                             break;
@@ -2286,6 +2273,9 @@ namespace WEB.Adavigo.CMS.Controllers
                     modelOrder.OrderId = Convert.ToInt32(model.OrderId);
                     modelOrder.OrderStatus = (byte?)Convert.ToInt32(model.OrderStatus);
                     modelOrder.PaymentStatus = Convert.ToInt32(model.PaymentStatus);
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                    modelOrder.TenantId = tenant_id;
                     var updateOrder = _orderRepository.UpdateOrder(modelOrder);
                     //var data2 = await _orderRepository.UpdateOrderStatus(Convert.ToInt32(model.OrderId), Convert.ToInt32(model.OrderStatus), UpdatedBy, UserVerify);
                     if (updateOrder > 0)
@@ -2393,10 +2383,12 @@ namespace WEB.Adavigo.CMS.Controllers
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
 
-                    var data = await _boongKingCodeESRepository.BoongKingCodeSuggesstion(txt_search);
+                    var data = await _boongKingCodeESRepository.BoongKingCodeSuggesstion(txt_search, tenant_id);
                     var data2 = data.GroupBy(s => s.bookingcode).Select(i => i.First()).ToList();
                     foreach (var item in data2)
                     {
@@ -2764,7 +2756,6 @@ namespace WEB.Adavigo.CMS.Controllers
         {
             var current_user = _ManagementUser.GetCurrentUser();
             var user =await _userRepository.GetDetailUser(current_user.Id);
-            ViewBag.DebtLimit = ((double)user.Entity.DebtLimit).ToString("N0") ;
             var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id);
             ViewBag.AmountTotal = AmountTotal.ToString("N0");
             return View();
@@ -2926,6 +2917,96 @@ namespace WEB.Adavigo.CMS.Controllers
 
             return PartialView(model);
         }
+        public async Task<IActionResult> GetActiveContractByClientId(long client_id)
+        {
+
+            try
+            {
+                string msg = "Khách hàng chưa được kích hoạt";
+                if (client_id <= 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        detail = "",
+                        msg,
+
+
+                    });
+                }
+                var client = await _clientRepository.GetClientDetailByClientId(client_id);
+                if (client != null && client.Id > 0 && client.ClientType != null && client.ClientType > 0)
+                {
+                    switch ((int)client.ClientType)
+                    {
+                        case (int)ClientTypeEnum.DALC1:
+                        case (int)ClientTypeEnum.DALC2:
+                        case (int)ClientTypeEnum.DLC3:
+                        case (int)ClientTypeEnum.DL:
+                        case (int)ClientTypeEnum.DN:
+                        case (int)ClientTypeEnum.CTV:
+                            {
+                                var contract = await _contractRepository.GetActiveContractByClientId(client_id);
+                                if (contract != null && contract.ContractId > 0)
+                                {
+                                    return Ok(new
+                                    {
+                                        status = (int)ResponseType.SUCCESS,
+                                        detail = "[B2B] " + client.ClientName + "(" + client.Phone + " - " + client.Email + ")",
+                                        msg = ""
+                                    });
+                                }
+                                else
+                                {
+                                    return Ok(new
+                                    {
+                                        status = (int)ResponseType.FAILED,
+                                        detail = client.ClientName + "(" + client.Phone + " - " + client.Email + ")",
+                                        msg = "[B2B] Khách hàng " + client.ClientName + " (" + client.Email + ") chưa có / chưa được xét duyệt hợp đồng",
+                                    });
+                                }
+                            }
+                        case (int)ClientTypeEnum.kl:
+                            {
+                                return Ok(new
+                                {
+                                    status = (int)ResponseType.SUCCESS,
+                                    detail = "[B2C] " + client.ClientName + "(" + client.Phone + " - " + client.Email + ")",
+                                    msg = ""
+                                });
+                            }
+                        default:
+                            {
+                                return Ok(new
+                                {
+                                    status = (int)ResponseType.SUCCESS,
+                                    detail = "[] " + client.ClientName + "(" + client.Phone + " - " + client.Email + ")",
+                                    msg = ""
+                                });
+                            }
+                    }
+
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        detail = "Khách hàng không tồn tại / chưa được phân loại, vui lòng chọn khách hàng khác",
+                        msg = ""
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetActiveContractByClientId - OrderManualController: " + ex.ToString());
+                return Ok(new
+                {
+                    status = (int)ResponseType.ERROR,
+                });
+            }
+        }
+
     }
 }
 

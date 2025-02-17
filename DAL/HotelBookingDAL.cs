@@ -805,12 +805,12 @@ namespace DAL
             }
         }
         //Get List dịch vụ khách sạn :
-        public async Task<DataTable> GetPagingList(SearchHotelBookingViewModel searchModel, int currentPage, int pageSize, string proc)
+        public async Task<DataTable> GetPagingList(SearchHotelBookingViewModel searchModel, int currentPage, int pageSize)
         {
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[17];
+                SqlParameter[] objParam = new SqlParameter[18];
                 if (searchModel.ServiceCode == null)
                 {
                     objParam[0] = new SqlParameter("@ServiceCode", DBNull.Value);
@@ -844,9 +844,11 @@ namespace DAL
                 objParam[15] = new SqlParameter("@BookingCode", searchModel.BookingCode);
                 objParam[16] = new SqlParameter("@PropertyId", searchModel.PropertyId);
 
+                objParam[17] = new SqlParameter("@TenantId", (searchModel.TenantId == null ? DBNull.Value : (int)searchModel.TenantId));
 
 
-                return dbWorker.GetDataTable(proc, objParam);
+
+                return dbWorker.GetDataTable(StoreProcedureConstant.SP_GetListHotelBooking, objParam);
             }
             catch (Exception ex)
             {
@@ -1387,7 +1389,7 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[9];
+                SqlParameter[] objParam = new SqlParameter[10];
                 if (searchModel.HotelIds == null || searchModel.HotelIds.Count == 0)
                     objParam[0] = new SqlParameter("@HotelId", DBNull.Value);
                 else
@@ -1426,6 +1428,8 @@ namespace DAL
                     objParam[7] = new SqlParameter("@PageIndex", searchModel.PageIndex);
                     objParam[8] = new SqlParameter("@PageSize", searchModel.PageSize);
                 }
+                objParam[9] = new SqlParameter("@TenantId", (searchModel.TenantId == null ? DBNull.Value : (int)searchModel.TenantId));
+
                 return dbWorker.GetDataTable(StoreProcedureConstant.sp_GetReportRevenueHotel, objParam);
             }
             catch (Exception ex)

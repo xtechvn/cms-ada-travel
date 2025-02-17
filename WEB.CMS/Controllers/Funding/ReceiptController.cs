@@ -19,12 +19,13 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
+using Repositories.Repositories;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     [CustomAuthorize]
 
@@ -46,11 +47,12 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly IPaymentRequestRepository _paymentRequestRepository;
         private readonly ISupplierRepository _supplierRepository;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
 
         public ReceiptController(IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, IHotelBookingRepositories hotelBookingRepositories, ITourRepository tourRepository,
             IClientRepository clientRepository, IDepositHistoryRepository depositHistoryRepository, IOrderRepository orderRepository, ManagementUser ManagementUser,
              IUserRepository userRepository,  IPaymentRequestRepository paymentRequestRepository,
-             IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService)
+             IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService, IIdentifierServiceRepository identifierServiceRepository)
         {
             _supplierRepository = supplierRepository;
             _WebHostEnvironment = hostEnvironment;
@@ -68,6 +70,7 @@ namespace WEB.Adavigo.CMS.Controllers
             _emailService = emailService;
             _configuration = configuration;
             config = ReadFile.LoadConfig();
+            _identifierServiceRepository = identifierServiceRepository;
         }
 
         public IActionResult Index()
@@ -83,11 +86,14 @@ namespace WEB.Adavigo.CMS.Controllers
             var model = new GenericViewModel<ContractPayViewModel>();
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (!string.IsNullOrEmpty(searchModel.BillNo))
                     searchModel.BillNo = searchModel.BillNo.Trim();
                 if (!string.IsNullOrEmpty(searchModel.Content))
                     searchModel.Content = searchModel.Content.Trim();
+                searchModel.TenantId = tenant_id;
                 var listContractPays = _contractPayRepository.GetListContractPay(searchModel, out long total, currentPage, pageSize);
                 model.CurrentPage = currentPage;
                 model.ListData = listContractPays;
@@ -250,20 +256,23 @@ namespace WEB.Adavigo.CMS.Controllers
                 var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
                 var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
                 HttpClient httpClient = new HttpClient();
-                JObject jsonObject = new JObject(
-                   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_THU).ToString())
-                );
-                var j_param = new Dictionary<string, object>
-                 {
-                     { "key",jsonObject}
-                 };
-                var data_product = JsonConvert.SerializeObject(j_param);
-                var token = CommonHelper.Encode(data_product, key_token_api);
-                var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
-                var response = await httpClient.PostAsync(apiPrefix, content);
-                var resultAPI = await response.Content.ReadAsStringAsync();
-                var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.BillNo = output.code;
+                //JObject jsonObject = new JObject(
+                //   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_THU).ToString())
+                //);
+                //var j_param = new Dictionary<string, object>
+                // {
+                //     { "key",jsonObject}
+                // };
+                //var data_product = JsonConvert.SerializeObject(j_param);
+                //var token = CommonHelper.Encode(data_product, key_token_api);
+                //var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
+                //var response = await httpClient.PostAsync(apiPrefix, content);
+                //var resultAPI = await response.Content.ReadAsStringAsync();
+                //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                model.TenantId = tenant_id;
+                model.BillNo =await _identifierServiceRepository.buildContractPay(tenant_id);
                 var contractPayId = _contractPayRepository.CreateContractPay(model);
                 if (contractPayId == -2)
                     return Ok(new
@@ -616,12 +625,12 @@ namespace WEB.Adavigo.CMS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetListBankAccountAdavigo()
+        public async Task<IActionResult> GetListBankAccountDeepSeekTravel()
         {
             try
             {
-                var supplierAdavigoId = _supplierRepository.GetByIDOrName(0, "adavigo");
-                var listBankAccount = _allCodeRepository.GetBankingAccountsBySupplierId(supplierAdavigoId);
+                var supplierDeepSeekTravelId = _supplierRepository.GetByIDOrName(0, "adavigo");
+                var listBankAccount = _allCodeRepository.GetBankingAccountsBySupplierId(supplierDeepSeekTravelId);
                 return Ok(new
                 {
                     isSuccess = true,
@@ -631,7 +640,7 @@ namespace WEB.Adavigo.CMS.Controllers
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("GetListBankAccountAdavigo - ReceiptController: " + ex);
+                LogHelper.InsertLogTelegram("GetListBankAccountDeepSeekTravel - ReceiptController: " + ex);
                 return Ok(new
                 {
                     isSuccess = false,

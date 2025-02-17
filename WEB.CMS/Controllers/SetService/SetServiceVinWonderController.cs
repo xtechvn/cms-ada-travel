@@ -18,13 +18,13 @@ using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 using static Utilities.DepositHistoryConstant;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.VinWonder
 {
     public class SetServiceController : Controller
     {
@@ -65,7 +65,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
             _orderESRepository = new OrderESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _flyBookingESRepository = new FlyBookingESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _allCodeRepository = allcodeRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _userRepository = userRepository;
             _passengerRepository = passengerRepository;
             _airlinesRepository = airlinesRepository;
@@ -151,7 +151,9 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
                             }
                             if (is_admin_or_department) break;
                         }
+                        int? tenant_id = _ManagementUser.GetCurrentTenantId();
 
+                        searchModel.TenantId = tenant_id;
                         ViewBag.Model = await _vinWonderBookingRepository.GetPagingList(searchModel, searchModel.PageIndex, searchModel.pageSize);
                     }
                 }
@@ -858,7 +860,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
                         }
 
                     }
-                    mail.subject = "[Adavigo] Vé Điện Tử Vinwonder Của Quý Khách - Mã Đơn hàng " + order.OrderNo;
+                    mail.subject = "[DeepSeekTravel] Vé Điện Tử Vinwonder Của Quý Khách - Mã Đơn hàng " + order.OrderNo;
                 }
             }
             catch (Exception ex)

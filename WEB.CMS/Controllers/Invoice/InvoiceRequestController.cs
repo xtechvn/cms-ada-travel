@@ -20,7 +20,7 @@ using Utilities.Contants;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.Invoice
+namespace WEB.DeepSeekTravel.CMS.Controllers.Invoice
 {
     [CustomAuthorize]
 

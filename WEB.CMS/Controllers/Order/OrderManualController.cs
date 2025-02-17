@@ -14,11 +14,11 @@ using Repositories.IRepositories;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.Order
+namespace WEB.DeepSeekTravel.CMS.Controllers.Order
 {
     [CustomAuthorize]
 
@@ -32,7 +32,6 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private readonly IAccountClientRepository _accountClientRepository;
         private readonly IUserRepository _userRepository;
         private readonly IIdentifierServiceRepository _identifierServiceRepository;
-        private readonly IndentiferService _indentiferService;
         private ClientESRepository _clientESRepository;
         private UserESRepository _userESRepository;
         private NationalESRepository _nationalESRepository;
@@ -77,7 +76,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             _userRepository = userRepository;
             _identifierServiceRepository = identifierServiceRepository;
             _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             _nationalESRepository = new NationalESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _accountClientRepository = accountClientRepository;
@@ -93,7 +92,6 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             _tourRepository = tourRepository;
             _provinceRepository = provinceRepository;
             _nationalRepository = nationalRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository,orderRepository,contractPayRepository);
             _supplierRepository = supplierRepository;
             _ManagementUser = managementUser;
             _contractRepository = contractRepository;
@@ -110,9 +108,44 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         }
 
         [HttpPost]
-        public IActionResult CreateOrderManual()
+        public  IActionResult CreateOrderManual()
         {
-            ViewBag.Branch = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
+            ViewBag.Branch = new List<AllCode>();
+            ViewBag.FullName = "";
+            ViewBag.Email = "";
+            ViewBag.UserId = 0;
+            try
+            {
+                int _UserId = 0;
+                string fullname = "";
+                string email = "";
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                    try
+                    {
+                        fullname = HttpContext.User.FindFirst("FullName").Value.ToString();
+                        email = HttpContext.User.FindFirst("Email").Value.ToString();
+                    }
+                    catch { 
+                    
+                        var  user= _userRepository.GetById(_UserId).Result;
+                        if (user != null && user.Id>0) {
+                            fullname = user.FullName;
+                            email=user.Email;
+                        }
+                    }
+                }
+                
+                ViewBag.Branch = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
+                ViewBag.FullName = fullname;
+                ViewBag.Email = email;
+                ViewBag.UserId = _UserId;
+            }
+            catch (Exception ex) { 
+            
+            
+            }
             return View();
         }
         [HttpPost]
@@ -347,13 +380,15 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
                 if (txt_search == null) txt_search = "";
-                var data = await _userESRepository.GetUserSuggesstion(txt_search);
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                var data = await _userESRepository.GetUserSuggesstion(txt_search, tenant_id);
 
                 if (service_type <= 0)
                 {
                     if (data == null || data.Count <= 0)
                     {
-                        var data_sql = await _userRepository.GetUserSuggesstion(txt_search);
+                        var data_sql = await _userRepository.GetUserSuggesstion(txt_search, tenant_id);
                         data = new List<UserESViewModel>();
                         if (data_sql != null && data_sql.Count > 0)
                         {
@@ -472,6 +507,8 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                         msg = "You do not have permission to do this."
                     });
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 //-- Check if order is manual Order:
                 var exists_order = await _orderRepository.GetOrderByID(data.order_id);
                
@@ -503,7 +540,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 }*/
                 if (data.hotel.id <= 0 || data.hotel.service_code == null || data.hotel.service_code.Trim() == "")
                 {
-                    data.hotel.service_code = await _indentiferService.buildServiceNo((int)ServicesType.VINHotelRent);
+                    data.hotel.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.VINHotelRent, tenant_id);
                 }
 
                 #region Check Client Debt:
@@ -609,7 +646,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                     });
 
                 }
-                workQueueClient.SyncES(id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"], ProjectType.ADAVIGO_CMS, "SummitHotelServiceData OrderManualController");
+                workQueueClient.SyncES(id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"]);
 
 
                 #region Update Order Amount:
@@ -927,7 +964,8 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-               
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (data.go == null || data.start_point == null || data.start_point.Trim() == "" || data.end_point == null || data.end_point.Trim() == "")
                 {
                     return Ok(new
@@ -944,7 +982,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 {
                     if (data.go == null || data.go.id <= 0)
                     {
-                        data.service_code = await _indentiferService.buildServiceNo((int)ServicesType.FlyingTicket);
+                        data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.FlyingTicket,tenant_id);
                     }
                     else
                     {
@@ -1083,7 +1121,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                             };
                             await _hotelBookingCodeRepository.InsertHotelBookingCode(hotel_code_view_model);
                         }
-                        workQueueClient.SyncES(route.Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"], ProjectType.ADAVIGO_CMS, "SummitFlyBookingServiceData OrderManualController");
+                        workQueueClient.SyncES(route.Id, _configuration["DataBaseConfig:Elastic:SP:SP_GetDetailFlyBookingDetail"], _configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"]);
 
                     }
                     if (detail.Count < 2)
@@ -1122,12 +1160,28 @@ namespace WEB.Adavigo.CMS.Controllers.Order
 
             try
             {
-                if (model == null || model.client_id <= 0 || model.branch <= 0 || model.main_sale_id <= 0)
+                if (model == null)
                 {
                     return Ok(new
                     {
                         status = (int)ResponseType.FAILED,
-                        msg = "Dữ liệu gửi lên không chính xác, vui lòng kiểm tra lại"
+                        msg = "Có lỗi trong quá trình xử lý, vui lòng liên hệ IT [ModelNULL]"
+                    });
+                }
+                else if (model.client_id <= 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        msg = "Vui lòng chọn khách hàng cho đơn hàng"
+                    });
+                }
+                else if (model.main_sale_id <= 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        msg = "Vui lòng chọn nhân viên chính cho đơn hàng"
                     });
                 }
                 long _UserId = 0;
@@ -1135,15 +1189,10 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                int company_type = 0;
-                try
-                {
-                    company_type = Convert.ToInt32(_configuration["CompanyType"]);
-                }
-                catch { }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
                 Entities.Models.Order order = new Entities.Models.Order()
                 {
-                    OrderNo = await _indentiferService.buildOrderManual(company_type),
+                    OrderNo = await _identifierServiceRepository.buildOrderManual(tenant_id),
                     SalerId = model.main_sale_id,
                     SalerGroupId = string.Join(",", model.sub_sale_id),
                     Note = model.note,
@@ -1173,12 +1222,14 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                         order_id = -1
                     });
                 }
+                
+                order.TenantId = tenant_id;
                 var result = await _orderRepository.CreateOrder(order);
                 var current_user = _ManagementUser.GetCurrentUser();
                
                 string link = "/Order/" + result.OrderId;
                  apiService.SendMessage( _UserId.ToString(),((int) ModuleType.DON_HANG).ToString(), ((int)ActionType.TAO_MOI).ToString(), order.OrderNo, link, current_user==null? "0": current_user.Role);
-                workQueueClient.SyncES(result.OrderId, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"], ProjectType.ADAVIGO_CMS, "CreateManualOrder OrderManualController");
+                workQueueClient.SyncES(result.OrderId, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"]);
 
                 //-- Bo sung tao contact client:
                 //-- Get Contract va bo sung contractID
@@ -1382,13 +1433,15 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 data.user_summit = (int)_UserId;
                
                 var client = await _clientRepository.GetClientDetailByClientId((long)exists_order.ClientId);
                 data.client_type = (int)client.ClientType;
                 if (data.tour_id <= 0 || data.service_code == null || data.service_code.Trim() == "")
                 {
-                    data.service_code = await _indentiferService.buildServiceNo((int)ServicesType.Tourist);
+                    data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.Tourist,tenant_id);
                 }
 
 
@@ -1490,7 +1543,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 }
                 //-- Notify
 
-                workQueueClient.SyncES(id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS, "SummitTourServiceData OrderManualController");
+                workQueueClient.SyncES(id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"]);
 
                 #region Update Order Amount:
 
@@ -2081,6 +2134,8 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (data.from_date >= data.to_date )
                 {
                     return Ok(new
@@ -2099,7 +2154,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 }
                 if (data.service_code == null || data.service_code.Trim() == "")
                 {
-                    data.service_code = await _indentiferService.buildServiceNo((int)ServiceType.Other);
+                    data.service_code = await _identifierServiceRepository.buildServiceNo((int)ServiceType.Other,tenant_id);
                 }
                 var exists_order = await _orderRepository.GetOrderByID(data.order_id);
                 int service_status = (int)ServiceStatus.OnExcution;

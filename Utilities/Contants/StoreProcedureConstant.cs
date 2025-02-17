@@ -20,7 +20,6 @@ namespace Utilities.Contants
         public static string GetPassengerByContactClientID = "SP_GetPassengerByContactClientID";
         public static string CreateContactClients = "SP_CreateContactClients";
         public static string CreateFlyBookingDetail = "SP_CreateFlyBookingDetail";
-        public static string CreateOrder = "SP_CreateOrder";
         public static string CreatePassengers = "SP_CreatePassengers";
         public static string CreateBaggage = "SP_CreateBaggage";
         public static string CheckIfNewOrderValid = "SP_CheckIfNewOrderValid";
@@ -442,10 +441,19 @@ namespace Utilities.Contants
 
 
         public const string SP_GetAllUser_search = "SP_GetAllUser_search";
+        public const string SP_GetAllDepartment_search = "SP_GetAllDepartment_search";
         public const string SP_GetListUserPermissionByUserId = "SP_GetListUserPermissionByUserId";
 
-        public static string UpsertUser = "sp_UpsertUser";
-        public static string UpsertUserRole = "sp_UpsertUserRole";
+        public static string UpdateUser = "sp_UpdateUser";
+        public static string InsertUser = "sp_InsertUser";
+        public static string InsertUserRole = "SP_InsertUserRole";
+        public static string UpdateUserRole = "SP_UpdateUserRole";
         public static string DeleteUserRole = "sp_DeleteUserRole";
+        public static string InsertDepartment = "sp_InsertDepartment";
+        public static string UpdateDepartment = "sp_UpdateDepartment";
+        public static string CreateOrder = "SP_CreateOrder";
+        public static string InsertOrder = "SP_InsertOrder";
+        public static string UpdateOrder = "sp_UpdateOrder";
+
     }
 }

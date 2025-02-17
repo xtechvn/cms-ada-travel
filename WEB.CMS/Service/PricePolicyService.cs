@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Utilities.Contants;
 
-namespace WEB.Adavigo.CMS.Service
+namespace WEB.DeepSeekTravel.CMS.Service
 {
     public static class PricePolicyService
     {

@@ -3,9 +3,13 @@ namespace Repositories.IRepositories
 {
     public interface IIdentifierServiceRepository
     {
-        Task<string> buildOrderNoManual(int company_type = 0);// don thu cong
-        Task<string> buildContractPay(); // sinh mã PHIEU THU
-        Task<string> buildContractNo();//mã hợp đồng
-        public int countServiceUse(int service_type);
+        public  Task<string> buildServiceNo(int service_type, int? tenant_id = null);
+        public Task<string> buildOrderManual(int? tenant_id = null);
+        public bool IsOrderManual(string orderNo, int? tenant_id = null);
+        public  Task<string> BuildPaymentRequest(int? tenant_id = null);
+        public  Task<string> buildContractPay(int? tenant_id = null);
+        public  Task<string> BuildPaymentVoucher(int? tenant_id = null);
+        public Task<string> buildContractNo(int? tenant_id = null);
+        public Task<string> buildClientNo(int client_type, int? tenant_id = null);
     }
 }

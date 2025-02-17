@@ -112,7 +112,7 @@ namespace DAL.Funding
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[21];
+                SqlParameter[] objParam = new SqlParameter[22];
                 objParam[0] = new SqlParameter("@PaymentCode", searchModel.PaymentCode);
                 objParam[1] = new SqlParameter("@Description", searchModel.Content);
                 if (searchModel.StatusMulti == null || searchModel.StatusMulti.Count == 0)
@@ -177,6 +177,7 @@ namespace DAL.Funding
                     objParam[20] = new SqlParameter("@IsPaymentBefore", DBNull.Value);
                 else
                     objParam[20] = new SqlParameter("@IsPaymentBefore", searchModel.IsPaymentBefore);
+                objParam[21] = new SqlParameter("@TenantId", searchModel.TenantId); 
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)
@@ -190,7 +191,7 @@ namespace DAL.Funding
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[19];
+                SqlParameter[] objParam = new SqlParameter[20];
                 objParam[0] = new SqlParameter("@PaymentCode", searchModel.PaymentCode);
                 objParam[1] = new SqlParameter("@Description", searchModel.Content);
                 if (searchModel.StatusMulti == null || searchModel.StatusMulti.Count == 0)
@@ -245,6 +246,7 @@ namespace DAL.Funding
                     objParam[18] = new SqlParameter("@IsPaymentBefore", DBNull.Value);
                 else
                     objParam[18] = new SqlParameter("@IsPaymentBefore", searchModel.IsPaymentBefore);
+                objParam[19] = new SqlParameter("@TenantId", searchModel.TenantId);
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)
@@ -377,7 +379,7 @@ namespace DAL.Funding
             List<int> detailIds = new List<int>();
             try
             {
-                SqlParameter[] objParam_paymentRequest = new SqlParameter[18];
+                SqlParameter[] objParam_paymentRequest = new SqlParameter[19];
                 objParam_paymentRequest[0] = new SqlParameter("@PaymentCode", model.PaymentCode);
                 objParam_paymentRequest[1] = new SqlParameter("@Type", model.Type);
                 objParam_paymentRequest[2] = new SqlParameter("@PaymentType", model.PaymentType);
@@ -428,6 +430,7 @@ namespace DAL.Funding
                     objParam_paymentRequest[17] = new SqlParameter("@IsPaymentBefore", false);
                 else
                     objParam_paymentRequest[17] = new SqlParameter("@IsPaymentBefore", model.IsPaymentBefore);
+                objParam_paymentRequest[18] = new SqlParameter("@TenantId", model.TenantId);
                 id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_InsertPaymentRequest, objParam_paymentRequest);
                 if (id > 0 && model.PaymentRequestDetails != null)
                 {
@@ -484,7 +487,7 @@ namespace DAL.Funding
             List<int> detailIds = new List<int>();
             try
             {
-                SqlParameter[] objParam_paymentRequest = new SqlParameter[22];
+                SqlParameter[] objParam_paymentRequest = new SqlParameter[23];
                 objParam_paymentRequest[0] = new SqlParameter("@Id", model.Id);
                 objParam_paymentRequest[1] = new SqlParameter("@PaymentCode", model.PaymentCode);
                 objParam_paymentRequest[2] = new SqlParameter("@Type", model.Type);
@@ -539,6 +542,7 @@ namespace DAL.Funding
                     objParam_paymentRequest[21] = new SqlParameter("@IsPaymentBefore", false);
                 else
                     objParam_paymentRequest[21] = new SqlParameter("@IsPaymentBefore", model.IsPaymentBefore);
+                objParam_paymentRequest[22] = new SqlParameter("@TenantId", DBNull.Value);
                 id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdatePaymentRequest, objParam_paymentRequest);
                 if (id > 0 && model.PaymentRequestDetails != null)
                 {

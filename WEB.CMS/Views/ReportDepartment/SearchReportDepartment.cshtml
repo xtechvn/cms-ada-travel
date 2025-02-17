@@ -11,7 +11,7 @@
         index = (Model.CurrentPage - 1) * Model.PageSize;
     }
 }
-@if (Model.ListData == null)
+@if (Model.ListData == null || Model.ListData.Count<=0)
 {
     <div class="search-null center mb40">
         <div class="mb24">

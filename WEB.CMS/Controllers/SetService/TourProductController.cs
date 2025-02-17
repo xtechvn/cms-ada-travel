@@ -19,7 +19,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
 {
     [CustomAuthorize]
     public class TourProductController : Controller
@@ -32,9 +32,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
         //private readonly IBrandRepository _brandRepository;
         private TourESRepository _tourESRepository;
         private readonly WorkQueueClient workQueueClient;
+        private ManagementUser _ManagementUser;
 
         public TourProductController(IAllCodeRepository allCodeRepository, ICommonRepository commonRepository, IConfiguration configuration,
-            ITourRepository tourRepository)
+            ITourRepository tourRepository, ManagementUser managementUser)
         {
             _allCodeRepository = allCodeRepository;
             _commonRepository = commonRepository;
@@ -44,10 +45,21 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
             _redisService.Connect();
             _tourESRepository = new TourESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             workQueueClient = new WorkQueueClient(configuration);
+            _ManagementUser = managementUser;
         }
 
         public async Task<IActionResult> Index()
         {
+            #region Validate SuperUser:
+
+
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
+            #endregion
             ViewBag.TourTypes = _allCodeRepository.GetListByType("TOUR_TYPE");
             ViewBag.OrganizingTypes = _allCodeRepository.GetListByType("ORGANIZING_TYPE");
             ViewBag.Provinces = await _commonRepository.GetProvinceList();
@@ -58,6 +70,13 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
         public IActionResult Search(TourProductSearchModel searchModel)
         {
             var model = new GenericViewModel<TourProductGridModel>();
+
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
             try
             {
                 searchModel.IsSelfDesign = false;
@@ -81,7 +100,15 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
             {
                 IsDisplayWeb = false
             };
+            #region Validate SuperUser:
 
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+            if (tenant_id != null && tenant_id > 0)
+            {
+                return RedirectToAction("error", "Home");
+            }
+            #endregion
             if (id > 0)
             {
                 var tourProduct = await _TourRepository.GetTourProductById(id);
@@ -341,11 +368,8 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
         {
             try
             {
-                int _UserId = 0;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
+                int _UserId = _ManagementUser.GetCurrentUserId();
+
                 var success = await _TourRepository.UpsertTourProductPrices(tour_product_id, model_upload, _UserId);
                 if (success)
                 {

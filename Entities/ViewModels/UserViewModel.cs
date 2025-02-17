@@ -10,8 +10,6 @@ namespace Entities.ViewModels
     {
         public string RoleId { get; set; }
         public string BirthDayPicker { get; set; }
-        public string CompanyType { get; set; }
-        public string OldCompanyType { get; set; }
     }
 
     public class UserDataViewModel : User

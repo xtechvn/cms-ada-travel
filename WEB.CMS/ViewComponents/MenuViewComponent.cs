@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 
 namespace WEB.CMS.ViewComponents

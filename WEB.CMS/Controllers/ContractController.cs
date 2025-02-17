@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using APP_CHECKOUT.RabitMQ;
 using Caching.Elasticsearch;
 using Entities.Models;
@@ -12,18 +7,15 @@ using Entities.ViewModels;
 using Entities.ViewModels.Contract;
 using Entities.ViewModels.ElasticSearch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     [CustomAuthorize]
 
@@ -44,15 +36,16 @@ namespace WEB.Adavigo.CMS.Controllers
         private IUserRepository _userRepository;
         private APIService apiService;
         private ICustomerManagerRepository _customerManagerRepository;
+        private IIdentifierServiceRepository _identifierServiceRepository;
         private readonly WorkQueueClient _workQueueClient;
         public ContractController(IConfiguration configuration, IAllCodeRepository allCodeRepository, IContractRepository contractRepository, ManagementUser ManagementUser, IUserRepository userRepository,
-            IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IPolicyRepository policyRepository, ICustomerManagerRepository customerManagerRepository)
+            IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IPolicyRepository policyRepository, ICustomerManagerRepository customerManagerRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
 
             _configuration = configuration;
             _allCodeRepository = allCodeRepository;
             _contractRepository = contractRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _contractESRepository = new ContractESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _clientRepository = clientRepository;
@@ -63,6 +56,7 @@ namespace WEB.Adavigo.CMS.Controllers
             apiService = new APIService(configuration, userRepository);
             _customerManagerRepository = customerManagerRepository;
             _workQueueClient = new WorkQueueClient(configuration);
+            _identifierServiceRepository = identifierServiceRepository;
         }
         public async Task<IActionResult> Index()
         {
@@ -80,7 +74,9 @@ namespace WEB.Adavigo.CMS.Controllers
             ViewBag.ContractStatus = ContractStatus;//loại kh
             ViewBag.DEBT_TYPE = DEBT_TYPE;//loại kh
             var searchModel = new ContractSearchViewModel();
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
 
+            searchModel.TenantId=tenant_id;
             ViewBag.PermissionsStatus = 0;
             var current_user = _ManagementUser.GetCurrentUser();
             if (current_user != null)
@@ -153,6 +149,10 @@ namespace WEB.Adavigo.CMS.Controllers
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
+                    //--Tenant
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                    searchModel.TenantId = tenant_id;
                     var i = 0;
                     if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
                     {
@@ -460,15 +460,17 @@ namespace WEB.Adavigo.CMS.Controllers
             string msg = "Error On Excution";
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                model.TenantId = tenant_id;
                 string userId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value).ToString();
 
-                APIService apiService = new APIService(_configuration, _userRepository);
                 var userAgent = _userAgentRepository.GetUserAgentClient(model.ClientId);
                 model.UserIdCreate = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-                if (model.ContractNo == null)
+                if (model.ContractNo == null|| model.ContractNo.Trim()=="")
                 {
-                    model.ContractNo = await apiService.buildContractNo();
+                    model.ContractNo = await _identifierServiceRepository.buildContractNo(tenant_id);
 
                 }
 
@@ -489,7 +491,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     var data = await _contractRepository.CreateContact(model);
                     if (data != 0)
                     {
-                        _workQueueClient.SyncES(data, _configuration["DataBaseConfig:Elastic:SP:Sp_GetContract"], _configuration["DataBaseConfig:Elastic:Index:contract"], ProjectType.ADAVIGO_CMS, "Setup ContractController");
+                        _workQueueClient.SyncES(data, _configuration["DataBaseConfig:Elastic:SP:Sp_GetContract"], _configuration["DataBaseConfig:Elastic:Index:contract"]);
 
                         //var SendMessage = apiService.SendMessage(userId, ModuleType.HOP_DONG.ToString(), ActionType.TAO_MOI.ToString(), model.ContractNo);
                         stt_code = (int)ResponseType.SUCCESS;
@@ -810,6 +812,10 @@ namespace WEB.Adavigo.CMS.Controllers
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
+                    //tenantid
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                    searchModel.TenantId = tenant_id;
                     var i = 0;
                     if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
                     {

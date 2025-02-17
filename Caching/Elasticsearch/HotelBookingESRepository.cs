@@ -13,7 +13,7 @@ namespace Caching.Elasticsearch
    public class HotelBookingESRepository : ESRepository<HotelBookingESViewModel>
     {
         private readonly IConfiguration _configuration;
-        private readonly string index_name = "adavigo_sp_gethotelbooking";
+        private readonly string index_name = "TravelLab_sp_gethotelbooking";
         public HotelBookingESRepository(string Host, IConfiguration configuration) : base(Host)
         {
 
@@ -21,7 +21,7 @@ namespace Caching.Elasticsearch
             index_name = configuration["DataBaseConfig:Elastic:Index:HotelBooking"];
         }
 
-        public async Task<List<HotelBookingESViewModel>> GetListProduct(string txt_search)
+        public async Task<List<HotelBookingESViewModel>> GetListProduct(string txt_search, int? tenant_id = null)
         {
             List<HotelBookingESViewModel> result = new List<HotelBookingESViewModel>();
             try
@@ -35,13 +35,22 @@ namespace Caching.Elasticsearch
                 var search_response = elasticClient.Search<HotelBookingESViewModel>(s => s
                           .Index(index_name)
                           .Size(top)
-                          .Query(q => q
-                           .QueryString(qs => qs
-                               .Fields(new[] { "servicecode"})
-                               .Query("*" + txt_search + "*")
-                               .Analyzer("standard")
-                           )
-                          ));
+                          .Query(q => 
+                              q.Bool(
+                               qb => qb.Must(
+                                  q => q.Term("isdelete", false),
+                                   q => q.QueryString(qs => qs
+                                .Fields(new[] { "servicecode" })
+                                .Query("*" + txt_search.ToUpper() + "*")
+                                .Analyzer("standard")),
+                                mu => mu.Term(t => t
+                                                .Field("tenantid")
+                                                .Value(tenant_id)
+                                            )
+
+                            )
+
+                          )));
 
                 if (!search_response.IsValid)
                 {

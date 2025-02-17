@@ -60,6 +60,7 @@ namespace Entities.ViewModels.CustomerManager
         public double MinAmount { get; set; } = -1;
         public double MaxAmount { get; set; } = -1;
         public string SalerPermission { get; set; }
+        public int? TenantId { get; set; }
     }
 
     public class CustomerManagerView
@@ -86,6 +87,7 @@ namespace Entities.ViewModels.CustomerManager
         public string Note { get; set; }
         public string ClientCode { get; set; }
         public DateTime JoinDate { get; set; }
+        public int? TenantId { get; set; }
 
     }
     public class AmountRemainView

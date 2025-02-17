@@ -17,7 +17,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.Report
+namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 {
     [CustomAuthorize]
     public class ReportDepartmentController : Controller
@@ -51,7 +51,9 @@ namespace WEB.Adavigo.CMS.Controllers.Report
         }
         public async Task<IActionResult> Index()
         {
-            var departments = await _DepartmentRepository.GetAll("");
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+            var departments = await _DepartmentRepository.Listing(null,tenant_id);
             var orderStatus = _allCodeRepository.GetListByType(AllCodeType.ORDER_STATUS);
             var branchs = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
             var serviceType = _allCodeRepository.GetListByType(AllCodeType.SERVICE_TYPE);
@@ -66,24 +68,18 @@ namespace WEB.Adavigo.CMS.Controllers.Report
             ViewBag.Branch = branchs;
             ViewBag.serviceType = serviceType;
             var current_user = _ManagementUser.GetCurrentUser();
-            if (current_user.Role != "")
+            if (current_user != null
+                && current_user.Role != null && current_user.Role != ""
+                && (current_user.Role.Contains(((int)RoleType.SaleOnl).ToString())
+                   || current_user.Role.Contains(((int)RoleType.SaleTour).ToString())
+                   || current_user.Role.Contains(((int)RoleType.SaleKd).ToString())
+
+                   ))
             {
-                var list = current_user.Role.Split(',');
-                foreach (var item in list)
-                {
-                    switch (Convert.ToInt32(item))
-                    {
-                        case (int)RoleType.SaleOnl:
-                        case (int)RoleType.SaleTour:
-                        case (int)RoleType.SaleKd:
-                            {
-                                ViewBag.Role = 1;
-                            }
-                            break;
-                    }
-                }
+                ViewBag.Role = 1;
+
             }
-                return View();
+           return View();
         }
 
         public async Task<IActionResult> SearchReportDepartment(ReportDepartmentViewModel searchModel)
@@ -99,157 +95,133 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var data = new List<SearchReportDepartmentViewModel>();
+                    var model = new GenericViewModel<SearchReportDepartmentViewModel>();
+                    model = await _DepartmentRepository.GetReportDepartment(searchModel);
+
+                    if (model.ListData != null)
                     {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
+                        var data_ks = model.ListData.Where(s => s.ParentDepartmentId == (int)DepartmentName.PHONG_KDKS || s.DepartmentId == (int)DepartmentName.PHONG_KDKS).ToList();
+                        if (data_ks != null && data_ks.Count > 0)
                         {
-                            switch (Convert.ToInt32(item))
+                            data.AddRange(data_ks);
+                            foreach (var item in data_ks)
                             {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
+                                model.ListData.Remove(item);
                             }
+
                         }
 
-                        var data = new List<SearchReportDepartmentViewModel>();
-                        var model = new GenericViewModel<SearchReportDepartmentViewModel>();
-                        model = await _DepartmentRepository.GetReportDepartment(searchModel);
-
-                        if (model.ListData != null)
+                        var data_DHLenDon = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.DH_TU_LD).ToList();
+                        if (data_DHLenDon != null && data_ks.Count > 0)
                         {
-                            var data_ks = model.ListData.Where(s => s.ParentDepartmentId == (int)DepartmentName.PHONG_KDKS || s.DepartmentId == (int)DepartmentName.PHONG_KDKS).ToList();
-                            if(data_ks!=null && data_ks.Count > 0) { data.AddRange(data_ks);
-                                foreach(var item in data_ks)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                                
+                            data.AddRange(data_DHLenDon);
+                            foreach (var item in data_DHLenDon)
+                            {
+                                model.ListData.Remove(item);
                             }
-
-                            var data_DHLenDon = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.DH_TU_LD).ToList();
-                            if (data_DHLenDon != null && data_ks.Count > 0) { data.AddRange(data_DHLenDon);
-                                foreach (var item in data_DHLenDon)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            } 
-
-                            var data_LH1 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH1_HN).ToList();
-                            if (data_LH1 != null && data_LH1.Count > 0) { data.AddRange(data_LH1);
-                                foreach (var item in data_LH1)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_LH2 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH2_HN).ToList();
-                            if (data_LH2 != null && data_LH2.Count > 0) { data.AddRange(data_LH2);
-                                foreach (var item in data_LH2)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_LH3 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH3_HN).ToList();
-                            if (data_LH3 != null && data_LH3.Count > 0) { data.AddRange(data_LH3);
-                                foreach (var item in data_LH3)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_Inbound = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_Inbound).ToList();
-                            if (data_Inbound != null && data_Inbound.Count > 0) { data.AddRange(data_Inbound);
-                                foreach (var item in data_Inbound)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_Sk = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_SK).ToList();
-                            if (data_Sk != null && data_Sk.Count > 0) { data.AddRange(data_Sk);
-                                foreach (var item in data_Sk)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_SG_LH1 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH1_HCM).ToList();
-                            if (data_SG_LH1 != null && data_SG_LH1.Count > 0) { data.AddRange(data_SG_LH1);
-                                foreach (var item in data_SG_LH1)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_SG_LH3 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH3_HCM).ToList();
-                            if (data_SG_LH3 != null && data_SG_LH3.Count > 0) { data.AddRange(data_SG_LH3);
-                                foreach (var item in data_SG_LH3)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-                            data.AddRange(model.ListData);
                         }
 
-                        model.ListData = data;
-
-                        var model2 = new GenericViewModel<SearchReportDepartmentViewModel>();
-                      var searchModel2 = searchModel;
-                        searchModel2.PageIndex = -1;
-                        model2 = await _DepartmentRepository.GetReportDepartment(searchModel2);
-                        if(model2!=null && model2.ListData!=null && model2.ListData.Count > 0)
+                        var data_LH1 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH1_HN).ToList();
+                        if (data_LH1 != null && data_LH1.Count > 0)
                         {
-                            ViewBag.TotalOrder = model2.ListData.Sum(s => s.TotalOrder);
-                            ViewBag.Amount = model2.ListData.Sum(s => s.Amount);
-                            ViewBag.Price = model2.ListData.Sum(s => s.Price);
-                            ViewBag.Comission = model2.ListData.Sum(s => s.Comission);
-                            ViewBag.Profit = model2.ListData.Sum(s => s.Profit);
-                            ViewBag.AmountVat = model2.ListData.Sum(s => s.AmountVat);
-                            ViewBag.PriceVat = model2.ListData.Sum(s => s.PriceVat);
-                            ViewBag.ProfitVat = model2.ListData.Sum(s => s.ProfitVat);
+                            data.AddRange(data_LH1);
+                            foreach (var item in data_LH1)
+                            {
+                                model.ListData.Remove(item);
+                            }
                         }
-                      
-                        return PartialView(model);
+
+                        var data_LH2 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH2_HN).ToList();
+                        if (data_LH2 != null && data_LH2.Count > 0)
+                        {
+                            data.AddRange(data_LH2);
+                            foreach (var item in data_LH2)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_LH3 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH3_HN).ToList();
+                        if (data_LH3 != null && data_LH3.Count > 0)
+                        {
+                            data.AddRange(data_LH3);
+                            foreach (var item in data_LH3)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_Inbound = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_Inbound).ToList();
+                        if (data_Inbound != null && data_Inbound.Count > 0)
+                        {
+                            data.AddRange(data_Inbound);
+                            foreach (var item in data_Inbound)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_Sk = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_SK).ToList();
+                        if (data_Sk != null && data_Sk.Count > 0)
+                        {
+                            data.AddRange(data_Sk);
+                            foreach (var item in data_Sk)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_SG_LH1 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH1_HCM).ToList();
+                        if (data_SG_LH1 != null && data_SG_LH1.Count > 0)
+                        {
+                            data.AddRange(data_SG_LH1);
+                            foreach (var item in data_SG_LH1)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_SG_LH3 = model.ListData.Where(s => s.DepartmentId == (int)DepartmentName.PHONG_LH3_HCM).ToList();
+                        if (data_SG_LH3 != null && data_SG_LH3.Count > 0)
+                        {
+                            data.AddRange(data_SG_LH3);
+                            foreach (var item in data_SG_LH3)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+                        data.AddRange(model.ListData);
                     }
 
+                    model.ListData = data;
+
+                    var model2 = new GenericViewModel<SearchReportDepartmentViewModel>();
+                    var searchModel2 = searchModel;
+                    searchModel2.PageIndex = -1;
+                    model2 = await _DepartmentRepository.GetReportDepartment(searchModel2);
+                    if (model2 != null && model2.ListData != null && model2.ListData.Count > 0)
+                    {
+                        ViewBag.TotalOrder = model2.ListData.Sum(s => s.TotalOrder);
+                        ViewBag.Amount = model2.ListData.Sum(s => s.Amount);
+                        ViewBag.Price = model2.ListData.Sum(s => s.Price);
+                        ViewBag.Comission = model2.ListData.Sum(s => s.Comission);
+                        ViewBag.Profit = model2.ListData.Sum(s => s.Profit);
+                        ViewBag.AmountVat = model2.ListData.Sum(s => s.AmountVat);
+                        ViewBag.PriceVat = model2.ListData.Sum(s => s.PriceVat);
+                        ViewBag.ProfitVat = model2.ListData.Sum(s => s.ProfitVat);
+                    }
+                    return PartialView(model);
+
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("SearchReportDepartment - ReportDepartmentController: " + ex);
-                return PartialView();
             }
+            return PartialView();
+
         }
         public async Task<IActionResult> SearchReportDepartmentsaler(ReportDepartmentViewModel searchModel)
         {
@@ -264,77 +236,36 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+
+                    var model = new GenericViewModel<ListReportDepartmentViewModel>();
+                    model = await _DepartmentRepository.GetReportDepartmentsaler(searchModel);
+                    var model2 = new GenericViewModel<ListReportDepartmentViewModel>();
+                    var searchModel2 = searchModel;
+                    searchModel2.PageIndex = -1;
+                    model2 = await _DepartmentRepository.GetReportDepartmentsaler(searchModel2);
+                    if (model2 != null && model2.ListData != null && model2.ListData.Count > 0)
                     {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                     
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<ListReportDepartmentViewModel>();
-                        model = await _DepartmentRepository.GetReportDepartmentsaler(searchModel);
-                        var model2 = new GenericViewModel<ListReportDepartmentViewModel>();
-                        var searchModel2 = searchModel;
-                        searchModel2.PageIndex = -1;
-                        model2 = await _DepartmentRepository.GetReportDepartmentsaler(searchModel2);
-                        if (model2 != null && model2.ListData != null && model2.ListData.Count > 0)
-                        {
-                            ViewBag.TotalOrder = model2.ListData.Sum(s => s.ParentDepartmentTotalOrder);
-                            ViewBag.Amount = model2.ListData.Sum(s => s.ParentDepartmentAmount);
-                            ViewBag.Price = model2.ListData.Sum(s => s.ParentDepartmentPrice);
-                            ViewBag.Comission = model2.ListData.Sum(s => s.ParentDepartmentComission);
-                            ViewBag.Profit = model2.ListData.Sum(s => s.ParentDepartmentProfit);
-                            ViewBag.AmountVat = model2.ListData.Sum(s => s.ParentDepartmentAmountVat);
-                            ViewBag.PriceVat = model2.ListData.Sum(s => s.ParentDepartmentPriceVat);
-                            ViewBag.ProfitVat = model2.ListData.Sum(s => s.ParentDepartmentProfitVat);
-                        }
-                        
-                        return PartialView(model);
+                        ViewBag.TotalOrder = model2.ListData.Sum(s => s.ParentDepartmentTotalOrder);
+                        ViewBag.Amount = model2.ListData.Sum(s => s.ParentDepartmentAmount);
+                        ViewBag.Price = model2.ListData.Sum(s => s.ParentDepartmentPrice);
+                        ViewBag.Comission = model2.ListData.Sum(s => s.ParentDepartmentComission);
+                        ViewBag.Profit = model2.ListData.Sum(s => s.ParentDepartmentProfit);
+                        ViewBag.AmountVat = model2.ListData.Sum(s => s.ParentDepartmentAmountVat);
+                        ViewBag.PriceVat = model2.ListData.Sum(s => s.ParentDepartmentPriceVat);
+                        ViewBag.ProfitVat = model2.ListData.Sum(s => s.ParentDepartmentProfitVat);
                     }
 
+                    return PartialView(model);
+
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("SearchReportDepartmentsaler - ReportDepartmentController: " + ex);
-                return PartialView();
             }
-           
+            return PartialView();
+
 
         }
         public async Task<IActionResult> SearchReportDepartmentBySupplier(ReportDepartmentViewModel searchModel)
@@ -350,62 +281,16 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<SearchReportDepartmentSupplier>();
-                        model = await _DepartmentRepository.GetRevenueBySupplier(searchModel);
-
-                        return PartialView(model);
-                    }
-
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var model = await _DepartmentRepository.GetRevenueBySupplier(searchModel);
+                    return PartialView(model);
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("SearchReportDepartmentBySupplier - ReportDepartmentController: " + ex);
-                return PartialView();
             }
-
-
+            return PartialView();
         }
         public async Task<IActionResult> SearchReportDepartmentClient(ReportDepartmentViewModel searchModel)
         {
@@ -420,61 +305,16 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<SearchReportDepartmentClient>();
-                        model = await _DepartmentRepository.GetRevenueByClient(searchModel);
-
-                        return PartialView(model);
-                    }
-
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var model = await _DepartmentRepository.GetRevenueByClient(searchModel);
+                    return PartialView(model);
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("SearchReportDepartmentClient - ReportDepartmentController: " + ex);
-                return PartialView();
             }
-          
+            return PartialView();
 
         }
         public async Task<IActionResult> GetListDetailRevenueByDepartment(ReportDepartmentViewModel searchModel)
@@ -485,157 +325,116 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+
+                    var data = new List<DetailRevenueByDepartmentViewModel>();
+                    var model = new GenericViewModel<DetailRevenueByDepartmentViewModel>();
+                    model = await _DepartmentRepository.GetListDetailRevenueByDepartment(searchModel);
+                    if (model.ListData != null)
                     {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
+                        var data_ks = model.ListData.Where(s => s.ParentDepartmentId == 16).ToList();
+                        if (data_ks != null && data_ks.Count > 0)
                         {
-                            switch (Convert.ToInt32(item))
+                            data.AddRange(data_ks);
+                            foreach (var item in data_ks)
                             {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var data = new List<DetailRevenueByDepartmentViewModel>();
-                        var model = new GenericViewModel<DetailRevenueByDepartmentViewModel>();
-                        model = await _DepartmentRepository.GetListDetailRevenueByDepartment(searchModel);
-                        if (model.ListData != null)
-                        {
-                            var data_ks = model.ListData.Where(s => s.ParentDepartmentId == 16).ToList();
-                            if (data_ks != null && data_ks.Count > 0)
-                            {
-                                data.AddRange(data_ks);
-                                foreach (var item in data_ks)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-
+                                model.ListData.Remove(item);
                             }
 
-                            var data_DHLenDon = model.ListData.Where(s => s.DepartmentId == 36).ToList();
-                            if (data_DHLenDon != null && data_ks.Count > 0)
-                            {
-                                data.AddRange(data_DHLenDon);
-                                foreach (var item in data_DHLenDon)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_LH1 = model.ListData.Where(s => s.DepartmentId == 14).ToList();
-                            if (data_LH1 != null && data_LH1.Count > 0)
-                            {
-                                data.AddRange(data_LH1);
-                                foreach (var item in data_LH1)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_LH2 = model.ListData.Where(s => s.DepartmentId == 47).ToList();
-                            if (data_LH2 != null && data_LH2.Count > 0)
-                            {
-                                data.AddRange(data_LH2);
-                                foreach (var item in data_LH2)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_LH3 = model.ListData.Where(s => s.DepartmentId == 48).ToList();
-                            if (data_LH3 != null && data_LH3.Count > 0)
-                            {
-                                data.AddRange(data_LH3);
-                                foreach (var item in data_LH3)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_Inbound = model.ListData.Where(s => s.DepartmentId == 38).ToList();
-                            if (data_Inbound != null && data_Inbound.Count > 0)
-                            {
-                                data.AddRange(data_Inbound);
-                                foreach (var item in data_Inbound)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_Sk = model.ListData.Where(s => s.DepartmentId == 50).ToList();
-                            if (data_Sk != null && data_Sk.Count > 0)
-                            {
-                                data.AddRange(data_Sk);
-                                foreach (var item in data_Sk)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_SG_LH1 = model.ListData.Where(s => s.DepartmentId == 20).ToList();
-                            if (data_SG_LH1 != null && data_SG_LH1.Count > 0)
-                            {
-                                data.AddRange(data_SG_LH1);
-                                foreach (var item in data_SG_LH1)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-
-                            var data_SG_LH3 = model.ListData.Where(s => s.DepartmentId == 51).ToList();
-                            if (data_SG_LH3 != null && data_SG_LH3.Count > 0)
-                            {
-                                data.AddRange(data_SG_LH3);
-                                foreach (var item in data_SG_LH3)
-                                {
-                                    model.ListData.Remove(item);
-                                }
-                            }
-                            data.AddRange(model.ListData);
                         }
 
-                        model.ListData = data;
-                        return PartialView(model);
+                        var data_DHLenDon = model.ListData.Where(s => s.DepartmentId == 36).ToList();
+                        if (data_DHLenDon != null && data_ks.Count > 0)
+                        {
+                            data.AddRange(data_DHLenDon);
+                            foreach (var item in data_DHLenDon)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_LH1 = model.ListData.Where(s => s.DepartmentId == 14).ToList();
+                        if (data_LH1 != null && data_LH1.Count > 0)
+                        {
+                            data.AddRange(data_LH1);
+                            foreach (var item in data_LH1)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_LH2 = model.ListData.Where(s => s.DepartmentId == 47).ToList();
+                        if (data_LH2 != null && data_LH2.Count > 0)
+                        {
+                            data.AddRange(data_LH2);
+                            foreach (var item in data_LH2)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_LH3 = model.ListData.Where(s => s.DepartmentId == 48).ToList();
+                        if (data_LH3 != null && data_LH3.Count > 0)
+                        {
+                            data.AddRange(data_LH3);
+                            foreach (var item in data_LH3)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_Inbound = model.ListData.Where(s => s.DepartmentId == 38).ToList();
+                        if (data_Inbound != null && data_Inbound.Count > 0)
+                        {
+                            data.AddRange(data_Inbound);
+                            foreach (var item in data_Inbound)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_Sk = model.ListData.Where(s => s.DepartmentId == 50).ToList();
+                        if (data_Sk != null && data_Sk.Count > 0)
+                        {
+                            data.AddRange(data_Sk);
+                            foreach (var item in data_Sk)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_SG_LH1 = model.ListData.Where(s => s.DepartmentId == 20).ToList();
+                        if (data_SG_LH1 != null && data_SG_LH1.Count > 0)
+                        {
+                            data.AddRange(data_SG_LH1);
+                            foreach (var item in data_SG_LH1)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+
+                        var data_SG_LH3 = model.ListData.Where(s => s.DepartmentId == 51).ToList();
+                        if (data_SG_LH3 != null && data_SG_LH3.Count > 0)
+                        {
+                            data.AddRange(data_SG_LH3);
+                            foreach (var item in data_SG_LH3)
+                            {
+                                model.ListData.Remove(item);
+                            }
+                        }
+                        data.AddRange(model.ListData);
                     }
 
+                    model.ListData = data;
+                    return PartialView(model);
+
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetListDetailRevenueByDepartment - ReportDepartmentController: " + ex);
-                return PartialView();
             }
-       
+            return PartialView();
 
         }
         public async Task<IActionResult> GetListDetailRevenueByDepartmentsaler(ReportDepartmentViewModel searchModel)
@@ -646,62 +445,18 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                       
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<ListDetailRevenueByDepartmentViewModel>();
-                        model = await _DepartmentRepository.GetListDetailRevenueBySaler(searchModel);
-
-                        return PartialView(model);
-                    }
-
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var model = new GenericViewModel<ListDetailRevenueByDepartmentViewModel>();
+                    model = await _DepartmentRepository.GetListDetailRevenueBySaler(searchModel);
+                    return PartialView(model);
+                   
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetListDetailRevenueByDepartmentsaler - ReportDepartmentController: " + ex);
-                return PartialView();
             }
-
+            return PartialView();
 
         }
         public async Task<IActionResult> GetListDetailRevenueByDepartmentSupplier(ReportDepartmentViewModel searchModel)
@@ -712,61 +467,18 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<DetailRevenueByDepartmentViewModel>();
-                        model = await _DepartmentRepository.GetListDetailRevenueBySupplier(searchModel);
-
-                        return PartialView(model);
-                    }
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var model = await _DepartmentRepository.GetListDetailRevenueBySupplier(searchModel);
+                    return PartialView(model);
 
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetListDetailRevenueByDepartmentSupplier - ReportDepartmentController: " + ex);
-                return PartialView();
             }
 
+            return PartialView();
 
         }
         public async Task<IActionResult> GetListDetailRevenueByDepartmentClient(ReportDepartmentViewModel searchModel)
@@ -777,61 +489,18 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<DetailRevenueByDepartmentViewModel>();
-                        model = await _DepartmentRepository.GetListDetailRevenueByClient(searchModel);
-
-                        return PartialView(model);
-                    }
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var model = await _DepartmentRepository.GetListDetailRevenueByClient(searchModel);
+                    return PartialView(model);
 
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetListDetailRevenueByDepartmentClient - ReportDepartmentController: " + ex);
-                return PartialView();
             }
-        
+            return PartialView();
+
 
         }
 
@@ -850,61 +519,16 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                       
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<OrderViewModel>();
-                        model = await _DepartmentRepository.GetListOrder(searchModel);
-
-                        return PartialView(model);
-                    }
-
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var model = await _DepartmentRepository.GetListOrder(searchModel);
+                    return PartialView(model);
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("SearchReportDepartmentListOrrder - ReportDepartmentController: " + ex);
-                return PartialView();
             }
+            return PartialView();
 
 
         }
@@ -916,149 +540,96 @@ namespace WEB.Adavigo.CMS.Controllers.Report
             {
                 string _UploadFolder = @"Template\Export";
                 string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, _UploadFolder);
-
                 var current_user = _ManagementUser.GetCurrentUser();
-
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+
+                    string _FileName_Base = "Doanh thu tổng theo phòng ban bán hàng";
+                    if (searchModel.Type == 1)
                     {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
+                        switch (searchModel.DepartmentType)
                         {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                case (int)RoleType.GD:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
+                            case (int)DepartmentType.RevenueByDepartment:
+                                {
+                                    _FileName_Base = "Doanh thu tổng theo phòng ban bán hàng";
+                                }
+                                break;
+                            case (int)DepartmentType.RevenueByDepartmentsaler:
+                                {
+                                    _FileName_Base = "Doanh thu tổng theo nhân viên bán hàng";
+                                }
+                                break;
+                            case (int)DepartmentType.RevenueByDepartmentSupplier:
+                                {
+                                    _FileName_Base = "Doanh thu tổng theo nhà cung cấp";
+                                }
+                                break;
+                            case (int)DepartmentType.RevenueByDepartmentClient:
+                                {
+                                    _FileName_Base = "Doanh thu tổng theo khách hàng";
+                                }
+                                break;
                         }
+                    }
+                    else
+                    {
+                        switch (searchModel.DepartmentType)
+                        {
+                            case (int)DepartmentType.RevenueByDepartment:
+                                {
+                                    _FileName_Base = "Doanh thu chi tiết dịch vụ theo phòng ban bán hàng";
+                                }
+                                break;
+                            case (int)DepartmentType.RevenueByDepartmentsaler:
+                                {
+                                    _FileName_Base = "Doanh thu chi tiết dịch vụ theo nhân viên bán hàng";
+                                }
+                                break;
+                            case (int)DepartmentType.RevenueByDepartmentSupplier:
+                                {
+                                    _FileName_Base = "Doanh thu chi tiết dịch vụ theo nhà cung cấp";
+                                }
+                                break;
+                            case (int)DepartmentType.RevenueByDepartmentClient:
+                                {
+                                    _FileName_Base = "Doanh thu chi tiết dịch vụ theo khách hàng";
+                                }
+                                break;
+                        }
+                    }
+                    string _FileName = StringHelpers.GenFileName(_FileName_Base, current_user.Id, "xlsx");
 
+                    if (!Directory.Exists(_UploadDirectory))
+                    {
+                        Directory.CreateDirectory(_UploadDirectory);
+                    }
+                    //delete all file in folder before export
+                    try
+                    {
+                        System.IO.DirectoryInfo di = new DirectoryInfo(_UploadDirectory);
+                        foreach (FileInfo file in di.GetFiles())
+                        {
+                            file.Delete();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    string FilePath = Path.Combine(_UploadDirectory, _FileName);
+                    var rsPath = await _DepartmentRepository.ExportDeposit(searchModel, FilePath);
+                    if (!string.IsNullOrEmpty(rsPath))
+                    {
+                        return new JsonResult(new
+                        {
+                            isSuccess = true,
+                            message = "Xuất dữ liệu thành công",
+                            path = "/" + _UploadFolder + "/" + _FileName
+                        });
                     }
 
                 }
-                string _FileName_Base = "Doanh thu tổng theo phòng ban bán hàng";
-                if (searchModel.Type == 1)
-                {
-                    switch (searchModel.DepartmentType)
-                    {
-                        case (int)DepartmentType.RevenueByDepartment:
-                            {
-                                _FileName_Base = "Doanh thu tổng theo phòng ban bán hàng";
-                            }
-                            break;
-                        case (int)DepartmentType.RevenueByDepartmentsaler:
-                            {
-                                _FileName_Base = "Doanh thu tổng theo nhân viên bán hàng";
-                            }
-                            break;
-                        case (int)DepartmentType.RevenueByDepartmentSupplier:
-                            {
-                                _FileName_Base = "Doanh thu tổng theo nhà cung cấp";
-                            }
-                            break;
-                        case (int)DepartmentType.RevenueByDepartmentClient:
-                            {
-                                _FileName_Base = "Doanh thu tổng theo khách hàng";
-                            }
-                            break;
-                    }
-                }
-                else
-                {
-                    switch (searchModel.DepartmentType)
-                    {
-                        case (int)DepartmentType.RevenueByDepartment:
-                            {
-                                _FileName_Base = "Doanh thu chi tiết dịch vụ theo phòng ban bán hàng";
-                            }
-                            break;
-                        case (int)DepartmentType.RevenueByDepartmentsaler:
-                            {
-                                _FileName_Base = "Doanh thu chi tiết dịch vụ theo nhân viên bán hàng";
-                            }
-                            break;
-                        case (int)DepartmentType.RevenueByDepartmentSupplier:
-                            {
-                                _FileName_Base = "Doanh thu chi tiết dịch vụ theo nhà cung cấp";
-                            }
-                            break;
-                        case (int)DepartmentType.RevenueByDepartmentClient:
-                            {
-                                _FileName_Base = "Doanh thu chi tiết dịch vụ theo khách hàng";
-                            }
-                            break;
-                    }
-                }
-                string _FileName = StringHelpers.GenFileName(_FileName_Base, current_user.Id, "xlsx");
-
-                if (!Directory.Exists(_UploadDirectory))
-                {
-                    Directory.CreateDirectory(_UploadDirectory);
-                }
-                //delete all file in folder before export
-                try
-                {
-                    System.IO.DirectoryInfo di = new DirectoryInfo(_UploadDirectory);
-                    foreach (FileInfo file in di.GetFiles())
-                    {
-                        file.Delete();
-                    }
-                }
-                catch
-                {
-                }
-
-
-                string FilePath = Path.Combine(_UploadDirectory, _FileName);
-
-                var rsPath = await _DepartmentRepository.ExportDeposit(searchModel, FilePath);
-
-                if (!string.IsNullOrEmpty(rsPath))
-                {
-                    return new JsonResult(new
-                    {
-                        isSuccess = true,
-                        message = "Xuất dữ liệu thành công",
-                        path = "/" + _UploadFolder + "/" + _FileName
-                    });
-                }
-                else
-                {
-                    return new JsonResult(new
-                    {
-                        isSuccess = false,
-                        message = "Xuất dữ liệu thất bại"
-                    });
-                }
+                
             }
             catch (Exception ex)
             {
@@ -1069,6 +640,11 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                     message = ex.Message.ToString()
                 });
             }
+            return new JsonResult(new
+            {
+                isSuccess = false,
+                message = "Xuất dữ liệu thất bại,vui lòng liên hệ bộ phận IT"
+            });
         }
         public async Task<IActionResult> ExportExcelListOrrder(ReportDepartmentViewModel searchModel)
         {
@@ -1087,49 +663,7 @@ namespace WEB.Adavigo.CMS.Controllers.Report
 
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.KeToanTruong:
-                                case (int)RoleType.GD:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-
-                    }
-
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                 }
                 if (!Directory.Exists(_UploadDirectory))
                 {
@@ -1249,72 +783,49 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
                 searchModel.SalerPermission = "" + _UserId;
-
                 var current_user = _ManagementUser.GetCurrentUser();
-                if (current_user != null)
+                if (current_user != null
+                && current_user.Role != null && current_user.Role != ""
+                && (current_user.Role.Contains(((int)RoleType.Admin).ToString())
+                   || current_user.Role.Contains(((int)RoleType.KT).ToString())
+                   || current_user.Role.Contains(((int)RoleType.KeToanTruong).ToString())
+                   || current_user.Role.Contains(((int)RoleType.PhoTPKeToan).ToString())
+                   || current_user.Role.Contains(((int)RoleType.GDHN).ToString())
+                   || current_user.Role.Contains(((int)RoleType.GDHPQ).ToString())
+                   || current_user.Role.Contains(((int)RoleType.GD).ToString())
+
+                   ))
                 {
-                    if (current_user.Role != "")
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var model = await _reportRepository.GetOperatorReport(searchModel, 1, 20000);
+                    ViewBag.Model = model;
+                    SumOperatorReportViewModel sum = new SumOperatorReportViewModel();
+                    if (model != null && model.ListData != null && model.ListData.Count > 0)
                     {
-                        var list = current_user.Role.Split(',');
-                        bool is_exceed_permission = false;
-                        foreach (var item in list)
+                        sum = new SumOperatorReportViewModel()
                         {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.KeToanTruong:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                    {
-                                        searchModel.SalerPermission = null;
-
-                                        is_exceed_permission = true;
-                                    }
-                                    break;
-                                default:
-                                    {
-                                        ViewBag.Model = new GenericViewModel<OperatorReportViewModel>();
-                                        ViewBag.Sum = new SumOperatorReportViewModel();
-                                        ViewBag.Department = new List<Department>();
-                                        return View();
-                                    }
-                            }
-                            if (is_exceed_permission) break;
-                        }
-
+                            AMOUNT = model.ListData.Sum(x => x.Amount),
+                            AmountPay = model.ListData.Sum(x => x.AmountPay != null ? (double)x.AmountPay : 0),
+                            AmountRemain = model.ListData.Sum(x => x.AmountRemain != null ? (double)x.AmountRemain : x.Amount),
+                            Comission = model.ListData.Sum(x => x.Comission != null ? (double)x.Comission : 0),
+                            Price = model.ListData.Sum(x => x.Price != null ? (double)x.Price : 0),
+                            PricePay = model.ListData.Sum(x => x.PricePay != null ? (double)x.PricePay : 0),
+                            PriceRemain = model.ListData.Sum(x => x.PriceRemain != null ? (double)x.PriceRemain : (x.Price != null ? (double)x.Price : 0)),
+                            Profit = model.ListData.Sum(x => x.Profit != null ? (double)x.Profit : 0),
+                            Refund = model.ListData.Sum(x => x.Refund != null ? (double)x.Refund : 0),
+                        };
                     }
-
-                }
-
-
-                var model = await _reportRepository.GetOperatorReport(searchModel, 1, 20000);
-                ViewBag.Model = model;
-                SumOperatorReportViewModel sum = new SumOperatorReportViewModel();
-                if (model!=null &&model.ListData!=null && model.ListData.Count > 0)
-                {
-                    sum = new SumOperatorReportViewModel()
+                    else
                     {
-                        AMOUNT = model.ListData.Sum(x => x.Amount),
-                        AmountPay = model.ListData.Sum(x => x.AmountPay != null ? (double)x.AmountPay : 0),
-                        AmountRemain = model.ListData.Sum(x => x.AmountRemain != null ? (double)x.AmountRemain : x.Amount),
-                        Comission = model.ListData.Sum(x => x.Comission != null ? (double)x.Comission : 0),
-                        Price = model.ListData.Sum(x => x.Price != null ? (double)x.Price : 0),
-                        PricePay = model.ListData.Sum(x => x.PricePay != null ? (double)x.PricePay : 0),
-                        PriceRemain = model.ListData.Sum(x => x.PriceRemain != null ? (double)x.PriceRemain : (x.Price != null ? (double)x.Price : 0)),
-                        Profit = model.ListData.Sum(x => x.Profit != null ? (double)x.Profit : 0),
-                        Refund = model.ListData.Sum(x => x.Refund != null ? (double)x.Refund : 0),
-                    };
+                        sum = await _reportRepository.GetSumOperatorReport(searchModel);
+                    }
+                    ViewBag.Sum = sum;
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                    var departments = await _DepartmentRepository.Listing(null, tenant_id);
+                    ViewBag.Department = departments.ToList();
                 }
-                else
-                {
-                    sum = await _reportRepository.GetSumOperatorReport(searchModel);
-                }
-                ViewBag.Sum = sum;
-                var departments = await _DepartmentRepository.GetAll("");
-                ViewBag.Department = departments.ToList();
+
             }
             catch (Exception ex)
             {
@@ -1335,80 +846,55 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 searchModel.SalerPermission = "" + _UserId;
 
                 var current_user = _ManagementUser.GetCurrentUser();
-                if (current_user != null)
+                if (current_user != null
+               && current_user.Role != null && current_user.Role != ""
+               && (current_user.Role.Contains(((int)RoleType.Admin).ToString())
+                  || current_user.Role.Contains(((int)RoleType.KT).ToString())
+                  || current_user.Role.Contains(((int)RoleType.KeToanTruong).ToString())
+                  || current_user.Role.Contains(((int)RoleType.PhoTPKeToan).ToString())
+                  || current_user.Role.Contains(((int)RoleType.GDHN).ToString())
+                  || current_user.Role.Contains(((int)RoleType.GDHPQ).ToString())
+                  || current_user.Role.Contains(((int)RoleType.GD).ToString())
+
+                  ))
                 {
-                    if (current_user.Role != "")
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    string folder = @"\wwwroot\Template\Export\" + _UserId;
+                    string full_path = Directory.GetCurrentDirectory() + folder;
+                    string file_name = StringHelpers.GenFileName("Doanh thu theo Phát sinh chi tiết đơn hàng", current_user.Id, "xlsx");
+
+                    string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, folder);
+                    string file_path_combine = Path.Combine(_UploadDirectory, file_name);
+                    try
                     {
-                        var list = current_user.Role.Split(',');
-                        bool is_exceed_permission = false;
-                        foreach (var item in list)
+                        System.IO.DirectoryInfo di = new DirectoryInfo(full_path);
+                        if (!di.Exists)
                         {
-                            switch (Convert.ToInt32(item))
+                            Directory.CreateDirectory(full_path);
+                        }
+                        else
+                        {
+                            foreach (FileInfo file in di.GetFiles())
                             {
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.KeToanTruong:
-                                case (int)RoleType.PhoTPKeToan:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                    {
-                                        searchModel.SalerPermission = null;
-
-                                        is_exceed_permission = true;
-                                    }
-                                    break;
-                                default:
-                                    {
-                                        return Ok(new
-                                        {
-                                            status = (int)ResponseType.FAILED,
-                                            msg = "Xuất dữ liệu thất bại, bạn không có quyền để xuất báo cáo này",
-                                            path = ""
-                                        });
-                                    }
+                                file.Delete();
                             }
-                            if (is_exceed_permission) break;
-                        }
-
-                    }
-
-                }
-                string folder = @"\wwwroot\Template\Export\" + _UserId;
-                string full_path = Directory.GetCurrentDirectory() + folder;
-                string file_name = StringHelpers.GenFileName("Doanh thu theo Phát sinh chi tiết đơn hàng", current_user.Id, "xlsx");
-
-                string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, folder);
-                string file_path_combine = Path.Combine(_UploadDirectory, file_name);
-                try
-                {
-                    System.IO.DirectoryInfo di = new DirectoryInfo(full_path);
-                    if (!di.Exists)
-                    {
-                        Directory.CreateDirectory(full_path);
-                    }
-                    else
-                    {
-                        foreach (FileInfo file in di.GetFiles())
-                        {
-                            file.Delete();
                         }
                     }
+                    catch
+                    {
+
+                    }
+
+
+                    var file_path = await _reportRepository.ExportOperatorExcel(await _reportRepository.GetOperatorReport(searchModel, 1, 20000), file_path_combine);
+
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        msg = "Xuất dữ liệu thành công",
+                        path = file_path.Replace(@"\wwwroot", "")
+                    });
                 }
-                catch
-                {
-
-                }
-
-
-                var file_path = await _reportRepository.ExportOperatorExcel( await _reportRepository.GetOperatorReport(searchModel, 1, 20000), file_path_combine);
-
-                return Ok(new
-                {
-                    status = (int)ResponseType.SUCCESS,
-                    msg = "Xuất dữ liệu thành công",
-                    path = file_path.Replace(@"\wwwroot", "")
-                });
             }
             catch (Exception ex)
             {
@@ -1425,64 +911,20 @@ namespace WEB.Adavigo.CMS.Controllers.Report
         {
             try
             {
-
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                case (int)RoleType.KeToanTruong:
-                                case (int)RoleType.PhoTPKeToan:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<ReportDepartmentBysaleViewModel>();
-                        model = await _DepartmentRepository.GetDepartmentBysaler(searchModel);
-                        return PartialView(model);
-                    }
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
+                    var model = await _DepartmentRepository.GetDepartmentBysaler(searchModel);
+                    return PartialView(model);
 
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("SearchReportDepartmentBysaler - ReportDepartmentController: " + ex);
-                return PartialView();
             }
+            return PartialView();
 
 
         }
@@ -1494,59 +936,19 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
 
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                case (int)RoleType.GD:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-                        var model = new GenericViewModel<DetailDepartmentBysaleViewModel>();
-                        model = await _DepartmentRepository.DetailDepartmentBysale(searchModel);
-                        ViewBag.saleid = searchModel.SalerId;
-                        return PartialView(model);
-                    }
+                    var model = await _DepartmentRepository.DetailDepartmentBysale(searchModel);
+                    ViewBag.saleid = searchModel.SalerId;
+                    return PartialView(model);
 
                 }
-                return PartialView();
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("SearchReportDepartmentBysaler - ReportDepartmentController: " + ex);
-                return PartialView();
             }
+            return PartialView();
 
 
         }
@@ -1560,50 +962,10 @@ namespace WEB.Adavigo.CMS.Controllers.Report
 
                 var current_user = _ManagementUser.GetCurrentUser();
                 string _FileName = StringHelpers.GenFileName("Danh sách báo cáo phòng ban sale", current_user.Id, "xlsx");
-
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
 
-                                case (int)RoleType.GD:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-
-                    }
 
                 }
                 if (!Directory.Exists(_UploadDirectory))
@@ -1668,49 +1030,9 @@ namespace WEB.Adavigo.CMS.Controllers.Report
 
                 if (current_user != null)
                 {
-                    if (current_user.Role != "")
-                    {
-                        var list = current_user.Role.Split(',');
-                        foreach (var item in list)
-                        {
-                            switch (Convert.ToInt32(item))
-                            {
-                                case (int)RoleType.SaleOnl:
-                                case (int)RoleType.SaleTour:
-                                case (int)RoleType.SaleKd:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.TPDHKS:
-                                case (int)RoleType.TPDHVe:
-                                case (int)RoleType.TPDHTour:
-                                case (int)RoleType.TPKS:
-                                case (int)RoleType.TPTour:
-                                case (int)RoleType.TPVe:
-                                case (int)RoleType.DHPQ:
-                                case (int)RoleType.DHTour:
-                                case (int)RoleType.DHVe:
-                                case (int)RoleType.GDHN:
-                                case (int)RoleType.GDHPQ:
-                                    {
-                                        searchModel.SalerPermission += current_user.UserUnderList;
-                                    }
-                                    break;
-                                case (int)RoleType.Admin:
-                                case (int)RoleType.KT:
-
-                                case (int)RoleType.GD:
-                                    {
-                                        searchModel.SalerPermission = null;
-                                    }
-                                    break;
-                            }
-                        }
-
-                    }
-
+                    searchModel.SalerPermission += ","+ current_user.UserUnderList;
                 }
+
                 if (!Directory.Exists(_UploadDirectory))
                 {
                     Directory.CreateDirectory(_UploadDirectory);

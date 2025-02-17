@@ -15,12 +15,12 @@ using System.Collections.Concurrent;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Service;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
-namespace WEB.Adavigo.CMS.Controllers.Order
+namespace WEB.DeepSeekTravel.CMS.Controllers.Order
 {
     [CustomAuthorize]
     public class RequestHotelBookingController : Controller
@@ -37,15 +37,16 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private readonly CommentService _commentService;
         private readonly ISubscriber _subscriber;
         private readonly IVoucherRepository _voucherRepository;
-        private readonly IndentiferService _indentiferService;
+        private readonly ManagementUser _ManagementUser;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         public RequestHotelBookingController(IConfiguration configuration, IUserRepository userRepository, IHotelBookingRepositories hotelBookingRepository,
             IRequestRepository requestRepository,IIdentifierServiceRepository identifierServiceRepository, IClientRepository clientRepository, IOrderRepository orderRepository, IHotelRepository hotelRepository,
-            IHttpContextAccessor httpContextAccessor, IVoucherRepository voucherRepository, IContractPayRepository contractPayRepository)
+            IHttpContextAccessor httpContextAccessor, IVoucherRepository voucherRepository, IContractPayRepository contractPayRepository, ManagementUser managementUser)
         {
             _configuration = configuration;
             _userRepository = userRepository;
             _hotelBookingRepository = hotelBookingRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _requestRepository = requestRepository;
             _clientRepository = clientRepository;
@@ -55,7 +56,8 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             var connection = ConnectionMultiplexer.Connect(_configuration["Redis:Host"] + ":" + _configuration["Redis:Port"]);
             _subscriber = connection.GetSubscriber();
             _voucherRepository = voucherRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
+            _identifierServiceRepository = identifierServiceRepository;
+            _ManagementUser = managementUser;
         }
         public IActionResult Index()
         {
@@ -207,6 +209,8 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                         msg = "You do not have permission to do this."
                     });
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 //-- Check if order is manual Order:
                 var exists_order = await _orderRepository.GetOrderByID(data.order_id);
 
@@ -230,7 +234,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
 
                 if (data.hotel.id <= 0 || data.hotel.service_code == null || data.hotel.service_code.Trim() == "")
                 {
-                    data.hotel.service_code = await _indentiferService.buildServiceNo((int)ServicesType.VINHotelRent);
+                    data.hotel.service_code = await _identifierServiceRepository.buildServiceNo((int)ServicesType.VINHotelRent, tenant_id);
                 }
 
                 #region Check Client Debt:

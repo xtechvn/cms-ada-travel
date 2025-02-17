@@ -148,7 +148,8 @@ namespace DAL
                     new SqlParameter("@CreatedBy", model.CreatedBy?? (object)DBNull.Value),
                     new SqlParameter("@CreatedDate", DateTime.Now),
                     new SqlParameter("@IsCommitFund",model.IsCommitFund?? (object)DBNull.Value),
-                    new SqlParameter("@Position",model.Position?? (object)DBNull.Value)
+                    new SqlParameter("@Position",model.Position?? (object)DBNull.Value),
+                    new SqlParameter("@TenantId",DBNull.Value)
 
                 };
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_InsertHotel, objParam);
@@ -200,7 +201,9 @@ namespace DAL
                     new SqlParameter("@Description", model.Description ?? (object)DBNull.Value),
                     new SqlParameter("@UpdatedBy",model.UpdatedBy?? (object)DBNull.Value),
                     new SqlParameter("@IsCommitFund",model.IsCommitFund?? (object)DBNull.Value),
-                    new SqlParameter("@Position",model.Position?? (object)DBNull.Value)
+                    new SqlParameter("@Position",model.Position?? (object)DBNull.Value),
+                    new SqlParameter("@TenantId",DBNull.Value)
+
                 };
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdateHotel, objParam);

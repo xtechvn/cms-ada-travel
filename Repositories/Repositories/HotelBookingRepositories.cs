@@ -348,7 +348,7 @@ namespace Repositories.Repositories
             try
             {
 
-                DataTable dt = await _hotelBookingDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.SP_GetListHotelBooking);
+                DataTable dt = await _hotelBookingDAL.GetPagingList(searchModel, currentPage, pageSize);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = dt.ToList<SearchHotelBookingModel>();
@@ -591,7 +591,7 @@ namespace Repositories.Repositories
             try
             {
                 var data = new List<SearchHotelBookingModel>();
-                DataTable dt = await _hotelBookingDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize, StoreProcedureConstant.SP_GetListHotelBooking);
+                DataTable dt = await _hotelBookingDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     data = dt.ToList<SearchHotelBookingModel>();

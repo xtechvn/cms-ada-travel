@@ -30,13 +30,13 @@ namespace WEB.CMS.Customize
                     {
                         if (IsAjaxRequest(context.HttpContext.Request))
                         {
-                            context.Result = new RedirectResult("/Account/RedirectLogin");
+                            context.Result = new RedirectResult("/Account/login");
                         }
                         else
                         {
                             //context.Result = new RedirectToRouteResult("/account/login?requestPath=" + Uri.EscapeDataString(context.HttpContext.Request.Path));
                             //context.Result = new RedirectResult("/error/index" + Uri.EscapeDataString(context.HttpContext.Request.Path));
-                            context.Result = new RedirectResult("/Account/RedirectLogin");
+                            context.Result = new RedirectResult("/Account/login");
                         }
                     }
                     else

@@ -19,11 +19,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     [CustomAuthorize]
     public class CustomerManagerController : Controller
@@ -39,13 +39,14 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IContractRepository _contractRepository;
         private readonly IWebHostEnvironment _WebHostEnvironment;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         private ManagementUser _ManagementUser;
         private IBankingAccountRepository _bankingAccountRepository;
         private IAccountClientRepository _accountClientRepository;
         private readonly WorkQueueClient _workQueueClient;
 
         public CustomerManagerController(IConfiguration configuration, ICustomerManagerRepository customerManagerRepositories, IDepositHistoryRepository depositHistoryRepository, ManagementUser ManagementUser, IWebHostEnvironment WebHostEnvironment, IAccountClientRepository accountClientRepository,
-        IOrderRepositor orderRepositor, IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IPaymentAccountRepository paymentAccountRepository, IClientRepository clientRepository, IUserRepository userRepository, IContractRepository contractRepository, IBankingAccountRepository bankingAccountRepository)
+        IOrderRepositor orderRepositor, IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IPaymentAccountRepository paymentAccountRepository, IClientRepository clientRepository, IUserRepository userRepository, IContractRepository contractRepository, IBankingAccountRepository bankingAccountRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
             _customerManagerRepositories = customerManagerRepositories;
             _depositHistoryRepository = depositHistoryRepository;
@@ -62,6 +63,7 @@ namespace WEB.Adavigo.CMS.Controllers
             _bankingAccountRepository = bankingAccountRepository;
             _accountClientRepository = accountClientRepository;
             _workQueueClient = new WorkQueueClient(configuration);
+            _identifierServiceRepository = identifierServiceRepository;
         }
         public async Task<IActionResult> Index()
         {
@@ -152,7 +154,10 @@ namespace WEB.Adavigo.CMS.Controllers
             {
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
-                {
+                {//--Tenant
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                    searchModel.TenantId = tenant_id;
                     var i = 0;
                     if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
                     {
@@ -266,7 +271,10 @@ namespace WEB.Adavigo.CMS.Controllers
             {
                 var DataModel = JsonConvert.DeserializeObject<CustomerManagerView>(data);
                 DataModel.UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                //--Tenant
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
 
+                DataModel.TenantId = tenant_id;
                 Regex regexemail = new Regex(@"^(\s*)([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)(\s*)|((\.(\w){2,})+)(\s*)$");
                 if (!regexemail.IsMatch(DataModel.email))
                 {
@@ -282,8 +290,7 @@ namespace WEB.Adavigo.CMS.Controllers
 
                 if (email == null && DataModel.Id == 0)
                 {
-                    APIService apiService = new APIService(_configuration, _userRepository);
-                    DataModel.ClientCode = await apiService.buildClientCode(DataModel.id_ClientType);
+                    DataModel.ClientCode = await _identifierServiceRepository.buildClientNo(Convert.ToInt32(DataModel.id_ClientType),tenant_id);
                     var Result = _customerManagerRepositories.SetUpClient(DataModel);
                     if (Result != 0)
                     {
@@ -296,9 +303,8 @@ namespace WEB.Adavigo.CMS.Controllers
                         else
                         {
                             var  clientdetail = await _clientRepository.GetClientByClientCode(DataModel.ClientCode);
-                            _workQueueClient.SyncES(clientdetail.Id,  _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
+                            _workQueueClient.SyncES(clientdetail.Id,  _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"]);
 
-                            //var SendMail = await apiService.SendMailResetPassword(DataModel.email);
                             stt_code = (int)ResponseType.SUCCESS;
                             msg = "Thêm mới thông tin thành công";
                         }
@@ -316,7 +322,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     var Result = _customerManagerRepositories.SetUpClient(DataModel);
                     if (Result == 1)
                     {
-                        _workQueueClient.SyncES(DataModel.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
+                        _workQueueClient.SyncES(DataModel.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"]);
 
                         stt_code = (int)ResponseType.SUCCESS;
                         msg = "Cập nhật thông tin thành công";

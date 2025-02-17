@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
+using static TheArtOfDev.HtmlRenderer.Adapters.RGraphicsPath;
 
 namespace DAL
 {
@@ -122,7 +123,7 @@ namespace DAL
                 }
 
                 objParam[23] = new SqlParameter("@OrderId", searchModel.BoongKingCode);
-                objParam[24] = new SqlParameter("@IsSalerDebtLimit", searchModel.IsSalerDebtLimit);
+                objParam[24] = new SqlParameter("@TenantId", (searchModel.TenantId == null ? DBNull.Value : (int)searchModel.TenantId));
 
 
                 return _DbWorker.GetDataTable(proc, objParam);
@@ -234,13 +235,13 @@ namespace DAL
                 return -2;
             }
         }
-        public long CountOrderInYear()
+        public long CountOrderInYear(int? tenant_id=null)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Order.AsNoTracking().Where(x => (x.CreateTime ?? DateTime.Now).Year == DateTime.Now.Year).Count();
+                    return _DbContext.Order.AsNoTracking().Where(x => (x.CreateTime ?? DateTime.Now).Year == DateTime.Now.Year &&x.TenantId== tenant_id).Count();
                 }
             }
             catch (Exception ex)
@@ -282,25 +283,7 @@ namespace DAL
                 return null;
             }
         }
-        public async Task<long> UpdataOrder(Order order)
-        {
-            try
-            {
-                using (var _DbContext = new EntityDataContext(_connection))
-                {
-                    _DbContext.Order.Update(order);
-                    await _DbContext.SaveChangesAsync();
-                    var OrderId = order.OrderId;
-                    return OrderId;
 
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("UpdataOrder - OrderDal: " + ex.ToString());
-                return 0;
-            }
-        }
 
         public DataTable GetListOrderByClientId(long clienId, string proc, int status = 0)
         {
@@ -648,113 +631,142 @@ namespace DAL
             }
             return null;
         }
-        public int UpdateOrder(Order model)
+        public int InsertOrder(Order order)
         {
             try
             {
-                SqlParameter[] objParam_order = new SqlParameter[34];
-                objParam_order[0] = model.OrderNo == null ? new SqlParameter("@OrderNo", DBNull.Value) : new SqlParameter("@OrderNo", model.OrderNo);
-                objParam_order[1] = model.ServiceType == null ? new SqlParameter("@ServiceType", DBNull.Value) : new SqlParameter("@ServiceType", model.ServiceType);
-                objParam_order[2] = model.Amount == null ? new SqlParameter("@Amount", DBNull.Value) : new SqlParameter("@Amount", model.Amount);
-                objParam_order[3] = model.CreateTime == null ? new SqlParameter("@CreateTime", DBNull.Value) : new SqlParameter("@CreateTime", model.CreateTime);
-                objParam_order[4] = model.ClientId == null ? new SqlParameter("@ClientId", DBNull.Value) : new SqlParameter("@ClientId", model.ClientId);
-                objParam_order[5] = model.ContactClientId == null ? new SqlParameter("@ContactClientId", DBNull.Value) : new SqlParameter("@ContactClientId", model.ContactClientId);
-                objParam_order[6] = model.OrderStatus == null ? new SqlParameter("@OrderStatus", DBNull.Value) : new SqlParameter("@OrderStatus", model.OrderStatus);
-                if (model.ContractId != null)
-                {
-                    objParam_order[7] = new SqlParameter("@ContractId", model.ContractId);
-                }
-                else
-                {
-                    objParam_order[7] = new SqlParameter("@ContractId", DBNull.Value);
-                }
-                objParam_order[8] = model.PaymentType == null ? new SqlParameter("@PaymentType", DBNull.Value) : new SqlParameter("@PaymentType", model.PaymentType);
-                objParam_order[9] = model.BankCode == null ? new SqlParameter("@BankCode", DBNull.Value) : new SqlParameter("@BankCode", model.BankCode);
-                if (model.PaymentDate != null)
-                {
-                    objParam_order[10] = new SqlParameter("@PaymentDate", model.PaymentDate);
-                }
-                else
-                {
-                    objParam_order[10] = new SqlParameter("@PaymentDate", DBNull.Value);
-                }
+                SqlParameter[] objParam_order = new SqlParameter[]
+                    {
+                        new SqlParameter("@OrderNo", order.OrderNo ?? (object)DBNull.Value),
+                    new SqlParameter("@ServiceType", order.ServiceType ?? (object)DBNull.Value),
+                    new SqlParameter("@CreateTime", order.CreateTime ?? (object)DBNull.Value),
+                                new SqlParameter("@Amount", order.Amount ?? (object)DBNull.Value),
+                    new SqlParameter("@PaymentStatus", order.PaymentStatus ?? (object)DBNull.Value),
+                    new SqlParameter("@ClientId", order.ClientId ?? (object)DBNull.Value),
+                    new SqlParameter("@ContactClientId", order.ContactClientId ?? (object)DBNull.Value),
+                    new SqlParameter("@OrderStatus", order.OrderStatus ?? (object)DBNull.Value),
+                    new SqlParameter("@ContractId", order.ContractId ?? (object)DBNull.Value),
+                    new SqlParameter("@SmsContent", order.SmsContent ?? (object)DBNull.Value),
+                    new SqlParameter("@PaymentType", order.PaymentType ?? (object)DBNull.Value),
+                    new SqlParameter("@BankCode", order.BankCode ?? (object)DBNull.Value),
+                    new SqlParameter("@PaymentDate", order.PaymentDate ?? (object)DBNull.Value),
+                    new SqlParameter("@PaymentNo", order.PaymentNo ?? (object)DBNull.Value),
+                    new SqlParameter("@ColorCode", order.ColorCode ?? (object)DBNull.Value),
+                    new SqlParameter("@Discount", order.Discount ?? (object)DBNull.Value),
+                    new SqlParameter("@Profit", order.Profit ?? (object)DBNull.Value),
+                    new SqlParameter("@ExpriryDate", order.ExpriryDate ?? (object)DBNull.Value),
+                    new SqlParameter("@StartDate", order.StartDate ?? (object)DBNull.Value),
+                    new SqlParameter("@EndDate", order.EndDate ?? (object)DBNull.Value),
+                    new SqlParameter("@ProductService", order.ProductService ?? (object)DBNull.Value),
+                    new SqlParameter("@Note", order.Note ?? (object)DBNull.Value),
+                    new SqlParameter("@UtmSource", order.UtmSource ?? (object)DBNull.Value),
+                    new SqlParameter("@UpdateLast", order.UpdateLast ?? (object)DBNull.Value),
+                    new SqlParameter("@SalerId", order.SalerId ?? (object)DBNull.Value),
+                    new SqlParameter("@SalerGroupId", order.SalerGroupId ?? (object)DBNull.Value),
+                    new SqlParameter("@UserUpdateId", order.UserUpdateId ?? (object)DBNull.Value),
+                    new SqlParameter("@SystemType", order.SystemType ?? (object)DBNull.Value),
+                    new SqlParameter("@AccountClientId", order.AccountClientId ?? (object)DBNull.Value),
+                    new SqlParameter("@CreatedBy", order.CreatedBy ?? (object)DBNull.Value),
+                    new SqlParameter("@Description", order.Description ?? (object)DBNull.Value),
+                    new SqlParameter("@BranchCode", order.BranchCode ?? (object)DBNull.Value),
+                    new SqlParameter("@BookingInfo", order.BookingInfo ?? (object)DBNull.Value),
+                    new SqlParameter("@Label", order.Label ?? (object)DBNull.Value),
+                    new SqlParameter("@IsFinishPayment", order.IsFinishPayment ?? (object)DBNull.Value),
+                    new SqlParameter("@PercentDecrease", order.PercentDecrease ?? (object)DBNull.Value),
+                    new SqlParameter("@VoucherId", order.VoucherId ?? (object)DBNull.Value),
+                    new SqlParameter("@Price", order.Price ?? (object)DBNull.Value),
+                    new SqlParameter("@SupplierId", order.SupplierId ?? (object)DBNull.Value),
+                    new SqlParameter("@DepartmentId", order.DepartmentId ?? (object)DBNull.Value),
+                    new SqlParameter("@OperatorId", order.OperatorId ?? (object)DBNull.Value),
+                    new SqlParameter("@UserVerify", order.UserVerify ?? (object)DBNull.Value),
+                    new SqlParameter("@VerifyDate", order.VerifyDate ?? (object)DBNull.Value),
+                    new SqlParameter("@DebtStatus", order.DebtStatus ?? (object)DBNull.Value),
+                    new SqlParameter("@DebtNote", order.DebtNote ?? (object)DBNull.Value),
+                    new SqlParameter("@Commission", order.Commission ?? (object)DBNull.Value),
+                    new SqlParameter("@UtmMedium", order.UtmMedium ?? (object)DBNull.Value),
+                    new SqlParameter("@Refund", order.Refund ?? (object)DBNull.Value),
+                    new SqlParameter("@TotalFundCustomerCare", order.TotalFundCustomerCare ?? (object)DBNull.Value),
+                    new SqlParameter("@AmountFinalize", order.AmountFinalize ?? (object)DBNull.Value),
+                    new SqlParameter("@FinalizeDate", order.FinalizeDate ?? (object)DBNull.Value),
+                    new SqlParameter("@IsLock", order.IsLock ?? (object)DBNull.Value),
+                    new SqlParameter("@ClosingEndDate", order.ClosingEndDate ?? (object)DBNull.Value),
+                    new SqlParameter("@TenantId", order.TenantId ?? (object)DBNull.Value),
+                };
 
-                if (model.PaymentNo != null)
-                {
-                    objParam_order[11] = new SqlParameter("@PaymentNo", model.PaymentNo);
-                }
-                else
-                {
-                    objParam_order[11] = new SqlParameter("@PaymentNo", DBNull.Value);
-                }
-                objParam_order[12] = model.Profit == null ? new SqlParameter("@Profit", DBNull.Value) : new SqlParameter("@Profit", model.Profit);
-                objParam_order[13] = model.Discount == null ? new SqlParameter("@Discount", DBNull.Value) : new SqlParameter("@Discount", model.Discount);
-                objParam_order[14] = model.PaymentStatus == null ? new SqlParameter("@PaymentStatus", DBNull.Value) : new SqlParameter("@PaymentStatus", model.PaymentStatus);
-                objParam_order[15] = new SqlParameter("@OrderId", model.OrderId);
-                objParam_order[16] = model.ExpriryDate == null ? new SqlParameter("@ExpriryDate", DBNull.Value) : new SqlParameter("@ExpriryDate", model.ExpriryDate);
-                objParam_order[17] = model.ProductService == null ? new SqlParameter("@ProductService", DBNull.Value) : new SqlParameter("@ProductService", model.ProductService.ToString());
-                objParam_order[18] = model.AccountClientId == null ? new SqlParameter("@AccountClientId", DBNull.Value) : new SqlParameter("@AccountClientId", model.AccountClientId);
-                objParam_order[19] = model.StartDate == null ? new SqlParameter("@StartDate", DBNull.Value) : new SqlParameter("@StartDate", model.StartDate);
-                objParam_order[20] = model.EndDate == null ? new SqlParameter("@EndDate", DBNull.Value) : new SqlParameter("@EndDate", model.EndDate);
-                objParam_order[21] = model.SystemType == null ? new SqlParameter("@SystemType", DBNull.Value) : new SqlParameter("@SystemType", model.SystemType);
-                objParam_order[22] = model.SalerId == null ? new SqlParameter("@SalerId", DBNull.Value) : new SqlParameter("@SalerId", model.SalerId);
-                if (model.SalerId != null)
-                {
-                    objParam_order[22] = new SqlParameter("@SalerId", model.SalerId);
-                }
-                else
-                {
-                    objParam_order[22] = new SqlParameter("@SalerId", DBNull.Value);
-                }
-                objParam_order[23] = model.SalerGroupId == null ? new SqlParameter("@SalerGroupId", DBNull.Value) : new SqlParameter("@SalerGroupId", model.SalerGroupId);
-                objParam_order[24] = model.UserUpdateId == null ? new SqlParameter("@UserUpdateId", DBNull.Value) : new SqlParameter("@UserUpdateId", model.UserUpdateId);
+                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.InsertOrder, objParam_order);
+                order.OrderId = id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateOrder - OrderDal: " + ex);
+                return -1;
+            }
+        }
+        public int UpdateOrder(Order order)
+        {
+            try
+            {
+                SqlParameter[] objParam_order = new SqlParameter[]
+                    {
+                     new SqlParameter("@OrderId", order.OrderId),
+                    new SqlParameter("@OrderNo", order.OrderNo ?? (object)DBNull.Value),
+                    new SqlParameter("@ServiceType", order.ServiceType ?? (object)DBNull.Value),
+                    new SqlParameter("@CreateTime", order.CreateTime ?? (object)DBNull.Value),
+                    new SqlParameter("@Amount", order.Amount ?? (object)DBNull.Value),
+                    new SqlParameter("@PaymentStatus", order.PaymentStatus ?? (object)DBNull.Value),
+                    new SqlParameter("@ClientId", order.ClientId ?? (object)DBNull.Value),
+                    new SqlParameter("@ContactClientId", order.ContactClientId ?? (object)DBNull.Value),
+                    new SqlParameter("@OrderStatus", order.OrderStatus ?? (object)DBNull.Value),
+                    new SqlParameter("@ContractId", order.ContractId ?? (object)DBNull.Value),
+                    new SqlParameter("@SmsContent", order.SmsContent ?? (object)DBNull.Value),
+                    new SqlParameter("@PaymentType", order.PaymentType ?? (object)DBNull.Value),
+                    new SqlParameter("@BankCode", order.BankCode ?? (object)DBNull.Value),
+                    new SqlParameter("@PaymentDate", order.PaymentDate ?? (object)DBNull.Value),
+                    new SqlParameter("@PaymentNo", order.PaymentNo ?? (object)DBNull.Value),
+                    new SqlParameter("@ColorCode", order.ColorCode ?? (object)DBNull.Value),
+                    new SqlParameter("@Discount", order.Discount ?? (object)DBNull.Value),
+                    new SqlParameter("@Profit", order.Profit ?? (object)DBNull.Value),
+                    new SqlParameter("@ExpriryDate", order.ExpriryDate ?? (object)DBNull.Value),
+                    new SqlParameter("@StartDate", order.StartDate ?? (object)DBNull.Value),
+                    new SqlParameter("@EndDate", order.EndDate ?? (object)DBNull.Value),
+                    new SqlParameter("@ProductService", order.ProductService ?? (object)DBNull.Value),
+                    new SqlParameter("@Note", order.Note ?? (object)DBNull.Value),
+                    new SqlParameter("@UtmSource", order.UtmSource ?? (object)DBNull.Value),
+                    new SqlParameter("@UpdateLast", order.UpdateLast ?? (object)DBNull.Value),
+                    new SqlParameter("@SalerId", order.SalerId ?? (object)DBNull.Value),
+                    new SqlParameter("@SalerGroupId", order.SalerGroupId ?? (object)DBNull.Value),
+                    new SqlParameter("@UserUpdateId", order.UserUpdateId ?? (object)DBNull.Value),
+                    new SqlParameter("@SystemType", order.SystemType ?? (object)DBNull.Value),
+                    new SqlParameter("@AccountClientId", order.AccountClientId ?? (object)DBNull.Value),
+                    new SqlParameter("@Description", order.Description ?? (object)DBNull.Value),
+                    new SqlParameter("@BranchCode", order.BranchCode ?? (object)DBNull.Value),
+                    new SqlParameter("@BookingInfo", order.BookingInfo ?? (object)DBNull.Value),
+                    new SqlParameter("@Label", order.Label ?? (object)DBNull.Value),
+                    new SqlParameter("@IsFinishPayment", order.IsFinishPayment ?? (object)DBNull.Value),
+                    new SqlParameter("@PercentDecrease", order.PercentDecrease ?? (object)DBNull.Value),
+                    new SqlParameter("@VoucherId", order.VoucherId ?? (object)DBNull.Value),
+                    new SqlParameter("@Price", order.Price ?? (object)DBNull.Value),
+                    new SqlParameter("@SupplierId", order.SupplierId ?? (object)DBNull.Value),
+                    new SqlParameter("@DepartmentId", order.DepartmentId ?? (object)DBNull.Value),
+                    new SqlParameter("@OperatorId", order.OperatorId ?? (object)DBNull.Value),
+                    new SqlParameter("@UserVerify", order.UserVerify ?? (object)DBNull.Value),
+                    new SqlParameter("@VerifyDate", order.VerifyDate ?? (object)DBNull.Value),
+                    new SqlParameter("@DebtStatus", order.DebtStatus ?? (object)DBNull.Value),
+                    new SqlParameter("@DebtNote", order.DebtNote ?? (object)DBNull.Value),
+                    new SqlParameter("@Commission", order.Commission ?? (object)DBNull.Value),
+                    new SqlParameter("@UtmMedium", order.UtmMedium ?? (object)DBNull.Value),
+                    new SqlParameter("@Refund", order.Refund ?? (object)DBNull.Value),
+                    new SqlParameter("@TotalFundCustomerCare", order.TotalFundCustomerCare ?? (object)DBNull.Value),
+                    new SqlParameter("@AmountFinalize", order.AmountFinalize ?? (object)DBNull.Value),
+                    new SqlParameter("@FinalizeDate", order.FinalizeDate ?? (object)DBNull.Value),
+                    new SqlParameter("@IsLock", order.IsLock ?? (object)DBNull.Value),
+                    new SqlParameter("@ClosingEndDate", order.ClosingEndDate ?? (object)DBNull.Value),
+                    new SqlParameter("@TenantId", order.TenantId ?? (object)DBNull.Value)
+                };
 
-                if (model.PercentDecrease != null)
-                {
-                    objParam_order[25] = new SqlParameter("@PercentDecrease", model.PercentDecrease);
-                }
-                else
-                {
-                    objParam_order[25] = new SqlParameter("@PercentDecrease", DBNull.Value);
-                }
-
-                if (model.Price != null)
-                {
-                    objParam_order[26] = new SqlParameter("@Price", model.Price);
-                }
-                else
-                {
-                    objParam_order[26] = new SqlParameter("@Price", DBNull.Value);
-                }
-
-                if (model.Label != null)
-                {
-                    objParam_order[27] = new SqlParameter("@Label", model.Label);
-                }
-                else
-                {
-                    objParam_order[27] = new SqlParameter("@Label", DBNull.Value);
-                }
-
-                if (model.VoucherId != null)
-                {
-                    objParam_order[28] = new SqlParameter("@VoucherId", model.VoucherId);
-                }
-                else
-                {
-                    objParam_order[28] = new SqlParameter("@VoucherId", DBNull.Value);
-                }
-                objParam_order[29] = model.CreatedBy == null ? new SqlParameter("@CreatedBy", DBNull.Value) : new SqlParameter("@CreatedBy", model.CreatedBy);
-                model.SupplierId = 0;
-                objParam_order[30] = new SqlParameter("@SupplierId", model.SupplierId);
-                objParam_order[31] = model.Note == null ? new SqlParameter("@Note", DBNull.Value) : new SqlParameter("@Note", model.Note);
-                objParam_order[32] = model.UtmMedium == null ? new SqlParameter("@UtmMedium", DBNull.Value) : new SqlParameter("@UtmMedium", model.UtmMedium);
-                objParam_order[33] = model.UtmSource == null ? new SqlParameter("@UtmSource", DBNull.Value) : new SqlParameter("@UtmSource", model.UtmSource);
-
-
-
-                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.CreateOrder, objParam_order);
-                model.OrderId = id;
+                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.UpdateOrder, objParam_order);
+                order.OrderId = id;
                 return id;
             }
             catch (Exception ex)
@@ -1094,7 +1106,7 @@ namespace DAL
             {
                 LogHelper.InsertLogTelegram("CheckAmountRemainBySalerId - OrderDal: " + ex);
             }
-            return null ;
+            return null;
         }
         public async Task<int> UpdateOrderIsSalerDebtLimit(long OrderId, long Status, long UpdatedBy, long UserVerify)
         {

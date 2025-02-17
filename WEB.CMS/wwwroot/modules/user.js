@@ -434,10 +434,8 @@ var _user = {
                     company_type += ',' + element.val()
                 }
             })
-            formData.set("CompanyType", company_type);
             formData.set("UserName", $('#UserName').val());
             formData.set("BirthDay", _global_function.GetDayText($('#datepicker').data('daterangepicker').startDate._d, true));
-            formData.set("OldCompanyType", $('#form-create-user').attr('data-companytype'))
 
             /*
             var model = {

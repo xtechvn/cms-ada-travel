@@ -23,7 +23,8 @@ namespace Entities.ViewModels.SetServices
 		public string SalerPermission { get; set; }
 		public string BookingCode { get; set; }
 		public List<int>? ServiceType { get; set; }
+        public int? TenantId { get; set; }
 
-	}
-	
+    }
+
 }

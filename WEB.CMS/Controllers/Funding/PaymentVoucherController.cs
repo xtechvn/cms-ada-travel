@@ -10,11 +10,13 @@ using System.Security.Claims;
 using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
+using WEB.DeepSeekTravel.CMS.Service;
+using Caching.Elasticsearch;
 
-namespace WEB.Adavigo.CMS.Controllers.Funding
+namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
 {
     [CustomAuthorize]
 
@@ -29,9 +31,13 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         private readonly IEmailService _emailService;
         private readonly IUserRepository _userRepository;
         private readonly ISupplierRepository _supplierRepository;
+        private readonly ManagementUser _ManagementUser;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
 
         public PaymentVoucherController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment,
-           IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository, IEmailService emailService, IUserRepository userRepository, ISupplierRepository supplierRepository)
+           IPaymentRequestRepository paymentRequestRepository, IPaymentVoucherRepository paymentVoucherRepository, IEmailService emailService, 
+           IUserRepository userRepository, ISupplierRepository supplierRepository, IConfiguration configuration,
+           IIdentifierServiceRepository identifierServiceRepository, IContractPayRepository contractPayRepository, IOrderRepository orderRepository, ManagementUser managementUser)
         {
             _WebHostEnvironment = hostEnvironment;
             _allCodeRepository = allCodeRepository;
@@ -41,13 +47,15 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             _emailService = emailService;
             _userRepository = userRepository;
             _supplierRepository = supplierRepository;
+            _identifierServiceRepository = identifierServiceRepository;
+            _ManagementUser = managementUser;
         }
 
         public IActionResult Index()
         {
             ViewBag.allCode_PAY_TYPE = _allCodeRepository.GetListByType(AllCodeType.PAY_TYPE);
             ViewBag.allCode_PAYMENT_VOUCHER_TYPE = _allCodeRepository.GetListByType(AllCodeType.PAYMENT_VOUCHER_TYPE);
-            ViewBag.listBankingAccountAdavigo = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
+            ViewBag.listBankingAccountDeepSeekTravel = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
            (long)config.SUPPLIERID_ADAVIGO).ToList();
             return View();
         }
@@ -58,6 +66,9 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             var model = new GenericViewModel<PaymentVoucherViewModel>();
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                searchModel.TenantId = tenant_id;
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (!string.IsNullOrEmpty(searchModel.PaymentCode))
                     searchModel.PaymentCode = searchModel.PaymentCode.Trim();
@@ -89,7 +100,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             }
             ViewBag.UserId = userLogin;
             ViewBag.Type = (int)AttachmentType.Payment_Voucher;
-            ViewBag.listBankingAccountAdavigo = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
+            ViewBag.listBankingAccountDeepSeekTravel = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
            (long)config.SUPPLIERID_ADAVIGO).ToList();
             return PartialView();
         }
@@ -107,7 +118,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             }
             ViewBag.UserId = userLogin;
             ViewBag.Type = (int)AttachmentType.Payment_Voucher;
-            ViewBag.listBankingAccountAdavigo = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
+            ViewBag.listBankingAccountDeepSeekTravel = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId ==
          (long)config.SUPPLIERID_ADAVIGO).ToList();
             return PartialView(detail);
         }
@@ -175,6 +186,9 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         {
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                model.TenantId = tenant_id;
                 var userLogin = 0;
                 if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                 {
@@ -191,24 +205,25 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                         message = messages
                     });
                 }
-                var client = new HttpClient();
-                var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
-                var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
-                HttpClient httpClient = new HttpClient();
-                JObject jsonObject = new JObject(
-                   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_CHI).ToString())
-                );
-                var j_param = new Dictionary<string, object>
-                 {
-                     { "key",jsonObject}
-                 };
-                var data_product = JsonConvert.SerializeObject(j_param);
-                var token = CommonHelper.Encode(data_product, key_token_api);
-                var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
-                var response = await httpClient.PostAsync(apiPrefix, content);
-                var resultAPI = await response.Content.ReadAsStringAsync();
-                var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.PaymentCode = output.code;
+                //var client = new HttpClient();
+                //var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
+                //var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
+                //HttpClient httpClient = new HttpClient();
+                //JObject jsonObject = new JObject(
+                //   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_CHI).ToString())
+                //);
+                //var j_param = new Dictionary<string, object>
+                // {
+                //     { "key",jsonObject}
+                // };
+                //var data_product = JsonConvert.SerializeObject(j_param);
+                //var token = CommonHelper.Encode(data_product, key_token_api);
+                //var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
+                //var response = await httpClient.PostAsync(apiPrefix, content);
+                //var resultAPI = await response.Content.ReadAsStringAsync();
+                //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
+
+                model.PaymentCode =await _identifierServiceRepository.BuildPaymentVoucher(tenant_id);
                 var result = _paymentVoucherRepository.CreatePaymentVoucher(model, out string msg);
                 if (result == -3)
                     return Ok(new

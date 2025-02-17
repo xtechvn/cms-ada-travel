@@ -49,5 +49,7 @@ namespace Entities.ViewModels.ElasticSearch
         [PropertyName("endpoint")]
 
         public string endpoint { get; set; }
+        public int? tenantid { get; set; }
+
     }
 }

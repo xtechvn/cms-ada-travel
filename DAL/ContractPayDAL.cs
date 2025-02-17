@@ -5,6 +5,7 @@ using Entities.ViewModels;
 using Entities.ViewModels.Funding;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -254,7 +255,7 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[13];
+                SqlParameter[] objParam = new SqlParameter[14];
                 objParam[0] = new SqlParameter("@BillNo", searchModel.BillNo);
                 objParam[1] = new SqlParameter("@Description", searchModel.Content);
                 objParam[2] = new SqlParameter("@ContractPayType", searchModel.Type);
@@ -292,6 +293,7 @@ namespace DAL
                     objParam[12] = new SqlParameter("@ServiceCode", DBNull.Value);
                 else
                     objParam[12] = new SqlParameter("@ServiceCode", searchModel.ServiceCode);
+                objParam[13] = new SqlParameter("@TenantId", searchModel.TenantId==null?DBNull.Value: searchModel.TenantId);
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)
@@ -432,7 +434,7 @@ namespace DAL
             List<int> detailIds = new List<int>();
             try
             {
-                SqlParameter[] objParam_contractPay = new SqlParameter[16];
+                SqlParameter[] objParam_contractPay = new SqlParameter[17];
                 objParam_contractPay[0] = new SqlParameter("@BillNo", model.BillNo);
                 if (model.ClientId == null || model.ClientId == 0)
                     objParam_contractPay[1] = new SqlParameter("@ClientId", DBNull.Value);
@@ -470,6 +472,7 @@ namespace DAL
                 objParam_contractPay[13] = new SqlParameter("@SupplierId", Convert.ToInt32(model.SupplierId));
                 objParam_contractPay[14] = new SqlParameter("@ObjectType", Convert.ToInt32(model.ObjectType));
                 objParam_contractPay[15] = new SqlParameter("@EmployeeId", Convert.ToInt32(model.EmployeeId));
+                objParam_contractPay[16] = new SqlParameter("@TenantId", model.TenantId==null ? DBNull.Value: model.TenantId);
                 id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_InsertContractPay, objParam_contractPay);
                 if (id > 0)
                 {
@@ -610,7 +613,7 @@ namespace DAL
             try
             {
                 int id = 0;
-                SqlParameter[] objParam_contractPay = new SqlParameter[16];
+                SqlParameter[] objParam_contractPay = new SqlParameter[17];
                 objParam_contractPay[0] = new SqlParameter("@BillNo", model.BillNo);
                 if (model.ClientId == null || model.ClientId == 0)
                     objParam_contractPay[1] = new SqlParameter("@ClientId", Convert.ToInt32(0));
@@ -639,6 +642,7 @@ namespace DAL
                 objParam_contractPay[13] = new SqlParameter("@SupplierId", Convert.ToInt32(model.SupplierId));
                 objParam_contractPay[14] = new SqlParameter("@ObjectType", Convert.ToInt32(model.ObjectType));
                 objParam_contractPay[15] = new SqlParameter("@EmployeeId", Convert.ToInt32(model.EmployeeId));
+                objParam_contractPay[16] = new SqlParameter("@TenantId", DBNull.Value);
                 id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdateContractPay, objParam_contractPay);
                 foreach (var item in model.ContractPayDetails)
                 {
@@ -814,13 +818,13 @@ namespace DAL
             }
         }
 
-        public long CountContractPayInYear()
+        public long CountContractPayInYear(int? tenant_id = null)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.ContractPay.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year).Count();
+                    return _DbContext.ContractPay.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year && x.TenantId == tenant_id).Count();
                 }
             }
             catch (Exception ex)
@@ -1241,13 +1245,28 @@ namespace DAL
                 return 0;
             }
         }
-        public long CountPaymentRequest()
+        public long CountPaymentRequest(int? tenant_id=null)
         {
             try
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.PaymentRequest.AsNoTracking().Count();
+                    return _DbContext.PaymentRequest.AsNoTracking().Where(x => x.TenantId == tenant_id).Count();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("CountPaymentRequest - ContractPayDAL: " + ex.ToString());
+                return -1;
+            }
+        }
+        public long CountPaymentVoucherInYear(int? tenant_id = null)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    return _DbContext.PaymentVoucher.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year && x.TenantId==tenant_id).Count();
                 }
             }
             catch (Exception ex)

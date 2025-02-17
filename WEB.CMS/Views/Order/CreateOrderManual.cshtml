@@ -4,6 +4,9 @@
 @using Entities.Models
 @{
     var branch = (List<AllCode>)ViewBag.Branch;
+    string fullname= (string)ViewBag.FullName;
+    string email = (string)ViewBag.Email;
+    int user_id = (int)ViewBag.UserId;
 }
 <style>
     .stop-scrolling {
@@ -40,7 +43,7 @@
                                 <div class="form-default3 pd10">
                                     <div class="form-group">
                                         <div class="wrap_input">
-                                            <select class="select2 client-select" id="client-select" style="width:100% !important">
+                                            <select class="client-select-create-order-manual" id="client-select-create-order-manual" style="width:100% !important">
                                             </select>
                                         </div>
                                         <div class="wrap_input error_client_select" style="display:none;">
@@ -55,7 +58,7 @@
                                     <div class="form-group">
                                         <label class="lbl">Nhân viên chính <sup class="red">*</sup></label>
                                         <select class="select2 main-staff-select" id="main-staff" style="width:100% !important">
-                                           
+                                            <option selected value="@user_id">@fullname - @email</option>
 
                                         </select>
                                     </div>
@@ -126,7 +129,6 @@
     </div>
 </div>
 
-<script type="text/javascript" src="~/modules/order_manual.js?v=2"></script>
 <script>
     _order_detail_create.Initialization();
 </script>

@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Repositories.IRepositories;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.Configs
+namespace WEB.DeepSeekTravel.CMS.Controllers.Configs
 {
     [CustomAuthorize]
 
@@ -14,12 +15,13 @@ namespace WEB.Adavigo.CMS.Controllers.Configs
     {
         private readonly IDepartmentRepository _DepartmentRepository;
         private readonly IAllCodeRepository _allCodeRepository;
-       
+        private ManagementUser _ManagementUser;
 
-        public DepartmentController(IDepartmentRepository departmentRepository, IAllCodeRepository allCodeRepository)
+        public DepartmentController(IDepartmentRepository departmentRepository, IAllCodeRepository allCodeRepository, ManagementUser managementUser)
         {
             _DepartmentRepository = departmentRepository;
             _allCodeRepository = allCodeRepository;
+            _ManagementUser = managementUser;
         }
 
         public IActionResult Index()
@@ -30,7 +32,9 @@ namespace WEB.Adavigo.CMS.Controllers.Configs
         [HttpPost]
         public async Task<IActionResult> Search(string name)
         {
-            var departments = await _DepartmentRepository.GetAll(name);
+            int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+            var departments = await _DepartmentRepository.Listing(name,tenant_id);
             return View(departments);
         }
 
@@ -66,6 +70,9 @@ namespace WEB.Adavigo.CMS.Controllers.Configs
             {
                 long result = 0;
                 string action = string.Empty;
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                model.TenantId = tenant_id;
                 if (model.Id > 0)
                 {
                     action = "Cập nhật";

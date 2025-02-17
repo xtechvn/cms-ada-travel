@@ -19,12 +19,13 @@ namespace DAL.Identifier
             _DbWorker = new DbWorker(connection);
         }
 
-        public int countServiceUse(int service_type)
+        public int countServiceUse(int service_type, int? tenant_id = null)
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[1];
+                SqlParameter[] objParam = new SqlParameter[2];
                 objParam[0] = new SqlParameter("@ServiceType", service_type);
+                objParam[1] = new SqlParameter("@TenantId", (tenant_id == null ? DBNull.Value : (int)tenant_id));
 
                 DataTable tb = new DataTable();
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_countServiceUse, objParam);
@@ -53,12 +54,13 @@ namespace DAL.Identifier
             }
         }
 
-        public int countClientTypeUse(int client_type)
+        public int countClientTypeUse(int client_type, int? tenant_id = null)
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[1];
+                SqlParameter[] objParam = new SqlParameter[2];
                 objParam[0] = new SqlParameter("@ClientType", client_type);
+                objParam[1] = new SqlParameter("@TenantId", (tenant_id==null? DBNull.Value:(int)tenant_id));
 
                 DataTable tb = new DataTable();
                 return _DbWorker.ExecuteNonQuery("Sp_CountClientByType", objParam);

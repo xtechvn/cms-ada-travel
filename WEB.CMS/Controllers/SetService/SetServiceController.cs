@@ -27,14 +27,14 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
-using WEB.Adavigo.CMS.Service.ServiceInterface;
+using WEB.DeepSeekTravel.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 using static Utilities.Contants.OrderConstants;
 using static Utilities.DepositHistoryConstant;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService
 {
     [CustomAuthorize]
 
@@ -190,6 +190,9 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                     break;
                             }
                         }
+                        int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                        searchModel.TenantId = tenant_id;
 
                         model = await _hotelBookingRepositories.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize);
                     }
@@ -880,9 +883,11 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
-                    var data = await _HotelBookingESRepository.GetListProduct(txt_search.Trim());
+                    var data = await _HotelBookingESRepository.GetListProduct(txt_search.Trim(), tenant_id);
                     return Ok(new
                     {
                         status = (int)ResponseType.SUCCESS,
@@ -1664,6 +1669,9 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 {
                 }
 
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                searchModel.TenantId = tenant_id;
 
                 string FilePath = Path.Combine(_UploadDirectory, _FileName);
 
@@ -1925,7 +1933,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                             {
                                 birthday="",
                                 email=_configuration["config_api_vinpearl:OPERATOR_EMAIL"],
-                                firstName="Adavigo",
+                                firstName="DeepSeekTravel",
                                 lastName="Travel",
                                 isPrimary=true,
                                  phoneNumber="",

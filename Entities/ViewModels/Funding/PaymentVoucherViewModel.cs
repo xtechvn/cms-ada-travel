@@ -54,6 +54,6 @@ namespace Entities.ViewModels.Funding
         public List<int> TypeMulti { get; set; }
         public List<AttachFile> AttachFile { get; set; }
         public IEnumerable<string> OtherImages { get; set; }
-
+        public int? TenantId { get; set; }
     }
 }

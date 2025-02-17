@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Entities.ViewModels;
 using Entities.ViewModels.Funding;
@@ -12,18 +13,21 @@ using Microsoft.Extensions.Hosting;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using Utilities;
+using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.Report
+namespace WEB.DeepSeekTravel.CMS.Controllers.Report
 {
     public class ReportHotelRevenueController : Controller
     {
         private readonly IHotelBookingRepositories _hotelBookingRepositories;
         private readonly IWebHostEnvironment _WebHostEnvironment;
+        private ManagementUser _ManagementUser;
 
-        public ReportHotelRevenueController(IHotelBookingRepositories hotelBookingRepositories, IWebHostEnvironment hostEnvironment)
+        public ReportHotelRevenueController(IHotelBookingRepositories hotelBookingRepositories, IWebHostEnvironment hostEnvironment, ManagementUser managementUser)
         {
             _hotelBookingRepositories = hotelBookingRepositories;
             _WebHostEnvironment = hostEnvironment;
+            _ManagementUser = managementUser;
         }
 
         public IActionResult Index()
@@ -37,6 +41,9 @@ namespace WEB.Adavigo.CMS.Controllers.Report
             var model = new GenericViewModel<ReportHotelRevenueViewModel>();
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                searchModel.TenantId = tenant_id;
                 searchModel.PageSize = pageSize;
                 searchModel.PageIndex = currentPage;
                 if (searchModel.HotelIds == null) searchModel.HotelIds = new List<string>();
@@ -84,6 +91,9 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 string FilePath = Path.Combine(_UploadDirectory, _FileName);
                 searchModel.PageIndex = -1;
                 searchModel.PageSize = -1;
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                searchModel.TenantId = tenant_id;
                 var rsPath = _hotelBookingRepositories.ExportHotelRevenue(searchModel, FilePath);
 
                 if (!string.IsNullOrEmpty(rsPath))

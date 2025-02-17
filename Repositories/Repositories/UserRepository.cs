@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
-using Repositories.Repositories.BaseRepos;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -170,7 +169,7 @@ namespace Repositories.Repositories
             return model;
         }
 
-        public GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize)
+        public GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize, int? tenant_id = null)
         {
             var model = new GenericViewModel<UserGridModel>()
             {
@@ -181,7 +180,7 @@ namespace Repositories.Repositories
             try
             {
                 
-                model.ListData = _UserDAL.GetUserPagingList(userName,  status, currentPage, pageSize);
+                model.ListData = _UserDAL.GetUserPagingList(userName,  status, currentPage, pageSize,tenant_id);
                 if(model.ListData!=null && model.ListData.Count > 0)
                 {
                     model.PageSize = pageSize;
@@ -233,7 +232,7 @@ namespace Repositories.Repositories
                     Manager = model.Manager,
                     UserMapId = model.UserMapId,
                     NickName = model.NickName,
-                    DebtLimit = model.DebtLimit
+                    TenantId= model.TenantId,
                 };
 
                 // Check exist User Name or Email
@@ -244,13 +243,13 @@ namespace Repositories.Repositories
                     return -1;
                 }
 
-                var userId =  _UserDAL.UpsertUser(entity);
+                var userId =  _UserDAL.InsertUser(entity);
 
                 if (!string.IsNullOrEmpty(model.RoleId))
                 {
                     var role_list = model.RoleId.Split(',').Select(s => int.Parse(s)).ToArray();
                     foreach (var role in role_list) {
-                         _userRoleDAL.UpsertUserRole(new UserRole()
+                         _userRoleDAL.InsertUserRole(new UserRole()
                         {
                             UserId = entity.Id,
                             RoleId = role
@@ -297,9 +296,15 @@ namespace Repositories.Repositories
 
                 if (arrayRole != null && arrayRole.Count() > 0)
                 {
+                    var exists_role = await _userRoleDAL.GetByUserId(userId);
+                    if (exists_role == null) exists_role = new List<UserRole>();
                     foreach (var role in arrayRole)
                     {
-                        _userRoleDAL.UpsertUserRole(new UserRole()
+                        if (exists_role.Any(x => x.RoleId == role))
+                        {
+                            continue;
+                        }
+                        _userRoleDAL.InsertUserRole(new UserRole()
                         {
                             UserId = userId,
                             RoleId = role
@@ -400,18 +405,23 @@ namespace Repositories.Repositories
                 entity.UserPositionId = model.UserPositionId;
                 entity.Level = model.Level == null ? entity.Level : model.Level;
                 entity.NickName = model.NickName;
-                entity.DebtLimit = model.DebtLimit;
 
 
-                var id= _UserDAL.UpsertUser(entity);
+                var id= _UserDAL.UpdateUser(entity);
                 if (!string.IsNullOrEmpty(model.RoleId))
                 {
                     var role_list = model.RoleId.Split(',').Select(s => int.Parse(s)).ToArray();
+                    var exists_role = await _userRoleDAL.GetByUserId(model.Id);
+                    if (exists_role == null) exists_role = new List<UserRole>();
                     foreach (var role in role_list)
                     {
-                        _userRoleDAL.UpsertUserRole(new UserRole()
+                        if (exists_role.Any(x => x.RoleId == role))
                         {
-                            UserId = entity.Id,
+                            continue;
+                        }
+                        _userRoleDAL.InsertUserRole(new UserRole()
+                        {
+                            UserId = model.Id,
                             RoleId = role
                         });
 
@@ -507,12 +517,11 @@ namespace Repositories.Repositories
                 return null;
             }
         }
-        public async Task<List<User>> GetUserSuggesstion(string txt_search)
+        public async Task<List<User>> GetUserSuggesstion(string txt_search, int? tenant_id = null)
         {
             try
             {
-                if (txt_search == null) txt_search = "";
-                return await _UserDAL.GetUserSuggesstion(txt_search);
+                return JsonConvert.DeserializeObject<List<User>>( JsonConvert.SerializeObject(_UserDAL.GetUserPagingList(txt_search, null, 1, 50, tenant_id)));
             }
             catch (Exception ex)
             {
@@ -520,12 +529,11 @@ namespace Repositories.Repositories
                 return null;
             }
         }
-        public async Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids)
+        public async Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids,int? tenant_id = null)
         {
             try
             {
-                if (txt_search == null) txt_search = "";
-                return await _UserDAL.GetUserSuggesstion(txt_search, ids);
+                return JsonConvert.DeserializeObject<List<User>>(JsonConvert.SerializeObject(_UserDAL.GetUserPagingList(txt_search, null, 1, 50, tenant_id)));
             }
             catch (Exception ex)
             {
@@ -597,12 +605,11 @@ namespace Repositories.Repositories
                 return null;
             }
         }
-
-        public string GetListUserByUserId(int user_id)
+		 public string GetListUserByUserId(int user_id, int? tenant_id= null)
         {
             try
             {
-                return _UserDAL.GetListUserByUserId(user_id);
+                return _UserDAL.GetListUserByUserId(user_id, tenant_id);
             }
             catch
             {

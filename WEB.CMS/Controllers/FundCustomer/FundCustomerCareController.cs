@@ -13,7 +13,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.FundCustomer
+namespace WEB.DeepSeekTravel.CMS.Controllers.FundCustomer
 {
     public class FundCustomerCareController : Controller
     {

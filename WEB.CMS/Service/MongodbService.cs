@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using Utilities;
 
-namespace WEB.Adavigo.CMS.Service
+namespace WEB.DeepSeekTravel.CMS.Service
 {
     public class MongodbService
     {

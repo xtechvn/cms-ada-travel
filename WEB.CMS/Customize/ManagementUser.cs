@@ -37,18 +37,17 @@ namespace WEB.CMS.Customize
             try
             {
                 Claim ClaimDepartmentId = _HttpContext.HttpContext.User.FindFirst("DepartmentId");
-                IEnumerable<PermissionData> permissions = null;
+                List<PermissionData> permissions = new List<PermissionData>();
                 int user_id = int.Parse(_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 string role = _HttpContext.HttpContext.User.FindFirst(ClaimTypes.Role) != null ? _HttpContext.HttpContext.User.FindFirst(ClaimTypes.Role).Value : "";
                 string ClaimUserUnderList = "";
 
                 //-- Get From Cache
-                permissions = Enumerable.Empty<PermissionData>();
                 UserRoleCacheModel user_role_cache = new UserRoleCacheModel();
                 string data_json = "";
                 try
                 {
-                    data_json = _redisConn.Get(CacheName.USER_ROLE + user_id + "_" + _configuration["CompanyType"], Convert.ToInt32(_configuration["Redis:Database:db_common"]));
+                    //data_json = _redisConn.Get(CacheName.USER_ROLE + user_id, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
                 }
                 catch
                 {
@@ -77,19 +76,22 @@ namespace WEB.CMS.Customize
                             MenuId = s.MenuId,
                             RoleId = s.RoleId,
                             PermissionId = s.PermissionId
-                        });
+                        }).ToList();
                     }
                     else
                     {
-                        user_role_cache.Permission = Enumerable.Empty<PermissionData>();
+                        user_role_cache.Permission = new List<PermissionData>();
                     }
-                    user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id);
+                    int? tenant_id = GetCurrentTenantId();
+
+                    user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id, tenant_id);
+                    permissions = user_role_cache.Permission;
+                    ClaimUserUnderList = user_role_cache.UserUnderList;
                     var data_encode = JsonConvert.SerializeObject(user_role_cache);
                     string token = CommonHelper.Encode(data_encode, _configuration["DataBaseConfig:key_api:api_manual"]);
-                    //string token = data_encode;
                     try
                     {
-                        _redisConn.Set(CacheName.USER_ROLE + user_id + "_" + _configuration["CompanyType"], token, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
+                        _redisConn.Set(CacheName.USER_ROLE + user_id, token, Convert.ToInt32(_configuration["Redis:Database:db_common"]));
                     }
                     catch { }
                 }
@@ -101,8 +103,8 @@ namespace WEB.CMS.Customize
                     Email = _HttpContext.HttpContext.User.FindFirst(ClaimTypes.Email).Value,
                     Role = role,
                     DepartmentId = ClaimDepartmentId != null ? int.Parse(ClaimDepartmentId.Value) : 0,
-                    Permissions = permissions,
-                    UserUnderList = ClaimUserUnderList != null ? ClaimUserUnderList : String.Empty
+                    Permissions = user_role_cache.Permission,
+                    UserUnderList = ClaimUserUnderList ?? String.Empty
                 };
             }
             catch (Exception ex)
@@ -110,6 +112,42 @@ namespace WEB.CMS.Customize
                 LogHelper.InsertLogTelegram("GetCurrentUser - ManagementUser: " + ex.ToString());
                 return null;
             }
+        }
+        public int GetCurrentUserId()
+        {
+            int _UserId = -1;
+            try
+            {
+                if (_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt32(_HttpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetCurrentUserId - ManagementUser: " + ex.ToString());
+            }
+            return _UserId;
+
+        }
+        public int? GetCurrentTenantId()
+        {
+            int? tenant_id = -1;
+            try
+            {
+                if (_HttpContext.HttpContext.User.FindFirst("TenantId") != null)
+                {
+                    tenant_id = Convert.ToInt32(_HttpContext.HttpContext.User.FindFirst("TenantId").Value);
+                    if (tenant_id <= 0) tenant_id = null;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetCurrentTenantId - ManagementUser: " + ex.ToString());
+            }
+            return tenant_id;
+
         }
     }
 }

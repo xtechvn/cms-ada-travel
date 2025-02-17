@@ -18,11 +18,11 @@ using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using static Utilities.DepositHistoryConstant;
 
-namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
+namespace WEB.DeepSeekTravel.CMS.Controllers.SetService.Fly
 {
     [CustomAuthorize]
     public class SetServiceController : Controller
@@ -59,7 +59,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
             _orderESRepository = new OrderESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _flyBookingESRepository = new FlyBookingESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _allCodeRepository = allcodeRepository;
-            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _userRepository = userRepository;
             _passengerRepository = passengerRepository;
             _airlinesRepository = airlinesRepository;
@@ -131,7 +131,9 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
                                     break;
                             }
                         }
+                        int? tenant_id = _ManagementUser.GetCurrentTenantId();
 
+                        searchModel.TenantId = tenant_id;
                         model = await _flyBookingDetailRepository.GetPagingList(searchModel, searchModel.PageIndex, searchModel.pageSize);
                     }
                 }
@@ -597,10 +599,12 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
                     var data_order = new List<OrderSelectViewModel>();
-                    var data = await _orderESRepository.GetOrderNoSuggesstion(txt_search);
+                    var data = await _orderESRepository.GetOrderNoSuggesstion(txt_search, tenant_id);
                     data_order.AddRange(data.Select(s => new OrderSelectViewModel { orderid = s.id, orderno = s.orderno }));
                     return Ok(new
                     {
@@ -640,9 +644,11 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
                 {
                     _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
                 if (txt_search != null)
                 {
-                    var data = await _flyBookingESRepository.GetFlyBookingSuggesstion(txt_search);
+                    var data = await _flyBookingESRepository.GetFlyBookingSuggesstion(txt_search, tenant_id);
                     return Ok(new
                     {
                         status = (int)ResponseType.SUCCESS,

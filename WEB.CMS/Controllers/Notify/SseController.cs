@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Utilities;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers.Notify
+namespace WEB.DeepSeekTravel.CMS.Controllers.Notify
 {
     [CustomAuthorize]
     public class SseController : Controller
@@ -75,13 +75,7 @@ namespace WEB.Adavigo.CMS.Controllers.Notify
                 if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                 {
                     var _company_type="";
-                    AppSettings _appconfig = new AppSettings();
-                    using (StreamReader r = new StreamReader("appsettings.json"))
-                    {
-                        string json = r.ReadToEnd();
-                        _appconfig = JsonConvert.DeserializeObject<AppSettings>(json);
-                        _company_type = _appconfig.CompanyType;
-                    }
+
                     user_id = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                     Response.Headers.Add("Content-Type", "text/event-stream");
                     _subscriber.Subscribe("NOTIFY_" + user_id +(_company_type.Trim() == "0" ? "" : "_" + _company_type.Trim()), (channel, message) =>

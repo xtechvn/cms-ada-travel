@@ -1025,9 +1025,7 @@ namespace Repositories.Repositories
             }
             return 0;
         }
-        public long CountPaymentRequest()
-        {
-            return _contractPayDAL.CountPaymentRequest();
-        }
+       
+      
     }
 }

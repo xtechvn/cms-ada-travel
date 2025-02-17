@@ -45,7 +45,7 @@ namespace Repositories.Repositories
                 if (contactClient_Id == 0) { return -1; }
                 var model = _OrderDAL.GetByOrderId((long)client.OrderId);
                 model.ContactClientId = Convert.ToInt32(contactClient_Id.ToString());
-                var a =await _OrderDAL.UpdataOrder(model);
+                var a =  _OrderDAL.UpdateOrder(model);
                 return a;
             }
             catch(Exception ex)

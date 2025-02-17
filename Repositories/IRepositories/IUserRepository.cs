@@ -9,7 +9,7 @@ namespace Repositories.IRepositories
     {
         Task<UserDetailViewModel> CheckExistAccount(AccountModel entity);
         Task<bool> ResetPassword(string input);
-        GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize);
+        GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize, int? tenant_id = null);
         Task<UserDetailViewModel> GetDetailUser(int Id);
         Task<UserDataViewModel> GetUser(int Id);
         Task<int> Create(UserViewModel model);
@@ -23,14 +23,15 @@ namespace Repositories.IRepositories
         Task<string> ResetPasswordByUserId(int userId);
         Task<int> ChangePassword(UserPasswordModel model);
         List<User> GetAll();
-        Task<List<User>> GetUserSuggesstion(string txt_search);
-        Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids);
+        Task<List<User>> GetUserSuggesstion(string txt_search, int? tenant_id = null);
+        Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids, int? tenant_id = null);
         Task<User> GetClientDetailAsync(long clientId);
         Task<List<RolePermission>> GetUserPermissionById(int Id);
         public List<UserPosition> GetUserPositions();
         public Task<UserPosition> GetUserPositionsByID(int id);
         Task<List<Role>> GetUserActiveRoleList(int user_id);
-        string GetListUserByUserId(int user_id);
+        string GetListUserByUserId(int user_id,int? tenant_id=null);
+
         Task<bool> CheckRolePermissionByUserAndRole(int UserId, int RoleId, int PermissionId, int MenuId);
         Task<bool> CheckRolePermissionByUserAndRole(int UserId, List<long> RoleIds, int PermissionId, int MenuId);
 

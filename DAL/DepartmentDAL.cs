@@ -24,6 +24,28 @@ namespace DAL
         {
             DbWorker = new DbWorker(connection);
         }
+        public List<Department> Listing(string name, int? status=null,  int? tenant_id = null)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[]
+                {
+                    new SqlParameter("@Name", ((name==null||name.Trim()=="")? DBNull.Value: name)),
+                    new SqlParameter("@Status", (status==null? DBNull.Value: (int)status)),
+                    new SqlParameter("@TenantId", (tenant_id==null? DBNull.Value: (int)tenant_id))
+                };
+                var dt = DbWorker.GetDataTable(StoreProcedureConstant.SP_GetAllDepartment_search, objParam);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    return dt.ToList<Department>();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Listing - DepartmentDAL: " + ex);
+            }
+            return null;
+        }
         public async Task<DataTable> GetListRevenueByDepartment(ReportDepartmentViewModel searchModel)
         {
             try
@@ -425,6 +447,68 @@ namespace DAL
             {
                 LogHelper.InsertLogTelegram("GetByIds - UserDAL: " + ex);
                 return null;
+            }
+        }
+        public int InsertDepartment(Department department)
+        {
+            try
+            {
+
+                 SqlParameter[] parameters = new SqlParameter[]
+                 {
+                    new SqlParameter("@DepartmentName", department.DepartmentName),
+                    new SqlParameter("@DepartmentCode", department.DepartmentCode),
+                    new SqlParameter("@ParentId", department.ParentId),
+                    new SqlParameter("@FullParent",  department.FullParent),
+                    new SqlParameter("@IsDelete",  department.IsDelete),
+                    new SqlParameter("@Status", department.Status),
+                    new SqlParameter("@Sort", department.Sort),
+                    new SqlParameter("@Description", department.Description),
+                    new SqlParameter("@Branch",  department.Branch),
+                    new SqlParameter("@IsReport",  department.IsReport),
+                    new SqlParameter("@CreatedBy", department.CreatedBy),
+                    new SqlParameter("@CreatedDate", department.CreatedDate),
+                    new SqlParameter("@TenantId", department.TenantId),
+                 };
+                var id = DbWorker.ExecuteNonQuery(StoreProcedureConstant.InsertDepartment, parameters);
+                department.Id = id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertDepartment - DepartmentDAL: " + ex);
+                return -1;
+            }
+        }
+        public int UpdateDepartment(Department department)
+        {
+            try
+            {
+                SqlParameter[] parameters = new SqlParameter[]
+                                {
+                    new SqlParameter("@Id", department.Id),
+                    new SqlParameter("@DepartmentName", department.DepartmentName),
+                    new SqlParameter("@DepartmentCode", department.DepartmentCode),
+                    new SqlParameter("@ParentId", department.ParentId),
+                    new SqlParameter("@FullParent",  department.FullParent),
+                    new SqlParameter("@IsDelete",  department.IsDelete),
+                    new SqlParameter("@Status", department.Status),
+                    new SqlParameter("@Sort", department.Sort),
+                    new SqlParameter("@Description", department.Description),
+                    new SqlParameter("@Branch",  department.Branch),
+                    new SqlParameter("@IsReport",  department.IsReport),
+                    new SqlParameter("@CreatedBy", department.CreatedBy),
+                    new SqlParameter("@CreatedDate", department.CreatedDate),
+                    new SqlParameter("@TenantId", department.TenantId),
+                                };
+                var id = DbWorker.ExecuteNonQuery(StoreProcedureConstant.UpdateDepartment, parameters);
+                department.Id = id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateDepartment - DepartmentDAL: " + ex);
+                return -1;
             }
         }
     }

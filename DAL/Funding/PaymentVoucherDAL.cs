@@ -91,7 +91,7 @@ namespace DAL.Funding
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[11];
+                SqlParameter[] objParam = new SqlParameter[12];
                 objParam[0] = new SqlParameter("@PaymentCode", searchModel.PaymentCode);
                 objParam[1] = new SqlParameter("@Description", searchModel.Content);
                 if (searchModel.TypeMulti == null || searchModel.TypeMulti.Count == 0)
@@ -126,6 +126,7 @@ namespace DAL.Funding
                     objParam[8] = new SqlParameter("@PageIndex", currentPage);
                     objParam[9] = new SqlParameter("@PageSize", pageSize);
                 }
+                objParam[11] = new SqlParameter("@TenantId", searchModel.TenantId);
                 //if (searchModel.BankingAccountSource == 0)
                 //    objParam[10] = new SqlParameter("@SourceAccount",DBNull.Value);
                 //else
@@ -159,7 +160,7 @@ namespace DAL.Funding
             int id = 0;
             try
             {
-                SqlParameter[] objParam_PaymentVoucher = new SqlParameter[16];
+                SqlParameter[] objParam_PaymentVoucher = new SqlParameter[17];
                 objParam_PaymentVoucher[0] = new SqlParameter("@PaymentCode", model.PaymentCode);
                 objParam_PaymentVoucher[1] = new SqlParameter("@Type", model.Type);
                 objParam_PaymentVoucher[2] = new SqlParameter("@RequestId",
@@ -197,6 +198,7 @@ namespace DAL.Funding
                     objParam_PaymentVoucher[15] = new SqlParameter("@SourceAccount", DBNull.Value);
                 else
                     objParam_PaymentVoucher[15] = new SqlParameter("@SourceAccount", Convert.ToInt32(model.SourceAccount));
+                objParam_PaymentVoucher[16] = new SqlParameter("@TenantId", model.TenantId==null?DBNull.Value: model.TenantId);
                 id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_InsertPaymentVoucher, objParam_PaymentVoucher);
                 UpdatePaymentRequestStatus(model.PaymentRequestDetails.Select(n => n.Id).ToList());
                 if (model.Type == (int)PAYMENT_VOUCHER_TYPE.HOAN_TRA_KHACH_HANG)

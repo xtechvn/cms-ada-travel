@@ -11,7 +11,7 @@ using Utilities.Contants;
 using System.Security.Claims;
 using WEB.CMS.Customize;
 
-namespace WEB.Adavigo.CMS.Controllers
+namespace WEB.DeepSeekTravel.CMS.Controllers
 {
     [CustomAuthorize]
 

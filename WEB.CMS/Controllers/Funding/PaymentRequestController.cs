@@ -13,11 +13,11 @@ using Repositories.Repositories;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
-using WEB.Adavigo.CMS.Service;
+using WEB.DeepSeekTravel.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
-namespace WEB.Adavigo.CMS.Controllers.Funding
+namespace WEB.DeepSeekTravel.CMS.Controllers.Funding
 {
     [CustomAuthorize]
 
@@ -33,12 +33,12 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         private readonly IFlyBookingDetailRepository _flyBookingDetailRepository;
         private readonly IBankingAccountRepository _bankingAccountRepository;
         private readonly IClientRepository _clientRepository;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         private readonly WEB.CMS.Models.AppSettings config;
         private readonly IContractPayRepository _contractPayRepository;
         private ManagementUser _ManagementUser;
         private APIService apiService;
         private readonly IUserRepository _userRepository;
-        private IndentiferService _indentiferService;
         public PaymentRequestController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser,
            IPaymentRequestRepository paymentRequestRepository, ISupplierRepository supplierRepository, IUserRepository userRepository,
            ITourPackagesOptionalRepository tourPackagesOptionalRepository, IConfiguration configuration, IFlyBookingDetailRepository flyBookingDetailRepository,
@@ -60,7 +60,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             _flyBookingDetailRepository = flyBookingDetailRepository;
             _bankingAccountRepository = bankingAccountRepository;
             _clientRepository = clientRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
+            _identifierServiceRepository = identifierServiceRepository;
         }
 
         public IActionResult Index()
@@ -77,6 +77,9 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             var model = new GenericViewModel<PaymentRequestViewModel>();
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                searchModel.TenantId = tenant_id;
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (searchModel.PaymentTypeMulti == null) searchModel.PaymentTypeMulti = new List<int>();
                 if (searchModel.StatusMulti == null) searchModel.StatusMulti = new List<int>();
@@ -182,6 +185,9 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         {
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                searchModel.TenantId = tenant_id;
                 if (searchModel.CreateByIds == null) searchModel.CreateByIds = new List<int>();
                 if (searchModel.PaymentTypeMulti == null) searchModel.PaymentTypeMulti = new List<int>();
                 if (searchModel.StatusMulti == null) searchModel.StatusMulti = new List<int>();
@@ -442,6 +448,9 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         {
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+
+                model.TenantId = tenant_id;
                 var userLogin = 0;
                 if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                 {
@@ -477,7 +486,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 //var response = await httpClient.PostAsync(apiPrefix, content);
                 //var resultAPI = await response.Content.ReadAsStringAsync();
                 //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.PaymentCode =await _indentiferService.BuildPaymentRequest();
+                model.PaymentCode =await _identifierServiceRepository.BuildPaymentRequest(tenant_id);
                 var result = _paymentRequestRepository.CreatePaymentRequest(model);
                 if (result == -2)
                     return Ok(new

@@ -13,7 +13,7 @@ namespace Caching.Elasticsearch
    public class ProgramsESRepository : ESRepository<ProgramsViewModel>
     {
         public ProgramsESRepository(string Host) : base(Host) { }
-        public async Task<List<ProgramsViewModel>> GetProgramsSuggesstion(string txt_search, string index_name = "adavigo_sp_getprograms")
+        public async Task<List<ProgramsViewModel>> GetProgramsSuggesstion(string txt_search, string index_name = "TravelLab_sp_getprograms")
         {
             List<ProgramsViewModel> result = new List<ProgramsViewModel>();
             try
@@ -69,7 +69,7 @@ namespace Caching.Elasticsearch
             }
 
         }
-        public async Task<List<ProgramsViewModel>> GetProgramsSuggesstionByHotelid(string txt_search, string index_name = "adavigo_sp_getprograms")
+        public async Task<List<ProgramsViewModel>> GetProgramsSuggesstionByHotelid(string txt_search, string index_name = "TravelLab_sp_getprograms")
         {
             List<ProgramsViewModel> result = new List<ProgramsViewModel>();
             try

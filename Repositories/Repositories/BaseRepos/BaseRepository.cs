@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
@@ -36,7 +37,7 @@ namespace Repositories.Repositories.BaseRepos
                 UserRoleCacheModel user_role_cache = new UserRoleCacheModel()
                 {
                     Role = role,
-                    Permission = Enumerable.Empty<PermissionData>(),
+                    Permission = new List<PermissionData>(),
                     UserUnderList = ""
                 };
                 //-- Get From Cache
@@ -45,7 +46,7 @@ namespace Repositories.Repositories.BaseRepos
 
                     _redisConn = new RedisConn(configuration);
                     _redisConn.Connect();
-                    string data_json = _redisConn.Get(CacheName.USER_ROLE + user_id + "_" + configuration["CompanyType"], Convert.ToInt32(configuration["Redis:Database:db_common"]));
+                    string data_json = _redisConn.Get(CacheName.USER_ROLE + user_id, Convert.ToInt32(configuration["Redis:Database:db_common"]));
                     if (data_json != null && data_json.Trim() != "")
                     {
                         JArray objParr = null;
@@ -73,7 +74,7 @@ namespace Repositories.Repositories.BaseRepos
 
                 }
                 //-- Get from Db:
-                user_role_cache.Permission = Enumerable.Empty<PermissionData>();
+                user_role_cache.Permission = new List<PermissionData>();
                 var permission = _UserRepository.GetUserPermissionById(user_id).Result;
                 if (permission != null && permission.Any())
                 {
@@ -82,13 +83,23 @@ namespace Repositories.Repositories.BaseRepos
                         MenuId = s.MenuId,
                         RoleId = s.RoleId,
                         PermissionId = s.PermissionId
-                    });
+                    }).ToList();
                 }
                 else
                 {
-                    user_role_cache.Permission = Enumerable.Empty<PermissionData>();
+                    user_role_cache.Permission = new List<PermissionData>();
                 }
-                user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id);
+				                int? tenant_id = null;
+				if (context.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    try
+                    {
+                        tenant_id = Convert.ToInt32(context.HttpContext.User.FindFirst("TenantId").Value);
+                    }
+                    catch { }
+					   if (tenant_id <= 0) tenant_id = null;
+                }
+                user_role_cache.UserUnderList = _UserRepository.GetListUserByUserId(user_id, tenant_id);
                 string token = CommonHelper.Encode(JsonConvert.SerializeObject(user_role_cache), configuration["DataBaseConfig:key_api:api_manual"]);
                 _SysUserModel = new SysUserModel
                 {
@@ -102,7 +113,7 @@ namespace Repositories.Repositories.BaseRepos
                 };
                 try
                 {
-                    _redisConn.Set(CacheName.USER_ROLE + user_id + "_" + configuration["CompanyType"], token, Convert.ToInt32(configuration["Redis:Database:db_common"]));
+                    _redisConn.Set(CacheName.USER_ROLE + user_id, token, Convert.ToInt32(configuration["Redis:Database:db_common"]));
                 }
                 catch (Exception ex)
                 {
