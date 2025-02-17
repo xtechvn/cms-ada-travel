@@ -44,7 +44,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             _ManagementUser = ManagementUser;
             _userRepository = userRepository;
             _configuration = configuration;
-            _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
 
         }
 
@@ -311,7 +311,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         {
             try
             {
-                var accountClients = await _clientESRepository.GetClientSuggesstion(name);
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+                var accountClients = await _clientESRepository.GetClientSuggesstion(name,tenant_id);
                 var suggestionlist = accountClients.Select(s => new
                 {
                     id = s.id,

@@ -11,5 +11,6 @@ namespace Entities.ViewModels.ElasticSearch
         public long id { get; set; }
         [PropertyName("contractno")]
         public string contractno { get; set; }
+        public int? tenantid { get; set; }
     }
 }

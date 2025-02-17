@@ -18,6 +18,7 @@ namespace Entities.ViewModels.ElasticSearch
         [PropertyName("email")]
         public string email { get; set; }
         public string phone { get; set; }
+        public int? tenantid { get; set; }
     }
     public class ClientESViewModel
     {

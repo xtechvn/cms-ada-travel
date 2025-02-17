@@ -75,7 +75,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
             _allCodeRepository = allcodeRepository;
             _userRepository = userRepository;
             _identifierServiceRepository = identifierServiceRepository;
-            _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
             _nationalESRepository = new NationalESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
@@ -340,7 +340,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers.Order
             {
                 if (txt_search != null)
                 {
-                    var data = await _clientESRepository.GetClientSuggesstion(txt_search);
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+                    var data = await _clientESRepository.GetClientSuggesstion(txt_search,tenant_id);
                     return Ok(new
                     {
                         status = (int)ResponseType.SUCCESS,

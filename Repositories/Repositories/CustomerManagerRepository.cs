@@ -45,7 +45,7 @@ namespace Repositories.Repositories
             _UserAgentDAL = new UserAgentDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _AccountClientDAL = new AccountClientDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _UserDAL = new UserDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
-            _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _contractPayRepository = contractPayRepository;
         }
 
