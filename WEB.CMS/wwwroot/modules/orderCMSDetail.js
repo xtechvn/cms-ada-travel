@@ -354,6 +354,7 @@ var _orderDetail = {
                 hotelArrivalDate: element.find('#hotelArrivalDate').val(),
                 hotelArrivalDate: element.find('#hotelArrivalDate').val(),
                 HotelName: element.find('#HotelName').val(),
+                HotelId: element.find('#HotelId').val(),
             };
             HotelEmail.push(obj_package);
         });

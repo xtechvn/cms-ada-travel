@@ -171,6 +171,7 @@ namespace Entities.ViewModels.HotelBookingCode
     }
     public class HotelEmail
     {
+        public string HotelId { get; set; }
         public string HotelName { get; set; }
         public string hotelNote { get; set; }
         public string hotelAmount { get; set; }
