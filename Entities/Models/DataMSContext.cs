@@ -371,7 +371,7 @@ namespace Entities.Models
             modelBuilder.Entity<ArticleRelated>(entity =>
             {
                 entity.HasOne(d => d.Article)
-                    .WithMany(p => p.ArticleRelated)
+                    .WithMany(p => p.ArticleRelateds)
                     .HasForeignKey(d => d.ArticleId)
                     .HasConstraintName("FK_ArticleRelated_Article");
             });
@@ -379,12 +379,12 @@ namespace Entities.Models
             modelBuilder.Entity<ArticleTag>(entity =>
             {
                 entity.HasOne(d => d.Article)
-                    .WithMany(p => p.ArticleTag)
+                    .WithMany(p => p.ArticleTags)
                     .HasForeignKey(d => d.ArticleId)
                     .HasConstraintName("FK_ArticleTags_Article");
 
                 entity.HasOne(d => d.Tag)
-                    .WithMany(p => p.ArticleTag)
+                    .WithMany(p => p.ArticleTags)
                     .HasForeignKey(d => d.TagId)
                     .HasConstraintName("FK_ArticleTags_Tags");
             });
@@ -1840,7 +1840,7 @@ namespace Entities.Models
                     .HasMaxLength(100);
 
                 entity.HasOne(d => d.Order)
-                    .WithMany(p => p.Passenger)
+                    .WithMany(p => p.Passengers)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Passenger_Order");
@@ -2275,7 +2275,7 @@ namespace Entities.Models
                 entity.Property(e => e.UpdateLast).HasColumnType("datetime");
 
                 entity.HasOne(d => d.RoomFun)
-                    .WithMany(p => p.RoomPackage)
+                    .WithMany(p => p.RoomPackages)
                     .HasForeignKey(d => d.RoomFunId)
                     .HasConstraintName("FK_RoomPackage_RoomFun1");
             });
@@ -2322,7 +2322,7 @@ namespace Entities.Models
                 entity.Property(e => e.UpdateLast).HasColumnType("datetime");
 
                 entity.HasOne(d => d.RoomPackage)
-                    .WithMany(p => p.ServicePiceRoom)
+                    .WithMany(p => p.ServicePiceRooms)
                     .HasForeignKey(d => d.RoomPackageId)
                     .HasConstraintName("FK_ServicePiceRoom_RoomPackage");
             });

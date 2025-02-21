@@ -133,6 +133,7 @@ builder.Services.AddTransient<IHotelRepository, HotelRepository>();
 builder.Services.AddTransient<IDebtStatisticRepository, DebtStatisticRepository>();
 builder.Services.AddTransient<IRequestRepository, RequestRepository>();
 builder.Services.AddTransient<IVoucherRepository, VoucherRepository>();
+builder.Services.AddTransient<IDebtGuaranteeRepository, DebtGuaranteeRepository>();
 // Setting Redis                     
 builder.Services.AddSingleton<RedisConn>();
 builder.Services.AddSingleton<ManagementUser>();

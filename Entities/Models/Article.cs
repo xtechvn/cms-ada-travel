@@ -7,8 +7,8 @@ namespace Entities.Models
     {
         public Article()
         {
-            ArticleRelated = new HashSet<ArticleRelated>();
-            ArticleTag = new HashSet<ArticleTag>();
+            ArticleRelateds = new HashSet<ArticleRelated>();
+            ArticleTags = new HashSet<ArticleTag>();
         }
 
         public long Id { get; set; }
@@ -29,7 +29,7 @@ namespace Entities.Models
         public DateTime? UpTime { get; set; }
         public short? Position { get; set; }
 
-        public virtual ICollection<ArticleRelated> ArticleRelated { get; set; }
-        public virtual ICollection<ArticleTag> ArticleTag { get; set; }
+        public virtual ICollection<ArticleRelated> ArticleRelateds { get; set; }
+        public virtual ICollection<ArticleTag> ArticleTags { get; set; }
     }
 }

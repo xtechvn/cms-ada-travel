@@ -7,7 +7,7 @@ namespace Entities.Models
     {
         public RoomPackage()
         {
-            ServicePiceRoom = new HashSet<ServicePiceRoom>();
+            ServicePiceRooms = new HashSet<ServicePiceRoom>();
         }
 
         public int Id { get; set; }
@@ -19,6 +19,6 @@ namespace Entities.Models
         public DateTime? UpdateLast { get; set; }
 
         public virtual RoomFun RoomFun { get; set; }
-        public virtual ICollection<ServicePiceRoom> ServicePiceRoom { get; set; }
+        public virtual ICollection<ServicePiceRoom> ServicePiceRooms { get; set; }
     }
 }

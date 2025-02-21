@@ -12,6 +12,7 @@ using Entities.ViewModels.OrderManual;
 using ENTITIES.ViewModels.ElasticSearch;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver.Linq;
+using Nest;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
 using System.Diagnostics;
@@ -62,13 +63,14 @@ namespace WEB.Adavigo.CMS.Controllers
         private HotelBookingCodeESRepository _boongKingCodeESRepository;
         private LogActionMongoService LogActionMongo;
         private IndentiferService _indentiferService;
+        private IDebtGuaranteeRepository _debtGuaranteeRepository;
 
         private readonly List<int> list_order_status_not_allow_to_edit = new List<int>() { (int)OrderStatus.FINISHED, (int)OrderStatus.CANCEL, (int)OrderStatus.WAITING_FOR_ACCOUNTANT, (int)OrderStatus.WAITING_FOR_OPERATOR };
         public OrderController(IConfiguration configuration, IOrderRepository orderRepository, IClientRepository clientRepository, IHotelBookingRepositories hotelBookingRepositories, ManagementUser managementUser, IContractRepository contractRepository,
             IAllCodeRepository allcodeRepository, IContactClientRepository contactClientRepository, IOrderRepositor iOrderRepositories, IFlightSegmentRepository flightSegmentRepository, IBagageRepository bagageRepository, IContactClientRepository ContactClientRepository, IHotelBookingCodeRepository hotelBookingCodeRepository,
             IFlyBookingDetailRepository flyBookingDetailRepository, IUserRepository userRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, ITourRepository tourRepository, IEmailService emailService, IAttachFileRepository attachFileRepository, IOtherBookingRepository otherBookingRepository,
             IInvoiceRequestRepository invoiceRequestRepository, IVinWonderBookingRepository vinWonderBookingRepository, IIdentifierServiceRepository identifierServiceRepository,
-            IWebHostEnvironment WebHostEnvironment, IInvoiceRepository invoiceRepository, IAccountClientRepository accountClientRepository, IPaymentRequestRepository paymentRequestRepository)
+            IWebHostEnvironment WebHostEnvironment, IInvoiceRepository invoiceRepository, IAccountClientRepository accountClientRepository, IPaymentRequestRepository paymentRequestRepository, IDebtGuaranteeRepository debtGuaranteeRepository)
         {
             _invoiceRequestRepository = invoiceRequestRepository;
             _configuration = configuration;
@@ -103,6 +105,7 @@ namespace WEB.Adavigo.CMS.Controllers
             workQueueClient = new WorkQueueClient(configuration);
             _identifierServiceRepository = identifierServiceRepository;
             _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
+            _debtGuaranteeRepository = debtGuaranteeRepository;
         }
 
 
@@ -1226,7 +1229,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                     LogActionMongo.InsertLog(model);
                                     string link = "/Order/" + OrderId;
 
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.HOAN_THANH).ToString(), order.OrderNo, link, current_user.Role.ToString());
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.HOAN_THANH).ToString(), order.OrderNo, link, current_user.Role.ToString());
                                     sst_status = (int)ResponseType.SUCCESS;
                                     smg = "Đổi trạng thái thành công";
                                 }
@@ -1244,7 +1247,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                     var updateOrderService = await _orderRepository.UpdateAllServiceStatusByOrderId(OrderId, (int)ServiceStatus.Cancel);
 
                                     string link = "/Order/" + OrderId;
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.HUY).ToString(), order.OrderNo, link, current_user.Role.ToString());
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.HUY).ToString(), order.OrderNo, link, current_user.Role.ToString());
                                     await _orderRepository.UndoContractPayByOrderId(OrderId, (int)UserVerify);
                                     sst_status = (int)ResponseType.SUCCESS;
                                     smg = "Đổi trạng thái thành công";
@@ -1662,23 +1665,23 @@ namespace WEB.Adavigo.CMS.Controllers
                             {
                                 if (item.Type.Equals("Tour"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.tour.ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.tour.ServiceCode);
                                 }
                                 if (item.Type.Equals("Khách sạn"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Hotel[0].ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Hotel[0].ServiceCode);
                                 }
                                 if (item.Type.Equals("Vé máy bay"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Flight.ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Flight.ServiceCode);
                                 }
                                 if (item.Type.Equals("Dịch vụ khác"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.OtherBooking[0].ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.OtherBooking[0].ServiceCode);
                                 }
                                 if (item.Type.Equals("Vinwonder"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.VinWonderBooking[0].ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.VinWonderBooking[0].ServiceCode);
                                 }
                             }
                             var modelEmail = new SendEmailViewModel();
@@ -1704,23 +1707,23 @@ namespace WEB.Adavigo.CMS.Controllers
                             {
                                 if (item.Type.Equals("Tour"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.tour.ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.tour.ServiceCode);
                                 }
                                 if (item.Type.Equals("Khách sạn"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Hotel[0].ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Hotel[0].ServiceCode);
                                 }
                                 if (item.Type.Equals("Vé máy bay"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Flight.ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Flight.ServiceCode);
                                 }
                                 if (item.Type.Equals("Dịch vụ khác"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.OtherBooking[0].ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.OtherBooking[0].ServiceCode);
                                 }
                                 if (item.Type.Equals("Vinwonder"))
                                 {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.VinWonderBooking[0].ServiceCode);
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.VinWonderBooking[0].ServiceCode);
                                 }
                             }
                             sst_status = (int)ResponseType.SUCCESS;
@@ -2544,7 +2547,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 ViewBag.ClientEmail = Client.Email;
                 ViewBag.id = Id;
                 ViewBag.OrderId = OrderId;
-                ViewBag.EmailBody = await _emailService.GetTemplateHotelBookingCode(Id, OrderId, null,null);
+                ViewBag.EmailBody = await _emailService.GetTemplateHotelBookingCode(Id, OrderId, null, null);
             }
             catch (Exception ex)
             {
@@ -2562,7 +2565,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 {
                     Note = "";
                 }
-                bool resulstSendMail = await _emailService.SendEmailBookingCode(Id, OrderId, CC_Email, BCC_Email, Email, To_Email, subject_name, Note,Description);
+                bool resulstSendMail = await _emailService.SendEmailBookingCode(Id, OrderId, CC_Email, BCC_Email, Email, To_Email, subject_name, Note, Description);
                 if (resulstSendMail)
                 {
                     status = (int)ResponseType.SUCCESS;
@@ -2580,7 +2583,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 msg = msg
             });
         }
-        public async Task<IActionResult> SaleUpdateOrderFinishPayment(long OrderId, int type, long SalerId, long Amount)
+        public async Task<IActionResult> SaleUpdateOrderFinishPayment(int OrderId, int type, long SalerId, long Amount)
         {
             var sst_status = (int)ResponseType.ERROR;
             var smg = "Không thành công";
@@ -2588,164 +2591,28 @@ namespace WEB.Adavigo.CMS.Controllers
             try
             {
                 var current_user = _ManagementUser.GetCurrentUser();
-                if (OrderId != 0)
+                int _UserId = 0;
+                var dataOrder = _iOrderRepositories.GetByOrderId(OrderId);
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                 {
-                    var listrole = new List<int>();
-                    var model = new GenericViewModel<ContractViewModel>();
-                    var dataOrder = _iOrderRepositories.GetByOrderId(OrderId);
-                    model = await _contractRepository.GetListByType((long)dataOrder.ClientId, 1, 10);
-
-                    var check = await _orderRepository.CheckAmountRemainBySalerId(SalerId);
-                    if (check >= 0 || (Amount + check) > 0)
-                    {
-                        
-                        return Ok(new
-                        {
-                            sst_status = sst_status,
-                            smg = "Đơn hàng vượt mức công nợ"
-                        });
-                    }
-                    var _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                    var user = await _userRepository.GetById(_UserId);
-                    var orderStatus = _allCodeRepository.GetListByType("ORDER_STATUS");
-                    var allCodes = orderStatus.Where(s => s.CodeValue == (int)OrderStatus.WAITING_FOR_OPERATOR).ToList();
-                    var modelLog = new LogActionModel();
-                    modelLog.Type = (int)AttachmentType.OrderDetail;
-                    modelLog.LogId = OrderId;
-                    modelLog.CreatedUserName = user.FullName;
-                    modelLog.Log = allCodes[0].Description;
-                    modelLog.Note = user.FullName + " công nợ đơn hàng";
-                    var data = await _orderRepository.GetAllServiceByOrderId(dataOrder.OrderId);
-                    if (data != null)
-                        foreach (var item in data)
-                        {
-                            item.Price += item.Profit;
-                            if (item.Type.Equals("Tour"))
-                            {
-                                item.tour = await _tourRepository.GetDetailTourByID(Convert.ToInt32(item.ServiceId));
-                            }
-                            if (item.Type.Equals("Khách sạn"))
-                            {
-                                item.Hotel = await _hotelBookingRepositories.GetDetailHotelBookingByID(Convert.ToInt32(item.ServiceId));
-                            }
-                            if (item.Type.Equals("Vé máy bay"))
-                            {
-                                item.Flight = await _flyBookingDetailRepository.GetDetailFlyBookingDetailById(Convert.ToInt32(item.ServiceId));
-                            }
-                            if (item.Type.Equals("Dịch vụ khác"))
-                            {
-                                item.OtherBooking = await _otherBookingRepository.GetDetailOtherBookingById(Convert.ToInt32(item.ServiceId));
-                            }
-                            if (item.Type.Equals("Vinwonder"))
-                            {
-                                item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
-                            }
-                        }
-                    if (data != null && data.Count > 1)
-                    {
-                        for (int o = 0; o < data.Count - 1; o++)
-                        {
-
-                            if (data[o].Flight != null && data[o + 1].Flight != null)
-                            {
-                                if (data[o].Flight.GroupBookingId == data[o + 1].Flight.GroupBookingId && data[o].Flight.Leg != data[o + 1].Flight.Leg)
-                                {
-                                    data[o].Flight.StartDistrict2 = data[o + 1].Flight.StartDistrict;
-                                    data[o].Flight.EndDistrict2 = data[o + 1].Flight.EndDistrict;
-                                    data[o].Flight.Leg2 = 3;
-                                    data[o].Flight.BookingCode2 = data[o + 1].Flight.BookingCode;
-                                    data[o].Amount = data[o].Flight.Amount + data[o + 1].Flight.Amount;
-                                    data[o].EndDate = data[o + 1].EndDate;
-
-                                    data.Remove(data[o + 1]);
-
-                                }
-                            }
-
-                        }
-                    }
-                    if (type == 0)
-                    {
-                        long status = Convert.ToInt32((int)OrderStatus.WAITING_FOR_OPERATOR);
-                        await _orderRepository.UpdateOrderIsSalerDebtLimit(OrderId, 1, _UserId, _UserId);
-                        var data2 = await _orderRepository.UpdateOrderFinishPayment(OrderId, status);
-                        if (data2 >= 0)
-                        {
-
-                            string link = "/Order/" + OrderId;
-
-                            foreach (var item in data)
-                            {
-                                if (item.Type.Equals("Tour"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.tour.ServiceCode);
-                                }
-                                if (item.Type.Equals("Khách sạn"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Hotel[0].ServiceCode);
-                                }
-                                if (item.Type.Equals("Vé máy bay"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Flight.ServiceCode);
-                                }
-                                if (item.Type.Equals("Dịch vụ khác"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.OtherBooking[0].ServiceCode);
-                                }
-                                if (item.Type.Equals("Vinwonder"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.VinWonderBooking[0].ServiceCode);
-                                }
-                            }
-                            var modelEmail = new SendEmailViewModel();
-                            modelEmail.Orderid = OrderId;
-                            modelEmail.ServiceType = (int)EmailType.SaleDH;
-                            var attach_file = new List<AttachfileViewModel>();
-                            bool resulstSendMail = await _emailService.SendEmail(modelEmail, attach_file);
-                            sst_status = (int)ResponseType.SUCCESS;
-                            smg = "Công nợ thành công thành công";
-
-                            LogActionMongo.InsertLog(modelLog);
-                        }
-                    }
-                    else
-                    {
-
-                        var data2 = await _orderRepository.UpdateServiceStatusByOrderId(OrderId, (long)ServiceStatus.Decline, (long)ServiceStatus.OnExcution);
-                        if (data2 >= 0)
-                        {
-
-                            string link = "/Order/" + OrderId;
-                            foreach (var item in data)
-                            {
-                                if (item.Type.Equals("Tour"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.tour.ServiceCode);
-                                }
-                                if (item.Type.Equals("Khách sạn"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Hotel[0].ServiceCode);
-                                }
-                                if (item.Type.Equals("Vé máy bay"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Flight.ServiceCode);
-                                }
-                                if (item.Type.Equals("Dịch vụ khác"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.OtherBooking[0].ServiceCode);
-                                }
-                                if (item.Type.Equals("Vinwonder"))
-                                {
-                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.VinWonderBooking[0].ServiceCode);
-                                }
-                            }
-                            sst_status = (int)ResponseType.SUCCESS;
-                            smg = "Công nợ thành công ";
-                            LogActionMongo.InsertLog(modelLog);
-                        }
-                    }
+                    _UserId = (int)Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                var model = new DebtGuarantee();
+                model.Code = "BL"+OrderId;
+                model.CreatedBy = _UserId;
+                model.Orderid = OrderId;
+                model.ClientId = (int?)dataOrder.ClientId;
+                if (Amount > 10000000)
+                {
+                    model.Status = (int)DebtGuaranteeStatus.CHO_TP_DUYET;
+                }
+                else
+                {
+                    model.Status = (int)DebtGuaranteeStatus.CHO_TN_DUYET;
                 }
 
+                var Insert = await _debtGuaranteeRepository.InsertDebtGuarantee(model);
+                if (Insert > 0) sst_status = (int)ResponseType.SUCCESS;
             }
             catch (Exception ex)
             {
@@ -2763,8 +2630,8 @@ namespace WEB.Adavigo.CMS.Controllers
         public async Task<IActionResult> SaleDebtLimit()
         {
             var current_user = _ManagementUser.GetCurrentUser();
-            var user =await _userRepository.GetDetailUser(current_user.Id);
-            ViewBag.DebtLimit = ((double)user.Entity.DebtLimit).ToString("N0") ;
+            var user = await _userRepository.GetDetailUser(current_user.Id);
+            ViewBag.DebtLimit = ((double)user.Entity.DebtLimit).ToString("N0");
             var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id);
             ViewBag.AmountTotal = AmountTotal.ToString("N0");
             return View();

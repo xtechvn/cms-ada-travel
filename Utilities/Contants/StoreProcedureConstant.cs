@@ -447,5 +447,11 @@ namespace Utilities.Contants
         public static string UpsertUser = "sp_UpsertUser";
         public static string UpsertUserRole = "sp_UpsertUserRole";
         public static string DeleteUserRole = "sp_DeleteUserRole";
+
+        public static string SP_GetListDebtGuarantee = "SP_GetListDebtGuarantee";
+        public static string SP_GeDetailDebtGuarantee = "SP_GeDetailDebtGuarantee";
+        public static string sp_UpdateDebtGuarantee = "sp_UpdateDebtGuarantee";
+        public static string sp_InsertDebtGuarantee = "sp_InsertDebtGuarantee";
+
     }
 }

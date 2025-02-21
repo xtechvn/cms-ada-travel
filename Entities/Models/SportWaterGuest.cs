@@ -3,16 +3,15 @@ using System.Collections.Generic;
 
 namespace Entities.Models
 {
-    public partial class HotelPosition
+    public partial class SportWaterGuest
     {
         public long Id { get; set; }
-        public int? HotelId { get; set; }
-        /// <summary>
-        /// 1: B2B, 2: B2C
-        /// </summary>
-        public short? PositionType { get; set; }
-        public int? Position { get; set; }
-        public int? Status { get; set; }
+        public int? ClientId { get; set; }
+        public string UserName { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string RoomNo { get; set; }
+        public int? National { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }

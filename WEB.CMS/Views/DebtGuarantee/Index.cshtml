@@ -1,0 +1,58 @@
+﻿@using Entities.Models
+@{
+    ViewData["Title"] = "Danh sách đơn hàng công nợ";
+    var Status = (List<AllCode>)ViewBag.Status;
+}
+@using Entities.Models
+
+
+<section style=" overflow-x: hidden;">
+    <div class="main-container">
+        <div class="row-main container">
+            <h2 class="txt_18 bold mb20">Danh sách đơn hàng công nợ</h2>
+            <div class="flex fillter-donhang">
+                <div class="form-group mb10 mr-2">
+                    <input type="text" class="form-control" id="Code" placeholder="Mã phiếu" style=" width: 200px;">
+                </div>
+                <div class="form-group mb10 mr-2">
+                    <select type="text" class="form-control" id="Status" style=" width: 200px;">
+                        <option value="-1">Tất cả</option>
+                        @foreach (var item in Status)
+                        {
+                            <option value="@item.CodeValue">@item.Description</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group mb10 mr-2"style="min-width:200px;">
+                    <select class="select2 orderno-select main-staff-select" id="OrderId" style="min-width:200px;width:100% !important">
+                    </select>
+                    @*<input type="text" class="form-control" id="OrderId" placeholder="Mã đơn hàng" style=" width: 200px;">*@
+                </div>
+
+                <div class="mb10 mr-2">
+                    <button class="btn-search btn-default" type="button" onclick="_payment_request_service.Export()" id="btnExport">
+                        <i class="fa fa-file-excel-o" id="icon-export"></i>
+                    </button>
+                    <button type="button" class="btn btn-default bg-main" onclick="_payment_request_service.ActionSearch(1)">
+                        <svg class="icon-svg" style="vertical-align: sub;">
+                            <use xlink:href="/images/icons/icon.svg#search"></use>
+                        </svg>
+                        Tìm kiếm
+                    </button>
+                </div>
+            </div>
+
+            <div id="grid_data" class="wrap_bg wrap_bg_no-padding mb20">
+                <div class="col-xl-12 text-center" style="margin-top:200px">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+@section scripts {
+    <script type="text/javascript" src="~/modules/debt_guarantee.js"></script>
+}

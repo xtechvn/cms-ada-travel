@@ -7,6 +7,9 @@ namespace Entities.Models
     {
         public int Id { get; set; }
         public int CampaignId { get; set; }
+        /// <summary>
+        /// Khóa chính của các loại vé theo tên đặt bên Vinwonder
+        /// </summary>
         public int ServiceId { get; set; }
         public double BasePrice { get; set; }
         public double WeekendRate { get; set; }

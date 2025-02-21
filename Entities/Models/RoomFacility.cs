@@ -3,15 +3,11 @@ using System.Collections.Generic;
 
 namespace Entities.Models
 {
-    public partial class TourDestination
+    public partial class RoomFacility
     {
-        public long Id { get; set; }
-        public long? TourId { get; set; }
-        public int? LocationId { get; set; }
-        /// <summary>
-        /// Lưu theo Tour Type 
-        /// </summary>
-        public int? Type { get; set; }
+        public int Id { get; set; }
+        public long? HotelRoomId { get; set; }
+        public int? FacilityId { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }

@@ -8,11 +8,9 @@ namespace Entities.Models
         public long Id { get; set; }
         public long? BookingId { get; set; }
         public string RateCode { get; set; }
-        public string Name { get; set; }
-        public double? BasePrice { get; set; }
-        public int? Quantity { get; set; }
-        public double? Profit { get; set; }
+        public int? Number { get; set; }
         public double? Amount { get; set; }
+        public double? Profit { get; set; }
         public DateTime? DateUsed { get; set; }
         public int? Adt { get; set; }
         public int? Child { get; set; }
@@ -23,5 +21,8 @@ namespace Entities.Models
         public DateTime? CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public string Name { get; set; }
+        public double? BasePrice { get; set; }
+        public int? Quantity { get; set; }
     }
 }
