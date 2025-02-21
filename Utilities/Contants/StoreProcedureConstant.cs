@@ -452,6 +452,7 @@ namespace Utilities.Contants
         public static string SP_GeDetailDebtGuarantee = "SP_GeDetailDebtGuarantee";
         public static string sp_UpdateDebtGuarantee = "sp_UpdateDebtGuarantee";
         public static string sp_InsertDebtGuarantee = "sp_InsertDebtGuarantee";
+        public static string SP_GetDetailDebtGuaranteeByOrderid = "SP_GetDetailDebtGuaranteeByOrderid";
 
     }
 }

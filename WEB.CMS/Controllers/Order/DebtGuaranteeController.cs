@@ -62,6 +62,60 @@ namespace WEB.CMS.Controllers.Order
             var model = new GenericViewModel<DebtGuaranteeViewModel>();
             try
             {
+                var current_user = _ManagementUser.GetCurrentUser();
+                if (current_user != null)
+                {
+                    if (current_user.Role != "")
+                    {
+                        var list = current_user.Role.Split(',');
+                        foreach (var item in list)
+                        {
+                            bool is_admin = false;
+                            switch (Convert.ToInt32(item))
+                            {
+                                case (int)RoleType.SaleOnl:
+                                case (int)RoleType.SaleKd:
+                                case (int)RoleType.SaleTour:
+                                case (int)RoleType.TPDHKS:
+                                case (int)RoleType.TPDHVe:
+                                case (int)RoleType.TPDHTour:
+                                case (int)RoleType.TPKS:
+                                case (int)RoleType.TPTour:
+                                case (int)RoleType.TPVe:
+                                case (int)RoleType.DHPQ:
+                                case (int)RoleType.DHTour:
+                                case (int)RoleType.DHVe:
+                                case (int)RoleType.GDHN:
+                                case (int)RoleType.GDHPQ:
+                                    {
+                                        if (Searchmodel.SalerPermission == null || Searchmodel.SalerPermission.Trim() == "")
+                                        {
+                                            Searchmodel.SalerPermission = current_user.UserUnderList;
+                                        }
+                                        else
+                                        {
+                                            Searchmodel.SalerPermission += "," + current_user.UserUnderList;
+
+                                        }
+                                    }
+                                    break;
+                                case (int)RoleType.Admin:
+                                case (int)RoleType.KT:
+                                case (int)RoleType.GD:
+                                case (int)RoleType.PhoTPKeToan:
+                                    {
+                                        Searchmodel.SalerPermission = null;
+                                        is_admin = true;
+                                    }
+                                    break;
+                            }
+                            if (is_admin) break;
+                        }
+
+                     
+                    }
+
+                }
                 model = await _debtGuaranteeRepository.GetListDebtGuarantee(Searchmodel);
             }
             catch (Exception ex)

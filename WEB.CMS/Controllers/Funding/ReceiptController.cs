@@ -46,11 +46,12 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly IPaymentRequestRepository _paymentRequestRepository;
         private readonly ISupplierRepository _supplierRepository;
+        private readonly IDebtGuaranteeRepository _debtGuaranteeRepository;
 
         public ReceiptController(IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, IHotelBookingRepositories hotelBookingRepositories, ITourRepository tourRepository,
             IClientRepository clientRepository, IDepositHistoryRepository depositHistoryRepository, IOrderRepository orderRepository, ManagementUser ManagementUser,
              IUserRepository userRepository,  IPaymentRequestRepository paymentRequestRepository,
-             IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService)
+             IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService, IDebtGuaranteeRepository debtGuaranteeRepository)
         {
             _supplierRepository = supplierRepository;
             _WebHostEnvironment = hostEnvironment;
@@ -68,6 +69,7 @@ namespace WEB.Adavigo.CMS.Controllers
             _emailService = emailService;
             _configuration = configuration;
             config = ReadFile.LoadConfig();
+            _debtGuaranteeRepository = debtGuaranteeRepository;
         }
 
         public IActionResult Index()
@@ -285,6 +287,9 @@ namespace WEB.Adavigo.CMS.Controllers
                 var current_user = _ManagementUser.GetCurrentUser();
                 foreach (var item in model.ContractPayDetails)
                 {
+                  var DetailDebtGuarantee =await  _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(item.OrderId);
+                  _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)_UserId);
+
                     string link = "/Receipt/Detail?contractPayId=" + contractPayId;
                     apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_THU).ToString(),
                        ((int)ActionType.TAO_MOI_PHIEU_THU).ToString(), item.OrderCode, link, current_user == null ? "0" : current_user.Role);

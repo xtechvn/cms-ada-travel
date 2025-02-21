@@ -25,12 +25,13 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[5];
+                SqlParameter[] objParam = new SqlParameter[6];
                 objParam[0] = new SqlParameter("@Code", model.Code);
                 objParam[1] = new SqlParameter("@Status", model.Status);
                 objParam[2] = new SqlParameter("@OrderId", model.OrderId);
                 objParam[3] = new SqlParameter("@PageIndex", model.PageIndex);
                 objParam[4] = new SqlParameter("@PageSize", model.PageSize);
+                objParam[5] = new SqlParameter("@SalerPermission", model.SalerPermission);
                 return _dbWorker.GetDataTable(StoreProcedureConstant.SP_GetListDebtGuarantee, objParam);
 
             }
@@ -88,6 +89,22 @@ namespace DAL
                 objParam[0] = new SqlParameter("@Id", Id);
      
                 return _dbWorker.GetDataTable(StoreProcedureConstant.SP_GeDetailDebtGuarantee, objParam);
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("DebtGuaranteeDAL DetailDebtGuarantee" + ex);
+                return null;
+            }
+        }   
+        public async Task<DataTable> DetailDebtGuaranteebyOrderid(int Orderid)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[1];
+                objParam[0] = new SqlParameter("@Orderid", Orderid);
+     
+                return _dbWorker.GetDataTable(StoreProcedureConstant.SP_GetDetailDebtGuaranteeByOrderid, objParam);
 
             }
             catch (Exception ex)

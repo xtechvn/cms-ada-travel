@@ -98,6 +98,24 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("InsertDebtGuarantee - PolicyDetailDAL. " + ex);
                 return null;
             }
+        }  
+        public async Task<DebtGuaranteeViewModel> DetailDebtGuaranteebyOrderid(int Id)
+        {
+            try
+            {
+                DataTable dt = await debtGuaranteeDAL.DetailDebtGuaranteebyOrderid(Id);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<DebtGuaranteeViewModel>();
+                    return data[0];
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertDebtGuarantee - PolicyDetailDAL. " + ex);
+                return null;
+            }
         }
     }
 }
