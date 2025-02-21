@@ -244,7 +244,7 @@ namespace Repositories.Repositories
                     return -1;
                 }
 
-                var userId =  _UserDAL.UpsertUser(entity);
+                var userId = await  _UserDAL.CreateAsync(entity);
 
                 if (!string.IsNullOrEmpty(model.RoleId))
                 {
@@ -264,7 +264,7 @@ namespace Repositories.Repositories
                         _userRoleDAL.DeleteUserRole(entity.Id, non_keep);
                     }
                 }
-                return userId;
+                return Convert.ToInt32(userId);
             }
             catch (Exception ex)
             {
@@ -362,14 +362,18 @@ namespace Repositories.Repositories
                 var entity = await _UserDAL.FindAsync(model.Id);
 
                 // Check exist User Name or Email
-                var userList = await _UserDAL.GetAllAsync();
+                // var userList = await _UserDAL.GetAllAsync();
 
-                var exmodel = userList.Where(s => s.Id != entity.Id && s.Status == 0 && (s.UserName == entity.UserName /*|| s.Email == entity.Email*/)).ToList();
-                if (exmodel != null && exmodel.Count > 0)
-                {
-                    return -1;
-                }
-
+                //var exmodel = userList.Where(s => s.Id != entity.Id /*&& s.Status == 0 && (s.UserName == entity.UserName || s.Email == entity.Email)*/).FirstOrDefault();
+                //if (exmodel != null && exmodel.Count > 0)
+                //{
+                //    return -1;
+                //}
+                //var exists_other_user = await _UserDAL.CheckIfExists(model.UserName, model.Id);
+                //if(exists_other_user!=null && exists_other_user.Id > 0)
+                //{
+                //    return -1;
+                //}
                 if (entity.DepartmentId.HasValue && entity.DepartmentId.Value > 0
                     && model.DepartmentId.HasValue && model.DepartmentId.Value > 0
                     && entity.DepartmentId.Value != model.DepartmentId.Value)
@@ -403,7 +407,7 @@ namespace Repositories.Repositories
                 entity.DebtLimit = model.DebtLimit;
 
 
-                var id= _UserDAL.UpsertUser(entity);
+               await  _UserDAL.UpdateAsync(entity);
                 if (!string.IsNullOrEmpty(model.RoleId))
                 {
                     var role_list = model.RoleId.Split(',').Select(s => int.Parse(s)).ToArray();

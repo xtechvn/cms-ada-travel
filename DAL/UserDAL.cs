@@ -395,5 +395,20 @@ namespace DAL
             }
 
         }
+        public async Task<User> CheckIfExists(string user_name,int id)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    return await _DbContext.User.AsNoTracking().FirstOrDefaultAsync(s => s.UserName.Equals(user_name) && s.Id!=id);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetByUserName - UserDAL: " + ex);
+                return null;
+            }
+        }
     }
 }
