@@ -15,7 +15,7 @@
                 <tbody>
                     <tr>
                         <td colspan="3">
-                            <strong>Mã : @Model.Code</strong>
+                            <strong>Mã bảo lãnh : @Model.Code</strong>
 
                             @switch (Model.Status)
                             {
@@ -40,22 +40,36 @@
                     <tr>
                         <td style="width: 45%;">
                             <div class="row">
+
                                 <div class="col-5 mb10">Mã đơn hàng</div>
                                 <div class="col-7 mb10">: @Model.OrderNo</div>
-                                <div class="col-5 mb10">Người tạo</div>
-                                <div class="col-7 mb10">: @Model.UserCreateName</div>
-                                <div class="col-5 mb10">Ngày tạo</div>
-                                <div class="col-7 mb10">: @Model.CreatedDate.ToString("dd/MM/yyyy")</div>
+                                <div class="col-5 mb10">Giá trị đơn hàng</div>
+                                <div class="col-7 mb10">: @(Model.Amount == 0 ? "0" : Model.Amount.ToString("#,##"))</div> 
+                                <div class="col-5 mb10">Lợi nhuận</div>
+                                <div class="col-7 mb10">: @Model.Profit</div> 
+                                <div class="col-5 mb10">Ngày bắt đầu - kết thúc</div>
+                                <div class="col-7 mb10">: @Model.StartDate.ToString("dd/MM/yyyy") - @Model.EndDate.ToString("dd/MM/yyyy")</div>
+                                
                             </div>
                         </td>
                         <td>
                             <div class="row">
                                 <div class="col-6 row">
+                                    <div class="col-5 mb10">Sale phụ trách</div>
+                                    <div class="col-7 mb10">: @Model.UserCreateName</div>
+
                                     <div class="col-5 mb10">Ngày tạo</div>
                                     <div class="col-7 mb10">
-                                        @Model.CreatedDate.ToString("dd/MM/yyyy")
+                                       : @Model.CreatedDate.ToString("dd/MM/yyyy")
                                     </div>
-
+                                    <div class="col-5 mb10">khách hàng</div>
+                                    <div class="col-7 mb10">
+                                        : @Model.ClientName
+                                    </div>
+                                    <div class="col-5 mb10">Nhãn đơn</div>
+                                    <div class="col-7 mb10">
+                                       : @Model.Label
+                                    </div>
                                 </div>
 
                             </div>
