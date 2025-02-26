@@ -309,6 +309,12 @@ namespace WEB.Adavigo.CMS.Controllers
                 var result = id;
                 if (id != 0)
                 {
+                    ViewBag.CN = 1;
+                    var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid((int)id);
+                    if (DetailDebtGuarantee != null)
+                    {
+                        ViewBag.CN = 0;
+                    }
                     ViewBag.OrderClosing = false;
                     var ListOrderBookClosing = await _orderRepository.GetListOrderBookClosingByOrderId(id);
                     ViewBag.ServiceStatus = 0;

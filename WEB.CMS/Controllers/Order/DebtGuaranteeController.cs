@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Nest;
+using PdfSharp;
 using Repositories.IRepositories;
 using Repositories.Repositories;
+using System.Linq;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
@@ -134,17 +136,67 @@ namespace WEB.CMS.Controllers.Order
                 _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             }
             var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
-            var order = await _orderRepository.GetOrderByID(detail.OrderId);
-            var Leaderid = await _userRepository.GetLeaderByUserId(Convert.ToInt64(order.SalerId));
-            var Tpsalerid = await _userRepository.GetManagerByUserId(Convert.ToInt64(order.SalerId));
-            if (Leaderid == _UserId)
-            {
-                ViewBag.tn = 1;
+            var current_user = _ManagementUser.GetCurrentUser();
+            if (current_user != null) {
+                if (current_user.Role != "")
+                {
+                  
+                    var order = await _orderRepository.GetOrderByID(detail.OrderId);
+                    var list = current_user.Role.Split(',');
+                    foreach (var item in list)
+                    {
+                        bool is_admin = false;
+                        switch (Convert.ToInt32(item))
+                        {
+                            case (int)RoleType.SaleOnl:
+                            case (int)RoleType.SaleKd:
+                            case (int)RoleType.SaleTour:
+                            case (int)RoleType.TPDHKS:
+                            case (int)RoleType.TPDHVe:
+                            case (int)RoleType.TPDHTour:
+                            case (int)RoleType.TPKS:
+                            case (int)RoleType.TPTour:
+                            case (int)RoleType.TPVe:
+                            case (int)RoleType.DHPQ:
+                            case (int)RoleType.DHTour:
+                            case (int)RoleType.DHVe:
+                            case (int)RoleType.GDHN:
+                            case (int)RoleType.GDHPQ:
+                                {
+                                    var User =await _userRepository.GetDetailUser(_UserId);
+                                    if(User != null)
+                                    {
+                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TP)
+                                        {
+                                            ViewBag.tp = 1;
+                                        }
+                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TN)
+                                        {
+                                            ViewBag.tn = 1;
+                                        }
+                                    }
+                                
+                                }
+                                break;
+                            case (int)RoleType.Admin:
+                           
+                                break;
+                        }
+                        if (is_admin) break;
+                    }
+                }
             }
-            if (Tpsalerid == _UserId)
-            {
-                ViewBag.tp = 1;
-            }
+
+            //var Leaderid = await _userRepository.GetLeaderByUserId(Convert.ToInt64(order.SalerId));
+            //var Tpsalerid = await _userRepository.GetManagerByUserId(Convert.ToInt64(order.SalerId));
+            //if (Leaderid == _UserId)
+            //{
+            //    ViewBag.tn = 1;
+            //}
+            //if (Tpsalerid == _UserId)
+            //{
+            //    ViewBag.tp = 1;
+            //}
             return PartialView(detail);
         }
         public async Task<IActionResult> UpdateStatus(int id, int status)
