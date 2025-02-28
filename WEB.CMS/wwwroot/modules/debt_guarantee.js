@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
     _debt_guarantee.Init();
-    $("#OrderNo").select2({
+    $("#OrderId").select2({
         theme: 'bootstrap4',
         placeholder: "Mã đơn hàng",
         /* tags: true,*/
@@ -74,10 +74,9 @@ var _debt_guarantee = {
             PageIndex: PageIndex,
             PageSize: $("#selectPaggingOptions").find(':selected').val(),
         }
+        return _searchModel;
     },
-    SearchData: function () {
 
-    },
     OnPaging: function (value) {
         if (value > 0) {
             PageIndex = value;

@@ -214,7 +214,7 @@ namespace WEB.CMS.Controllers.Order
                 if (Update > 0)
                 {
                     smg = "Thành công";
-                    if (status == (int)DebtGuaranteeStatus.TN_DUYET || status == (int)DebtGuaranteeStatus.TN_DUYET)
+                    if (status == (int)DebtGuaranteeStatus.TP_DUYET || status == (int)DebtGuaranteeStatus.TN_DUYET)
                     {
 
 
@@ -280,7 +280,7 @@ namespace WEB.CMS.Controllers.Order
                             }
                         }
                         long status_order = Convert.ToInt32((int)OrderStatus.WAITING_FOR_OPERATOR);
-                        var data2 = await _orderRepository.UpdateOrderFinishPayment(detail.OrderId, status);
+                        var data2 = await _orderRepository.UpdateOrderFinishPayment(detail.OrderId, status_order);
 
                         string link = "/Order/" + detail.OrderId;
 

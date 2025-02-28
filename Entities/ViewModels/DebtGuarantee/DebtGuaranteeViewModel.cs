@@ -11,6 +11,8 @@ namespace Entities.ViewModels.DebtGuarantee
         public long Id { get; set; }
         public string Code { get; set; }
         public string ClientName { get; set; }
+        public string ClientPhone { get; set; }
+        public string ClienEmail { get; set; }
         public string StatusName { get; set; }
         public string ClientId { get; set; }
         public int Status { get; set; }

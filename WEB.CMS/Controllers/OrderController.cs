@@ -709,7 +709,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     else
                     {
                         var data = await _orderESRepository.GetOrderNoSuggesstion2(txt_search, Convert.ToInt32(systemtype));
-                        data_order.AddRange(data.Select(s => new OrderSelectViewModel { orderid = s.orderid, orderno = s.orderno }));
+                        data_order.AddRange(data.Select(s => new OrderSelectViewModel { orderid = s.id, orderno = s.orderno }));
 
                         return Ok(new
                         {

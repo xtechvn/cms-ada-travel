@@ -42,7 +42,7 @@
                             <div class="row">
 
                                 <div class="col-5 mb10">Mã đơn hàng</div>
-                                <div class="col-7 mb10">: @Model.OrderNo</div>
+                                <div class="col-7 mb10">:<a class="blue" href="/Order/@Model.OrderId">@Model.OrderNo</a> </div>
                                 <div class="col-5 mb10">Giá trị đơn hàng</div>
                                 <div class="col-7 mb10">: @(Model.Amount == 0 ? "0" : Model.Amount.ToString("#,##"))</div> 
                                 <div class="col-5 mb10">Lợi nhuận</div>
@@ -53,7 +53,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="row">
+                            <div >
                                 <div class="col-6 row">
                                     <div class="col-5 mb10">Sale phụ trách</div>
                                     <div class="col-7 mb10">: @Model.UserCreateName</div>
@@ -64,7 +64,7 @@
                                     </div>
                                     <div class="col-5 mb10">khách hàng</div>
                                     <div class="col-7 mb10">
-                                        : @Model.ClientName
+                                        : @Model.ClientName - @Model.ClientPhone - @Model.ClienEmail
                                     </div>
                                     <div class="col-5 mb10">Nhãn đơn</div>
                                     <div class="col-7 mb10">
@@ -85,12 +85,12 @@
             @if (ViewBag.tn == 1)
             {
                 <button class="btn btn-default ml-1 tn-duyet">Duyệt</button>
-                <button class="btn btn-default ml-1 tn-tuchoi-duyet">Từ chối</button>
+                <button class="btn btn-default ml-1 tn-tuchoi-duyet red">Từ chối</button>
             }
             @if (ViewBag.tp == 1)
             {
                 <button class="btn btn-default ml-1 tp-duyet">Duyệt</button>
-                <button class="btn btn-default ml-1 tp-tuchoi-duyet">Từ chối</button>
+                <button class="btn btn-default ml-1 tp-tuchoi-duyet red">Từ chối</button>
             }
             @*<button class="btn btn-default ml-1 tn-duyet">Duyệt</button>
             <button class="btn btn-default ml-1 tp-duyet">Duyệt</button>
