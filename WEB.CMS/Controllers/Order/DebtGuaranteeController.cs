@@ -37,7 +37,7 @@ namespace WEB.CMS.Controllers.Order
         private IOtherBookingRepository _otherBookingRepository;
         private readonly IVinWonderBookingRepository _vinWonderBookingRepository;
 
-        public DebtGuaranteeController(IDebtGuaranteeRepository debtGuaranteeRepository, IAllCodeRepository allCodeRepository, IUserRepository userRepository, 
+        public DebtGuaranteeController(IDebtGuaranteeRepository debtGuaranteeRepository, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
             IOrderRepository orderRepository, IConfiguration configuration, ManagementUser managementUser, IEmailService emailService, ITourRepository tourRepository, IHotelBookingRepositories hotelBookingRepositories, IFlyBookingDetailRepository flyBookingDetailRepository, IOtherBookingRepository otherBookingRepository, IVinWonderBookingRepository vinWonderBookingRepository)
         {
             _debtGuaranteeRepository = debtGuaranteeRepository;
@@ -114,7 +114,7 @@ namespace WEB.CMS.Controllers.Order
                             if (is_admin) break;
                         }
 
-                     
+
                     }
 
                 }
@@ -137,10 +137,11 @@ namespace WEB.CMS.Controllers.Order
             }
             var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
             var current_user = _ManagementUser.GetCurrentUser();
-            if (current_user != null) {
+            if (current_user != null)
+            {
                 if (current_user.Role != "")
                 {
-                  
+
                     var order = await _orderRepository.GetOrderByID(detail.OrderId);
                     var list = current_user.Role.Split(',');
                     foreach (var item in list)
@@ -163,23 +164,23 @@ namespace WEB.CMS.Controllers.Order
                             case (int)RoleType.GDHN:
                             case (int)RoleType.GDHPQ:
                                 {
-                                    var User =await _userRepository.GetDetailUser(_UserId);
-                                    if(User != null)
+                                    var User = await _userRepository.GetDetailUser(_UserId);
+                                    if (User != null)
                                     {
-                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TP && detail.Status!= (int)DebtGuaranteeStatus.TU_CHOI)
+                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TP  && (detail.Status == (int)DebtGuaranteeStatus.CHO_TP_DUYET || detail.Status == (int)DebtGuaranteeStatus.CHO_TN_DUYET) )
                                         {
                                             ViewBag.tp = 1;
                                         }
-                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TN && detail.Status != (int)DebtGuaranteeStatus.TU_CHOI)
+                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TN && detail.Status == (int)DebtGuaranteeStatus.CHO_TN_DUYET && detail.Amount <= 10000000)
                                         {
                                             ViewBag.tn = 1;
                                         }
                                     }
-                                
+
                                 }
                                 break;
                             case (int)RoleType.Admin:
-                           
+
                                 break;
                         }
                         if (is_admin) break;

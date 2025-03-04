@@ -34,12 +34,14 @@
 
 var _debt_guarantee_detail = {
     updatestatus: function (status) {
+        _global_function.AddLoading()
         var id = $('#Id').val();
         $.ajax({
             url: "/DebtGuarantee/UpdateStatus",
             type: "post",
             data: { id: id, status: status },
             success: function (result) {
+                _global_function.RemoveLoading()
                 if (result.status === 0) {
                     _msgalert.success(result.smg);
                     setTimeout(function () {
