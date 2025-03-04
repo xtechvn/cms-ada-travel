@@ -13,5 +13,6 @@ namespace Utilities.Contants
         TN_DUYET = 2,
         TP_DUYET = 3,
         HOAN_THANH = 4,
+        TU_CHOI = 5,
     }
 }

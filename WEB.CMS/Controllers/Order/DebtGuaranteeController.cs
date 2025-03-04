@@ -166,11 +166,11 @@ namespace WEB.CMS.Controllers.Order
                                     var User =await _userRepository.GetDetailUser(_UserId);
                                     if(User != null)
                                     {
-                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TP)
+                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TP && detail.Status!= (int)DebtGuaranteeStatus.TU_CHOI)
                                         {
                                             ViewBag.tp = 1;
                                         }
-                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TN)
+                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TN && detail.Status != (int)DebtGuaranteeStatus.TU_CHOI)
                                         {
                                             ViewBag.tn = 1;
                                         }
