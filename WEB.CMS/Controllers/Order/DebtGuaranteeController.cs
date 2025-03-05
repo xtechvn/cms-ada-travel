@@ -180,7 +180,9 @@ namespace WEB.CMS.Controllers.Order
                                 }
                                 break;
                             case (int)RoleType.Admin:
-
+                                {
+                                    ViewBag.tp = 1;
+                                }
                                 break;
                         }
                         if (is_admin) break;
