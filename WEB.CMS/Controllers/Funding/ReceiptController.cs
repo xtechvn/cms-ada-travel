@@ -288,7 +288,10 @@ namespace WEB.Adavigo.CMS.Controllers
                 foreach (var item in model.ContractPayDetails)
                 {
                   var DetailDebtGuarantee =await  _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(item.OrderId);
-                  _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)_UserId);
+                    if(DetailDebtGuarantee!= null)
+                    {
+                        _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)_UserId);
+                    }
 
                     string link = "/Receipt/Detail?contractPayId=" + contractPayId;
                     apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_THU).ToString(),
