@@ -158,7 +158,11 @@
 <div class="mask-content"></div>
 
 @section scripts {
-
+    <script>
+        console.log("sale: "+@ViewBag.sale+" " );
+        console.log("ServiceStatus: "+@ViewBag.ServiceStatus+" "  );
+        console.log("CN: "+@ViewBag.CN+" " );
+    </script>
     <script type="text/javascript" src="~/modules/add_invoice_request.js" asp-append-version="true"></script>
     @*<script type="text/javascript" src="~/modules/invoice_request.js" asp-append-version="true"></script>*@
     <script type="text/javascript" src="~/js/zebra_datepicker.min.js" asp-append-version="true"></script>
