@@ -32,12 +32,15 @@
     });
 });
 let PageIndex = 1;
+let isPickerApprove = false;
 var _debt_guarantee = {
     Init: function () {
         var _searchModel = {
             Code: null,
             Status: null,
             OrderId: null,
+            CreateTime: null,
+            ToDateTime: null,
             PageIndex: 1,
             PageSize: 20,
         }
@@ -71,8 +74,15 @@ var _debt_guarantee = {
             Code: $('#Code').val(),
             Status: $('#Status').val(),
             OrderId: $('#OrderId').val(),
+            CreateTime: null,
+            ToDateTime: null,
             PageIndex: PageIndex,
             PageSize: $("#selectPaggingOptions").find(':selected').val(),
+        }
+        if (isPickerApprove) {
+            _searchModel.CreateTime = $('#filter_date_daterangepicker').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            _searchModel.ToDateTime = $('#filter_date_daterangepicker').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+
         }
         return _searchModel;
     },

@@ -3,9 +3,11 @@ using DAL.StoreProcedure;
 using Entities.Models;
 using Entities.ViewModels.DebtGuarantee;
 using Microsoft.Data.SqlClient;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,13 +27,15 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[6];
+                SqlParameter[] objParam = new SqlParameter[8];
                 objParam[0] = new SqlParameter("@Code", model.Code);
                 objParam[1] = new SqlParameter("@Status", model.Status);
                 objParam[2] = new SqlParameter("@OrderId", model.OrderId);
                 objParam[3] = new SqlParameter("@PageIndex", model.PageIndex);
                 objParam[4] = new SqlParameter("@PageSize", model.PageSize);
                 objParam[5] = new SqlParameter("@SalerPermission", model.SalerPermission);
+                objParam[6] = (CheckDate(model.CreateTime) == DateTime.MinValue) ? new SqlParameter("@CreateTime", DBNull.Value) : new SqlParameter("@CreateTime", CheckDate(model.CreateTime));
+                objParam[7] = (CheckDate(model.ToDateTime) == DateTime.MinValue) ? new SqlParameter("@ToDateTime", DBNull.Value) : new SqlParameter("@ToDateTime", CheckDate(model.ToDateTime).AddDays(1));
                 return _dbWorker.GetDataTable(StoreProcedureConstant.SP_GetListDebtGuarantee, objParam);
 
             }
@@ -112,6 +116,16 @@ namespace DAL
                 LogHelper.InsertLogTelegram("DebtGuaranteeDAL DetailDebtGuarantee" + ex);
                 return null;
             }
+        }
+        private DateTime CheckDate(string dateTime)
+        {
+            DateTime _date = DateTime.MinValue;
+            if (!string.IsNullOrEmpty(dateTime))
+            {
+                _date = DateTime.ParseExact(dateTime, "d/M/yyyy", CultureInfo.InvariantCulture);
+            }
+
+            return _date != DateTime.MinValue ? _date : DateTime.MinValue;
         }
     }
 }

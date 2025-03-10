@@ -241,7 +241,7 @@ namespace WEB.Adavigo.CMS.Service
             }
             return listTransactionAC;
         }
-        public double SumTotalAmountTransactionSMs(string AccountNumber, string BankName, DateTime? ToDate)
+        public async Task<double> SumTotalAmountTransactionSMs(string AccountNumber, string BankName, DateTime? ToDate)
         {
             var listTransaction = new List<TransactionSMSViewModel>();
 

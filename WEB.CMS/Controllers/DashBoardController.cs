@@ -330,16 +330,25 @@ namespace WEB.CMS.Controllers
             }
         }
         [HttpPost]
-        public IActionResult GettotalAmountBankingAccountTransferSmsGroupByDate(TransferSmsSearchModel searchModel)
+        public async Task<IActionResult> GettotalAmountBankingAccountTransferSmsGroupByDate(TransferSmsSearchModel searchModel)
         {
             try
             {
                 TransferSmsService transferSmsService = new TransferSmsService();
                 long total = 0;
+                double Sum_Total_Amount_TransactionSMs = 0;
                 var totalAmount = transferSmsService.SumAmountBankingAccountTransactionSMs(searchModel);
                 var newDate = DateTime.Now;
-                var SumTotalAmountTransactionSMs = transferSmsService.SumTotalAmountTransactionSMs(searchModel.AccountNumber, searchModel.BankName, newDate);
-                totalAmount = totalAmount + SumTotalAmountTransactionSMs;
+
+                var ListBankingAccountTransactionSMs = transferSmsService.GetLisstBankingAccountTransactionSMs();
+                foreach (var item in ListBankingAccountTransactionSMs)
+                {
+                    searchModel.AccountNumber = item.AccountNumber;
+                    searchModel.BankName = item.BankId;
+                    var SumTotalAmountTransactionSMs =await transferSmsService.SumTotalAmountTransactionSMs(searchModel.AccountNumber, searchModel.BankName, newDate);
+                    Sum_Total_Amount_TransactionSMs += SumTotalAmountTransactionSMs;
+                }
+                totalAmount = totalAmount + Sum_Total_Amount_TransactionSMs;
                 return new JsonResult(totalAmount);
             }
             catch (Exception ex)

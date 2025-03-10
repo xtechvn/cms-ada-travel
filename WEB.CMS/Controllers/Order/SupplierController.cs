@@ -342,7 +342,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         }
 
         [HttpPost]
-        public IActionResult PaymentDelete(int id)
+        public async Task<IActionResult> PaymentDelete(int id)
         {
             try
             {
@@ -350,6 +350,19 @@ namespace WEB.Adavigo.CMS.Controllers.Order
 
                 if (result > 0)
                 {
+                    string url = "mongodb://" + configuration["DataBaseConfig:MongoServer:user"] + ":" + configuration["DataBaseConfig:MongoServer:pwd"] + "@" + configuration["DataBaseConfig:MongoServer:Host"] + ":" + configuration["DataBaseConfig:MongoServer:Port"] + "/" + configuration["DataBaseConfig:MongoServer:catalog_log"];
+                    var client = new MongoClient(url);
+
+                    IMongoDatabase db = client.GetDatabase(configuration["DataBaseConfig:MongoServer:catalog_log"]);
+                    IMongoCollection<BankingAccountViewModel> affCollection = db.GetCollection<BankingAccountViewModel>(configuration["DataBaseConfig:MongoServer:BankingAccount_collection"]);
+
+                    var filter = Builders<BankingAccountViewModel>.Filter.Where(x => x.Id == id);
+                    var result_document = affCollection.Find(filter).ToList();
+                    if (result_document != null && result_document.Count > 0)
+                    {
+                        await affCollection.DeleteOneAsync(filter);
+                    }
+                   
                     return new JsonResult(new
                     {
                         isSuccess = true,

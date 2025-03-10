@@ -23,16 +23,21 @@
                         }
                     </select>
                 </div>
-                <div class="form-group mb10 mr-2"style="min-width:200px;">
+                <div class="form-group mb10 mr-2" style="min-width:200px;">
                     <select class="select2 orderno-select main-staff-select" id="OrderId" style="min-width:200px;width:100% !important">
                     </select>
                     @*<input type="text" class="form-control" id="OrderId" placeholder="Mã đơn hàng" style=" width: 200px;">*@
                 </div>
-
+                <div class="form-group mb10 mr-2">
+                    <div class="datepicker-wrap" style="width:100%">
+                        <input class="form-control date text-left filter_date_daterangepicker" id="filter_date_daterangepicker" type="text" name="datetimeApprove"
+                               placeholder="Ngày tạo" />
+                    </div>
+                </div>
                 <div class="mb10 mr-2">
                     @* <button class="btn-search btn-default" type="button" onclick="_payment_request_service.Export()" id="btnExport">
-                        <i class="fa fa-file-excel-o" id="icon-export"></i>
-                    </button> *@
+                <i class="fa fa-file-excel-o" id="icon-export"></i>
+            </button> *@
                     <button type="button" class="btn btn-default bg-main" onclick="_debt_guarantee.SearchData()">
                         <svg class="icon-svg" style="vertical-align: sub;">
                             <use xlink:href="/images/icons/icon.svg#search"></use>
@@ -55,4 +60,21 @@
 
 @section scripts {
     <script type="text/javascript" src="~/modules/debt_guarantee.js"></script>
+    <script type="text/javascript" src="~/js/zebra_datepicker.min.js"></script>
+    <script>
+        $('input[name="datetimeApprove"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+        $('input[name="datetimeApprove"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            isPickerApprove = false;
+        });
+        $('input[name="datetimeApprove"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+            isPickerApprove = true;
+        });
+    </script>
 }
