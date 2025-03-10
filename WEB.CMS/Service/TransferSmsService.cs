@@ -121,7 +121,7 @@ namespace WEB.Adavigo.CMS.Service
                 {
                     filter &= Builders<TransactionSMSViewModel>.Filter.Lte("ReceiveTime", searchModel.ToDate);
                 }
-                filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
+                //filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
                 var S = Builders<TransactionSMSViewModel>.Sort.Descending("_id");
 
                 listTransaction = collection.Find(filter).Sort(S).ToList();
@@ -201,7 +201,7 @@ namespace WEB.Adavigo.CMS.Service
                 {
                     filter &= Builders<TransactionSMSViewModel>.Filter.Lte("ReceiveTime", searchModel.ToDate);
                 }
-                filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
+                //filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
                 var S = Builders<TransactionSMSViewModel>.Sort.Descending("_id");
 
 
@@ -265,7 +265,7 @@ namespace WEB.Adavigo.CMS.Service
                     filter &= Builders<TransactionSMSViewModel>.Filter.Where(s => s.BankName.ToUpper().Contains(BankName.Trim().ToUpper()));
                 }
                 filter &= Builders<TransactionSMSViewModel>.Filter.Lte("ReceiveTime", ToDate);
-                filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
+                //filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
                 var S = Builders<TransactionSMSViewModel>.Sort.Descending("_id");
 
                 listTransaction = collection.Find(filter).Sort(S).ToList();
@@ -329,7 +329,7 @@ namespace WEB.Adavigo.CMS.Service
                             filter &= Builders<TransactionSMSViewModel>.Filter.Eq(n => n.StatusPush, true);
                         }
                     }
-                    filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
+                    //filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
                     var S = Builders<TransactionSMSViewModel>.Sort.Descending("_id");
 
 

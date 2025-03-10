@@ -336,8 +336,8 @@ namespace WEB.CMS.Controllers
             {
                 TransferSmsService transferSmsService = new TransferSmsService();
                 long total = 0;
-                double Sum_Total_Amount_TransactionSMs = 0;
-                var totalAmount = transferSmsService.SumAmountBankingAccountTransactionSMs(searchModel);
+                double totalAmount = 0;
+                //var totalAmount = transferSmsService.SumAmountBankingAccountTransactionSMs(searchModel);
                 var newDate = DateTime.Now;
 
                 var ListBankingAccountTransactionSMs = transferSmsService.GetLisstBankingAccountTransactionSMs();
@@ -346,9 +346,10 @@ namespace WEB.CMS.Controllers
                     searchModel.AccountNumber = item.AccountNumber;
                     searchModel.BankName = item.BankId;
                     var SumTotalAmountTransactionSMs =await transferSmsService.SumTotalAmountTransactionSMs(searchModel.AccountNumber, searchModel.BankName, newDate);
-                    Sum_Total_Amount_TransactionSMs += SumTotalAmountTransactionSMs;
+                    //Sum_Total_Amount_TransactionSMs += SumTotalAmountTransactionSMs;
+                    item.TransactionSMs_Amount = SumTotalAmountTransactionSMs;
                 }
-                totalAmount = totalAmount + Sum_Total_Amount_TransactionSMs;
+                totalAmount = ListBankingAccountTransactionSMs.Sum(s=>s.TransactionSMs_Amount) + ListBankingAccountTransactionSMs.Sum(s => s.Amount);
                 return new JsonResult(totalAmount);
             }
             catch (Exception ex)
