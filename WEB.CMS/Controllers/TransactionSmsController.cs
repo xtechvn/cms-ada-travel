@@ -78,7 +78,8 @@ namespace WEB.Adavigo.CMS.Controllers
                     item.SumAmount = ListTransactionSMs.Where(s=>s.Amount>0).Sum(s => s.Amount);
                     item.SumAmountTR = ListTransactionSMs.Where(s=>s.Amount<0).Sum(s => s.Amount);
 
-                    var date_new = searchModel.FromDate.Value.AddDays(-1);
+                    var date_new_string = searchModel.FromDate.Value.AddDays(-1).ToString("dd/MM/yyyy") +" 11:59:59 PM";
+                    var date_new = Convert.ToDateTime(date_new_string);
                     var SumTotalAmountTransactionSMs =await transferSmsService.SumTotalAmountTransactionSMs(searchModel.AccountNumber, searchModel.BankName, date_new);
 
                     item.Amount = item.Amount + SumTotalAmountTransactionSMs;
