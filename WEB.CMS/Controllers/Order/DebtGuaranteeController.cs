@@ -5,6 +5,7 @@ using Entities.ViewModels.Attachment;
 using Entities.ViewModels.DebtGuarantee;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Mongo;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -208,6 +209,7 @@ namespace WEB.CMS.Controllers.Order
             var smg = "Không thành công";
             try
             {
+                var current_user = _ManagementUser.GetCurrentUser();
                 int _UserId = 0;
                 if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                 {
@@ -221,7 +223,7 @@ namespace WEB.CMS.Controllers.Order
                     {
 
 
-                        var current_user = _ManagementUser.GetCurrentUser();
+                        
                         var orderStatus = _allCodeRepository.GetListByType("ORDER_STATUS");
                         var allCodes = orderStatus.Where(s => s.CodeValue == (int)OrderStatus.WAITING_FOR_OPERATOR).ToList();
                         var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
@@ -286,7 +288,7 @@ namespace WEB.CMS.Controllers.Order
                         var data2 = await _orderRepository.UpdateOrderFinishPayment(detail.OrderId, status_order);
 
                         string link = "/Order/" + detail.OrderId;
-
+                        apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DA_DUYET_CONG_NO).ToString(), detail.OrderNo, link, current_user.Role, detail.OrderNo);
                         foreach (var item in data)
                         {
                             if (item.Type.Equals("Tour"))
@@ -315,6 +317,14 @@ namespace WEB.CMS.Controllers.Order
                         modelEmail.ServiceType = (int)EmailType.SaleDH;
                         var attach_file = new List<AttachfileViewModel>();
                         bool resulstSendMail = await _emailService.SendEmail(modelEmail, attach_file);
+                    }
+                    else
+                    {
+                        var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
+                        var user = await _userRepository.GetById(_UserId);
+                        var order = await _orderRepository.GetOrderByID(detail.OrderId);
+                        string link = "/Order/" + detail.OrderId;
+                        apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.TU_CHOI_DON_CONG_NO).ToString(), detail.OrderNo, link, current_user.Role, detail.OrderNo);
                     }
                 }
 

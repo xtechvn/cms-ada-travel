@@ -9,6 +9,7 @@ using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Invoice;
 using Entities.ViewModels.Mongo;
 using Entities.ViewModels.OrderManual;
+using Entities.ViewModels.Vinpearl;
 using ENTITIES.ViewModels.ElasticSearch;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver.Linq;
@@ -2618,7 +2619,14 @@ namespace WEB.Adavigo.CMS.Controllers
                 }
 
                 var Insert = await _debtGuaranteeRepository.InsertDebtGuarantee(model);
-                if (Insert > 0) sst_status = (int)ResponseType.SUCCESS;
+                if (Insert > 0) {
+                    var user = await _userRepository.GetById(_UserId);
+                    var order = await _orderRepository.GetOrderByID(OrderId);
+                    string link = "/DebtGuarantee/Detail/" + Insert;
+                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_CONG_NO).ToString(), model.Code, link, current_user.Role, model.Code);
+
+                    sst_status = (int)ResponseType.SUCCESS;
+                }
             }
             catch (Exception ex)
             {
