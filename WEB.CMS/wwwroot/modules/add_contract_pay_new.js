@@ -1710,6 +1710,8 @@ var _contract_pay_create_new = {
     },
     GetListBankAccountAdavigo: function (supplierId) {
         _global_function.AddLoading()
+        bankingAccountId = $("#bankingAccount").val();
+      
         $.ajax({
             url: "/Receipt/GetListBankAccountAdavigo",
             type: "Post",
@@ -1723,11 +1725,6 @@ var _contract_pay_create_new = {
                     "<option value='0'>Chọn</option>"
                 );
                 listBankAccount = result.data
-                for (var i = 0; i < result.data.length; i++) {
-                    $('#bankingAccount').append(
-                        "<option value='" + result.data[i].id + "'> " + result.data[i].bankId + " - " + result.data[i].accountNumber + "</option>"
-                    );
-                }
                 if (bankingAccountId !== undefined && bankingAccountId !== null && bankingAccountId !== 0) {
                     $("#bankingAccount").val(bankingAccountId);
                     for (var i = 0; i < listBankAccount.length; i++) {
@@ -1735,6 +1732,19 @@ var _contract_pay_create_new = {
                             $('#bankName').val(listBankAccount[i].accountName)
                     }
                 }
+                for (var i = 0; i < result.data.length; i++) {
+                    if (result.data[i].id == bankingAccountId) {
+                        $('#bankingAccount').append(
+                            "<option selected value='" + result.data[i].id + "'> " + result.data[i].bankId + " - " + result.data[i].accountNumber + "</option>"
+                        );
+                    } else {
+                        $('#bankingAccount').append(
+                            "<option value='" + result.data[i].id + "'> " + result.data[i].bankId + " - " + result.data[i].accountNumber + "</option>"
+                        );
+                    }
+                   
+                }
+               
             }
         });
     },
