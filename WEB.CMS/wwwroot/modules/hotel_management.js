@@ -113,6 +113,7 @@
         formData.ImageThumb = (avatar != null && avatar != "") ? avatar : "";
         formData.HotelId = null;
         formData.IsCommitFund = $('#IsCommitFund').is(":checked")
+        formData.ProvinceId = $('#ProvinceId').val();
 
 
         if ((formData.ImageThumb == null || formData.ImageThumb == "") && status == 0) {
