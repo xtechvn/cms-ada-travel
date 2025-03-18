@@ -114,6 +114,7 @@
         formData.HotelId = null;
         formData.IsCommitFund = $('#IsCommitFund').is(":checked")
         formData.ProvinceId = $('#ProvinceId').val();
+        formData.State = $('#ProvinceId').val();
 
 
         if ((formData.ImageThumb == null || formData.ImageThumb == "") && status == 0) {
