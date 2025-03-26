@@ -16,6 +16,7 @@ using MongoDB.Driver.Linq;
 using Nest;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
+using StackExchange.Redis;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
@@ -511,7 +512,7 @@ namespace WEB.Adavigo.CMS.Controllers
             try
             {
 
-                var rolelist = _clientRepository.GetClientType(ClientType.kl).Result;
+                var rolelist = _clientRepository.GetClientType(Utilities.Contants.ClientType.kl).Result;
                 if (!string.IsNullOrEmpty(name))
                 {
                     rolelist = rolelist.Where(s => StringHelpers.ConvertStringToNoSymbol(s.ClientName.Trim().ToLower())
@@ -1112,7 +1113,9 @@ namespace WEB.Adavigo.CMS.Controllers
                     var data = _iOrderRepositories.GetByOrderId(orderId);
                     if (data.SalerId != null)
                     {
-                        if ((_UserId != data.SalerId && current_user.UserUnderList.Contains(data.SalerId.ToString())) || current_user.Role.Contains(((int)RoleType.Admin).ToString()))
+                        var Tpsalerid = await _userRepository.GetManagerByUserId(Convert.ToInt64(data.SalerId));
+                        var Leaderid = await _userRepository.GetLeaderByUserId(Convert.ToInt64(data.SalerId));
+                        if ((_UserId != data.SalerId && current_user.UserUnderList.Contains(data.SalerId.ToString()))|| _UserId== Tpsalerid|| _UserId == Leaderid || current_user.Role.Contains(((int)RoleType.Admin).ToString()))
                         {
                             ViewBag.IsEdit = true;
                         }
