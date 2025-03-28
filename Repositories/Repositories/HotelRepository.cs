@@ -257,6 +257,10 @@ namespace Repositories.Repositories
                     model.ImageThumb = _UrlStaticImage +  UpLoadHelper.UploadBase64Src(model.ImageThumb, _UrlStaticImage).Result;
                 if (model.Id > 0)
                 {
+                    if(model.HotelId == "0"|| model.HotelId == null|| model.HotelId =="")
+                    {
+                        model.HotelId = model.Id.ToString();
+                    }
                     model.UpdatedBy = _SysUserModel.Id;
                    var id=  _HotelDAL.UpdateHotel(model);
                     var modelPosition = new HotelPosition();
