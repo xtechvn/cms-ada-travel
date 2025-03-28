@@ -111,7 +111,7 @@
         
         let avatar = $('#avatar_image').attr('src');
         formData.ImageThumb = (avatar != null && avatar != "") ? avatar : "";
-        formData.HotelId = null;
+        formData.HotelId = $('#HotelId').val();
         formData.IsCommitFund = $('#IsCommitFund').is(":checked")
         formData.ProvinceId = $('#ProvinceId').val();
         formData.State = $('#ProvinceId option:selected').text().trim();
