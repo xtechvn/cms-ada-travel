@@ -1,5 +1,5 @@
 ﻿var _customer_manager_html = {
-    html_Client_option: '<option class="select2-results__option" value="{Client_id}">B2B - {Client_name}</option>',
+    html_Client_option: '<option class="select2-results__option" value="{Client_id}">{Client_name}</option>',
     html_Client_option_B2C: '<option class="select2-results__option" value="{Client_id}">B2C - {Client_name}</option>',
 
 }
