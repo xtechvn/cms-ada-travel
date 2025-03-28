@@ -1237,7 +1237,7 @@
                         results: $.map(response.data, function (item) {
                             return {
                                 text: item.name,
-                                id: item.hotelid,
+                                id: parseFloat(item.hotelid) == 0 ? item.id : item.hotelid,
                             }
                         })
                     };
