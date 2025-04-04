@@ -128,6 +128,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                             case (int)RoleType.TPKS:
                             case (int)RoleType.DHKS:
                             case (int)RoleType.DHPQ:
+                            case (int)RoleType.SaleKd:
                                 {
                                     searchModel.SalerPermission += current_user.UserUnderList;
                                 }
@@ -173,6 +174,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                 case (int)RoleType.TPKS:
                                 case (int)RoleType.TPDHKS:
                                 case (int)RoleType.DHPQ:
+                                case (int)RoleType.SaleKd:
                                     {
                                         searchModel.SalerPermission += current_user.UserUnderList;
                                     }

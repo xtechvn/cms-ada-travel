@@ -125,6 +125,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Other
                                 case (int)RoleType.DHTour:
                                 case (int)RoleType.DHVe:
                                 case (int)RoleType.DHKS:
+                                case (int)RoleType.SaleKd:
                                     {
                                         searchModel.SalerPermission += current_user.UserUnderList;
                                     }
