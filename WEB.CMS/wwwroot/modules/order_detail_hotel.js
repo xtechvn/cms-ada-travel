@@ -2,7 +2,7 @@
     ServiceType: 1,
     Initialization: function (hotel_booking_id) {
         $('#AddHotelService').addClass('show')
-        _order_detail_common.UserSuggesstion($('#main-hotel-staff'), 1);
+        _order_detail_common.UserSuggesstion($('#main-hotel-staff'), 0);
         _order_detail_hotel.HotelServiceRoomPopup(hotel_booking_id);
         _order_detail_hotel.HotelServiceRoomPackagesPopup(hotel_booking_id);
 
