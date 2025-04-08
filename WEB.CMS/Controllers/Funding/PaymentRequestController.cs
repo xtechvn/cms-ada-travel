@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Repositories.IRepositories;
 using Repositories.Repositories;
+using System.Linq;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
@@ -605,7 +606,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                     listServiceType.Add((int)ServiceType.Tour);
                     listServiceType.Add((int)ServiceType.Other);
                 }
-                if (current_user.UserUnderList != null && current_user.UserUnderList != "" && current_user.UserUnderList.Contains(model.CreatedBy.ToString()))
+                if (current_user.UserUnderList != null && current_user.UserUnderList != "" && current_user.Role.Contains(((int)RoleType.SaleKd).ToString()) ==false  && current_user.UserUnderList.Contains(model.CreatedBy.ToString()))
                 {
                     ViewBag.TBP_DUYET_YEU_CAU_CHI = 1;
                 }
