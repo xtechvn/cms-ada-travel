@@ -455,6 +455,7 @@ var _add_payment_voucher = {
         $("#body_payment_requests").empty();
         $('#bankName').val("")
         $("#bankingAccount").empty();
+        debugger
         if (payment_request_type !== null && payment_request_type !== '' && parseInt(payment_request_type) != 3) { // thanh toán dịch vụ và khác
             $('#lblSupplier').show()
             $('#divSupplier').show()

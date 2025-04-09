@@ -426,8 +426,8 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
 
             if (model.Type == (int)PAYMENT_VOUCHER_TYPE.THANH_TOAN_DICH_VU && model.IsServiceIncluded != null && model.IsServiceIncluded.Value && !model.IsAdminEdit)
             {
-                var listPaymentRequestByServiceId = _paymentRequestRepository.GetByServiceId(model.PaymentRequestDetails!=null? model.PaymentRequestDetails[0].ServiceId: model.ServiceId,
-                   model.PaymentRequestDetails != null ? model.PaymentRequestDetails[0].ServiceType: model.ServiceType);
+                var listPaymentRequestByServiceId = _paymentRequestRepository.GetByServiceId(model.PaymentRequestDetails != null ? model.PaymentRequestDetails[0].ServiceId : model.ServiceId,
+                   model.PaymentRequestDetails != null ? model.PaymentRequestDetails[0].ServiceType : model.ServiceType);
                 var totalPaymentRequest = listPaymentRequestByServiceId.Where(n => n.Status != (int)PAYMENT_REQUEST_STATUS.TU_CHOI).Sum(n => n.Amount);
                 if (model.TotalAmountService + model.TotalSupplierRefund < totalPaymentRequest + model.Amount)
                 {
@@ -478,7 +478,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 //var response = await httpClient.PostAsync(apiPrefix, content);
                 //var resultAPI = await response.Content.ReadAsStringAsync();
                 //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.PaymentCode =await _indentiferService.BuildPaymentRequest();
+                model.PaymentCode = await _indentiferService.BuildPaymentRequest();
                 var result = _paymentRequestRepository.CreatePaymentRequest(model);
                 if (result == -2)
                     return Ok(new
@@ -606,7 +606,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                     listServiceType.Add((int)ServiceType.Tour);
                     listServiceType.Add((int)ServiceType.Other);
                 }
-                if (current_user.UserUnderList != null && current_user.UserUnderList != "" && current_user.Role.Contains(((int)RoleType.SaleKd).ToString()) ==false  && current_user.UserUnderList.Contains(model.CreatedBy.ToString()))
+                if (current_user.UserUnderList != null && current_user.UserUnderList != "" && current_user.Role.Contains(((int)RoleType.SaleKd).ToString()) == false && current_user.UserUnderList.Contains(model.CreatedBy.ToString()))
                 {
                     ViewBag.TBP_DUYET_YEU_CAU_CHI = 1;
                 }
@@ -1541,6 +1541,35 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             }
 
             return PartialView();
+        }
+
+        public async Task<IActionResult> AddPaymentVoucher(int paymentRequestId)
+        {
+            ViewBag.allCode_PAY_TYPE = _allCodeRepository.GetListByType(AllCodeType.PAY_TYPE);
+            ViewBag.allCode_PAYMENT_VOUCHER_TYPE = _allCodeRepository.GetListByType(AllCodeType.PAYMENT_VOUCHER_TYPE);
+            ViewBag.listBankingAccount = _allCodeRepository.GetBankingAccounts();
+            ViewBag.listBankingAccountAdavigo = _allCodeRepository.GetBankingAccounts().Where(n => n.SupplierId == (long)config.SUPPLIERID_ADAVIGO).ToList();
+            ViewBag.ClientId = 0;
+            ViewBag.SupplierId = 0;
+
+            var model = _paymentRequestRepository.GetById(paymentRequestId);
+            if (model.RelateData == null) model.RelateData = new List<PaymentRequestDetailViewModel>();
+            if (model.PaymentType == 3 || model.PaymentType == 5)
+            {
+                ViewBag.text = model.ClientName;
+                ViewBag.ClientId = model.ClientId;
+            }
+            else
+            {
+                ViewBag.text = model.SupplierName;
+                ViewBag.SupplierId = model.SupplierId;
+            }
+
+            ViewBag.type = model.Type;
+            ViewBag.PaymentType = model.PaymentType;
+
+
+            return PartialView(model);
         }
     }
 }

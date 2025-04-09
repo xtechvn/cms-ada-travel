@@ -1025,5 +1025,13 @@ var _payment_request_service = {
                 text.print();
             }
         });
-    }
+    },
+    AddNewPaymentVoucher: function (id) {
+        let title = 'Thêm phiếu chi';
+        let url = '/PaymentRequest/AddPaymentVoucher';
+        var param = {
+            paymentRequestId:id
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
 }
