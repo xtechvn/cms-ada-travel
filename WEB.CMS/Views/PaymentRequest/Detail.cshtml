@@ -28,7 +28,7 @@
                         <td colspan="3">
                             <strong>Mã  phiếu yêu cầu chi: @Model.PaymentCode</strong>
                             @if (Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET) ||
-                           Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))
+                            Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))
                             {
                                 <span class="status-wait">@Model.PaymentRequestStatus</span>
                             }
@@ -358,10 +358,15 @@
         <div class="flex flex-end">
             @*<button type="submit" class="btn btn-default cancel ml-1" onclick="_payment_request_service.BackToList()">Quay lại</button>*@
             <button type="submit" class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</button>
-            <button type="submit" class="btn btn-default cancel ml-1"style="background:#0066ff !important;display:none" onclick="_payment_request_service.AddNewPaymentVoucher('@Model.Id')">Tạo phiếu chi</button>
+            @if (isAdmin || KTT_DUYET_YEU_CAU_CHI == 1 || KTV_DUYET_YEU_CAU_CHI == 1)
+            {
+                <button type="submit" class="btn btn-default cancel ml-1" style="background:#0066ff !important;" onclick="_payment_request_service.AddNewPaymentVoucher('@Model.Id')">Tạo phiếu chi</button>
+
+            }
             @if (ViewBag.TYPE == (int)PAYMENT_VOUCHER_TYPE.QUY_CHAM_SOC_KHACH_HANG)
-            {<button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
-                     onclick="_payment_request_service.PopupInYCChi(@Model.Id)">
+            {
+                <button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
+                         onclick="_payment_request_service.PopupInYCChi(@Model.Id)">
                     <a class="fa fa-print txt_14" href="javascript:;" onclick="_payment_request_service.PopupInYCChi(@Model.Id)"></a>
                 </button>
 
