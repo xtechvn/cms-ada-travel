@@ -32,10 +32,11 @@ namespace WEB.Adavigo.CMS.Controllers.Report
         private readonly IReportRepository _reportRepository;
         private ManagementUser _ManagementUser;
         private readonly IAllCodeRepository _allCodeRepository;
+        private readonly ISupplierRepository _supplierRepository;
 
         public ReportDepartmentController(IOrderRepository orderRepository, IDepartmentRepository departmentRepository,
             IWebHostEnvironment WebHostEnvironment, IHotelBookingRepositories hotelBookingRepositories, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository,
-             IReportRepository reportRepository, ManagementUser managementUser, IAllCodeRepository allcodeRepository, IOtherBookingRepository otherBookingRepository)
+             IReportRepository reportRepository, ManagementUser managementUser, IAllCodeRepository allcodeRepository, IOtherBookingRepository otherBookingRepository, ISupplierRepository supplierRepository)
         {
             _orderRepository = orderRepository;
             _DepartmentRepository = departmentRepository;
@@ -46,7 +47,9 @@ namespace WEB.Adavigo.CMS.Controllers.Report
             _ManagementUser = managementUser;
             _allCodeRepository = allcodeRepository;
             _otherBookingRepository = otherBookingRepository;
-           
+            _supplierRepository = supplierRepository;
+
+
 
         }
         public async Task<IActionResult> Index()
@@ -1208,6 +1211,21 @@ namespace WEB.Adavigo.CMS.Controllers.Report
 
                                 }).ToList();
                                 suggestionlist.AddRange(hotellist);
+                                var Supplier_list = new List<SupplierViewModel> ();
+                                foreach (var item in extra_package)
+                                {
+                                    var Supplier =new SupplierViewModel();
+                                    Supplier.id = (int)item.SupplierId;
+                                    var Supplier_Detail = _supplierRepository.GetDetailById((int)item.SupplierId);
+                                    Supplier.fullname = Supplier_Detail.FullName;
+                                    Supplier_list.Add(Supplier);
+                                   
+                                }
+                                if (Supplier_list!=null && Supplier_list.Count>0)
+                                {
+                                    suggestionlist.AddRange(Supplier_list);
+                                }
+                              
                             }
                             suggestionlist = suggestionlist.GroupBy(s => s.id).Select(s => s.First()).ToList();
                             return JsonConvert.SerializeObject(suggestionlist);

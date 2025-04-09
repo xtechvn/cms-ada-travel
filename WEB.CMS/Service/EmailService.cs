@@ -506,31 +506,32 @@ namespace WEB.Adavigo.CMS.Service
 
                                     }
                                 if (extra_package != null && extra_package.Count > 0)
-                                    foreach (var item in extra_package)
+                                    extra_package = extra_package.Where(s => s.SupplierId == SupplierId).ToList();
+                                foreach (var item in extra_package)
+                                {
+                                    double operator_price = 0;
+                                    if (item.UnitPrice == null)
                                     {
-                                        double operator_price = 0;
-                                        if (item.UnitPrice == null)
-                                        {
-                                            AmountDVK += (double)(item.Amount - item.Profit);
-                                        }
-                                        else
-                                        {
-                                            AmountDVK += (double)item.UnitPrice;
-                                        };
-
-                                        if (item.UnitPrice != null) operator_price = Math.Round(((double)item.UnitPrice / (double)item.Nights / (double)item.Quantity), 0);
-                                        if (operator_price <= 0) operator_price = item.OperatorPrice != null ? (double)item.OperatorPrice : 0;
-                                        chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.PackageCode + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.PackageId + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.StartDate == null ? "" : ((DateTime)item.StartDate).ToString("dd/MM/yyyy")) + " - " + (item.EndDate == null ? "" : ((DateTime)item.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operator_price.ToString("N0") + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.Nights != null ? ((double)item.Nights).ToString("N0") : "1") + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.Quantity != null ? ((double)item.Quantity).ToString("N0") : "1") + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice == null ? ((double)item.Amount - (double)item.Profit).ToString("N0") : ((double)item.UnitPrice).ToString("N0")) + "</td>" +
-                                                                          "</tr>";
-
-
+                                        AmountDVK += (double)(item.Amount - item.Profit);
                                     }
+                                    else
+                                    {
+                                        AmountDVK += (double)item.UnitPrice;
+                                    };
+
+                                    if (item.UnitPrice != null) operator_price = Math.Round(((double)item.UnitPrice / (double)item.Nights / (double)item.Quantity), 0);
+                                    if (operator_price <= 0) operator_price = item.OperatorPrice != null ? (double)item.OperatorPrice : 0;
+                                    chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.PackageCode + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.PackageId + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.StartDate == null ? "" : ((DateTime)item.StartDate).ToString("dd/MM/yyyy")) + " - " + (item.EndDate == null ? "" : ((DateTime)item.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operator_price.ToString("N0") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.Nights != null ? ((double)item.Nights).ToString("N0") : "1") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.Quantity != null ? ((double)item.Quantity).ToString("N0") : "1") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice == null ? ((double)item.Amount - (double)item.Profit).ToString("N0") : ((double)item.UnitPrice).ToString("N0")) + "</td>" +
+                                                                      "</tr>";
+
+
+                                }
 
                                 var code = await _hotelBookingCodeRepository.GetListlBookingCodeByHotelBookingId(id, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
                                 string passenger2 = "";
@@ -598,7 +599,7 @@ namespace WEB.Adavigo.CMS.Service
                                     body = body.Replace("{{datatabledv}}", datatabledv);
                                 }
 
-                                if (hotel.SupplierId == (int)SupplierId)
+                                if (datatabledvkhac != "")
                                 {
                                     body = body.Replace("{{datatabledvkhac}}", datatabledvkhac);
                                 }
@@ -921,6 +922,8 @@ namespace WEB.Adavigo.CMS.Service
 
                                     }
                                 if (extra_package != null && extra_package.Count > 0)
+                                {
+                                    extra_package = extra_package.Where(s => s.SupplierId == SupplierId).ToList();
                                     foreach (var item in extra_package)
                                     {
                                         double operator_price = 0;
@@ -937,6 +940,8 @@ namespace WEB.Adavigo.CMS.Service
 
 
                                     }
+                                }
+                                 
 
                                 datatabledv = "<table style='border-collapse: collapse;width:100%;'>" +
                                                               "<thead>" +
@@ -992,7 +997,7 @@ namespace WEB.Adavigo.CMS.Service
                                     body = body.Replace("{{datatabledv}}", datatabledv);
                                 }
                                 var hotel = await _hotelBookingRepositories.GetHotelBookingByID(modelEmail.ServiceId);
-                                if (hotel.SupplierId == (int)modelEmail.SupplierId)
+                                if (datatabledvkhac != "")
                                 {
                                     body = body.Replace("{{datatabledvkhac}}", datatabledvkhac);
                                 }
@@ -2293,8 +2298,8 @@ namespace WEB.Adavigo.CMS.Service
                                     "<tr>" +
                                         "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Số đêm</td>" +
                                         "<td style='border: 1px solid #999; padding: 5px;'><input id='hotelTotalDays'type='text'value=" + item.Hotel[0].TotalDays + "></td>" +
-                                    "</tr>" 
-                                    +datatabledv
+                                    "</tr>"
+                                    + datatabledv
                                     + datatabledvkhac +
                                     "<tr>" +
                                         "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
@@ -2305,7 +2310,7 @@ namespace WEB.Adavigo.CMS.Service
                                         "<tr><td colspan='4' style = 'padding: 5px; font-weight: bold;text-align: center;background:#a8c7fa;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "" +
                                         "<input id='HotelName'type='text'style='display:none' value='Dịch vụ khách sạn " + hotedetail[0].HotelName + "'>" +
                                         "<input id='HotelId'type='text'style='display:none' value=" + item.ServiceId + "></td></tr> " +
-                                   
+
                                                     "" + note + "" +
                                                           "</table>";
 
@@ -2763,7 +2768,7 @@ namespace WEB.Adavigo.CMS.Service
                                             Nights = (double)p.Nights;
                                             TotalAmount = ((double)p.SaleTotalAmount).ToString("N0");
                                             NumberOfRooms = item2.NumberOfRooms == null ? 1 : (double)item2.NumberOfRooms;
-                                        
+
                                             Goi = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</td>";
                                             TgSD = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + date_time + "</td>";
                                             GiaN = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</td>";
@@ -3566,7 +3571,7 @@ namespace WEB.Adavigo.CMS.Service
                                             foreach (var p in package_by_room_id)
                                             {
                                                 row++;
-                                                var style_row ="";
+                                                var style_row = "";
                                                 if (row > 2)
                                                 {
                                                     style_row = "display: none;";
@@ -3600,7 +3605,7 @@ namespace WEB.Adavigo.CMS.Service
                                                                   TgSD +
                                                                   GiaN +
                                                                   SDem +
-                                                                  "<td rowspan = '" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style = 'border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + NumberOfRooms + " </td> "+
+                                                                  "<td rowspan = '" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style = 'border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + NumberOfRooms + " </td> " +
                                                                   TTien
                                                                    + "</tr>";
                                             }
@@ -3720,7 +3725,7 @@ namespace WEB.Adavigo.CMS.Service
                                                 "" + note + "" +
                                                       "<tr>" +
                                                       "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
-                                                      "<td colspan='3' style='border: 1px solid #999; padding: 5px;'><textarea type='text' style='min-height: 120px;width: 100%;'disabled value=" + hotel.Note + ">"+ hotel.Note+"</textarea></td></tr>";
+                                                      "<td colspan='3' style='border: 1px solid #999; padding: 5px;'><textarea type='text' style='min-height: 120px;width: 100%;'disabled value=" + hotel.Note + ">" + hotel.Note + "</textarea></td></tr>";
 
                             }
                         }
