@@ -37,26 +37,29 @@
 
 
 <div class="grid grid__2 grid-don-hang gap10 mb20">
-    <input type="text" name="paymentVoucherId" id="paymentVoucherId" value="@Model.Id" style="display: none" />
-    <input type="text" name="paymentCode" id="paymentCode" value="@Model.PaymentCode" style="display: none" />
-    <input type="text" name="client_name_hide" id="client_name_hide" value="@Model.ClientName" style="display: none" />
-    <input type="text" name="supplier_name_hide" id="supplier_name_hide" value="@Model.SupplierName" style="display: none" />
-    <input type="text" name="attachmentFile" id="attachmentFile" value="@Model.AttachFiles" style="display: none" />
+    <input type="text" name="paymentRequestId" id="paymentRequestId" value="@ViewBag.id" style="display: none" />
+    <input type="text" name="paymentCode" id="paymentCode" value="@ViewBag.code" style="display: none" />
+    <input type="text" name="client_name_hide" id="client_name_hide" value="@ViewBag.ClientName" style="display: none" />
+    <input type="text" name="supplier_name_hide" id="supplier_name_hide" value="@ViewBag.SupplierName" style="display: none" />
+    <input type="text" name="attachmentFile" id="attachmentFile" value="" style="display: none" />
     <div class="grid-item border">
 
         <div class="col-md-6 mb10"><label class="lbl mt5 mb0">Loại nghiệp vụ <sup class="red">*</sup></label></div>
         <div class="col-md-12 mb10">
             <select class="form-control background-disabled" style="width: 100%; height: 34px ;" id="payment-voucher-type" disabled
                     onchange="_add_payment_voucher.OnChooseType()">
-  
+
                 @foreach (var item in allCode_PAYMENT_VOUCHER_TYPE)
                 {
-                    if (item.CodeValue == ViewBag.type){
+                    if (item.CodeValue == ViewBag.type)
+                    {
                         <option value="@item.CodeValue" selected>@item.Description</option>
-                    }else{
+                    }
+                    else
+                    {
                         <option value="@item.CodeValue">@item.Description</option>
                     }
-                    
+
                 }
             </select>
             <div class="validate-payment-voucher-type"></div>
@@ -81,7 +84,7 @@
     </div>
 </div>
 <div class="row m-0 p-0">
-    @if(ViewBag.PaymentType == 3 || ViewBag.PaymentType == 5)
+    @if(ViewBag.type == 3 || ViewBag.type == 5)
     {
         <div class="col-md-6 mb10" id="lblCustomer"><label class="lbl mt5 mb0">Tên khách hàng <sup class="red">*</sup></label></div>
         <div class="col-md-12 mb10" id="divCustomer">
@@ -168,7 +171,7 @@
 <div class="row m-0 p-0">
     <div class="col-md-12 mb10"> <label class="lbl mt5 mb0"> Nội dung <sup class="red">*</sup></label></div>
     <div class="col-md-12 mb10">
-        <input type="text" id="content" maxlength="500" name="name" placeholder="Nhập text(tối đa 500 kí tự)" autocomplete="off" />
+        <input type="text" id="content" maxlength="500" value="@ViewBag.Note" name="name" placeholder="Nhập text(tối đa 500 kí tự)" autocomplete="off" />
         <div class="validate-content"></div>
     </div>
 
@@ -224,10 +227,11 @@
 <script type="text/javascript" src="~/modules/add_payment_voucher.js?v=1"></script>
 <script>
     _add_payment_voucher.Initialization();
-     $(document).ready(function () {
-        _add_payment_voucher.OnChooseTypeEdit(@clientId, @supplierId, @bankingAccountId)
-        _global_function.RenderFileAttachment($('.attachment-edit'),@Model.Id, @((int)AttachmentType.Payment_Voucher))
 
+     $(document).ready(function () {
+         _add_payment_voucher.OnChooseTypeEditPaymentRequest(@clientId, @supplierId, @bankingAccountId)
+
+        _global_function.RenderFileAttachment($('.attachment-addnew'),0, @((int)AttachmentType.Payment_Voucher))
     })
 </script>
 @section scripts {

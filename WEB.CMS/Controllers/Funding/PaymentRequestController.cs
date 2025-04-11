@@ -1554,22 +1554,21 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
 
             var model = _paymentRequestRepository.GetById(paymentRequestId);
             if (model.RelateData == null) model.RelateData = new List<PaymentRequestDetailViewModel>();
-            if (model.PaymentType == 3 || model.PaymentType == 5)
-            {
-                ViewBag.text = model.ClientName;
-                ViewBag.ClientId = model.ClientId;
-            }
-            else
-            {
-                ViewBag.text = model.SupplierName;
-                ViewBag.SupplierId = model.SupplierId;
-            }
+
+            ViewBag.ClientId = model.ClientId==null?0: model.ClientId;
+
+            ViewBag.SupplierId = model.SupplierId == null ? 0 : model.SupplierId;
 
             ViewBag.type = model.Type;
             ViewBag.PaymentType = model.PaymentType;
-
+            ViewBag.Note = model.Note;
+            ViewBag.code = model.PaymentCode;
+            ViewBag.id = paymentRequestId;
+            ViewBag.ClientName = model.ClientName;
+            ViewBag.SupplierName = model.SupplierName;
 
             return PartialView(model);
         }
+
     }
 }
