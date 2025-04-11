@@ -97,16 +97,16 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 {
                     if (!string.IsNullOrEmpty(current_user.UserUnderList))
                         searchModel.CreateByIds = current_user.UserUnderList.Split(',').Select(n => int.Parse(n)).ToList();
-
-                }
-                var list = Array.ConvertAll(current_user.Role.Split(','), int.Parse);
-                foreach (var item in list)
-                {
-                    if (item == (int)RoleType.Admin || item == (int)RoleType.PhoTPKeToan || item == (int)RoleType.KeToanTruong)
+                    var list = Array.ConvertAll(current_user.Role.Split(','), int.Parse);
+                    foreach (var item in list)
                     {
-                        searchModel.CreateByIds = null;
+                        if (item == (int)RoleType.Admin || item == (int)RoleType.PhoTPKeToan || item == (int)RoleType.KeToanTruong)
+                        {
+                            searchModel.CreateByIds = null;
+                        }
                     }
                 }
+              
                 var listPaymentRequest = _paymentRequestRepository.GetPaymentRequests(searchModel, out long total, currentPage, pageSize);
                 model.CurrentPage = currentPage;
                 model.ListData = listPaymentRequest;
