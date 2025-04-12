@@ -4,6 +4,10 @@
     const tenant_id = "01JNGDB23ZF2MNEN4GCX8WSZ21";
     const chatIconUrl = "https://static-image.adavigo.com/uploads/icons/icon-chat.png";
     const avatarUrl = "https://static-image.adavigo.com/uploads/icons/avatar.png";
+    // Inject Markdown parser (marked.js)
+    const markedScript = document.createElement("script");
+    markedScript.src = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
+    document.head.appendChild(markedScript);
 
     // ======================== STYLE =========================
     const css = `
@@ -16,7 +20,7 @@
 
 .widget-chat .chat-circle {
     position: fixed;
-    bottom: 20px;
+    bottom: 80px;
     right: 20px;
     color: #fff;
     cursor: pointer;
@@ -36,12 +40,26 @@
     height: 600px;
     max-width: calc(100% - 30px);
     max-height: 100vh;
-    bottom: 30px;
+    bottom: 90px;
     border-radius: 10px;
     border: 1px solid #E3EBF3;
     background: #FFF;
     box-shadow: 0 4px 34px 0 rgb(0 0 0 / .15);
     border-radius: 5px
+}
+.hint-chat {
+    display: inline-block;
+    color: #fff;
+    position: fixed;
+    bottom: 90px;
+    right: 90px;
+    cursor: pointer;
+    align-items: center;
+    padding: 15px 30px;
+    background: linear-gradient(90deg, #070BA0 26.71%, #6B6FFE 102.09%);
+    gap: 0.5rem;
+    border-radius: 9999px;
+    animation: 1.6s ease 0s infinite normal none running moveLeftAndBack-6870bd72;
 }
 
 @media (max-width:767px) {
@@ -290,7 +308,7 @@
     display: inline-block;
     color: #fff;
     position: fixed;
-    bottom: 30px;
+    bottom: 90px;
     right: 90px;
     cursor: pointer;
     align-items: center;
@@ -328,7 +346,7 @@
 .widget-chat .chat-box,
 .widget-chat .chat-circle,
 .widget-chat .hint-chat {
-    z-index: 9999 !important;
+    z-index: 10 !important;
     position: fixed !important;
 }
 .typing-dots {
@@ -368,6 +386,33 @@
     }
 }
 
+.chat-box-expand {
+    display: inline-block;
+    float: right;
+    width: 20px;
+    height: 20px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/1828/1828778.png'); /* icon expand */
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* Phóng to nửa màn hình */
+.chat-box.halfscreen {
+    position: fixed !important;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    width: 50vw;
+    height: 100vh;
+    z-index: 9999;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    border-radius: 0;
+}
+
+
+
     `;
     const style = document.createElement("style");
     style.innerHTML = css;
@@ -377,7 +422,7 @@
     const html = `
     <div class="widget-chat">
         <div id="body">
-            <span class="hint-chat">Tôi có thể giúp gì cho bạn ?</span>
+           
 
             <div id="chat-circle" class="btn btn-raised chat-circle">
                 <img src="${chatIconUrl}" width="60" alt="Chat" />
@@ -386,7 +431,17 @@
             <div class="chat-box">
                 <div class="chat-box-header">
                     iBiet - Trợ lý thông minh
-                    <span class="chat-box-toggle"></span>
+                    <div style="
+    display: flex;
+    align-items: center;
+">
+                        <span class="chat-box-toggle"></span>
+                    <span class="fa fa-expand" style="
+                                    margin: 10px;
+                                    cursor: pointer;
+                                "></span>
+                    </div>
+
                 </div>
 
                 <div class="chat-box-body">
@@ -406,7 +461,7 @@
                             👉 Chọn một chủ đề bên dưới để bắt đầu:
                                 <ul class="tab-select">
                                     <li>Thông tin tour</li>
-                                    <li>Thời gian chạy</li>
+                                    <li>Báo cáo quản trị</li>
                                     <li>Hướng dẫn đăng ký</li>
                                 </ul>
                             </div>
@@ -435,6 +490,13 @@
         $(".chat-box").toggle('scale');
         $(".hint-chat").toggle('scale');
     });
+
+    // Xử lý phóng to nửa màn hình
+    $(document).on("click", ".fa-expand", function () {
+        $(".chat-box").toggleClass("halfscreen");
+    });
+
+
 
     // const tenantMap = {
     //     "xtech.vn": "01JNGDB23ZF2MNEN4GCX8WSZ21",
@@ -490,7 +552,7 @@
         `);
         $(".chat-logs").scrollTop($(".chat-logs")[0].scrollHeight);
 
-
+        debugger
         // Gửi webhook
         const payload = [{
             //id: Date.now(),
@@ -506,16 +568,17 @@
             contentType: "application/json",
             data: JSON.stringify(payload),
             success: function (res) {
-
+                debugger
                 $(`#${typingId}`).remove();
 
                 if (res && res.msg) {
+                    const htmlMsg = marked.parse(res.msg); // Convert Markdown to HTML
                     $(".chat-logs").append(`
                     <div class="chat-msg user">
                         <span class="msg-avatar">
                             <img src="${chatIconUrl}">
                         </span>
-                        <div class="cm-msg-text">${res.msg}</div>
+                        <div class="cm-msg-text">${htmlMsg}</div>
                     </div>
                 `);
                     $(".chat-logs").scrollTop($(".chat-logs")[0].scrollHeight);
@@ -524,8 +587,21 @@
 
             },
             error: function (xhr, status, err) {
-           
                 $(`#${typingId}`).remove();
+
+                // 👉 Thêm thông báo lỗi vào giao diện chat
+                $(".chat-logs").append(`
+        <div class="chat-msg user">
+            <span class="msg-avatar">
+                <img src="${chatIconUrl}">
+            </span>
+            <div class="cm-msg-text">
+                ⚠️ Hiện tại server đang tắt. Xin vui lòng liên hệ admin để được hỗ trợ.
+            </div>
+        </div>
+    `);
+                $(".chat-logs").scrollTop($(".chat-logs")[0].scrollHeight);
+
                 console.error("❌ Lỗi gửi:", err);
             }
         });
