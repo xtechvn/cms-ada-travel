@@ -168,7 +168,7 @@ namespace WEB.CMS.Controllers.Order
                                     var User = await _userRepository.GetDetailUser(_UserId);
                                     if (User != null)
                                     {
-                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TP  && (detail.Status == (int)DebtGuaranteeStatus.CHO_TP_DUYET || detail.Status == (int)DebtGuaranteeStatus.CHO_TN_DUYET) )
+                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TP && (detail.Status == (int)DebtGuaranteeStatus.CHO_TP_DUYET || detail.Status == (int)DebtGuaranteeStatus.CHO_TN_DUYET))
                                         {
                                             ViewBag.tp = 1;
                                         }
@@ -182,7 +182,8 @@ namespace WEB.CMS.Controllers.Order
                                 break;
                             case (int)RoleType.Admin:
                                 {
-                                    ViewBag.tp = 1;
+                                    if (detail.Status == (int)DebtGuaranteeStatus.CHO_TP_DUYET || detail.Status == (int)DebtGuaranteeStatus.CHO_TN_DUYET)
+                                        ViewBag.tp = 1;
                                 }
                                 break;
                         }
@@ -223,7 +224,7 @@ namespace WEB.CMS.Controllers.Order
                     {
 
 
-                        
+
                         var orderStatus = _allCodeRepository.GetListByType("ORDER_STATUS");
                         var allCodes = orderStatus.Where(s => s.CodeValue == (int)OrderStatus.WAITING_FOR_OPERATOR).ToList();
                         var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
