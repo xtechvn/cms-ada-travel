@@ -395,6 +395,7 @@ function convertTinyMCEToPlainText(htmlContent) {
      },
 
 
+<<<<<<< HEAD
      postToFanpage: async function (articleId) {
          const defaultImage = "https://static-image.adavigo.com/uploads/images/2025/1/23/9ac274a4-56ab-47fe-bbba-5a94daa84510.png";
 
@@ -404,16 +405,37 @@ function convertTinyMCEToPlainText(htmlContent) {
          let images = JSON.parse($('#selectedImagesForFanpage').val() || '[]');
 
          if (images.length === 0) {
+=======
+     postToFanpage: function (articleId) {
+         debugger
+        
+         const defaultImage = "https://static-image.adavigo.com/uploads/images/2025/1/23/9ac274a4-56ab-47fe-bbba-5a94daa84510.png";
+
+         // ✅ Lấy ảnh từ input (vừa chọn)
+         const selected = JSON.parse($('#selectedImagesForFanpage').val() || '[]');
+
+         // ✅ Nếu không có ảnh vừa chọn → fallback sang ảnh DB
+         let images = [];
+         if (selected.length > 0) {
+             images = selected;
+         } else {
+             // ✅ Fallback ảnh từ DB nếu có
+>>>>>>> main
              $('#fanpage-db-wrapper .fanpage-img-option').each(function () {
                  const url = $(this).attr('src');
                  if (url) images.push(url);
              });
          }
 
+<<<<<<< HEAD
+=======
+         // ✅ Nếu vẫn rỗng → dùng ảnh mặc định
+>>>>>>> main
          if (images.length === 0) {
              images = [defaultImage];
          }
 
+<<<<<<< HEAD
          const imagesNeedConvert = images.filter(x => !x.includes("static-image.adavigo.com"));
 
          if (imagesNeedConvert.length > 0) {
@@ -434,15 +456,25 @@ function convertTinyMCEToPlainText(htmlContent) {
              }
          }
 
+=======
+         // ✅ Gán IsPostedToFanpage để lưu luôn trạng thái
+>>>>>>> main
          $('#IsPostedToFanpage').val(1);
 
          _newsDetail.OnSave(0, function (savedId) {
              if (!savedId) {
+<<<<<<< HEAD
                  $('#loadingPostFanpage').removeClass('show');
+=======
+>>>>>>> main
                  _msgalert.error("❌ Không thể lưu bài viết trước khi đăng.");
                  return;
              }
 
+<<<<<<< HEAD
+=======
+             // ✅ Lấy lại content mới nhất từ TinyMCE sau khi Save
+>>>>>>> main
              const rawContent = tinymce.activeEditor.getContent();
              const plainText = convertTinyMCEToPlainText(rawContent);
              const payload = {
@@ -456,16 +488,28 @@ function convertTinyMCEToPlainText(htmlContent) {
                  contentType: "application/json",
                  data: JSON.stringify(payload),
                  success: function (res) {
+<<<<<<< HEAD
                      $('#loadingPostFanpage').removeClass('show');
 
                      if (res.post_supports_client_mutation_id) {
                          _msgalert.success("✅ Đăng bài lên Fanpage thành công!");
                          $('#btn-post-fanpage').replaceWith('<button class="btn btn-success" disabled>Đã đăng lên Fanpage</button>');
                          window.location.href = "/news/detail/" + savedId;
+=======
+                     debugger
+                     if (res.post_supports_client_mutation_id) {
+                         _msgalert.success("✅ Đăng bài lên Fanpage thành công!");
+                         $('#btn-post-fanpage').replaceWith('<button class="btn btn-success" disabled>Đã đăng lên Fanpage</button>');
+                         // ✅ Chuyển hướng sau khi đăng thành công
+                        
+                             window.location.href = "/news/detail/" + savedId;
+                         
+>>>>>>> main
                      } else {
                          _msgalert.error("❌ Đăng lên Fanpage thất bại.");
                      }
                  },
+<<<<<<< HEAD
                  error: function () {
                      $('#loadingPostFanpage').removeClass('show');
                      _msgalert.error("❌ Lỗi khi kết nối tới N8n.");
@@ -475,6 +519,12 @@ function convertTinyMCEToPlainText(htmlContent) {
      }
 
 
+=======
+                 error: () => _msgalert.error("❌ Lỗi khi kết nối tới N8n.")
+             });
+         });
+     }
+>>>>>>> main
  };
 
 var _newsDetail = {

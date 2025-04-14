@@ -148,6 +148,7 @@ namespace Utilities
             {
                 try
                 {
+<<<<<<< HEAD
                     // ⚠️ Bypass 403 bằng cách giả lập browser headers
                     client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
                     client.DefaultRequestHeaders.Referrer = new Uri("https://google.com");
@@ -156,6 +157,12 @@ namespace Utilities
                     var base64 = Convert.ToBase64String(bytes);
 
                     string extension = Path.GetExtension(imageUrl).ToLower();
+=======
+                    var bytes = await client.GetByteArrayAsync(imageUrl);
+                    var base64 = Convert.ToBase64String(bytes);
+                    string extension = Path.GetExtension(imageUrl).ToLower();
+
+>>>>>>> main
                     string mime = extension switch
                     {
                         ".jpg" or ".jpeg" => "image/jpeg",
@@ -175,7 +182,10 @@ namespace Utilities
         }
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
         /// <summary>
         /// Resize image with maximum 1000px width
         /// </summary>

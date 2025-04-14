@@ -36,7 +36,8 @@ namespace DAL
                                       UserId = n.UserId,
                                       UserName = u.UserName,
                                       UpdateTime = n.UpdateTime,
-                                      Type = n.Type
+                                      Type = n.Type,
+                                      FullName=u.FullName
                                   }).ToListAsync();
                 }
             }

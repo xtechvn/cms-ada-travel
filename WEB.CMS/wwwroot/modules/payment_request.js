@@ -1034,4 +1034,33 @@ var _payment_request_service = {
         };
         _magnific.OpenSmallPopup(title, url, param);
     },
+    KTNote: function (id) {
+        let title = 'Ghi chú';
+        let url = '/PaymentRequest/PopupNoteKT';
+        var param = {
+            id: id
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    SetupNoteKTRequest: function () {
+        var id = $('#Id').val();
+        var notekt = $('#notekt').val();
+        $.ajax({
+            url: "/PaymentRequest/SetUpNoteKT",
+            type: "Post",
+            data: { id: id, notekt: notekt },
+            success: function (result) {
+                _global_function.RemoveLoading()
+                if (result.isSuccess === true) {
+                    _msgalert.success(result.message);
+                    $.magnificPopup.close();
+                    setTimeout(function () {
+                        window.location.reload()
+                    }, 1000)
+                } else {
+                    _msgalert.error(result.message);
+                }
+            }
+        });
+    }
 }

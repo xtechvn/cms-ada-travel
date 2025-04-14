@@ -1,5 +1,8 @@
 ﻿using APP_CHECKOUT.RabitMQ;
+<<<<<<< HEAD
 using Entities.ConfigModels;
+=======
+>>>>>>> main
 using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.News;
@@ -226,6 +229,7 @@ namespace WEB.CMS.Controllers
 
             return Json(new { success = true });
         }
+<<<<<<< HEAD
         [HttpPost]
         public async Task<IActionResult> ConvertImagesBeforePost([FromBody] List<string> images)
         {
@@ -247,6 +251,8 @@ namespace WEB.CMS.Controllers
 
             return Ok(processedImages);
         }
+=======
+>>>>>>> main
 
 
         [HttpPost]

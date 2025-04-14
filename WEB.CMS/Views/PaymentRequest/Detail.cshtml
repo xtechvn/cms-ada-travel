@@ -6,6 +6,7 @@
 @using Utilities.Contants
 @using Entities.ViewModels
 @using System.Linq
+@using Entities.ViewModels
 @model PaymentRequestViewModel
 @{
     var counter = 0;
@@ -13,6 +14,7 @@
     int KTT_DUYET_YEU_CAU_CHI = (int)ViewBag.KTT_DUYET_YEU_CAU_CHI;
     int KTV_DUYET_YEU_CAU_CHI = (int)ViewBag.KTV_DUYET_YEU_CAU_CHI;
     bool isAdmin = (bool)ViewBag.isAdmin;
+    var List_Note = (List<NoteViewModel>)ViewBag.ListNote;
 }
 <section class="main-container">
     <input type="text" name="name" value="@Model.Id" id="requestId" hidden style="display: none" />
@@ -28,7 +30,7 @@
                         <td colspan="3">
                             <strong>Mã  phiếu yêu cầu chi: @Model.PaymentCode</strong>
                             @if (Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET) ||
-                            Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))
+                           Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))
                             {
                                 <span class="status-wait">@Model.PaymentRequestStatus</span>
                             }
@@ -213,6 +215,19 @@
                                         </div>
                                     }
                                 </div>
+                                @if (List_Note != null && List_Note.Count > 0)
+                                {
+                                    <div class="col-12">
+                                        <div class="col-12 mb10" style="color:red;">Kế toán Ghi chú</div>
+                                        <div class="row">
+                                            @foreach (var item in List_Note)
+                                            {
+                                                <div class="col-2 mb10">@item.FullName</div>
+                                                <div class="col-7 mb10">:  @item.Comment </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
                             </div>
                             <div class="row">
 
@@ -358,106 +373,110 @@
         <div class="flex flex-end">
             @*<button type="submit" class="btn btn-default cancel ml-1" onclick="_payment_request_service.BackToList()">Quay lại</button>*@
             <button type="submit" class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</button>
-                @if ((isAdmin || KTT_DUYET_YEU_CAU_CHI == 1 || KTV_DUYET_YEU_CAU_CHI == 1 ) && Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_CHI))
-                {
-                    <button type="submit" class="btn btn-default cancel ml-1" style="background:#0066ff !important;" onclick="_payment_request_service.AddNewPaymentVoucher('@Model.Id')">Tạo phiếu chi</button>
-
-                }
-                @if (ViewBag.TYPE == (int)PAYMENT_VOUCHER_TYPE.QUY_CHAM_SOC_KHACH_HANG)
-                {
-                    <button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
-                            onclick="_payment_request_service.PopupInYCChi(@Model.Id)">
-                        <a class="fa fa-print txt_14" href="javascript:;" onclick="_payment_request_service.PopupInYCChi(@Model.Id)"></a>
-                    </button>
-
-                }
-                @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.LUU_NHAP || Model.Status == (int)PAYMENT_REQUEST_STATUS.TU_CHOI)
-                {
-                    <button type="button" class="btn btn-danger ml-1" onclick="_payment_request_service.Delete('@Model.PaymentCode')">
-                        Xóa
-                    </button>
-                    <button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
-                            onclick="_payment_request_service.Edit(@Model.Id)">
-                        Chỉnh sửa
-                    </button>
-                }
-                @if (isAdmin)
-                {
-                    <button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
-                            onclick="_payment_request_service.EditAdmin(@Model.Id)">
-                        Chỉnh sửa (Admin)
-                    </button>
-                }
-
-                @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_CHI && (isAdmin || KTT_DUYET_YEU_CAU_CHI == 1))
-                {
-                    <button type="button" class="btn btn-danger ml-1" onclick="_payment_request_service.UndoApprove(@((int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))">
-                        Bỏ duyệt
-                    </button>
-                }
-                @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_CHI && KTV_DUYET_YEU_CAU_CHI == 1)
-                {
-                    <button type="button" class="btn btn-danger ml-1" onclick="_payment_request_service.UndoApprove(@((int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET))">
-                        Bỏ duyệt
-                    </button>
-                }
-                @if (isAdmin && Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET)
-                {
-                    <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
-                            onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_CHI))">
-                        Duyệt
-                    </button>
-                }
-                @if (isAdmin && Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET)
-                {
-                    <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
-                            onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET))">
-                        Duyệt
-                    </button>
-                }
-                @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET && KTT_DUYET_YEU_CAU_CHI == 1)
-                {
-                    <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
-                            onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_CHI))">
-                        Duyệt
-                    </button>
-                }
-                @*@if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET && KTV_DUYET_YEU_CAU_CHI == 1 && Model.Type == (int)PAYMENT_VOUCHER_TYPE.CHI_PHI_MARKETING)
+            @if (KTT_DUYET_YEU_CAU_CHI == 1 || KTV_DUYET_YEU_CAU_CHI == 1 || isAdmin)
             {
-            <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
-            onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_CHI))">
-            Duyệt
-            </button>
-            }*@
-                @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET && TBP_DUYET_YEU_CAU_CHI == 1)
-                {
-                    <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
-                            onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET))">
-                        Duyệt
-                    </button>
-                }
-                @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET && TBP_DUYET_YEU_CAU_CHI == 1)
-                {
-                    <button type="button" class="btn btn-danger ml-1"
-                            onclick="_payment_request_service.Reject()">
-                        Từ chối
-                    </button>
-                }
-                @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET && isAdmin)
-                {
-                    <button type="button" class="btn btn-danger ml-1"
-                            onclick="_payment_request_service.Reject()">
-                        Từ chối
-                    </button>
-                }
-                @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET && (isAdmin || KTT_DUYET_YEU_CAU_CHI == 1))
-                {
-                    <button type="button" class="btn btn-danger ml-1"
-                            onclick="_payment_request_service.Reject()">
-                        Từ chối
-                    </button>
-                }
-            </div>
+                <button type="submit" class="btn btn-default cancel ml-1" style="background:#0066ff !important;" onclick="_payment_request_service.KTNote('@Model.Id')">Ghi chú</button>
+            }
+            @if ((isAdmin || KTT_DUYET_YEU_CAU_CHI == 1 || KTV_DUYET_YEU_CAU_CHI == 1) && Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_CHI))
+            {
+                <button type="submit" class="btn btn-default cancel ml-1" style="background:#0066ff !important;" onclick="_payment_request_service.AddNewPaymentVoucher('@Model.Id')">Tạo phiếu chi</button>
+
+            }
+            @if (ViewBag.TYPE == (int)PAYMENT_VOUCHER_TYPE.QUY_CHAM_SOC_KHACH_HANG)
+            {
+                <button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
+                        onclick="_payment_request_service.PopupInYCChi(@Model.Id)">
+                    <a class="fa fa-print txt_14" href="javascript:;" onclick="_payment_request_service.PopupInYCChi(@Model.Id)"></a>
+                </button>
+
+            }
+            @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.LUU_NHAP || Model.Status == (int)PAYMENT_REQUEST_STATUS.TU_CHOI)
+            {
+                <button type="button" class="btn btn-danger ml-1" onclick="_payment_request_service.Delete('@Model.PaymentCode')">
+                    Xóa
+                </button>
+                <button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
+                        onclick="_payment_request_service.Edit(@Model.Id)">
+                    Chỉnh sửa
+                </button>
+            }
+            @if (isAdmin)
+            {
+                <button type="button" class="btn btn-default ml-1" style="background: #5cb566 !important;"
+                        onclick="_payment_request_service.EditAdmin(@Model.Id)">
+                    Chỉnh sửa (Admin)
+                </button>
+            }
+
+            @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_CHI && (isAdmin || KTT_DUYET_YEU_CAU_CHI == 1))
+            {
+                <button type="button" class="btn btn-danger ml-1" onclick="_payment_request_service.UndoApprove(@((int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))">
+                    Bỏ duyệt
+                </button>
+            }
+            @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_CHI && KTV_DUYET_YEU_CAU_CHI == 1)
+            {
+                <button type="button" class="btn btn-danger ml-1" onclick="_payment_request_service.UndoApprove(@((int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET))">
+                    Bỏ duyệt
+                </button>
+            }
+            @if (isAdmin && Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET)
+            {
+                <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
+                        onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_CHI))">
+                    Duyệt
+                </button>
+            }
+            @if (isAdmin && Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET)
+            {
+                <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
+                        onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET))">
+                    Duyệt
+                </button>
+            }
+            @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET && KTT_DUYET_YEU_CAU_CHI == 1)
+            {
+                <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
+                        onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_CHI))">
+                    Duyệt
+                </button>
+            }
+            @*@if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET && KTV_DUYET_YEU_CAU_CHI == 1 && Model.Type == (int)PAYMENT_VOUCHER_TYPE.CHI_PHI_MARKETING)
+        {
+        <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
+        onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_CHI))">
+        Duyệt
+        </button>
+        }*@
+            @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET && TBP_DUYET_YEU_CAU_CHI == 1)
+            {
+                <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
+                        onclick="_payment_request_service.Approve(@((int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET))">
+                    Duyệt
+                </button>
+            }
+            @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET && TBP_DUYET_YEU_CAU_CHI == 1)
+            {
+                <button type="button" class="btn btn-danger ml-1"
+                        onclick="_payment_request_service.Reject()">
+                    Từ chối
+                </button>
+            }
+            @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET && isAdmin)
+            {
+                <button type="button" class="btn btn-danger ml-1"
+                        onclick="_payment_request_service.Reject()">
+                    Từ chối
+                </button>
+            }
+            @if (Model.Status == (int)PAYMENT_REQUEST_STATUS.CHO_KTT_DUYET && (isAdmin || KTT_DUYET_YEU_CAU_CHI == 1))
+            {
+                <button type="button" class="btn btn-danger ml-1"
+                        onclick="_payment_request_service.Reject()">
+                    Từ chối
+                </button>
+            }
+        </div>
     </div>
 </section>
 <style>
