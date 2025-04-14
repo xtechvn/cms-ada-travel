@@ -40,11 +40,12 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         private APIService apiService;
         private readonly IUserRepository _userRepository;
         private IndentiferService _indentiferService;
+        private INoteRepository _noteRepository;
         public PaymentRequestController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser,
            IPaymentRequestRepository paymentRequestRepository, ISupplierRepository supplierRepository, IUserRepository userRepository,
            ITourPackagesOptionalRepository tourPackagesOptionalRepository, IConfiguration configuration, IFlyBookingDetailRepository flyBookingDetailRepository,
            IOtherBookingRepository otherBookingRepository, IHotelBookingRepositories hotelBookingRepositories, IBankingAccountRepository bankingAccountRepository,
-           IClientRepository clientRepository, IContractPayRepository contractPayRepository, IIdentifierServiceRepository identifierServiceRepository, IOrderRepository orderRepository)
+           IClientRepository clientRepository, IContractPayRepository contractPayRepository, IIdentifierServiceRepository identifierServiceRepository, IOrderRepository orderRepository, INoteRepository noteRepository)
         {
             _contractPayRepository = contractPayRepository;
             _WebHostEnvironment = hostEnvironment;
@@ -62,6 +63,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             _bankingAccountRepository = bankingAccountRepository;
             _clientRepository = clientRepository;
             _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
+            _noteRepository = noteRepository;
         }
 
         public IActionResult Index()
@@ -106,7 +108,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                         }
                     }
                 }
-              
+
                 var listPaymentRequest = _paymentRequestRepository.GetPaymentRequests(searchModel, out long total, currentPage, pageSize);
                 model.CurrentPage = currentPage;
                 model.ListData = listPaymentRequest;
@@ -619,6 +621,8 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                         break;
                     }
                 }
+                var list_note = await _noteRepository.GetListByType(paymentRequestId, (int)AttachmentType.YCC_Comment);
+                ViewBag.ListNote = list_note;
             }
 
             return View(model);
@@ -1555,7 +1559,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             var model = _paymentRequestRepository.GetById(paymentRequestId);
             if (model.RelateData == null) model.RelateData = new List<PaymentRequestDetailViewModel>();
 
-            ViewBag.ClientId = model.ClientId==null?0: model.ClientId;
+            ViewBag.ClientId = model.ClientId == null ? 0 : model.ClientId;
 
             ViewBag.SupplierId = model.SupplierId == null ? 0 : model.SupplierId;
 
@@ -1569,6 +1573,59 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
 
             return PartialView(model);
         }
+        public IActionResult PopupNoteKT(int id)
+        {
+            ViewBag.id = id;
+            return PartialView();
+        }
+        public async Task<IActionResult> SetUpNoteKT(int id, string notekt)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(notekt) && notekt.Length > 300)
+                {
+                    return Ok(new
+                    {
+                        isSuccess = false,
+                        message = "Nội dung ghi chú không được lớn hơn 300 kí tự"
+                    });
+                }
+                int _UserId = 0;
 
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                var model = new Note();
+                model.Comment = notekt;
+                model.DataId = id;
+                model.UserId = _UserId;
+                model.Type = (int?)AttachmentType.YCC_Comment;
+                var setup = await _noteRepository.UpSert(model);
+                if (setup > 0)
+                {
+                    return Ok(new
+                    {
+                        isSuccess = true,
+                        message = "Ghi chú thành công"
+                    });
+                }
+
+                return Ok(new
+                {
+                    isSuccess = false,
+                    message = "Lưu ghi chú không thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Update - PaymentRequestController: " + ex + ". Đã có lỗi xảy ra");
+                return Ok(new
+                {
+                    isSuccess = false,
+                    message = "Lưu ghi chú thất bại. Đã có lỗi xảy ra"
+                });
+            }
+        }
     }
 }

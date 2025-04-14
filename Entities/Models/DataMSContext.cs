@@ -30,6 +30,8 @@ namespace Entities.Models
         public virtual DbSet<AllotmentHistory> AllotmentHistory { get; set; }
         public virtual DbSet<AllotmentUse> AllotmentUse { get; set; }
         public virtual DbSet<Article> Article { get; set; }
+        public virtual DbSet<FanpageArticleImage> FanpageArticleImages { get; set; }
+
         public virtual DbSet<ArticleCategory> ArticleCategory { get; set; }
         public virtual DbSet<ArticleRelated> ArticleRelated { get; set; }
         public virtual DbSet<ArticleTag> ArticleTag { get; set; }

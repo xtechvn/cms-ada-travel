@@ -14,6 +14,11 @@
     <div class="flex row-main-head">
         <h2 class="title_page">Quản lý bài viết</h2>
         <div class="btn-right text-right">
+            @* Tạo bằng Ai *@
+            <button type="button" class="btn btn-default  mr-2" onclick="_news.ShowAddOrUpdate(0)">
+                <i class="fa fa-plus"></i>Tạo AI
+            </button>
+            @* @* Tạo Thủ Công *@ 
             <a class="btn btn-default" href="/news/detail/0">
                 + Tạo bài viết
             </a>
@@ -150,4 +155,5 @@
 
 @section scripts {
     <script src="~/modules/news.js?v=13"></script>
+
 }
