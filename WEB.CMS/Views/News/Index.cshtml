@@ -15,13 +15,16 @@
         <h2 class="title_page">Quản lý bài viết</h2>
         <div class="btn-right text-right">
             @* Tạo bằng Ai *@
-            <button type="button" class="btn btn-default  mr-2" onclick="_news.ShowAddOrUpdate(0)">
-                <i class="fa fa-plus"></i>Generate Ai Content
+            <button type="button" class="btn btn-default mr-2" onclick="_news.ShowAddOrUpdate(0)">
+                <img src="/images/icons/Sparkle.svg" alt="AI Icon" style="width: 16px; height: 16px; margin-right: 5px;">
+                Generate Ai Content
             </button>
+
             @* @* Tạo Thủ Công *@ 
-            <a class="btn btn-default" href="/news/detail/0">
+           <a class="btn btn-default" href="/news/detail/0" onclick="localStorage.removeItem('aiArticles')">
                 + Tạo bài viết
             </a>
+
             <div class="number-new text-center">
                 Tổng số bài
                 <div><strong id="total-article-filter">0</strong></div>

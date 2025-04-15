@@ -30,7 +30,7 @@
     // ✅ Cuối cùng xác định loại bài viết
     bool isFanpage = (platFormVal == 1 && aimodelTypeVal == 1);
     bool isWebsiteAI = (platFormVal == 0 && aimodelTypeVal == 1);
-    bool isWebsiteManual = (aimodelTypeVal == 0);
+    bool isWebsiteManual = (platFormVal == 255 && aimodelTypeVal == 255 || platFormVal == 0 && aimodelTypeVal == 0);
 }
 
 
