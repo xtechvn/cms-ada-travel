@@ -32,7 +32,7 @@ namespace Utilities
             string tokenData = string.Empty;
             try
             {
-               
+
                 var j_param = new Dictionary<string, string> {
                     { "data_file", modelImage.ImageData },
                     { "extend", modelImage.ImageExtension }};
@@ -148,10 +148,14 @@ namespace Utilities
             {
                 try
                 {
+                    // ⚠️ Bypass 403 bằng cách giả lập browser headers
+                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+                    client.DefaultRequestHeaders.Referrer = new Uri("https://google.com");
+
                     var bytes = await client.GetByteArrayAsync(imageUrl);
                     var base64 = Convert.ToBase64String(bytes);
-                    string extension = Path.GetExtension(imageUrl).ToLower();
 
+                    string extension = Path.GetExtension(imageUrl).ToLower();
                     string mime = extension switch
                     {
                         ".jpg" or ".jpeg" => "image/jpeg",

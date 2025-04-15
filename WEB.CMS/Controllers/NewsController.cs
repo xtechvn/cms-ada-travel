@@ -1,4 +1,5 @@
 ﻿using APP_CHECKOUT.RabitMQ;
+using Entities.ConfigModels;
 using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.News;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,9 +39,10 @@ namespace WEB.CMS.Controllers
         private readonly IWebHostEnvironment _WebHostEnvironment;
         private readonly IConfiguration _configuration;
         private readonly WorkQueueClient workQueueClient;
+        private readonly string _UrlStaticImage;
 
         public NewsController(IConfiguration configuration, IArticleRepository articleRepository, IUserRepository userRepository, ICommonRepository commonRepository, IWebHostEnvironment hostEnvironment,
-            IGroupProductRepository groupProductRepository)
+            IGroupProductRepository groupProductRepository, IOptions<DomainConfig> domainConfig)
         {
             _ArticleRepository = articleRepository;
             _CommonRepository = commonRepository;
@@ -47,7 +50,9 @@ namespace WEB.CMS.Controllers
             _WebHostEnvironment = hostEnvironment;
             _configuration = configuration;
             _GroupProductRepository = groupProductRepository;
+            _UrlStaticImage = domainConfig.Value.ImageStatic;
             workQueueClient = new WorkQueueClient(configuration);
+
 
         }
 
@@ -220,6 +225,27 @@ namespace WEB.CMS.Controllers
             await _ArticleRepository.SaveFanpageImagesAsync(model.ArticleId, model.Images);
 
             return Json(new { success = true });
+        }
+        [HttpPost]
+        public async Task<IActionResult> ConvertImagesBeforePost([FromBody] List<string> images)
+        {
+            var processedImages = new List<string>();
+
+            foreach (var image in images)
+            {
+                var url = await UpLoadHelper.UploadBase64Src(image, _UrlStaticImage);
+                // ✅ Nếu URL trả về KHÔNG chứa static domain thì gắn vào
+                if (!string.IsNullOrEmpty(url) && !url.Contains(_UrlStaticImage))
+                {
+                    url = _UrlStaticImage + url;
+                }
+                if (!string.IsNullOrEmpty(url))
+                {
+                    processedImages.Add(url);
+                }
+            }
+
+            return Ok(processedImages);
         }
 
 
