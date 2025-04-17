@@ -209,8 +209,20 @@ namespace WEB.Adavigo.CMS.Service
                                         var saler = await _userRepository.GetById((long)item.Flight.SalerId);
 
                                         message.To.Add(saler.Email);
+                                    }
+                                    if (item.Type.Equals("Dịch vụ khác"))
+                                    {
+                                        item.OtherBooking = await _otherBookingRepository.GetDetailOtherBookingById(Convert.ToInt32(item.ServiceId));
+                                        var saler = await _userRepository.GetById((long)item.OtherBooking[0].OperatorId);
 
+                                        message.To.Add(saler.Email);
+                                    }
+                                    if (item.Type.Equals("Vinwonder"))
+                                    {
+                                        item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
+                                        var saler = await _userRepository.GetById((long)item.VinWonderBooking[0].SalerId);
 
+                                        message.To.Add(saler.Email);
                                     }
 
 
