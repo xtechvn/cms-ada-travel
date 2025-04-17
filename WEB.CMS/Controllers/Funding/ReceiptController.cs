@@ -50,7 +50,7 @@ namespace WEB.Adavigo.CMS.Controllers
 
         public ReceiptController(IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, IHotelBookingRepositories hotelBookingRepositories, ITourRepository tourRepository,
             IClientRepository clientRepository, IDepositHistoryRepository depositHistoryRepository, IOrderRepository orderRepository, ManagementUser ManagementUser,
-             IUserRepository userRepository,  IPaymentRequestRepository paymentRequestRepository,
+             IUserRepository userRepository, IPaymentRequestRepository paymentRequestRepository,
              IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService, IDebtGuaranteeRepository debtGuaranteeRepository)
         {
             _supplierRepository = supplierRepository;
@@ -287,8 +287,8 @@ namespace WEB.Adavigo.CMS.Controllers
                 var current_user = _ManagementUser.GetCurrentUser();
                 foreach (var item in model.ContractPayDetails)
                 {
-                  var DetailDebtGuarantee =await  _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(item.OrderId);
-                    if(DetailDebtGuarantee!= null)
+                    var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(item.OrderId);
+                    if (DetailDebtGuarantee != null)
                     {
                         _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)_UserId);
                     }
@@ -320,7 +320,8 @@ namespace WEB.Adavigo.CMS.Controllers
                     var ContractPayByOrderId = await _contractPayRepository.GetContractPayByOrderId(item.OrderId);
                     modelEmail.ServiceType = (int)EmailType.SaleDH;
                     var order = await _orderRepository.GetOrderByID(item.OrderId);
-                    if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && order.OrderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR)
+
+                    if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && order.OrderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR && DetailDebtGuarantee == null)
                     {
                         _emailService.SendEmail(modelEmail, attach_file);
                     }
