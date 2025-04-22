@@ -275,8 +275,8 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             ViewBag.payment_request_type = payment_request_type;
             if (serviceId == 0 && requestDetail != null && requestDetail.RelateData != null && requestDetail.RelateData.Count > 0)
             {
-                ViewBag.serviceType = requestDetail.RelateData[0].ServiceId;
-                ViewBag.serviceId = requestDetail.RelateData[0].ServiceType;
+                ViewBag.serviceType = requestDetail.RelateData[0].ServiceType;
+                ViewBag.serviceId = requestDetail.RelateData[0].ServiceId;
             }
             if (requestDetail != null && requestDetail.Type != (int)PAYMENT_VOUCHER_TYPE.HOAN_TRA_KHACH_HANG
                 && requestDetail.Status == (int)PAYMENT_REQUEST_STATUS.TU_CHOI)
