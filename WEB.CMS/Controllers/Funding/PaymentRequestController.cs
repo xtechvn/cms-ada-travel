@@ -275,8 +275,8 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             ViewBag.payment_request_type = payment_request_type;
             if (serviceId == 0 && requestDetail != null && requestDetail.RelateData != null && requestDetail.RelateData.Count > 0)
             {
-                ViewBag.serviceType = requestDetail.RelateData[0].ServiceId;
-                ViewBag.serviceId = requestDetail.RelateData[0].ServiceType;
+                ViewBag.serviceType = requestDetail.RelateData[0].ServiceType;
+                ViewBag.serviceId = requestDetail.RelateData[0].ServiceId;
             }
             if (requestDetail != null && requestDetail.Type != (int)PAYMENT_VOUCHER_TYPE.HOAN_TRA_KHACH_HANG
                 && requestDetail.Status == (int)PAYMENT_REQUEST_STATUS.TU_CHOI)
@@ -430,6 +430,10 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             {
                 var listPaymentRequestByServiceId = _paymentRequestRepository.GetByServiceId(model.PaymentRequestDetails != null ? model.PaymentRequestDetails[0].ServiceId : model.ServiceId,
                    model.PaymentRequestDetails != null ? model.PaymentRequestDetails[0].ServiceType : model.ServiceType);
+                if(model.TotalAmountService==0&& model.TotalSupplierRefund == 0)
+                {
+                    model.TotalAmountService= listPaymentRequestByServiceId.Where(n => n.Status != (int)PAYMENT_REQUEST_STATUS.LUU_NHAP).Sum(n => n.Amount);
+                }
                 var totalPaymentRequest = listPaymentRequestByServiceId.Where(n => n.Status != (int)PAYMENT_REQUEST_STATUS.TU_CHOI).Sum(n => n.Amount);
                 if (model.TotalAmountService + model.TotalSupplierRefund < totalPaymentRequest + model.Amount)
                 {
