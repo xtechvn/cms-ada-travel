@@ -29,6 +29,7 @@ namespace Entities.ViewModels.Funding
         public long ServiceId { get; set; }
         public string ServiceCode { get; set; }
         public int? ServiceType { get; set; }
+        public int StatusCode { get; set; }
     }
      public class ContractPayDetaiByOrderIdlViewModel
     {

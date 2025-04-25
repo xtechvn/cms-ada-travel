@@ -254,6 +254,7 @@ namespace Repositories.Repositories
                                      CreateDate = row["CreateTime"].Equals(DBNull.Value) ? "" : Convert.ToDateTime(row["CreateTime"]).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
                                      Amount = !row["Amount"].Equals(DBNull.Value) ? Convert.ToDouble(row["Amount"].ToString()) : 0,
                                      IsFinishPayment = Convert.ToInt32(row["IsFinishPayment"].ToString()),
+                                     StatusCode = Convert.ToInt32(row["StatusCode"].ToString()),
                                  }).ToList();
                     var listContractPayDetail = contractPayDAL.GetByContractDataIds(listOrder.Select(n => Convert.ToInt64(n.OrderId)).ToList());
                     foreach (var item in listOrder)
