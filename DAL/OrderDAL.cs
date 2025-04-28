@@ -527,6 +527,11 @@ namespace DAL
                             data.PaymentStatus = (int)PaymentStatus.PAID_NOT_ENOUGH;
                             data.IsFinishPayment = 0;
                         }
+                        if (amount == contract_pay_total_amount )
+                        {
+                            data.PaymentStatus = (int)PaymentStatus.PAID;
+                            data.IsFinishPayment = 1;
+                        }
                         data.Amount = amount;
                         data.Price = price;
                         data.Profit = profit - (data.Discount == null ? 0 : data.Discount);
