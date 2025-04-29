@@ -212,18 +212,17 @@ namespace WEB.CMS.Controllers
                 var success = await _aPIService.UpdateUser(model);
                 if (success > 0)
                 {
-                    rs = success;
-                    //var exists = await _UserRepository.GetById(model.Id);
-                    //if (exists == null || exists.Id <= 0)
-                    //{
-                    //    rs = await _UserRepository.Create(model);
+                    var exists = await _UserRepository.GetById(model.Id);
+                    if (exists == null || exists.Id <= 0)
+                    {
+                        rs = await _UserRepository.Create(model);
 
-                    //}
-                    //else
-                    //{
-                    //    rs = await _UserRepository.Update(model);
+                    }
+                    else
+                    {
+                        rs = await _UserRepository.Update(model);
 
-                    //}
+                    }
                 }
                 else
                 {
