@@ -243,7 +243,7 @@ namespace WEB.Adavigo.CMS.Service
 
                                 if (order != null)
                                 {
-                                    model.Subject = "Xác nhận đơn hàng " + order.OrderNo + " " + order.Label;
+                                    model.Subject = "TEST EMAIL Xác nhận đơn hàng " + order.OrderNo + " " + order.Label;
                                     message.Subject = model.Subject.Replace('\n', ' ');
                                     var listService = await _orderRepository.GetAllServiceByOrderId(order.OrderId);
                                     var saler = await _userRepository.GetById(Convert.ToInt64(order.SalerId));
@@ -1907,6 +1907,13 @@ namespace WEB.Adavigo.CMS.Service
                                     var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.Other);
                                     if (note != null)
                                         item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
+                                } 
+                                if (item.Type.Equals("Vinwonder"))
+                                {
+                                    item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
+                                    var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.Other);
+                                    if (note != null)
+                                        item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
                                 }
                             }
                         if (data != null && data.Count > 1)
@@ -2492,6 +2499,30 @@ namespace WEB.Adavigo.CMS.Service
 
                                 }
                             }
+                            if (item.Type.Equals("Vinwonder"))
+                            {
+                                if (item.VinWonderBooking != null)
+                                {
+                                    string note = string.Empty;
+
+                                    note += "<tr>" +
+                                        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
+                                        "<td style='border: 1px solid #999; padding: 5px;' ><input id='VinWonderStartDate'type='text' value=" + item.StartDate.ToString("dd/MM/yyyy") + " ></td> " +
+                                       
+                                    "</tr>" +
+                                    "<tr>" +
+                                        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +
+                                        "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' ><input id='VinWonderAmount' class='currency'type='text' value=" + ((double)item.VinWonderBooking[0].Amount).ToString("N0") + "></td>" +
+                                   "</tr>";
+
+
+
+                                    Packagesdetail = "<table class='Vinwonder-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'><tr>" +
+                                        "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > <input id='VinWonderName' disabled style=\"font-weight: bold; text-align: center;background:#a8c7fa; \"type='text'value=\"Dịch vụ : " + item.VinWonderBooking[0].SiteName + "\"</ td ></tr> " +
+                                                    "" + note + "</table>";
+
+                                }
+                            }
                             Packagesdata += Packagesdetail;
                         }
                     }
@@ -3037,6 +3068,36 @@ namespace WEB.Adavigo.CMS.Service
 
 
                     }
+                    if (model.VinWonderEmail != null && model.VinWonderEmail.Count > 0)
+                    {
+
+                        foreach (var item in model.VinWonderEmail)
+                        {
+                            string note = string.Empty;
+
+
+
+                            note += "<tr>" +
+                                "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
+                                "<td style='border: 1px solid #999; padding: 5px;' >" + item.VinWonderStartDate + " </td> " +
+                              
+                            "</tr>" +
+                            "<tr>" +
+                                "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +
+                                "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + item.VinWonderAmount + "</td>" +
+                           "</tr>";
+
+
+
+                            Packagesdetail = "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > " + item.VinWonderName + "</ td > " +
+                                            "" + note + "";
+                            Packagesdata += "<table role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'>" +
+                                Packagesdetail + "</table>";
+                        }
+
+
+
+                    }
                     var data_VietQRBankList = await _APIService.GetVietQRBankList();
                     var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
                     string bank_code = "Techcombank";
@@ -3352,6 +3413,13 @@ namespace WEB.Adavigo.CMS.Service
                             {
                                 item.OtherBooking = await _otherBookingRepository.GetDetailOtherBookingById(Convert.ToInt32(item.ServiceId));
                                 var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.Other);
+                                if (note != null)
+                                    item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
+                            }
+                            if (item.Type.Equals("Vinwonder"))
+                            {
+                                item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
+                                var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.VinWonder);
                                 if (note != null)
                                     item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
                             }
@@ -3930,6 +3998,34 @@ namespace WEB.Adavigo.CMS.Service
 
                             }
                         }
+                        if (item.Type.Equals("Vinwonder"))
+                        {
+                            if (item.VinWonderBooking != null)
+                            {
+                                string note = string.Empty;
+
+                                note += "<tr>" +
+                                    "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
+                                    "<td style='border: 1px solid #999; padding: 5px;' >" + item.StartDate.ToString("dd/MM/yyyy") + " </td> " +
+                                 
+                                "</tr>" +
+                                "<tr>" +
+                                    "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +
+                                    "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + ((double)item.VinWonderBooking[0].Amount).ToString("N0") + "</td>" +
+                               "</tr>";
+
+
+
+                                Packagesdetail = "<table class='Other-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'><tr>" +
+                                    "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > Dịch vụ : " + item.VinWonderBooking[0].SiteName + "</td></tr> " +
+                                                "" + note + "" +
+                                                      "<tr>" +
+                                                      "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
+                                                      "<td colspan='3' style='border: 1px solid #999; padding: 5px;'>" + item.Note + "</td></tr>";
+
+                            }
+                        }
+
                         Packagesdata += "<table class='Tour-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'>" +
                             Packagesdetail +
                             "</table>";
@@ -3942,7 +4038,7 @@ namespace WEB.Adavigo.CMS.Service
                 string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
 
-                var template = workingDirectory + @"\EmailTemplate\OrderTemplate.html";
+                var template = workingDirectory + @"\EmailTemplate\OrderTemplateDH.html";
                 string body = File.ReadAllText(template);
                 if (order.ClientId != null && order.ClientId != 0)
                 {

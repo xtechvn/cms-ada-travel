@@ -308,6 +308,7 @@ var _orderDetail = {
         let TourEmail = [];
         let HotelEmail = [];
         let FyEmail = [];
+        let VinWonderEmail = [];
         $(".Tour-row").each(function (index, item) {
             var element = $(item);
             var obj_package = {
@@ -378,6 +379,16 @@ var _orderDetail = {
                 fyNote: element.find('#fyNote').val(),
             };
             FyEmail.push(obj_package);
+        });
+        $(".Vinwonder-row").each(function (index, item) {
+            var element = $(item);
+            var obj_package = {
+                VinWonderStartDate: element.find('#VinWonderStartDate').val(),
+                VinWonderAmount: element.find('#VinWonderAmount').val(),
+                VinWonderName: element.find('#VinWonderName').val(),
+       
+            };
+            VinWonderEmail.push(obj_package);
         });
         var model = {
             Subject: $('#Subject').val(),
@@ -456,6 +467,7 @@ var _orderDetail = {
             TourEmail: TourEmail,
             HotelEmail: HotelEmail,
             FyEmail: FyEmail,
+            VinWonderEmail: VinWonderEmail,
             Packagesemail: []
         }
         var list_attach_file = _global_function.GetAttachmentFiles($('.attachment-file-block'))
