@@ -17,6 +17,7 @@ using Nest;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
 using StackExchange.Redis;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
@@ -1115,7 +1116,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     {
                         var Tpsalerid = await _userRepository.GetManagerByUserId(Convert.ToInt64(data.SalerId));
                         var Leaderid = await _userRepository.GetLeaderByUserId(Convert.ToInt64(data.SalerId));
-                        if ((_UserId != data.SalerId && current_user.UserUnderList.Contains(data.SalerId.ToString()))|| _UserId== Tpsalerid|| _UserId == Leaderid || current_user.Role.Contains(((int)RoleType.Admin).ToString()))
+                        if ((_UserId != data.SalerId && current_user.UserUnderList.Contains(data.SalerId.ToString())) || _UserId == Tpsalerid || _UserId == Leaderid || current_user.Role.Contains(((int)RoleType.Admin).ToString()))
                         {
                             ViewBag.IsEdit = true;
                         }
@@ -1235,7 +1236,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 {
                                     var allCodes = orderStatus.Where(s => s.CodeValue == status).ToList();
                                     model.Log = allCodes[0].Description;
-                                    model.Note = user.FullName + " " + allCodes[0].Description + " đơn";
+                                    model.Note = user.FullName + " cập nhật trạng thái đơn " + allCodes[0].Description ;
                                     LogActionMongo.InsertLog(model);
                                     string link = "/Order/" + OrderId;
 
@@ -1252,7 +1253,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 {
                                     var allCodes = orderStatus.Where(s => s.CodeValue == status).ToList();
                                     model.Log = allCodes[0].Description;
-                                    model.Note = user.FullName + " " + allCodes[0].Description + " đơn";
+                                    model.Note = user.FullName + " cập nhật trạng thái đơn " + allCodes[0].Description ;
                                     LogActionMongo.InsertLog(model);
                                     var updateOrderService = await _orderRepository.UpdateAllServiceStatusByOrderId(OrderId, (int)ServiceStatus.Cancel);
 
@@ -1274,7 +1275,7 @@ namespace WEB.Adavigo.CMS.Controllers
                             {
                                 var allCodes = orderStatus.Where(s => s.CodeValue == status).ToList();
                                 model.Log = allCodes[0].Description;
-                                model.Note = user.FullName + " " + allCodes[0].Description + " ";
+                                model.Note = user.FullName + " cập nhật trạng thái đơn " + allCodes[0].Description + " ";
                                 LogActionMongo.InsertLog(model);
                                 var data2 = await _orderRepository.UpdateOrderStatus(OrderId, status, UpdatedBy, UserVerify);
                                 if (data2 > 0)
@@ -2289,10 +2290,11 @@ namespace WEB.Adavigo.CMS.Controllers
                     modelLog.Type = (int)AttachmentType.OrderDetail;
                     modelLog.CreatedUserName = user.FullName;
                     modelLog.Log = "Cập nhật trạng thái đơn";
-                    modelLog.Note = user.FullName + " cập nhật trạng thái đơn";
+                    modelLog.Note = user.FullName + " cập nhật trạng thái đơn ";
 
-
-
+                    var orderStatus = _allCodeRepository.GetListByType("ORDER_STATUS");
+                    var allCodes = orderStatus.Where(s => s.CodeValue == Convert.ToInt32(model.OrderStatus)).ToList();
+                    modelLog.Note +=  allCodes[0].Description;
                     long UserVerify = 0;
 
                     var modelOrder = new Entities.Models.Order();
@@ -2608,7 +2610,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     _UserId = (int)Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
                 var model = new DebtGuarantee();
-                model.Code = "BL"+OrderId;
+                model.Code = "BL" + OrderId;
                 model.CreatedBy = _UserId;
                 model.Orderid = OrderId;
                 model.ClientId = (int?)dataOrder.ClientId;
@@ -2622,7 +2624,8 @@ namespace WEB.Adavigo.CMS.Controllers
                 }
 
                 var Insert = await _debtGuaranteeRepository.InsertDebtGuarantee(model);
-                if (Insert > 0) {
+                if (Insert > 0)
+                {
                     var user = await _userRepository.GetById(_UserId);
                     var order = await _orderRepository.GetOrderByID(OrderId);
                     string link = "/DebtGuarantee/Detail/" + Insert;
