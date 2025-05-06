@@ -243,7 +243,7 @@ namespace WEB.Adavigo.CMS.Service
 
                                 if (order != null)
                                 {
-                                    model.Subject = "TEST EMAIL Xác nhận đơn hàng " + order.OrderNo + " " + order.Label;
+                                    model.Subject = "Xác nhận đơn hàng " + order.OrderNo + " " + order.Label;
                                     message.Subject = model.Subject.Replace('\n', ' ');
                                     var listService = await _orderRepository.GetAllServiceByOrderId(order.OrderId);
                                     var saler = await _userRepository.GetById(Convert.ToInt64(order.SalerId));
