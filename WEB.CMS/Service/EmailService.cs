@@ -2576,10 +2576,10 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{NDChuyenKhoan}}", "<input type=\"text\" id=\"NDChuyenKhoan\" value=\"" + order.OrderNo + " CHUYEN KHOAN\" />");
 
                     var data_VietQRBankList = await _APIService.GetVietQRBankList();
-                    var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
-                    string bank_code = "Techcombank";
+                    var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("VPbank".Trim().ToLower())) : null;
+                    string bank_code = "VPbank";
                     if (selected_bank != null) bank_code = selected_bank.bin;
-                    var result = await _APIService.GetVietQRCode("19131835226016", bank_code, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var result = await _APIService.GetVietQRCode("9698888", bank_code, order.OrderNo, Convert.ToDouble(order.Amount));
                     var jsonData = JObject.Parse(result);
                     var status = int.Parse(jsonData["code"].ToString());
                     if (status == (int)ResponseType.SUCCESS)
@@ -3099,10 +3099,10 @@ namespace WEB.Adavigo.CMS.Service
 
                     }
                     var data_VietQRBankList = await _APIService.GetVietQRBankList();
-                    var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
-                    string bank_code = "Techcombank";
+                    var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("VPbank".Trim().ToLower())) : null;
+                    string bank_code = "VPbank";
                     if (selected_bank != null) bank_code = selected_bank.bin;
-                    var result = await _APIService.GetVietQRCode("19131835226016", bank_code, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var result = await _APIService.GetVietQRCode("9698888", bank_code, order.OrderNo, Convert.ToDouble(order.Amount));
                     var jsonData = JObject.Parse(result);
                     var status = int.Parse(jsonData["code"].ToString());
                     if (status == (int)ResponseType.SUCCESS)
