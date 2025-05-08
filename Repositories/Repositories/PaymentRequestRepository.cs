@@ -528,7 +528,9 @@ namespace Repositories.Repositories
                         if (serviceCode.Contains("HOTEL"))
                             countStatus.ServiceType = (int)ServiceType.BOOK_HOTEL_ROOM;
                         if (serviceCode.Contains("OTHER"))
-                            countStatus.ServiceType = (int)ServiceType.Other;
+                            countStatus.ServiceType = (int)ServiceType.Other; 
+                        if (serviceCode.Contains("VINWONDER"))
+                            countStatus.ServiceType = (int)ServiceType.VinWonder;
                         item.ListServiceCodeAndType.Add(countStatus);
                         index++;
                     }

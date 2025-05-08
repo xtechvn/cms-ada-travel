@@ -10,5 +10,6 @@ namespace Entities.ViewModels.SetServices
     public class VinWonderBookingTicketViewModel : VinWonderBookingTicket
     {
         public string SupplierName { get; set; }
+        public decimal TotalAmountPay { get; set; }
     }
 }

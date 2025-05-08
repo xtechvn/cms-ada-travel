@@ -41,11 +41,12 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         private readonly IUserRepository _userRepository;
         private IndentiferService _indentiferService;
         private INoteRepository _noteRepository;
+        private IVinWonderBookingRepository _vinWonderBookingRepository;
         public PaymentRequestController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser,
            IPaymentRequestRepository paymentRequestRepository, ISupplierRepository supplierRepository, IUserRepository userRepository,
            ITourPackagesOptionalRepository tourPackagesOptionalRepository, IConfiguration configuration, IFlyBookingDetailRepository flyBookingDetailRepository,
            IOtherBookingRepository otherBookingRepository, IHotelBookingRepositories hotelBookingRepositories, IBankingAccountRepository bankingAccountRepository,
-           IClientRepository clientRepository, IContractPayRepository contractPayRepository, IIdentifierServiceRepository identifierServiceRepository, IOrderRepository orderRepository, INoteRepository noteRepository)
+           IClientRepository clientRepository, IContractPayRepository contractPayRepository, IIdentifierServiceRepository identifierServiceRepository, IOrderRepository orderRepository, INoteRepository noteRepository, IVinWonderBookingRepository vinWonderBookingRepository)
         {
             _contractPayRepository = contractPayRepository;
             _WebHostEnvironment = hostEnvironment;
@@ -64,6 +65,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             _clientRepository = clientRepository;
             _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
             _noteRepository = noteRepository;
+            _vinWonderBookingRepository = vinWonderBookingRepository;
         }
 
         public IActionResult Index()
@@ -1630,6 +1632,90 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                     message = "Lưu ghi chú thất bại. Đã có lỗi xảy ra"
                 });
             }
+        }
+        public async Task<IActionResult> GetVinwonderPackageOption(long serviceId, long orderId, int serviceType = 0)
+        {
+            try
+            {
+                var listVinwonderTicket = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(serviceId);
+                listVinwonderTicket = listVinwonderTicket.Where(n => n.SupplierId != null && n.SupplierId != 0 ).ToList();
+                var listVinwonderTicketReturn = new List<VinWonderBookingTicketViewModel>();
+                foreach (var item in listVinwonderTicket)
+                {
+                    item.Amount = item.BasePrice;
+                    var getBySupplierId = listVinwonderTicketReturn.Where(n => n.SupplierId != null && n.SupplierId == item.SupplierId).ToList();
+                    if (listVinwonderTicketReturn.Count > 0)
+                    {
+                        foreach (var sup in listVinwonderTicketReturn)
+                        {
+                            if (sup.SupplierId == item.SupplierId)
+                            {
+                                sup.Amount += item.Amount;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        listVinwonderTicketReturn.Add(item);
+                    }
+                }
+ 
+                var listPaymentRequest = _paymentRequestRepository.GetByServiceId(serviceId, serviceType);
+                if (listPaymentRequest.Count > 0)
+                {
+                    foreach (var item in listVinwonderTicketReturn)
+                    {
+                        var paymentRequests = listPaymentRequest.Where(n => (n.IsDelete == null || n.IsDelete.Value == false)
+                            && n.Status != (int)PAYMENT_REQUEST_STATUS.TU_CHOI && n.SupplierId == item.SupplierId).ToList();
+                        item.TotalAmountPay = paymentRequests.Sum(n => n.Amount);
+                    }
+                }
+                return Ok(new
+                {
+                    isSuccess = true,
+                    message = "Thành công",
+                    data = listVinwonderTicketReturn
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetVinwonderPackageOption - PaymentRequestController: " + ex + ". Đã có lỗi xảy ra");
+                return Ok(new
+                {
+                    isSuccess = false,
+                    message = "Thất bại" + ". Đã có lỗi xảy ra",
+                    data = new List<Entities.Models.Order>()
+                });
+            }
+        }
+        public async Task<string> GetVinwonderPackagesOptionalSuggest(string name, long serviceId)
+        {
+            try
+            {
+                var supplierList = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(serviceId);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    supplierList = supplierList.Where(n =>
+                    n.SupplierName.Trim().ToLower().Contains(name.Trim().ToLower())).ToList();
+                }
+
+                var suggestionlist = supplierList.Select(s => new SupplierViewModel
+                {
+                    id = (int)s.SupplierId,
+                    fullname = s.SupplierName,
+
+                }).ToList();
+
+                suggestionlist = suggestionlist.GroupBy(s => s.id).Select(s => s.First()).ToList();
+                return JsonConvert.SerializeObject(suggestionlist);
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetFlyBookingPackagesOptionalSuggest - PaymentRequestController: " + ex + ". Đã có lỗi xảy ra");
+                return null;
+            }
+
         }
     }
 }

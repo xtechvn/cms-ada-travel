@@ -6,6 +6,7 @@ using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Mongo;
 using Entities.ViewModels.OrderManual;
+using Entities.ViewModels.SetServices;
 using ENTITIES.ViewModels.Articles;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -2235,7 +2236,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         {
             try
             {
-                ViewBag.ExtraList = new List<VinWonderBookingTicket>();
+                ViewBag.ExtraList = new List<VinWonderBookingTicketViewModel>();
                 if (booking_id > 0)
                 {
                     var list = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(booking_id);

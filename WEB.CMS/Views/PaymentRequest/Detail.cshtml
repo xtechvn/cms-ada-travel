@@ -269,6 +269,12 @@
                                                                         @item.ServiceCode
                                                                     </a>
                                                                 }
+                                                                @if (item.ServiceType == (int)ServiceType.VinWonder) // VinWonder
+                                                                {
+                                                                    <a class="blue" href="/SetService/vinwonder/Detail/@item.ServiceId">
+                                                                        @item.ServiceCode
+                                                                    </a>
+                                                                }
                                                             </td>
                                                             <td>@item.StartDateStr - @item.EndDateStr</td>
                                                             <td>
