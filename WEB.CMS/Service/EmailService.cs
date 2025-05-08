@@ -12,6 +12,7 @@ using Repositories.IRepositories;
 using Repositories.Repositories;
 using SharpCompress.Common;
 using System.Buffers.Text;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
@@ -765,6 +766,112 @@ namespace WEB.Adavigo.CMS.Service
 
                             }
                             break;
+                        case (int)ServicesType.VinWonder:
+                            {
+                                string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                                var template = workingDirectory + @"\EmailTemplate\OtherSupplierTemplate.html";
+
+                                string body = File.ReadAllText(template);
+                                var model = _vinWonderBookingRepository.GetVinWonderBookingById(id);
+                                var extra_package = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(Convert.ToInt32(id));
+
+                                if (model == null) return null;
+
+                                var order = await _orderRepository.GetOrderByID((long)model.OrderId);
+                                var Dh = await _userRepository.GetById((long)model.SalerId);
+                                if (extra_package != null && extra_package.Count() > 0)
+                                {
+                                    extra_package = extra_package.Where(s => s.SupplierId == SupplierId).ToList();
+                                    foreach (var item in extra_package)
+                                    {
+
+                                        chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Name + "</td>" +
+
+                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice != null ? ((double)item.UnitPrice/ (double)item.Quantity) : 0).ToString("N0") + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Quantity + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item.UnitPrice).ToString("N0") + "</td>"
+                                                                    + "</tr>";
+                                    }
+
+                                }
+
+
+                                if (chitietdichvu != string.Empty)
+                                {
+                                    datatabledv = "<table style='border-collapse: collapse;width:100%;'>" +
+                                                                "<thead>" +
+                                                                    "<tr>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Loại dịch vụ</th>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá nhập</th>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số lượng</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                    "</tr> " +
+                                                                "</thead>" +
+                                                                "<tbody>" +
+                                                                    chitietdichvu +
+                                                               "</tbody>" +
+                                                           "</table>";
+                                }
+                                else
+                                {
+                                    datatabledv = "";
+                                }
+                                if (datatabledv == "")
+                                {
+
+                                    body = body.Replace("{{styledv}}", "style=\"display:none;\"");
+                                    body = body.Replace("{{datatabledv}}", datatabledv);
+                                }
+                                else
+                                {
+                                    body = body.Replace("{{datatabledv}}", datatabledv);
+                                }
+                                if (extra_package != null && extra_package.Count() > 0)
+                                {
+                                    var Supplier = _supplierRepository.GetDetailById((int)extra_package[0].SupplierId);
+                                    body = body.Replace("{{HotelName}}", "<input type =\"text\" id=\"TileEmail\"style=\"text-align: center;font-weight: bold;\" value=\"PHIẾU XÁC NHẬN DỊCH VỤ: " + Supplier.FullName + "\"/>");
+
+                                }
+                                else
+                                {
+                                    body = body.Replace("{{HotelName}}", "<input type =\"text\" id=\"TileEmail\"style=\"text-align: center;font-weight: bold;\" value=\"PHIẾU XÁC NHẬN DỊCH VỤ: \"/>");
+
+                                }
+                                body = body.Replace("{{styledvkhac}}", "style =\"display:none;\"");
+                                body = body.Replace("{{datatable}}", "<textarea id=\"datatable\" style=\"height: 200px !important;\">" + model.Note + "</textarea>");
+                                body = body.Replace("{{datatableCode}}", "<textarea id=\"datatableCode\" style=\"height: 200px !important;\">" + model.ServiceCode + "</textarea>");
+                                body = body.Replace("{{userName}}", "<input type =\"text\" id=\"user_Name\" value=\"\" />");
+
+                                body = body.Replace("{{userPhone}}", "<input type =\"text\" id=\"user_Phone\" value=\"\" />");
+                                body = body.Replace("{{userEmail}}", "<input type =\"text\" id=\"user_Email\" value=\"\" />");
+                                body = body.Replace("{{orderNo}}", "<input type =\"text\" id=\"orderNo\" value=\"" + order.OrderNo + "\" />");
+                                body = body.Replace("{{ArrivalDate}}", "<input type =\"text\"style=\"min-width: 100px;\" id=\"go_startdate\" value=\"" + ((DateTime)order.StartDate).ToString("dd/MM/yyyy") + "\" />");
+                                body = body.Replace("{{DepartureDate}}", "<input type =\"text\" id=\"go_enddate\" value=\"" + ((DateTime)order.EndDate).ToString("dd/MM/yyyy") + "\" />");
+
+                                body = body.Replace("{{salerName}}", "<input type =\"text\" id=\"saler_Name\" value=\"" + Dh.FullName + "\" />");
+                                body = body.Replace("{{salerPhone}}", "<input type =\"text\" id=\"saler_Phone\" value=\"" + Dh.Phone + "\" />");
+                                body = body.Replace("{{salerEmail}}", "<input type =\"text\" id=\"saler_Email\" value=\"" + Dh.Email + "\" />");
+
+                                //body = body.Replace("{{NumberOfRoom}}", "<input type =\"text\" id=\"NumberOfRoom\" value=\"" + NumberOfRoom.ToString() + "\" />");
+                                //body = body.Replace("{{numberOfAdult}}", "<input style=\"width:30% !important;\" type =\"text\" id=\"go_numberOfAdult\" value=\"" + NumberOfAdult.ToString() + "\" />");
+                                //body = body.Replace("{{numberOfChild}}", "<input style=\"width:30% !important;\" type =\"text\" id=\"go_numberOfChild\" value=\"" + NumberOfChild.ToString() + "\" />");
+                                //body = body.Replace("{{numberOfInfant}}", "<input style=\"width:30% !important;\" type =\"text\" id=\"go_numberOfInfant\" value=\"" + NumberOfInfant.ToString() + "\" />");
+
+                                body = body.Replace("{{totalAmount}}", "<input type =\"text\" class=\"currency\" id=\"totalAmount\" value=\"" + (model.OthersAmount != null ? (double)model.OthersAmount : 0).ToString("N0") + "\" />");
+                                body = body.Replace("{{OrderAmount}}", "<input type =\"text\" class=\"currency\" id=\"OrderAmount\" value=\"" + (model.TotalPrice != null ? (double)model.TotalUnitPrice : 0).ToString("N0") + "\" />");
+
+                                body = body.Replace("{{totalToday}}", "<input type=\"text\" id=\"totalToday\" value=\"" + 1 + "\" />");
+
+
+                                body = body.Replace("{{Note}}", "<textarea id=\"order_note\" style=\"height: 100px !important;\">" + order_note + "</textarea>");
+                                body = body.Replace("{{payment_notification}}", "<textarea id=\"payment_notification\" style=\"height: 200px !important;\">" + payment_notification + "</textarea>");
+                                return body;
+
+                            }
+                            break;
                     }
 
                     return null;
@@ -953,7 +1060,7 @@ namespace WEB.Adavigo.CMS.Service
 
                                     }
                                 }
-                                 
+
 
                                 datatabledv = "<table style='border-collapse: collapse;width:100%;'>" +
                                                               "<thead>" +
@@ -1141,6 +1248,102 @@ namespace WEB.Adavigo.CMS.Service
 
                                 return body;
                             }
+                            break;
+                        case (int)ServicesType.VinWonder:
+                            {
+                                string datatabledv = String.Empty;
+                                string datatabledvkhac = String.Empty;
+                                string chitietdichvu = String.Empty;
+                                var template = workingDirectory + @"\EmailTemplate\OtherSupplierTemplate.html";
+
+                                string body = File.ReadAllText(template);
+
+
+                                var model = _vinWonderBookingRepository.GetVinWonderBookingById(modelEmail.ServiceId);
+                                var extra_package = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(modelEmail.ServiceId);
+
+                                if (model == null) return null;
+
+                                var order = await _orderRepository.GetOrderByID((long)model.OrderId);
+                                var Dh = await _userRepository.GetById((long)model.SalerId);
+                                if (extra_package != null && extra_package.Count() > 0)
+                                {
+                                    extra_package = extra_package.Where(s => s.SupplierId == SupplierId).ToList();
+                                    foreach (var item in extra_package)
+                                    {
+
+                                        chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Name + "</td>" +
+
+                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice != null ? ((double)item.UnitPrice / (double)item.Quantity) : 0).ToString("N0") + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Quantity + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item.UnitPrice).ToString("N0") + "</td>"
+                                                                    + "</tr>";
+                                    }
+
+                                }
+
+
+                                if (chitietdichvu != string.Empty)
+                                {
+                                    datatabledv = "<table style='border-collapse: collapse;width:100%;'>" +
+                                                                "<thead>" +
+                                                                    "<tr>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Loại dịch vụ</th>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá nhập</th>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số lượng</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                    "</tr> " +
+                                                                "</thead>" +
+                                                                "<tbody>" +
+                                                                    chitietdichvu +
+                                                               "</tbody>" +
+                                                           "</table>";
+                                }
+                                else
+                                {
+                                    datatabledv = "";
+                                }
+                                if (datatabledv == "")
+                                {
+
+                                    body = body.Replace("{{styledv}}", "style=\"display:none;\"");
+                                    body = body.Replace("{{datatabledv}}", datatabledv);
+                                }
+                                else
+                                {
+                                    body = body.Replace("{{datatabledv}}", datatabledv);
+                                }
+
+
+
+                                body = body.Replace("{{datatable}}", modelEmail.datatable);
+                                body = body.Replace("{{userName}}", modelEmail.user_Name);
+                                body = body.Replace("{{HotelName}}", modelEmail.TileEmail);
+                                body = body.Replace("{{userPhone}}", modelEmail.user_Phone);
+                                body = body.Replace("{{userEmail}}", modelEmail.user_Email);
+                                body = body.Replace("{{orderNo}}", modelEmail.OrderNo);
+                                body = body.Replace("{{ArrivalDate}}", modelEmail.go_startdate);
+                                body = body.Replace("{{DepartureDate}}", modelEmail.go_enddate);
+                                body = body.Replace("{{NumberOfRoom}}", modelEmail.NumberOfRoom);
+                                body = body.Replace("{{numberOfAdult}}", modelEmail.go_numberOfAdult);
+                                body = body.Replace("{{numberOfChild}}", modelEmail.go_numberOfChild);
+                                body = body.Replace("{{numberOfInfant}}", modelEmail.go_numberOfInfant);
+                                body = body.Replace("{{totalAmount}}", modelEmail.totalAmount.ToString("N0"));
+                                body = body.Replace("{{OrderAmount}}", modelEmail.OrderAmount.ToString("N0"));
+
+                                body = body.Replace("{{salerName}}", modelEmail.saler_Name);
+                                body = body.Replace("{{salerPhone}}", modelEmail.saler_Phone);
+                                body = body.Replace("{{salerEmail}}", modelEmail.saler_Email);
+                                body = body.Replace("{{totalToday}}", modelEmail.totalToday);
+
+                                body = body.Replace("{{Note}}", modelEmail.OrderNote);
+                                body = body.Replace("{{payment_notification}}", modelEmail.PaymentNotification);
+
+                                return body;
+                            }                           
                             break;
                     }
 
@@ -1907,7 +2110,7 @@ namespace WEB.Adavigo.CMS.Service
                                     var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.Other);
                                     if (note != null)
                                         item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
-                                } 
+                                }
                                 if (item.Type.Equals("Vinwonder"))
                                 {
                                     item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
@@ -2508,7 +2711,7 @@ namespace WEB.Adavigo.CMS.Service
                                     note += "<tr>" +
                                         "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
                                         "<td style='border: 1px solid #999; padding: 5px;' ><input id='VinWonderStartDate'type='text' value=" + item.StartDate.ToString("dd/MM/yyyy") + " ></td> " +
-                                       
+
                                     "</tr>" +
                                     "<tr>" +
                                         "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +
@@ -3080,7 +3283,7 @@ namespace WEB.Adavigo.CMS.Service
                             note += "<tr>" +
                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
                                 "<td style='border: 1px solid #999; padding: 5px;' >" + item.VinWonderStartDate + " </td> " +
-                              
+
                             "</tr>" +
                             "<tr>" +
                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +
@@ -4007,7 +4210,7 @@ namespace WEB.Adavigo.CMS.Service
                                 note += "<tr>" +
                                     "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
                                     "<td style='border: 1px solid #999; padding: 5px;' >" + item.StartDate.ToString("dd/MM/yyyy") + " </td> " +
-                                 
+
                                 "</tr>" +
                                 "<tr>" +
                                     "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +

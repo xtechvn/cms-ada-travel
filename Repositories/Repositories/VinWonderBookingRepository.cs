@@ -44,14 +44,14 @@ namespace Repositories.Repositories
         {
             return await _vinWonderBookingTicketDAL.GetVinWonderTicketByBookingId(booking_id);
         }
-        public async Task<List<VinWonderBookingTicket>> GetVinWonderTicketByBookingIdSP(long booking_id)
+        public async Task<List<VinWonderBookingTicketViewModel>> GetVinWonderTicketByBookingIdSP(long booking_id)
         {
             try
             {
                 DataTable dt = await _vinWonderBookingTicketDAL.GetVinWonderTicketByBookingIdSP(booking_id);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    var data = dt.ToList<VinWonderBookingTicket>();
+                    var data = dt.ToList<VinWonderBookingTicketViewModel>();
                     return data;
                 }
                 return null;

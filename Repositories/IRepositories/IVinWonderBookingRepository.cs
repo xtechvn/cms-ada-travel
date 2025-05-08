@@ -14,7 +14,7 @@ namespace Repositories.IRepositories
     {
         public VinWonderBooking GetVinWonderBookingById(long booking_id);
         Task<List<VinWonderBookingTicket>> GetVinWonderTicketByBookingId(long booking_id);
-        Task<List<VinWonderBookingTicket>> GetVinWonderTicketByBookingIdSP(long booking_id);
+        Task<List<VinWonderBookingTicketViewModel>> GetVinWonderTicketByBookingIdSP(long booking_id);
         Task<List<VinWonderBookingTicketCustomer>> GetVinWonderTicketCustomerByBookingIdSP(long booking_id);
         Task<long> SummitVinWonderServiceData(OrderManualVinWonderBookingServiceSummitModel data, int user_id);
         Task<long> DeleteVinWonderBookingByID(long id);

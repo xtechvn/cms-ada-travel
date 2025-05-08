@@ -28,6 +28,7 @@ namespace WEB.Adavigo.CMS.Controllers.Report
         private readonly IHotelBookingRepositories _hotelBookingRepositories;
         private readonly IOtherBookingRepository _otherBookingRepository;
         private readonly IHotelBookingRoomExtraPackageRepository _hotelBookingRoomExtraPackageRepository;
+        private readonly IVinWonderBookingRepository _vinWonderBookingRepository;
 
         private readonly IReportRepository _reportRepository;
         private ManagementUser _ManagementUser;
@@ -36,7 +37,7 @@ namespace WEB.Adavigo.CMS.Controllers.Report
 
         public ReportDepartmentController(IOrderRepository orderRepository, IDepartmentRepository departmentRepository,
             IWebHostEnvironment WebHostEnvironment, IHotelBookingRepositories hotelBookingRepositories, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository,
-             IReportRepository reportRepository, ManagementUser managementUser, IAllCodeRepository allcodeRepository, IOtherBookingRepository otherBookingRepository, ISupplierRepository supplierRepository)
+             IReportRepository reportRepository, ManagementUser managementUser, IAllCodeRepository allcodeRepository, IOtherBookingRepository otherBookingRepository, ISupplierRepository supplierRepository, IVinWonderBookingRepository vinWonderBookingRepository)
         {
             _orderRepository = orderRepository;
             _DepartmentRepository = departmentRepository;
@@ -48,7 +49,7 @@ namespace WEB.Adavigo.CMS.Controllers.Report
             _allCodeRepository = allcodeRepository;
             _otherBookingRepository = otherBookingRepository;
             _supplierRepository = supplierRepository;
-
+            _vinWonderBookingRepository = vinWonderBookingRepository;
 
 
         }
@@ -1239,6 +1240,22 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                             var suggestionlist = supplierList.Select(s => new SupplierViewModel
                             {
                                 id = (int)s.SuplierId,
+                                fullname = s.SupplierName,
+
+                            }).ToList();
+
+                            suggestionlist = suggestionlist.GroupBy(s => s.id).Select(s => s.First()).ToList();
+                            return JsonConvert.SerializeObject(suggestionlist);
+                        }
+                        break;
+                    case (int)ServicesType.VinWonder:
+                        {
+                            var supplierList =await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(id);
+
+
+                            var suggestionlist = supplierList.Select(s => new SupplierViewModel
+                            {
+                                id = (int)s.SupplierId,
                                 fullname = s.SupplierName,
 
                             }).ToList();

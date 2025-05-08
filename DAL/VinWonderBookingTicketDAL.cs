@@ -69,6 +69,7 @@ namespace DAL
                         if (exists_ticket != null && exists_ticket.Id > 0 && item.UnitPrice >= 0)
                         {
                             exists_ticket.UnitPrice = item.UnitPrice;
+                            exists_ticket.SupplierId = item.SupplierId;
                             exists_ticket.UpdatedBy = user_summit;
                             exists_ticket.UpdatedDate = DateTime.Now;
                             _DbContext.VinWonderBookingTicket.Update(exists_ticket);
