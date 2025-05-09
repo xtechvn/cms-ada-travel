@@ -292,6 +292,12 @@ else if (Model.IsIncludeService == 1 && (Model.SupplierId != 0 && Model.Supplier
                                     @item.ServiceCode
                                 </a>
                             }
+                            @if (item.ServiceType == 6)
+                            {
+                                <a class="blue" href="/SetService/Tour/Detail/@item.ServiceId">
+                                    @item.ServiceCode
+                                </a>
+                            }
                         </td>
                         <td>@item.StartDateStr - @item.EndDateStr</td>
                         <td>
