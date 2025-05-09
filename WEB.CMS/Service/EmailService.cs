@@ -776,7 +776,7 @@ namespace WEB.Adavigo.CMS.Service
                                 var extra_package = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(Convert.ToInt32(id));
 
                                 if (model == null) return null;
-
+                                double TotalUnitPrice = 0;
                                 var order = await _orderRepository.GetOrderByID((long)model.OrderId);
                                 var Dh = await _userRepository.GetById((long)model.SalerId);
                                 if (extra_package != null && extra_package.Count() > 0)
@@ -792,7 +792,7 @@ namespace WEB.Adavigo.CMS.Service
                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item.UnitPrice).ToString("N0") + "</td>"
                                                                     + "</tr>";
                                     }
-
+                                    TotalUnitPrice = (double)extra_package.Sum(s => s.UnitPrice);
                                 }
 
 
@@ -861,7 +861,7 @@ namespace WEB.Adavigo.CMS.Service
                                 //body = body.Replace("{{numberOfInfant}}", "<input style=\"width:30% !important;\" type =\"text\" id=\"go_numberOfInfant\" value=\"" + NumberOfInfant.ToString() + "\" />");
 
                                 body = body.Replace("{{totalAmount}}", "<input type =\"text\" class=\"currency\" id=\"totalAmount\" value=\"" + (model.OthersAmount != null ? (double)model.OthersAmount : 0).ToString("N0") + "\" />");
-                                body = body.Replace("{{OrderAmount}}", "<input type =\"text\" class=\"currency\" id=\"OrderAmount\" value=\"" + (model.TotalPrice != null ? (double)model.TotalUnitPrice : 0).ToString("N0") + "\" />");
+                                body = body.Replace("{{OrderAmount}}", "<input type =\"text\" class=\"currency\" id=\"OrderAmount\" value=\"" + TotalUnitPrice.ToString("N0") + "\" />");
 
                                 body = body.Replace("{{totalToday}}", "<input type=\"text\" id=\"totalToday\" value=\"" + 1 + "\" />");
 
