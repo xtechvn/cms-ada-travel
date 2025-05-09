@@ -1644,7 +1644,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 {
                     item.Amount = item.BasePrice;
                     var getBySupplierId = listVinwonderTicketReturn.Where(n => n.SupplierId != null && n.SupplierId == item.SupplierId).ToList();
-                    if (listVinwonderTicketReturn.Count > 0)
+                    if (getBySupplierId.Count > 0)
                     {
                         foreach (var sup in listVinwonderTicketReturn)
                         {
