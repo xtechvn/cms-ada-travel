@@ -172,7 +172,7 @@ namespace WEB.CMS.Controllers.Order
                                         {
                                             ViewBag.tp = 1;
                                         }
-                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TN && detail.Status == (int)DebtGuaranteeStatus.CHO_TN_DUYET )
+                                        if (current_user.UserUnderList.Contains(order.SalerId.ToString()) && User.Entity.UserPositionId == UserPositionType.TN && (detail.Status == (int)DebtGuaranteeStatus.CHO_TP_DUYET || detail.Status == (int)DebtGuaranteeStatus.CHO_TN_DUYET))
                                         {
                                             ViewBag.tn = 1;
                                         }
