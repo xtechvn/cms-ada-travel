@@ -420,7 +420,7 @@
 
     // ======================== HTML ==========================
     const html = `
-    <div class="widget-chat">
+    <div class="widget-chat" style="display: none;">
         <div id="body">
            
 
