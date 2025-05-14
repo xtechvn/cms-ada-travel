@@ -290,10 +290,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 foreach (var item in model.ContractPayDetails)
                 {
                     var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(item.OrderId);
-                    if (DetailDebtGuarantee != null)
-                    {
-                        _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)_UserId);
-                    }
+                 
 
                     string link = "/Receipt/Detail?contractPayId=" + contractPayId;
                     apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_THU).ToString(),
@@ -322,21 +319,25 @@ namespace WEB.Adavigo.CMS.Controllers
                     var ContractPayByOrderId = await _contractPayRepository.GetContractPayByOrderId(item.OrderId);
                     modelEmail.ServiceType = (int)EmailType.SaleDH;
                     var order = await _orderRepository.GetOrderByID(item.OrderId);
+                   
                     if (model.Type == ContractType.TT_DON_HANG)
                     {
-                        if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && (item.StatusCode == (int)OrderStatus.CREATED_ORDER || item.StatusCode == (int)OrderStatus.CONFIRMED_SALE) && DetailDebtGuarantee == null)
+                        if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && (item.StatusCode == (int)OrderStatus.CREATED_ORDER || item.StatusCode == (int)OrderStatus.CONFIRMED_SALE) && (DetailDebtGuarantee == null || DetailDebtGuarantee.Status != (int)DebtGuaranteeStatus.TN_DUYET || DetailDebtGuarantee.Status != (int)DebtGuaranteeStatus.TP_DUYET))
                         {
                             _emailService.SendEmail(modelEmail, attach_file);
                         }
                     }
                     else
                     {
-                        if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && order.OrderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR && DetailDebtGuarantee == null)
+                        if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && order.OrderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR && (DetailDebtGuarantee == null || DetailDebtGuarantee.Status!= (int)DebtGuaranteeStatus.TN_DUYET || DetailDebtGuarantee.Status != (int)DebtGuaranteeStatus.TP_DUYET))
                         {
                             _emailService.SendEmail(modelEmail, attach_file);
                         }
                     }
-                   
+                    if (DetailDebtGuarantee != null)
+                    {
+                        _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)_UserId);
+                    }
                 }
                 return Ok(new
                 {
