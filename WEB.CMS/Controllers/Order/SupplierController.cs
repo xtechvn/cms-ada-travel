@@ -4,10 +4,12 @@ using Entities.ViewModels.BankingAccount;
 using Entities.ViewModels.Funding;
 using Entities.ViewModels.Hotel;
 using Entities.ViewModels.SupplierConfig;
+using Entities.ViewModels.Tour;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Repositories.IRepositories;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Utilities;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
@@ -25,9 +27,14 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private readonly ISupplierRepository _supplierRepository;
         private readonly IBrandRepository _brandRepository;
         private readonly WEB.CMS.Models.AppSettings config;
+        private readonly IHotelBookingRoomRepository _hotelBookingRoomRepository;
+        private readonly IOtherBookingRepository _otherBookingRepository;
+        private readonly IFlyBookingDetailRepository _flyBookingDetailRepository;
+        private readonly ITourPackagesOptionalRepository _tourPackagesOptionalRepository;
+        private readonly IVinWonderBookingRepository _vinWonderBookingRepository;
 
         public SupplierController(IAllCodeRepository allCodeRepository, ISupplierRepository supplierRepository,
-            IBrandRepository brandRepository, ICommonRepository commonRepository, IConfiguration _configuration, IWebHostEnvironment webHostEnvironment)
+            IBrandRepository brandRepository, ICommonRepository commonRepository, IConfiguration _configuration, IWebHostEnvironment webHostEnvironment, IHotelBookingRoomRepository hotelBookingRoomRepository, IOtherBookingRepository otherBookingRepository, IFlyBookingDetailRepository flyBookingDetailRepository, ITourPackagesOptionalRepository tourPackagesOptionalRepository, IVinWonderBookingRepository vinWonderBookingRepository)
         {
             _allCodeRepository = allCodeRepository;
             _supplierRepository = supplierRepository;
@@ -36,6 +43,11 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             config = ReadFile.LoadConfig();
             configuration = _configuration;
             _WebHostEnvironment = webHostEnvironment;
+            _hotelBookingRoomRepository = hotelBookingRoomRepository;
+            _otherBookingRepository = otherBookingRepository;
+            _flyBookingDetailRepository = flyBookingDetailRepository;
+            _tourPackagesOptionalRepository = tourPackagesOptionalRepository;
+            _vinWonderBookingRepository = vinWonderBookingRepository;
         }
 
         #region supplier
@@ -504,9 +516,35 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         [HttpPost]
         public IActionResult OrderListing(SupplierOrderSearchModel model)
         {
-            var data = _supplierRepository.GetSupplierOrderList(model);
+            
+            return PartialView();
+        }
+        public async Task<IActionResult> FlyListing(OptionalSearshModel model)
+        {
+            var data =await _flyBookingDetailRepository.GetListFlyBookingPackagesBySupplierId(model);
             return PartialView(data);
         }
+        public async Task<IActionResult> HotelListing(OptionalSearshModel model)
+        {
+            var data =await _hotelBookingRoomRepository.GetListHotelBookingRoomsOptionalBySupplierId(model);
+            return PartialView(data);
+        }
+        public async Task<IActionResult> OtherListing(OptionalSearshModel model)
+        {
+            var data =await _otherBookingRepository.GetListOtherBookingPackagesOptionalBySupplierId(model);
+            return PartialView(data);
+        }
+        public async Task<IActionResult> TourListing(OptionalSearshModel model)
+        {
+            var data =await _tourPackagesOptionalRepository.GetListTourPackagesOptionalBySupplierId(model);
+            return PartialView(data);
+        }
+        public async Task<IActionResult> VinWonderListing(OptionalSearshModel model)
+        {
+            var data =await _vinWonderBookingRepository.GetListVinWonderOptionalBySupplierId(model);
+            return PartialView(data);
+        }
+
         #endregion
 
         #region services

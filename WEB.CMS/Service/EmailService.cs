@@ -228,7 +228,15 @@ namespace WEB.Adavigo.CMS.Service
 
 
                                 }
-                            message.To.Add(model.Email);
+                            if (model.Email != null && model.Email.Trim() != "")
+                            {
+                                var Email_split = model.Email.Split(",");
+                                foreach (var email in Email_split)
+                                {
+                                    message.CC.Add(email);
+                                }
+                            }
+                            //message.To.Add(model.Email);
 
                             message.To.Add(Email_KIEMSOAT);
                             message.To.Add(Email_KETOAN);

@@ -2,6 +2,7 @@
 using Entities.ViewModels;
 using Entities.ViewModels.HotelBookingRoom;
 using Entities.ViewModels.OrderManual;
+using Entities.ViewModels.Tour;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +16,7 @@ namespace Repositories.IRepositories
         Task<List<HotelBookingRoomViewModel>> GetHotelBookingRoomByHotelBookingID(long HotelBookingId, long status);
         Task<long> UpdateHotelBookingUnitPrice(HotelBookingUnitPriceChangeSummitModel data, long hotel_booking_id, int user_update);
         Task<List<HotelBookingRoomRatesOptionalViewModel>> GetHotelBookingRoomRatesOptionalByBookingId(long HotelBookingId);
+        Task<GenericViewModel<HotelBookingRoomsOptionalModel>> GetListHotelBookingRoomsOptionalBySupplierId(OptionalSearshModel Searsh);
 
     }
 }

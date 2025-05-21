@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.ViewModels;
 using Entities.ViewModels.Tour;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,6 @@ namespace Repositories.IRepositories
         Task<int> InsertTourPackagesOptional(TourPackagesOptional model);
         Task<int> UpdateTourPackagesOptional(TourPackagesOptional model);
         Task<int> DeleteTourPackagesOptional(int Id);
+        Task<GenericViewModel<TourPackagesOptionalModel>> GetListTourPackagesOptionalBySupplierId(OptionalSearshModel Searsh);
     }
 }

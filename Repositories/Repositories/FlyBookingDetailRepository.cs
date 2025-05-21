@@ -7,8 +7,10 @@ using Entities.ViewModels;
 using Entities.ViewModels.HotelBookingRoom;
 using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.SetServices;
+using Entities.ViewModels.Tour;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using PdfSharp;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -38,6 +40,7 @@ namespace Repositories.Repositories
         private readonly int min_adult_age = 13;
         private readonly OrderDAL _orderDAL;
         private readonly ClientDAL _clientDAL;
+        private readonly TourDAL _tourDAL;
         public FlyBookingDetailRepository(IOptions<DataBaseConfig> _dataBaseConfig)
         {
             flyBookingDetailDAL = new FlyBookingDetailDAL(_dataBaseConfig.Value.SqlServer.ConnectionString);
@@ -51,6 +54,7 @@ namespace Repositories.Repositories
             _orderDAL = new OrderDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _clientDAL = new ClientDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _flyBookingPackagesOptionalDAL = new FlyBookingPackagesOptionalDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
+            _tourDAL = new TourDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
         }
 
        
@@ -834,6 +838,30 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("GetHotelBookingOptionalListByHotelBookingId - HotelBookingRepository: " + ex);
                 return new List<FlyBookingPackagesOptionalViewModel>();
             }
+        }
+        public async Task<GenericViewModel<FlyBookingPackagesOptionalModel>> GetListFlyBookingPackagesBySupplierId(OptionalSearshModel Searsh)
+        {
+         
+            var model = new GenericViewModel<FlyBookingPackagesOptionalModel>();
+            try
+            {
+                DataTable dt = await _tourDAL.GetListOptionalBySupplierId(Searsh, StoreProcedureConstant.SP_GetAllListFlyBookingPackagesOptionalBySupplierId);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    model.ListData = dt.ToList<FlyBookingPackagesOptionalModel>();
+                    model.CurrentPage = Searsh.PageIndex;
+                    model.PageSize = Searsh.PageSize;
+                    model.TotalRecord = Convert.ToInt32(dt.Rows[0]["TotalRow"]);
+                    model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / model.PageSize);
+                    return model;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListFlyBookingPackagesBySupplierId - FlyBookingDetailRepository: " + ex);
+            }
+            return model;
         }
     }
 }

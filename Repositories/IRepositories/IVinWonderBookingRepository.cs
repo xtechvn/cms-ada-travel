@@ -2,6 +2,7 @@
 using Entities.ViewModels;
 using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.SetServices;
+using Entities.ViewModels.Tour;
 using Entities.ViewModels.VinWonder;
 using System;
 using System.Collections.Generic;
@@ -30,5 +31,6 @@ namespace Repositories.IRepositories
         Task<List<VinWonderBookingTicket>> GetVinWonderBookingTicketByBookingID(long BookingId);
         Task<List<VinWonderBooking>> GetVinWonderBookingByOrderId(long order_id);
         Task<List<VinWonderBookingTicketCustomer>> GetVinWondeCustomerByBookingId(long BookingId);
+        Task<GenericViewModel<VinWonderOptionalViewModel>> GetListVinWonderOptionalBySupplierId(OptionalSearshModel Searsh);
     }
 }

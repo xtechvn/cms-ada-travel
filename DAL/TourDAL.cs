@@ -1139,5 +1139,25 @@ namespace DAL
             }
         }
         #endregion
+
+        public async Task<DataTable> GetListOptionalBySupplierId(OptionalSearshModel model,string prc)
+        {
+            try
+            {
+                SqlParameter[] objParam_order = new SqlParameter[3];
+                objParam_order[0] = new SqlParameter("@SupplierId", model.SupplierId);
+                objParam_order[1] = new SqlParameter("@PageIndex", model.PageIndex);
+                objParam_order[2] = new SqlParameter("@PageSize", model.PageSize);
+
+                return dbWorker.GetDataTable(prc, objParam_order);
+                
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListOptionalBySupplierId - TourDAL. " + ex);
+                return null;
+            }
+        }
+
     }
 }

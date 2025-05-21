@@ -4,6 +4,7 @@ using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.HotelBookingRoom;
 using Entities.ViewModels.OrderManual;
+using Entities.ViewModels.Tour;
 using Microsoft.Extensions.Options;
 using Repositories.IRepositories;
 using System;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Contants;
 
 namespace Repositories.Repositories
 {
@@ -23,6 +25,7 @@ namespace Repositories.Repositories
         private readonly HotelBookingRoomDAL _hotelBookingRoomDAL;
         private readonly HotelBookingRoomRatesDAL _hotelBookingRoomRatesDAL;
         private readonly HotelBookingRoomExtraPackagesDAL _hotelBookingRoomExtraPackagesDAL;
+        private readonly TourDAL _tourDAL;
 
         public HotelBookingRoomsRepository(IOptions<DataBaseConfig> dataBaseConfig)
         {
@@ -31,6 +34,7 @@ namespace Repositories.Repositories
             _hotelBookingRoomRatesDAL = new HotelBookingRoomRatesDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _hotelBookingDAL = new HotelBookingDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _hotelBookingRoomExtraPackagesDAL = new HotelBookingRoomExtraPackagesDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
+            _tourDAL = new TourDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
         }
 
         public Task<List<HotelBookingRooms>> GetByHotelBookingID(long hotel_booking_id)
@@ -304,6 +308,29 @@ namespace Repositories.Repositories
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetHotelBookingRoomRatesOptionalByBookingId - HotelBookingRepository: " + ex);
+            }
+            return model;
+        }
+        public async Task<GenericViewModel<HotelBookingRoomsOptionalModel>> GetListHotelBookingRoomsOptionalBySupplierId(OptionalSearshModel Searsh)
+        {
+            var model = new GenericViewModel<HotelBookingRoomsOptionalModel>();
+            try
+            {
+                DataTable dt = await _tourDAL.GetListOptionalBySupplierId(Searsh, StoreProcedureConstant.SP_GetAllListHotelBookingRoomsOptionalBySupplierId);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    model.ListData = dt.ToList<HotelBookingRoomsOptionalModel>();
+                    model.CurrentPage = Searsh.PageIndex;
+                    model.PageSize = Searsh.PageSize;
+                    model.TotalRecord = Convert.ToInt32(dt.Rows[0]["TotalRow"]);
+                    model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / model.PageSize);
+                    return model;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListHotelBookingRoomsOptionalBySupplierId - HotelBookingRepository: " + ex);
             }
             return model;
         }

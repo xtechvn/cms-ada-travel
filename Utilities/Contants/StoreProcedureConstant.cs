@@ -293,6 +293,12 @@ namespace Utilities.Contants
         public static string SP_CheckAmountRemainBySalerId = "SP_CheckAmountRemainBySalerId";
         public static string SP_UpdateOrderIsSalerDebtLimit = "SP_UpdateOrderIsSalerDebtLimit";
 
+        public static string SP_GetAllListFlyBookingPackagesOptionalBySupplierId = "SP_GetAllListFlyBookingPackagesOptionalBySupplierId";
+        public static string SP_GetAllListHotelBookingRoomsOptionalBySupplierId = "SP_GetAllListHotelBookingRoomsOptionalBySupplierId";
+        public static string SP_GetAllListOtherBookingPackagesOptionallBySupplierId = "SP_GetAllListOtherBookingPackagesOptionallBySupplierId";
+        public static string SP_GetAllListTourPackagesOptionalBySupplierId = "SP_GetAllListTourPackagesOptionalBySupplierId";
+        public static string SP_GetAllListVinWonderOptionalBySupplierId = "SP_GetAllListVinWonderOptionalBySupplierId";
+
 
 
         #region vin wonder

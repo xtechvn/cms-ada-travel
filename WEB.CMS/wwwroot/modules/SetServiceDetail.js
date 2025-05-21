@@ -850,7 +850,7 @@ var _SetService_Detail = {
                 PaymentNotification: $('#payment_notification').val(),
                 ServiceType: $('#Type').val(),
                 Type: $('#ServiceType').val(),
-                Email: $('#Email').val(),
+                Email: $('#Email').val().toString(),
                 group_booking_id: $('#Type').attr('data-group-booking'),
 
                 OrderAmount: $('#OrderAmount').val() != undefined ? $('#OrderAmount').val().replaceAll(',', '') : 0,
@@ -1298,7 +1298,7 @@ var _SetService_Detail = {
         $("#Email").select2({
             theme: 'bootstrap4',
             placeholder: "Email nhà cung cấp",
-            maximumSelectionLength: 1,
+            /*maximumSelectionLength: 1,*/
             allowClear: true,
             tags: true,
             ajax: {
