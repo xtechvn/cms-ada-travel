@@ -4416,7 +4416,7 @@ namespace WEB.Adavigo.CMS.Service
                         if (model.BankingAccountId != null && model.BankingAccountId != 0)
                         {
                             var BankingAccount = _bankingAccountRepository.GetById((int)model.BankingAccountId);
-                            body = body.Replace("{{SoTK}}", BankingAccount.BankId + '(' + BankingAccount.AccountName + ')');
+                            body = body.Replace("{{SoTK}}", BankingAccount.AccountNumber + '(' + BankingAccount.AccountName + ')');
                             body = body.Replace("{{NganHang}}", BankingAccount.BankId);
                             body = body.Replace("{{ChuTK}}", BankingAccount.AccountName);
                         }
