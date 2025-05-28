@@ -6,6 +6,7 @@ using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.Tour;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -1144,11 +1145,14 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam_order = new SqlParameter[3];
+                SqlParameter[] objParam_order = new SqlParameter[5];
                 objParam_order[0] = new SqlParameter("@SupplierId", model.SupplierId);
                 objParam_order[1] = new SqlParameter("@PageIndex", model.PageIndex);
                 objParam_order[2] = new SqlParameter("@PageSize", model.PageSize);
-
+                //objParam_order[3] = (CheckDate(model.CreateDate) == DateTime.MinValue) ? new SqlParameter("@CreateDate", DBNull.Value) : new SqlParameter("@CreateDate", CheckDate(model.CreateDate));
+                //objParam_order[4] = (CheckDate(model.EndDate) == DateTime.MinValue) ? new SqlParameter("@EndDate", DBNull.Value) : new SqlParameter("@EndDate", CheckDate(model.EndDate));
+                objParam_order[3] = new SqlParameter("@CreateDate", model.CreateDate);
+                objParam_order[4] = new SqlParameter("@EndDate", model.EndDate);
                 return dbWorker.GetDataTable(prc, objParam_order);
                 
             }
@@ -1158,6 +1162,6 @@ namespace DAL
                 return null;
             }
         }
-
+ 
     }
 }

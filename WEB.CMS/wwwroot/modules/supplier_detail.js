@@ -1,4 +1,5 @@
-﻿var _supplier_detail = {
+﻿let isPickerApprove = false;
+var _supplier_detail = {
     Init: function () {
         this.elModal = $('#global_modal_popup');
         this.supplier_id = $('#global_supplier_id').val();
@@ -227,7 +228,9 @@ var _supplier_order = {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: 1,
-            PageSize: 10
+            PageSize: 10,
+            CreateDate: null,
+            EndDate: null,
         }
         this.ReloadListing(this.search_params);
         _supplier_order.FlyListing(model);
@@ -259,8 +262,15 @@ var _supplier_order = {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: Index,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
         }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+        } 
         _supplier_order.FlyListing(model);
     },
     HotelListing: function (input) {
@@ -273,8 +283,15 @@ var _supplier_order = {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: Index,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
         }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+        } 
         _supplier_order.HotelListing(model);
     },
     OtherListing: function (input) {
@@ -287,8 +304,15 @@ var _supplier_order = {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: Index,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
         }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+        } 
         _supplier_order.OtherListing(model);
     },
     TourListing: function (input) {
@@ -301,8 +325,15 @@ var _supplier_order = {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: Index,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
         }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+        } 
         _supplier_order.TourListing(model);
     },
     VinWonderListing: function (input) {
@@ -315,9 +346,78 @@ var _supplier_order = {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: Index,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
         }
         _supplier_order.VinWonderListing(model);
+    },
+    SearchData: function (Index) {
+        var model = {
+            SupplierId: $('#global_supplier_id').val(),
+            PageIndex: 1,
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
+        }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+        } 
+        var type = $('#tab-order-supplier .active').attr('data-tab-id');
+        if (type == undefined || type == null) type = 0;
+        switch (parseFloat( type)) {
+            case 0: {
+                _supplier_order.FlyListing(model);
+            } break;
+            case 1: {
+                _supplier_order.HotelListing(model);
+            } break;
+            case 2: {
+                _supplier_order.TourListing(model);
+            } break;
+            case 3: {
+                _supplier_order.OtherListing(model);
+
+            } break;
+            case 4: {
+                _supplier_order.VinWonderListing(model);
+            } break;
+        }
+    },
+    Export: function () {
+        var model = {
+            SupplierId: $('#global_supplier_id').val(),
+            PageIndex: 1,
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
+        }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+        }
+        var type = $('#tab-order-supplier .active').attr('data-tab-id');
+        if (type == undefined || type == null) type = 0;
+        type = parseFloat(type);
+        $.ajax({
+            url: "/Supplier/ExportExcelOrder",
+            type: "Post",
+            data: { searchModel: model, type: type }, 
+            success: function (result) {
+                $('#btnExport').prop('disabled', false);
+                if (result.isSuccess) {
+                    _msgalert.success(result.message);
+                    window.location.href = result.path;
+                } else {
+                    _msgalert.error(result.message);
+                }
+                $('#icon-export').removeClass('fa-spinner fa-pulse');
+                $('#icon-export').addClass('fa-file-excel-o');
+            }
+        });
     },
 }
 
@@ -486,33 +586,21 @@ $(document).ready(function () {
     _supplier_ticket.Init();
     _supplier_service_detail.Init();
     _supplier_program.Init();
-    $("body").on('click', ".supplier-button-hotel", function (ev, picker) {
-        $(".supplier-detail-change-tab-button").removeClass("active")
-        $(".supplier-button-hotel").addClass("active")
-        var model = {
-            SupplierId: $('#global_supplier_id').val(),
-            PageIndex: 1,
-            PageSize: 10
-        }
-        _supplier_order.HotelListing(model);
-    });
-    $("body").on('click', ".supplier-button-hotel", function (ev, picker) {
-        $(".supplier-detail-change-tab-button").removeClass("active")
-        $(".supplier-button-hotel").addClass("active")
-        var model = {
-            SupplierId: $('#global_supplier_id').val(),
-            PageIndex: 1,
-            PageSize: 10
-        }
-        _supplier_order.HotelListing(model);
-    });
+
     $("body").on('click', ".supplier-button-fly", function (ev, picker) {
         $(".supplier-detail-change-tab-button").removeClass("active")
         $(".supplier-button-fly").addClass("active")
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: 1,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
+        }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
         }
         _supplier_order.FlyListing(model);
     });
@@ -522,7 +610,14 @@ $(document).ready(function () {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: 1,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
+        }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
         }
         _supplier_order.HotelListing(model);
     });
@@ -532,7 +627,14 @@ $(document).ready(function () {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: 1,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
+        }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
         }
         _supplier_order.TourListing(model);
     });
@@ -542,7 +644,14 @@ $(document).ready(function () {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: 1,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
+        }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
         }
         _supplier_order.OtherListing(model);
     });
@@ -552,7 +661,14 @@ $(document).ready(function () {
         var model = {
             SupplierId: $('#global_supplier_id').val(),
             PageIndex: 1,
-            PageSize: 10
+            PageSize: 10,
+            CreateDateStr: null,
+            EndDateStr: null,
+        }
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            model.CreateDateStr = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            model.EndDateStr = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
         }
         _supplier_order.VinWonderListing(model);
     });

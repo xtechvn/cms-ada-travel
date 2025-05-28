@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utilities;
 
 namespace Entities.ViewModels.Tour
 {
@@ -59,5 +60,22 @@ namespace Entities.ViewModels.Tour
         public int SupplierId { get; set; }
         public int PageIndex { get; set; }
         public int PageSize { get; set; }
+
+        public DateTime? CreateDate
+        {
+            get
+            {
+                return DateUtil.StringToDate(CreateDateStr);
+            }
+        }    
+        public DateTime? EndDate
+        {
+            get
+            {
+                return DateUtil.StringToDate(EndDateStr);
+            }
+        }
+        public string EndDateStr { get; set; }
+        public string CreateDateStr { get; set; }
     }
 }

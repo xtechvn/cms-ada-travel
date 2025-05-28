@@ -544,7 +544,86 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             var data =await _vinWonderBookingRepository.GetListVinWonderOptionalBySupplierId(model);
             return PartialView(data);
         }
+        public async Task<IActionResult> ExportExcelOrder(OptionalSearshModel searchModel,int type)
+        {
 
+            int _UserId = 0;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            }
+            string _FileName = StringHelpers.GenFileName("Danh sách đặt hàng vé máy bay", _UserId, "xlsx");
+            switch (type)
+            {
+                case 0:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng vé máy bay", _UserId, "xlsx");
+                    }
+                    break;
+                case 1:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng khách", _UserId, "xlsx");
+                    }
+                    break;
+                case 2:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng tour", _UserId, "xlsx");
+                    }
+                    break;
+                case 3:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng dịch vụ khác", _UserId, "xlsx");
+
+                    }
+                    break;
+                case 4:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng VinWonder", _UserId, "xlsx");
+                    }
+                    break;
+            }
+           
+            string _UploadFolder = @"Template\Export";
+            string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, _UploadFolder);
+
+            if (!Directory.Exists(_UploadDirectory))
+            {
+                Directory.CreateDirectory(_UploadDirectory);
+            }
+            //delete all file in folder before export
+            try
+            {
+                System.IO.DirectoryInfo di = new DirectoryInfo(_UploadDirectory);
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+            catch
+            {
+            }
+            string FilePath = Path.Combine(_UploadDirectory, _FileName);
+
+            var rsPath = await _supplierRepository.ExportSuppliersOrder(searchModel, FilePath,type);
+
+            if (!string.IsNullOrEmpty(rsPath))
+            {
+                return new JsonResult(new
+                {
+                    isSuccess = true,
+                    message = "Xuất dữ liệu thành công",
+                    path = "/" + _UploadFolder + "/" + _FileName
+                });
+            }
+            else
+            {
+                return new JsonResult(new
+                {
+                    isSuccess = false,
+                    message = "Xuất dữ liệu thất bại"
+                });
+            }
+        }
         #endregion
 
         #region services

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Entities.ViewModels.SupplierConfig;
 using Entities.ViewModels;
 using Entities.ViewModels.Hotel;
+using Entities.ViewModels.Tour;
 
 namespace Repositories.IRepositories
 {
@@ -55,6 +56,8 @@ namespace Repositories.IRepositories
 
         // Program
         GenericViewModel<SupplierProgramGridViewModel> GetSupplierProgramList(SupplierProgramSearchModel model);
+
+        Task<string> ExportSuppliersOrder(OptionalSearshModel searchModel, string FilePath, int type);
 
     }
 }
