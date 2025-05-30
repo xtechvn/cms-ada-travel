@@ -48,6 +48,7 @@ namespace Entities.ViewModels.Tour
         public DateTime? EndDate { get; set; }
         public int Quantity { get; set; }
         public int Times { get; set; }
+        public string PackageTypeName { get; set; }
     } 
     public class OtherBookingPackagesOptionalModel : OptionalViewModel
     {
