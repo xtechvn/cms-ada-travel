@@ -21,7 +21,7 @@ namespace Caching.Elasticsearch
             index_name = configuration["DataBaseConfig:Elastic:Index:FlyBookingDetail"];
         }
 
-        public async Task<List<FlyBookingESViewModel>> GetFlyBookingSuggesstion(string txt_search, string index_name = "fly_booking_detail_store")
+        public async Task<List<FlyBookingESViewModel>> GetFlyBookingSuggesstion(string txt_search)
         {
             List<FlyBookingESViewModel> result = new List<FlyBookingESViewModel>();
             try
