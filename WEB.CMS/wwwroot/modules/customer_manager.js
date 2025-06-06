@@ -163,7 +163,38 @@ $(document).ready(function () {
             cache: true
         }
     });
+    $("#filter-client").select2({
+        theme: 'bootstrap4',
+        placeholder: "Bộ lọc đã lưu",
+        maximumSelectionLength: 1,
+        ajax: {
+            url: "/CustomerManagerManual/GetSuggestionUserCache",
+            type: "post",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                var query = {
+                    txt_search: params.term,
+                }
+                // Query parameters will be ?search=[term]&type=public
+                return query;
+            },
+            processResults: function (response) {
+                return {
+                    results: $.map(response, function (item) {
+                        return {
+                            text: item.CacheName,
+                            id: item._id,
+                        }
+                    })
+                };
+            },
+        },
+
+    });
     _customer_manager.ClearlocalStorage();
+    //var model = [{ url: '/', name: 'Trang chủ' }, { url: '/CustomerManagerManual/Index', name: 'Quản lý khách hàng', activated: true }]
+    //_global_function.RenderBreadcumb(model)
 });
 
 var _customer_manager = {
@@ -1093,7 +1124,152 @@ var _customer_manager = {
             }
         });
     },
-   
+
+    SearchData2: function () {
+        var CreateDate;
+        var EndDate;
+        var CacheName_data = $('#filter-client').select2("val");
+        var MaKH_data = $('#client').select2("val");
+        textClient = $('#client').find(':selected').text();
+        var UserId_data = $('#txtNguoiTao').select2("val");
+        textNV = $('#txtNguoiTao').find(':selected').text();
+        var CreatedBy_data = $('#CreatedBy').select2("val");
+        textNT = $('#CreatedBy').find(':selected').text();
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            CreateDate = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            EndDate = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+        } else {
+            CreateDate = null
+            EndDate = null
+        }
+        let _searchModel = {
+            MaKH: null,
+            UserId: null,
+            CreatedBy: null,
+            TenKH: null,
+            Email: null,
+            Phone: null,
+            CacheName: null,
+            AgencyType: $('#AgencyType').val(),
+            ClientType: $('#ClientType').val(),
+            PermissionType: $('#PermisionType').val(),
+            CreateDate: CreateDate,
+            EndDate: EndDate,
+            MinAmount: $('#minamount').val().replaceAll(',', ''),
+            MaxAmount: $('#maxamount').val().replaceAll(',', ''),
+            PageIndex: 1,
+            PageSize: $("#selectPaggingOptions").find(':selected').val(),
+        };
+        if (MaKH_data != null && MaKH_data[0] != null) {
+            _searchModel.MaKH = MaKH_data[0]
+
+        }
+        else {
+            window.localStorage.removeItem("textClient")
+        }
+        if (UserId_data != null && UserId_data[0] != null) {
+            _searchModel.UserId = UserId_data[0]
+
+        }
+        else {
+            window.localStorage.removeItem("textNV")
+        }
+        if (CreatedBy_data != null && CreatedBy_data[0] != null) {
+            _searchModel.CreatedBy = CreatedBy_data[0]
+
+        }
+        else {
+            window.localStorage.removeItem("textNT")
+        }
+        if (CacheName_data != null && CacheName_data[0] != null) {
+
+
+        }
+        var objSearch = this.SearchParam;
+        objSearch = _searchModel;
+
+
+        $(".onclick-active").addClass('onclick');
+        $(".onclick-active").removeClass('onclick-active');
+        $(".form-down").slideUp();
+        $(".onclick-togle, .dropdown .dropbtn,.down-up .onclick").removeClass('active');
+        $(".dropdown.active").find('.dropdown-content').slideUp();
+        $(".select--v2__content").slideUp();
+        this.SearchClient(objSearch);
+
+    },
+    SeverFilter: function () {
+        var CreateDate;
+        var EndDate;
+        var Cache_Name = $('#Cache_name').val();
+        if (Cache_Name == null || Cache_Name == "") {
+            $('#Cache_name-error').show();
+            return false;
+        } else {
+            $('#Cache_name-error').hide();
+        }
+        var MaKH_data = $('#client').select2("val");
+        textClient = $('#client').find(':selected').text();
+        var UserId_data = $('#txtNguoiTao').select2("val");
+        textNV = $('#txtNguoiTao').find(':selected').text();
+        var CreatedBy_data = $('#CreatedBy').select2("val");
+        textNT = $('#CreatedBy').find(':selected').text();
+        if ($('#createdate').data('daterangepicker') !== undefined &&
+            $('#createdate').data('daterangepicker') != null && isPickerApprove) {
+            CreateDate = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
+            EndDate = $('#createdate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+        } else {
+            CreateDate = null
+            EndDate = null
+        }
+        let _searchModel = {
+            MaKH: MaKH_data,
+            UserId: UserId_data,
+            CreatedBy: CreatedBy_data,
+            TenKH: textClient,
+            Email: null,
+            Phone: null,
+            CacheName: Cache_Name,
+            AgencyType: $('#AgencyType').val(),
+            ClientType: $('#ClientType').val(),
+            PermissionType: $('#PermisionType').val(),
+            CreateDate: CreateDate,
+            EndDate: EndDate,
+            MinAmount: $('#minamount').val().replaceAll(',', ''),
+            MaxAmount: $('#maxamount').val().replaceAll(',', ''),
+            PageIndex: 1,
+            PageSize: $("#selectPaggingOptions").find(':selected').val(),
+        };
+
+        var objSearch = this.SearchParam;
+        objSearch = _searchModel;
+
+        $.ajax({
+            url: "/CustomerManagerManual/InsertLogCache",
+            type: "Post",
+            data: { searchModel: objSearch },
+            success: function (result) {
+                if (result.status == 0) {
+                    _msgalert.success(result.msg)
+                    $.magnificPopup.close();
+                } else {
+                    _msgalert.error(result.msg)
+                }
+            }
+        });
+    },
+    Clearboloc: function (id) {
+        document.getElementById(id).reset();
+        var text_ClientType = $('#ClientType').select2('data')[0].text;
+
+        $('#select2-ClientType-container').html(text_ClientType);
+        $('#select2-CreatedBy-container').html('');
+        $('#minamount').val('');
+        $('#maxamount').val('');
+
+
+    },
 }
 
 //// validate

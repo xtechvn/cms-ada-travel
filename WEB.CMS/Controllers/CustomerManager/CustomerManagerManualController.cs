@@ -1,9 +1,12 @@
 ﻿using APP_CHECKOUT.RabitMQ;
+using Entities.ViewModels.CustomerManager;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Customize;
+using WEB.CMS.Service;
 
 namespace WEB.CMS.Controllers.CustomerManager
 {
@@ -16,6 +19,7 @@ namespace WEB.CMS.Controllers.CustomerManager
         private readonly ICustomerManagerRepository _customerManagerRepositories;
         private readonly IClientRepository _clientRepository;
         private readonly IUserAgentRepository _userAgentRepository;
+        private LogCacheFilterMongoService _logCacheFilterMongoService;
         public CustomerManagerManualController(IConfiguration configuration, ManagementUser managementUser, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
             ICustomerManagerRepository customerManagerRepositories, IClientRepository clientRepository, IUserAgentRepository userAgentRepository)
         {
@@ -26,6 +30,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             _customerManagerRepositories = customerManagerRepositories;
             _clientRepository = clientRepository;
             _userAgentRepository = userAgentRepository;
+            _logCacheFilterMongoService = new LogCacheFilterMongoService(configuration);
         }
         public async Task<IActionResult> Index()
         {
@@ -108,6 +113,56 @@ namespace WEB.CMS.Controllers.CustomerManager
             {
                 LogHelper.InsertLogTelegram("DetailCustomerManager - CustomerManagerController: " + ex);
                 return PartialView();
+            }
+        }
+        
+        public async Task<IActionResult> InsertLogCache(CustomerManagerViewSearchModel searchModel)
+        {
+
+            int status = (int)ResponseType.FAILED;
+            string msg = "Error On Excution";
+            try
+            {
+
+                var Insert = await _logCacheFilterMongoService.InsertLogCache(searchModel);
+                if (Insert > 0)
+                {
+                    status = (int)ResponseType.SUCCESS;
+                    msg = "Lưu thành công thành công";
+                }
+                else
+                {
+                    status = (int)ResponseType.SUCCESS;
+                    msg = "Lưu thành không công thành công";
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertLogCache - CustomerManagerController: " + ex);
+                status = (int)ResponseType.ERROR;
+                msg = "Lỗi kỹ thuật vui lòng liên hệ bộ phận IT";
+            }
+            return Ok(new
+            {
+                status = status,
+                msg = msg,
+
+            });
+        }
+        public async Task<string> GetSuggestionUserCache(string txt_search)
+        {
+            try
+            {
+
+                var data = _logCacheFilterMongoService.GetListLogCache(txt_search, null);
+                return JsonConvert.SerializeObject(data);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetSuggestionUserCache - CustomerManagerController: " + ex);
+                return null;
             }
         }
     }

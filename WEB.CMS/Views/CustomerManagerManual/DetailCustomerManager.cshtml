@@ -9,6 +9,11 @@
         height: auto !important;
         min-height: 35px !important;
     }
+    .table-gray-client table td {
+        padding: .5rem;
+        vertical-align: middle;
+        border:none !important;
+    }
 </style>
 <div class="bg-white rounded p-3 side-left">
     <div class="flex flex-nowrap gap10 align-items-center mb-3">
@@ -29,7 +34,7 @@
     </div>
     <div class="box-info-user p-3 mb-3">
         <h6 class="text-uppercase mb-3">
-            <i class="icofont-ui-rate-blank mr-2"></i>Thông tin khách hàng
+            <i class="icofont-ui-rate-blank mr-2"></i>Thông tin khách hàng 
         </h6>
         <div class="row">
             <div class="col-6">
@@ -39,23 +44,27 @@
             <div class="col-6">
                 <p><i class="icofont-birthday-cake mr-2"></i>@(Model.Birthday != null ? ((DateTime)Model.Birthday).ToString("dd/MM/yyyy") : "Chưa có dữ liệu")</p>
             </div>
-            <div class="col-6">
-
-
-            </div>
-            <div class="col-6">
-                <p class="m-0"><i class="icofont-book-alt mr-2"></i>Chưa có dữ liệu</p>
-            </div>
+      
+        
             <div class="col-12">
-                <p><i class="icofont-email mr-2"></i>Chưa có dữ liệu</p>
+                <p><i class="icofont-email mr-2"></i>@Model.Email</p>
             </div>
         </div>
     </div>
     <div class="row align-items-center mb-3">
-        <div class="col-6">
-            <p class="m-0"><i class="icofont-birthday-cake mr-2"></i>Đối tượng</p>
+        <div class="col-5">
+            <p class="m-0">Mã khách hàng</p>
         </div>
-        <div class="col-6">
+        <div class="col-7">
+            <p class="m-0"> @Model.ClientCode</p>
+          
+        </div>
+    </div>
+    <div class="row align-items-center mb-3">
+        <div class="col-5">
+            <p class="m-0"><i class="icofont-user mr-2"></i>Đối tượng</p>
+        </div>
+        <div class="col-7">
             <div class="select-list">
                 <div class="relative select-user">
                     <p class=" btn-default white">
@@ -68,10 +77,10 @@
     </div>
 
     <div class="row align-items-center mb-3">
-        <div class="col-6">
-            <p class="m-0"><i class="icofont-birthday-cake mr-2"></i>Loại</p>
+        <div class="col-5">
+            <p class="m-0"><i class="icofont-user mr-2"></i>Loại</p>
         </div>
-        <div class="col-6">
+        <div class="col-7">
             <div class="select-list">
                 <div class="relative select-user">
                     <p class=" btn-default white">
@@ -83,10 +92,10 @@
         </div>
     </div>
     <div class="row align-items-center mb-3">
-        <div class="col-6">
+        <div class="col-5">
             <p class="m-0"><i class="icofont-user-alt-7 mr-2"></i>Nhóm</p>
         </div>
-        <div class="col-6">
+        <div class="col-7">
             <div class="select-list">
                 <div class="relative select-user">
                     <p class="btn-default white">
@@ -99,10 +108,10 @@
         </div>
     </div>
     <div class="row align-items-center mb-3">
-        <div class="col-6">
+        <div class="col-5">
             <p class="m-0"><i class="icofont-user-alt-7 mr-2"></i>Người phụ trách</p>
         </div>
-        <div class="col-6">
+        <div class="col-7">
             <div class="select-list">
                 <div class="relative select-user">
                     <p class="btn-default white">
@@ -121,41 +130,41 @@
 
         <div class="col-4  px-1">
             <div class="item-thongke text-center p-2">
-                <div class="icon rounded-circle  text-white" style="background: #4AB88A"><i class="icofont-money"></i></div>
+                <div class="icon rounded-circle  text-white" style="font-size: 25px;background: #4AB88A;width: 50px;height: 50px;line-height: 50px;margin: auto;"><i class="icofont-money"></i></div>
                 <p class="mb-0">Giá trị đơn hàng</p>
                 <b>@Model.AmountContractPay.ToString("N0") </b>
             </div>
         </div>
     </div>
-    <div class="box-info-item">
+    <div class="box-info-item table-gray-client" >
         <h3>Thông tin chính</h3>
         <table class="w-100">
             <tbody>
                 @if (Model.PermisionType == Utilities.Contants.PermisionType.DUOC_CN)
                 {
-                    <tr>
-                        <td>Công nợ</td>
+                    <tr class="mb-3">
+                        <td class="mb-3">Công nợ</td>
                         <td class="text-right">    <div class="blue text-right" data-toggle="modal" data-target="#myModal7"> @Model.TotalAmountUse.ToString("N0")/@Model.TotalDebtAmount.ToString("N0")</div></td>
                     </tr>
                 }
-                <tr>
-                    <td>Số dư chưa gạch nợ</td>
+                <tr class="mb-3">
+                    <td class="mb-3">Số dư chưa gạch nợ</td>
                     <td class="text-right">@ViewBag.Amount.ToString("N0")</td>
                 </tr>
-                <tr>
-                    <td>Tổng lợi nhuận</td>
+                <tr class="mb-3">
+                    <td class="mb-3">Tổng lợi nhuận</td>
                     <td class="text-right">@Model.TotalProfit.ToString("N0")</td>
                 </tr>
-                <tr>
-                    <td>Quỹ chăm sóc khách hàng</td>
+                <tr class="mb-3">
+                    <td class="mb-3">Quỹ chăm sóc khách hàng</td>
                     <td class="text-right">@Model.TotalFundCustomerCare.ToString("N0")</td>
                 </tr>
-                <tr>
-                    <td>Người tạo</td>
+                <tr class="mb-3">
+                    <td class="mb-3">Người tạo</td>
                     <td class="text-right">@Model.Create_name</td>
                 </tr>
-                <tr>
-                    <td>Ngày tạo</td>
+                <tr class="mb-3">
+                    <td class="mb-3">Ngày tạo</td>
                     <td class="text-right"> @Model.JoinDate.ToString("dd/MM/yyyy HH:MM:ss")</td>
                 </tr>
             </tbody>

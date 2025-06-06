@@ -60,6 +60,8 @@ namespace Entities.ViewModels.CustomerManager
         public double MinAmount { get; set; } = -1;
         public double MaxAmount { get; set; } = -1;
         public string SalerPermission { get; set; }
+        public string CacheName { get; set; }
+        public string _id { get; set; }
     }
 
     public class CustomerManagerView
