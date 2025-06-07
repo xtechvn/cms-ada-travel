@@ -384,11 +384,11 @@
             <button type="submit" class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</button>
             @if (KTT_DUYET_YEU_CAU_CHI == 1 || KTV_DUYET_YEU_CAU_CHI == 1 || isAdmin)
             {
-                <button type="submit" class="btn btn-default cancel ml-1" style="background:#0066ff !important;" onclick="_payment_request_service.KTNote('@Model.Id')">Ghi chú kế toán</button>
+                <button type="submit" class="btn btn-default  ml-1" style="background:#0066ff !important;" onclick="_payment_request_service.KTNote(@Model.Id)">Ghi chú kế toán</button>
             }
             @if ((isAdmin || KTT_DUYET_YEU_CAU_CHI == 1 || KTV_DUYET_YEU_CAU_CHI == 1) && Model.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_CHI))
             {
-                <button type="submit" class="btn btn-default cancel ml-1" style="background:#0066ff !important;" onclick="_payment_request_service.AddNewPaymentVoucher('@Model.Id')">Tạo phiếu chi nhanh</button>
+                <button type="submit" class="btn btn-default  ml-1" style="background:#0066ff !important;" onclick="_payment_request_service.AddNewPaymentVoucher(@Model.Id)">Tạo phiếu chi nhanh</button>
 
             }
             @if (ViewBag.TYPE == (int)PAYMENT_VOUCHER_TYPE.QUY_CHAM_SOC_KHACH_HANG)

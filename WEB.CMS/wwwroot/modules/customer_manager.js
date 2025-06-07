@@ -708,6 +708,7 @@ var _customer_manager = {
     SearchData: function () {
         var CreateDate;
         var EndDate;
+        var CacheName_data = $('#filter-client').select2("val");
         var MaKH_data = $('#client').select2("val");
         textClient = $('#client').find(':selected').text();
         var UserId_data = $('#txtNguoiTao').select2("val");
@@ -729,6 +730,7 @@ var _customer_manager = {
             TenKH: null,
             Email: null,
             Phone: null,
+            CacheName: null,
             AgencyType: $('#AgencyType').val(),
             ClientType: $('#ClientType').val(),
             PermissionType: $('#PermisionType').val(),
@@ -759,6 +761,10 @@ var _customer_manager = {
         }
         else {
             window.localStorage.removeItem("textNT")
+        }
+        if (CacheName_data != null && CacheName_data[0] != null) {
+            _searchModel.CacheName = CacheName_data[0]
+
         }
         var objSearch = this.SearchParam;
         objSearch = _searchModel;

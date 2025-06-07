@@ -120,7 +120,7 @@ namespace WEB.CMS.Controllers.CustomerManager
         {
 
             int status = (int)ResponseType.FAILED;
-            string msg = "Error On Excution";
+            string msg = "Lỗi kỹ thuật vui lòng liên hệ bộ phận IT";
             try
             {
 
@@ -133,7 +133,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 else
                 {
                     status = (int)ResponseType.SUCCESS;
-                    msg = "Lưu thành không công thành công";
+                    msg = "Lưu không công thành công";
                 }
 
 

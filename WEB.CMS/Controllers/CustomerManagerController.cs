@@ -22,6 +22,7 @@ using Utilities.Contants;
 using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
+using WEB.CMS.Service;
 
 namespace WEB.Adavigo.CMS.Controllers
 {
@@ -43,6 +44,7 @@ namespace WEB.Adavigo.CMS.Controllers
         private IBankingAccountRepository _bankingAccountRepository;
         private IAccountClientRepository _accountClientRepository;
         private readonly WorkQueueClient _workQueueClient;
+        private LogCacheFilterMongoService _logCacheFilterMongoService;
 
         public CustomerManagerController(IConfiguration configuration, ICustomerManagerRepository customerManagerRepositories, IDepositHistoryRepository depositHistoryRepository, ManagementUser ManagementUser, IWebHostEnvironment WebHostEnvironment, IAccountClientRepository accountClientRepository,
         IOrderRepositor orderRepositor, IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IPaymentAccountRepository paymentAccountRepository, IClientRepository clientRepository, IUserRepository userRepository, IContractRepository contractRepository, IBankingAccountRepository bankingAccountRepository)
@@ -62,6 +64,7 @@ namespace WEB.Adavigo.CMS.Controllers
             _bankingAccountRepository = bankingAccountRepository;
             _accountClientRepository = accountClientRepository;
             _workQueueClient = new WorkQueueClient(configuration);
+            _logCacheFilterMongoService = new LogCacheFilterMongoService(configuration);
         }
         public async Task<IActionResult> Index()
         {
@@ -154,6 +157,28 @@ namespace WEB.Adavigo.CMS.Controllers
                 if (current_user != null)
                 {
                     var i = 0;
+                    if (searchModel.CacheName != null)
+                    {
+                        var data = _logCacheFilterMongoService.GetListLogCache(null, searchModel.CacheName);
+                        if (data != null)
+                        {
+                            searchModel.MaKH = searchModel.MaKH == -1 ? data[0].MaKH : searchModel.MaKH;
+                            searchModel.CreatedBy = searchModel.CreatedBy == -1 ? data[0].CreatedBy : searchModel.CreatedBy;
+                            searchModel.UserId = searchModel.UserId == -1 ? data[0].UserId : searchModel.UserId;
+                            searchModel.TenKH = searchModel.TenKH == null ? data[0].TenKH : searchModel.TenKH;
+                            searchModel.Email = searchModel.Email == null ? data[0].Email : searchModel.Email;
+                            searchModel.Phone = searchModel.Phone == null ? data[0].Phone : searchModel.Phone;
+                            searchModel.AgencyType = searchModel.AgencyType == -1 ? data[0].AgencyType : searchModel.AgencyType;
+                            searchModel.ClientType = searchModel.ClientType == -1 ? data[0].ClientType : searchModel.ClientType;
+                            searchModel.PermissionType = searchModel.PermissionType == -1 ? data[0].PermissionType : searchModel.PermissionType;
+                            searchModel.CreateDate = searchModel.CreateDate == null ? data[0].CreateDate : searchModel.CreateDate;
+                            searchModel.EndDate = searchModel.EndDate == null ? data[0].EndDate : searchModel.EndDate;
+                            searchModel.MinAmount = searchModel.MinAmount == -1 ? data[0].MinAmount : searchModel.MinAmount;
+                            searchModel.MaxAmount = searchModel.MaxAmount == -1 ? data[0].MaxAmount : searchModel.MaxAmount;
+
+                        }
+
+                    }
                     if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
                     {
                         var list = Array.ConvertAll(current_user.Role.Split(','), int.Parse);

@@ -1035,7 +1035,6 @@ var _payment_request_service = {
         _magnific.OpenSmallPopup(title, url, param);
     },
     KTNote: function (id) {
-        $('.btn btn-default').removeClass('cancel')
         let title = 'Ghi chú';
         let url = '/PaymentRequest/PopupNoteKT';
         var param = {
@@ -1044,7 +1043,6 @@ var _payment_request_service = {
         _magnific.OpenSmallPopup(title, url, param);
     },
     SetupNoteKTRequest: function () {
-        $('.btn btn-default').removeClass('cancel')
         var id = $('#Id').val();
         var notekt = $('#notekt').val();
         $.ajax({
