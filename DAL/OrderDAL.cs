@@ -533,7 +533,7 @@ namespace DAL
                             data.PaymentStatus = (int)PaymentStatus.PAID_NOT_ENOUGH;
                             data.IsFinishPayment = 0;
                         }
-                        if (amount == contract_pay_total_amount )
+                        if (amount == contract_pay_total_amount)
                         {
                             data.PaymentStatus = (int)PaymentStatus.PAID;
                             data.IsFinishPayment = 1;
@@ -1105,7 +1105,7 @@ namespace DAL
             {
                 LogHelper.InsertLogTelegram("CheckAmountRemainBySalerId - OrderDal: " + ex);
             }
-            return null ;
+            return null;
         }
         public async Task<int> UpdateOrderIsSalerDebtLimit(long OrderId, long Status, long UpdatedBy, long UserVerify)
         {
