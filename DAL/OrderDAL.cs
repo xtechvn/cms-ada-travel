@@ -409,6 +409,7 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.StartDate) data.StartDate = min_date.StartDate;
                             if (data.EndDate == null || data.EndDate < max_date.EndDate) data.EndDate = max_date.EndDate;
                             commission += list_flybooking.Sum(x => x.Adgcommission != null ? (double)x.Adgcommission : 0);
+                            commission += list_flybooking.Sum(x => x.OthersAmount != null ? (double)x.OthersAmount : 0);
 
                         }
 
@@ -434,6 +435,8 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.ArrivalDate) data.StartDate = min_date.ArrivalDate;
                             if (data.EndDate == null || data.EndDate < max_date.DepartureDate) data.EndDate = max_date.DepartureDate;
                             commission += list_hotel_booking.Sum(x => x.TotalDiscount != null ? (double)x.TotalDiscount : 0);
+                            commission += list_hotel_booking.Sum(x => x.TotalOthersAmount != null ? (double)x.TotalOthersAmount : 0);
+
 
                         }
                         var hotel_extra = await _DbContext.HotelBookingRoomExtraPackages.AsNoTracking().Where(s => list_hotel_booking_id.Contains((long)s.HotelBookingId)).ToListAsync();
@@ -466,6 +469,7 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.StartDate) data.StartDate = min_date.StartDate;
                             if (data.EndDate == null || data.EndDate < max_date.EndDate) data.EndDate = max_date.EndDate;
                             commission += list_tour_booking.Sum(x => x.Commission != null ? (double)x.Commission : 0);
+                            commission += list_tour_booking.Sum(x => x.OthersAmount != null ? (double)x.OthersAmount : 0);
 
                         }
 
@@ -486,6 +490,7 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.CreatedDate) data.StartDate = VinWonderBooking_Ticket_min_date.DateUsed;
                             if (data.EndDate == null || data.EndDate < max_date.CreatedDate) data.EndDate = VinWonderBooking_Ticket_max_date.DateUsed;
                             commission += vinWonderBookings.Sum(x => x.Commission != null ? (double)x.Commission : 0);
+                            commission += vinWonderBookings.Sum(x => x.OthersAmount != null ? (double)x.OthersAmount : 0);
 
 
                         }
@@ -511,6 +516,7 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.StartDate) data.StartDate = min_date.StartDate;
                             if (data.EndDate == null || data.EndDate < max_date.EndDate) data.EndDate = max_date.EndDate;
                             commission += list_other_booking.Sum(x => x.Commission != null ? (double)x.Commission : 0);
+                            commission += vinWonderBookings.Sum(x => x.OthersAmount != null ? (double)x.OthersAmount : 0);
 
                         }
 
