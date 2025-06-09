@@ -1,0 +1,119 @@
+﻿@using Entities.ViewModels
+@using Entities.ViewModels.Mongo
+@model List<CommentClientMongoModel>
+<div class="comment-section" id="comment-section" data-request-id="@ViewBag.ClientId">
+    <div class="pd-20 bg-white radius10">
+        <div class="comment-list-wrapper">
+            @if (Model != null )
+            {
+                @foreach (var comment in Model)
+                {
+                    <div id="comment-@comment._id" class="info-basic flex flex-nowrap w-100">
+                        <div class="ava">
+                            <span class="thumb_img thumb_5x5">
+                                <img class="rounded-circle" src="/images/graphics/user.jpeg" width="70" height="70">
+                            </span>
+                        </div>
+                        <div class="content w-100">
+                            <div class="flex justify-content-between">
+                                <p><b> @comment.UserName.ToString() - @comment.FullName </b></p>
+                                <span style="color:#698096">@comment.CreatedTime.ToString("dd/MM/yyyy")<b class="ml-2"></b></span>
+                            </div>
+                            <div>@comment.Note</div>
+                           
+                        </div>
+                    </div>
+                    <div class="line-bottom mt16 mb16"></div>
+                }
+            }
+            else
+            {
+                <div class="no-comment">
+                    <span>Không có comment</span>
+                </div>
+            }
+        </div>
+
+        <!-- Form Comment -->
+        <form id="commentForm" enctype="multipart/form-data" onsubmit="return false">
+            <textarea id="commentContent" class="form-control commentContent" name="commentContent" placeholder="Nhập nội dung comment"></textarea>
+
+            <button type="button" class="btn btn-primary mt10" onclick="_customer_manager_Detail.addComment(@ViewBag.ClientId)">Gửi</button>
+        </form>
+    </div>
+</div>
+
+
+<style>
+    .comment-list-wrapper {
+        max-height: 400px; /* Giới hạn chiều cao của danh sách comment */
+        overflow-y: auto; /* Bật thanh cuộn dọc */
+    }
+
+        .comment-list-wrapper::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .comment-list-wrapper::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+
+            .comment-list-wrapper::-webkit-scrollbar-thumb:hover {
+                background-color: #aaa;
+            }
+
+        .comment-list-wrapper::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+        }
+
+    .initial-avatar {
+        background-color: #007bff;
+        color: white;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .line-bottom {
+        border-top: 1px solid #ddd;
+    }
+
+    .file-preview {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f5f5f5;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .file-type {
+        color: #007bff;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .file-icon-download {
+        margin-left: 10px;
+        color: #007bff;
+    }
+
+    .no-comment {
+        text-align: center;
+        font-size: 14px;
+        color: #777;
+    }
+</style>
+

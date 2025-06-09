@@ -3,16 +3,19 @@
 @using Entities.ViewModels.CustomerManager
 @using Entities.ViewModels.UserAgent
 @model CustomerManagerViewModel
-
+@{
+    var data_UserAgent = (List<UserAgentViewModel>)ViewBag.userAgent;
+}
 <style>
     .main-customer .btn-default {
         height: auto !important;
         min-height: 35px !important;
     }
+
     .table-gray-client table td {
         padding: .5rem;
         vertical-align: middle;
-        border:none !important;
+        border: none !important;
     }
 </style>
 <div class="bg-white rounded p-3 side-left">
@@ -34,7 +37,7 @@
     </div>
     <div class="box-info-user p-3 mb-3">
         <h6 class="text-uppercase mb-3">
-            <i class="icofont-ui-rate-blank mr-2"></i>Thông tin khách hàng 
+            <i class="icofont-ui-rate-blank mr-2"></i>Thông tin khách hàng
         </h6>
         <div class="row">
             <div class="col-6">
@@ -44,8 +47,8 @@
             <div class="col-6">
                 <p><i class="icofont-birthday-cake mr-2"></i>@(Model.Birthday != null ? ((DateTime)Model.Birthday).ToString("dd/MM/yyyy") : "Chưa có dữ liệu")</p>
             </div>
-      
-        
+
+
             <div class="col-12">
                 <p><i class="icofont-email mr-2"></i>@Model.Email</p>
             </div>
@@ -57,7 +60,7 @@
         </div>
         <div class="col-7">
             <p class="m-0"> @Model.ClientCode</p>
-          
+
         </div>
     </div>
     <div class="row align-items-center mb-3">
@@ -117,11 +120,34 @@
                     <p class="btn-default white">
                         <i class="icofont-user"></i>
 
-                        <span>@Model.UserId_name</span>
-                        <a href="javascripts:;" onclick="_customer_manager_Detail.OpenPopupUserAgent('')" title="đổi nhân viên phụ trách" class="text-right"><i class="fa fa-edit"></i></a>
-
+                        @if (data_UserAgent != null && data_UserAgent.Count > 0)
+                        {
+                            <span onclick="_customer_manager_Detail.OpenPopupUserAgent('@data_UserAgent[0].Id',@Model.Id)" >@data_UserAgent[0].UserId_Name </span>
+                            data_UserAgent.Remove(data_UserAgent[0]);
+                        }
                     </p>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="row align-items-center mb-3">
+        <div class="col-6">
+            <p class="m-0"><i class="icofont-users mr-2"></i>Người liên quan</p>
+        </div>
+        <div class="col-6">
+            <div class="flex align-items-center justify-content-end gap10">
+                <div class="list-avt pl-4">
+                    @if (data_UserAgent != null && data_UserAgent.Count > 0)
+                    {
+                        foreach (var item in data_UserAgent)
+                        {
+                            <img onclick="_customer_manager_Detail.OpenPopupUserAgent('@item.Id',@Model.Id)" class="rounded-circle" width="30" title="@item.UserId_Name" height="30" src="@(item.Avata != "" ? item.Avata:"/images/graphics/no-avt.png")">
+                        }
+                    }
+
+
+                </div>
+                <a href="javascripts:;" onclick="_customer_manager_Detail.OpenPopupUserAgent('0',@Model.Id)" title="Thêm nhân viên phụ trách" class="btn-add-user"><i class="icofont-ui-add"></i></a>
             </div>
         </div>
     </div>
@@ -136,7 +162,7 @@
             </div>
         </div>
     </div>
-    <div class="box-info-item table-gray-client" >
+    <div class="box-info-item table-gray-client">
         <h3>Thông tin chính</h3>
         <table class="w-100">
             <tbody>

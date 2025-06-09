@@ -18,11 +18,9 @@ var _customer_manager_Detail = {
 
         objSearch = _searchModel;
 
-        this.Search(objSearch);
         this.SearchOrder(objSearch);
-        this.SearchPaymentAccount(objSearch);
         this.SearchDetailCustomerManager(objSearch);
-        this.SearchContract(objSearch);
+
 
     },
     ReLoad: function () {
@@ -37,49 +35,71 @@ var _customer_manager_Detail = {
         this.SearchPaymentAccount(objSearch);
        
     },
-   
+    ReLoadCommentClient: function () {
+        var id = $('#id_userid').val()
+
+
+        this.SearchCommentClient(id);
+
+    },
     SearchPaymentAccount: function (input) {
+        $('#grid_data').html('');
         $.ajax({
             url: "/CustomerManager/ListPaymentAccount",
             type: "Post",
             data: input,
             success: function (result) {
                 $('#imgLoading_deposit_history').hide();
-                $('#grid_data_payment_account').html(result);
+                $('#grid_data').html(result);
+            }
+        });
+    },
+    SearchCommentClient: function (id) {
+        $('#grid_data').html('');
+        $.ajax({
+            url: "/CustomerManagerManual/CommentClient",
+            type: "Post",
+            data: { Clientid: id },
+            success: function (result) {
+                $('#imgLoading_deposit_history').hide();
+                $('#grid_data').html(result);
             }
         });
     },
 
     Search: function (input) {
+        $('#grid_data').html('');
         $.ajax({
             url: "/CustomerManager/ListDepositHistory",
             type: "Post",
             data: input,
             success: function (result) {
                 $('#imgLoading_deposit_history').hide();
-                $('#grid_data_deposit_history').html(result);
+                $('#grid_data').html(result);
             }
         });
     }, 
     SearchContract: function (input) {
+        $('#grid_data').html('');
         $.ajax({
             url: "/CustomerManager/ListContractPay",
             type: "Post",
             data: input,
             success: function (result) {
                 $('#imgLoading_Contract').hide();
-                $('#grid_data_Contract').html(result);
+                $('#grid_data').html(result);
             }
         });
     },
     SearchOrder: function (input) {
+        $('#grid_data').html('');
         $.ajax({
             url: "/CustomerManager/ListOrder",
             type: "Post",
             data: input,
             success: function (result) {
                 $('#imgLoading_order').hide();
-                $('#grid_data_order').html(result);
+                $('#grid_data').html(result);
             }
         });
     },
@@ -224,36 +244,37 @@ var _customer_manager_Detail = {
         if (status == 3)
             $('#data_deposit_history').addClass('active')
         if (status == 4)
-            $('#data_Contract').addClass('active')       
+            $('#data_Contract').addClass('active')
+        if (status == 5)
+            $('#note_kh').addClass('active')       
     },  
     OnStatuse: function (value) {
+        let _searchModel = {
+            id: $('#id_userid').val()
+        };
+        var objSearch = this.SearchParam;
+        objSearch = _searchModel;
         if (value == 1) {
-            $('#grid_data_order').show();
-            $('#grid_data_payment_account').hide();
-            $('#grid_data_deposit_history').hide();
-            $('#grid_data_Contract').hide();
+            this.SearchOrder(objSearch);
             $('#bt_data_payment_account').hide();
         }
         if (value == 2) {
-            $('#grid_data_order').hide();
-            $('#grid_data_payment_account').show();
-            $('#grid_data_deposit_history').hide();
-            $('#grid_data_Contract').hide();
             $('#bt_data_payment_account').show();
+            this.SearchPaymentAccount(objSearch);
+          
         }
         if (value == 3) {
-            $('#grid_data_order').hide();
-            $('#grid_data_payment_account').hide();
-            $('#grid_data_deposit_history').show();
-            $('#grid_data_Contract').hide();
             $('#bt_data_payment_account').hide();
+            this.Search(objSearch);
         }
         if (value == 4) {
-            $('#grid_data_order').hide();
-            $('#grid_data_payment_account').hide();
-            $('#grid_data_deposit_history').hide();
-            $('#grid_data_Contract').show();
             $('#bt_data_payment_account').hide();
+            this.SearchContract(objSearch);
+        }
+        if (value == 5) {
+            $('#bt_data_payment_account').hide();
+            var clientid = $('#id_userid').val()
+            this.SearchCommentClient(clientid);
         }
         
     },
@@ -366,8 +387,9 @@ var _customer_manager_Detail = {
             });
         }
     },
+
     OnUpdataUserAgent: function () {
-        
+
         let FromCreate = $("#UserAgent_Detail");
         FromCreate.validate({
             rules: {
@@ -382,6 +404,7 @@ var _customer_manager_Detail = {
             var UserId_new = $('#UserId_new').select2("val");
             var UserId = UserId_new[0];
             var user_Id = $('#id_userid').val();
+            var Client_Id = $('#UserAgent_Client').val();
             let _searchModel = {
                 id: user_Id
             };
@@ -389,11 +412,12 @@ var _customer_manager_Detail = {
 
             objSearch = _searchModel;
             $.ajax({
-                url: "/PaymentAccount/UpdatalUserAgent",
+                url: "/CustomerManagerManual/UpdatalUserAgent",
                 type: "POST",
                 data: {
                     id: user_Id,
-                    userId: UserId
+                    userId: UserId,
+                    clientId: Client_Id
                 },
                 success: function (result) {
 
@@ -403,21 +427,28 @@ var _customer_manager_Detail = {
 
                     if (result.stt_code === 0) {
                         _msgalert.success(result.msg);
-                        $.magnificPopup.close();
-                        _customer_manager_Detail.SearchDetailCustomerManager(objSearch);
+                        setTimeout(function () {
+                            $.magnificPopup.close();
+                            window.location.reload();
+                        }, 500);
+
 
                     }
                 }
             });
         }
     },
-    OpenPopupUserAgent: function (id) {
+    OpenPopupUserAgent: function (id, clientid) {
         var user_Id = $('#id_userid').val();
 
         let title = 'Đổi nhân viên phụ trách';
-        let url = '/PaymentAccount/DetailUserAgent';
+        if (id == 0) {
+            title = 'Thêm mới nhân viên phụ trách';
+        } 
+        let url = '/CustomerManagerManual/DetailUserAgent';
         let param = {
-            user_Id: user_Id
+            user_Id: id,
+            client: clientid
         };
         _magnific.OpenSmallPopup(title, url, param);
     },
@@ -434,6 +465,44 @@ var _customer_manager_Detail = {
                 }
             }
         });
+    },
+    addComment: function (id) {
+        let FromCreate = $('#commentForm');
+        FromCreate.validate({
+            rules: {
+
+                "commentContent": "required",
+
+            },
+            messages: {
+                "commentContent": "Nội dung comment không được bỏ trống",
+
+            }
+        });
+        if (FromCreate.valid()) {
+            var model = {
+                ClientId: id,
+                Note: $('#commentContent').val()
+            }
+
+            $.ajax({
+                url: '/CustomerManagerManual/InsertComment',
+                type: "post",
+                data: { model },
+                success: function (result) {
+                    if (result.status === 0) {
+                        _msgalert.success(result.msg);
+                        setTimeout(function () {
+                           
+                            _customer_manager_Detail.ReLoad();
+                        }, 500);
+                    } else {
+                        _msgalert.error(result.msg);
+                    }
+                }
+            });
+        }
+        
     },
 }
 
