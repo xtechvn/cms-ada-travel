@@ -237,7 +237,7 @@
                                 Chỉnh sửa
                             </button>
                         }
-                        @if ((isAdmin && Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET)
+                        @if (( Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET)
                        || (Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET && KTT_DUYET_YEU_CAU_XUAT_HOA_DON == 1))
                         {
                             <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
