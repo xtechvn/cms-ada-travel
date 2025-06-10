@@ -23,7 +23,7 @@ namespace Utilities.Contants
         NAP_QUY = 46,//NẠP QUỸ
         QL_KHACH_HANG = 50,//Quản lý khách hàng
         PHIEU_THU = 57,//quản lý phiếu thu
-        YEU_CAU_XUAT_HOA_DON = 77,//quản lý phiếu thu
+        YEU_CAU_XUAT_HOA_DON = 86,//quản lý phiếu thu
         CHUONG_TRINH = 90,//quản chương trình qc
         //CHUONG_TRINH = 82,//quản chương trình pro
 
