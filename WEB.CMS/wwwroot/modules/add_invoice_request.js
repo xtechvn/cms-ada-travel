@@ -205,7 +205,10 @@ var _add_invoice_request = {
                     
                     
                 }
-                $('#price_0').val(_add_invoice_request.FormatNumberStr(totalAmount));
+                if (orderid != 0 && orderId != undefined) {
+                    $('#price_0').val(_add_invoice_request.FormatNumberStr(totalAmount));
+                }
+                
                 $('#request-relate-table').find('tbody').append(
                     "<tr style='font-weight:bold !important;'>" +
                     "<td class='text-right' colspan='4'> Tổng </td>" +
