@@ -398,7 +398,7 @@ namespace DAL.Invoice
                 if (model.isSend == 0)
                     objParam_InvoiceRequest[11] = new SqlParameter("@Status", Convert.ToInt32((int)INVOICE_REQUEST_STATUS.LUU_NHAP));
                 else
-                    objParam_InvoiceRequest[11] = new SqlParameter("@Status", (int)INVOICE_REQUEST_STATUS.CHO_TBP_DUYET);
+                    objParam_InvoiceRequest[11] = new SqlParameter("@Status", (int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET);
                 objParam_InvoiceRequest[12] = new SqlParameter("@Id", model.Id);
                 objParam_InvoiceRequest[13] = new SqlParameter("@IsDelete", false);
                 objParam_InvoiceRequest[14] = new SqlParameter("@Note", string.IsNullOrEmpty(model.Note) ?

@@ -449,7 +449,7 @@ namespace Repositories.Repositories
                 {
                     InvoiceRequestViewModel model = new InvoiceRequestViewModel();
                     //item.VATAmount = ((decimal)item.VAT / (decimal)100) * item.TotalPrice;
-                    //item.TotalPriceVAT = (decimal)(item.TotalPrice + item.VATAmount);
+                    item.TotalPriceVAT = (decimal)((double)item.TotalPrice + item.PriceExtraExport);
                     item.CopyProperties(model);
                     invoiceRequestViewModels.Add(model);
                 }
