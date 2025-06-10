@@ -227,7 +227,7 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
 
         public IActionResult Add(long orderId)
         {
-            ViewBag.orderId = 0;
+            ViewBag.orderId = orderId;
             ViewBag.ClientId = 0;
             ViewBag.ClientName = string.Empty;
             ViewBag.TaxNo = string.Empty;
