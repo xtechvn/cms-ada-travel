@@ -67,8 +67,48 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
                 if (!string.IsNullOrEmpty(searchModel.InvoiceCode)) searchModel.InvoiceCode = searchModel.InvoiceCode.Trim();
                 if (!string.IsNullOrEmpty(searchModel.Note)) searchModel.Note = searchModel.Note.Trim();
                 var current_user = _ManagementUser.GetCurrentUser();
-                if (!string.IsNullOrEmpty(current_user.UserUnderList) && (searchModel.CreateByIds == null || searchModel.CreateByIds.Count == 0))
-                    searchModel.CreateByIds = current_user.UserUnderList.Split(',').Select(n => int.Parse(n)).ToList();
+                //if (!string.IsNullOrEmpty(current_user.UserUnderList) && (searchModel.CreateByIds == null || searchModel.CreateByIds.Count == 0))
+                //searchModel.CreateByIds = current_user.UserUnderList.Split(',').Select(n => int.Parse(n)).ToList();
+                if (current_user != null)
+                {
+                    if (current_user.Role != "")
+                    {
+                        var list = current_user.Role.Split(',');
+                        foreach (var item in list)
+                        {
+                            bool is_admin = false;
+                            switch (Convert.ToInt32(item))
+                            {
+                                case (int)RoleType.SaleOnl:
+                                case (int)RoleType.SaleKd:
+                                case (int)RoleType.SaleTour:
+                                case (int)RoleType.TPDHKS:
+                                case (int)RoleType.TPDHVe:
+                                case (int)RoleType.TPDHTour:
+                                case (int)RoleType.TPKS:
+                                case (int)RoleType.TPTour:
+                                case (int)RoleType.TPVe:
+                                    {
+                                        searchModel.CreateByIds = current_user.UserUnderList.Split(',').Select(n => int.Parse(n)).ToList();
+                                    }
+                                    break;
+                                case (int)RoleType.Admin:
+                                case (int)RoleType.KT:
+                                case (int)RoleType.GD:
+                                case (int)RoleType.KeToanTruong:
+                                case (int)RoleType.PhoTPKeToan:
+                                    {
+                                        searchModel.CreateByIds= null;
+                                       
+                                        is_admin = true;
+                                    }
+                                    break;
+                            }
+                            if (is_admin) break;
+                        }
+                    }
+
+                }
                 var listInvoiceRequest = _invoiceRequestRepository.GetInvoiceRequests(searchModel, out long total, currentPage, pageSize);
                 if (searchModel.Status != -1)
                 {
