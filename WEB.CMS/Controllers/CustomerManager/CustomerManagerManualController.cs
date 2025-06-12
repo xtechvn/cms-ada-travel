@@ -1,5 +1,6 @@
 ﻿using APP_CHECKOUT.RabitMQ;
 using Caching.Elasticsearch;
+using Entities.ViewModels;
 using Entities.ViewModels.CustomerManager;
 using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.Mongo;
