@@ -29,9 +29,9 @@ namespace WEB.CMS.Controllers
                 var j_param = new Dictionary<string, object>
                 {
                     { "store_name", request.StoreName },
-                    { "index_es", "adavigo_" + request.StoreName.ToLower() },
-                    { "project_type", Convert.ToInt16(ProjectType.ADAVIGO_CMS) },
-                    { "id", request.Id }
+                    { "index_es", "hulotoys_" + request.StoreName.ToLower() },
+                    { "project_type", Convert.ToInt16(ProjectType.HULOTOYS) },
+                    { "id", -1 }
                 };
 
                 var _data_push = JsonConvert.SerializeObject(j_param);
