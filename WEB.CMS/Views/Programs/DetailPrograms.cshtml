@@ -111,7 +111,7 @@
             @if ((Convert.ToInt32(Model.Status) == (int)ProgramsStatus.luu_nhap || Convert.ToInt32(Model.Status) == (int)ProgramsStatus.Tu_choi || Convert.ToInt32(Model.Status) == (int)ProgramsStatus.Tao_Moi) && ViewBag.btnThem == 1)
             {
                 <button type="submit" class="btn btn-default red mr-1" onclick="_DetailPrograms.UpdateProgramsStatus(@((int)ProgramsStatus.Da_Xoa),@ViewBag.id)">Xóa</button>
-                <button type="submit" class="btn btn-default cancel mr-1" onclick="_DetailPrograms.OpenPopup('@ViewBag.id');">Sửa</button>
+                <button type="submit" class="btn btn-default mr-1" onclick="_DetailPrograms.OpenPopup('@ViewBag.id');">Sửa</button>
                 @if (ViewBag.type == 1)
                 {
                     <button type="submit" class="btn btn-default  mr-1" onclick="_DetailPrograms.UpdateProgramsStatus(@((int)ProgramsStatus.Cho_TBP_duyet),@ViewBag.id)">Gửi duyệt</button>
