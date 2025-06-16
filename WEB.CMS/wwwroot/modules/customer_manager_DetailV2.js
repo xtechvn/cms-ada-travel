@@ -494,7 +494,7 @@ var _customer_manager_Detail = {
                         _msgalert.success(result.msg);
                         setTimeout(function () {
                            
-                            _customer_manager_Detail.ReLoad();
+                            _customer_manager_Detail.ReLoadCommentClient();
                         }, 500);
                     } else {
                         _msgalert.error(result.msg);
