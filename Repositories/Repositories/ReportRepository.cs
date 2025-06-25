@@ -394,7 +394,7 @@ namespace Repositories.Repositories
                         ws.Cells["X" + RowIndex].PutValue(item.FullName != null ? item.FullName : "");
                         ws.Cells["Y" + RowIndex].PutValue(item.OperatorName != null ? item.OperatorName : "");
                         ws.Cells["Z" + RowIndex].PutValue(item.BankId != null ? item.BankId.Replace(",", " ") + " - " + item.AccountNumber : "");
-                        ws.Cells["AA" + RowIndex].PutValue(item.TotalFundCustomerCare == null ? (0 : ((double)item.TotalFundCustomerCare).ToString("N0"));
+                        ws.Cells["AA" + RowIndex].PutValue((item.TotalFundCustomerCare == null ? 0 : (double)item.TotalFundCustomerCare).ToString("N0"));
                     
 
                         ws.Cells["K" + RowIndex].SetStyle(numberStyle);
