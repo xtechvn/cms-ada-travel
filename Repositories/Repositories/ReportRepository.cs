@@ -264,6 +264,7 @@ namespace Repositories.Repositories
                     ws.Cells["X2"].PutValue("Người phụ trách chính");
                     ws.Cells["Y2"].PutValue("Điều hành");
                     ws.Cells["Z2"].PutValue("Ngân hàng nhận tiền");
+                    ws.Cells["AA2"].PutValue("Quỹ chăm sóc khách hàng");
                     
                     cell.Merge(0, 0, 2, 1);
                     cell.Merge(0, 1, 2, 1);
@@ -393,6 +394,7 @@ namespace Repositories.Repositories
                         ws.Cells["X" + RowIndex].PutValue(item.FullName != null ? item.FullName : "");
                         ws.Cells["Y" + RowIndex].PutValue(item.OperatorName != null ? item.OperatorName : "");
                         ws.Cells["Z" + RowIndex].PutValue(item.BankId != null ? item.BankId.Replace(",", " ") + " - " + item.AccountNumber : "");
+                        ws.Cells["AA" + RowIndex].PutValue(item.TotalFundCustomerCare == null ? (0 : ((double)item.TotalFundCustomerCare).ToString("N0"));
                     
 
                         ws.Cells["K" + RowIndex].SetStyle(numberStyle);
