@@ -36,13 +36,12 @@
 
         <!-- Form Comment -->
         <form id="commentForm" enctype="multipart/form-data" onsubmit="return false">
-            <textarea id="commentContent" class="form-control commentContent" name="commentContent" placeholder="Nhập nội dung comment"></textarea>
+            <textarea id="commentContent" class="form-control commentContent" name="commentContent" style="min-height:100px;" placeholder="Nhập nội dung comment"></textarea>
 
             <button type="button" class="btn btn-primary mt10" onclick="_customer_manager_Detail.addComment(@ViewBag.ClientId)">Gửi</button>
         </form>
     </div>
 </div>
-
 
 <style>
     .comment-list-wrapper {

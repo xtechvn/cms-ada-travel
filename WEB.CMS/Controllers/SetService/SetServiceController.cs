@@ -1,4 +1,5 @@
 ﻿using API_CORE.Service.Vin;
+using APP_CHECKOUT.RabitMQ;
 using Caching.Elasticsearch;
 using DAL.MongoDB.Hotel;
 using Entities.Models;
@@ -13,6 +14,7 @@ using Entities.ViewModels.SupplierConfig;
 using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
@@ -70,6 +72,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
         private readonly IHotelRepository _HotelRepository;
         private readonly HotelBookingMongoService hotelBookingMongoService;
         private LogActionMongoService LogActionMongo;
+        private readonly WorkQueueClient workQueueClient;
 
         public SetServiceController(IConfiguration configuration, IHotelBookingRepositories hotelBookingRepositories, IOrderRepositor orderRepositor, IOrderRepository orderRepository, IWebHostEnvironment WebHostEnvironment
             , IHotelBookingRoomRepository hotelBookingRoomRepository, IHotelBookingGuestRepository hotelBookingGuestRepository, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository,
@@ -108,6 +111,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
             _HotelRepository = HotelRepository;
             hotelBookingMongoService = new HotelBookingMongoService(configuration);
             LogActionMongo = new LogActionMongoService(configuration);
+            workQueueClient = new WorkQueueClient(configuration);
         }
         public async Task<IActionResult> SetServiceHotel()
         {
@@ -1011,6 +1015,8 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                             apiService.SendMessage(user_id.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TRA_CODE).ToString(), order.OrderNo, link, current_user.Role.ToString(), model.BookingCode);
 
                         }
+                        workQueueClient.SyncES(data, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBookingCode"], _configuration["DataBaseConfig:Elastic:Index:HotelBookingCode"], ProjectType.ADAVIGO_CMS, "SetUpHotelBookingCode");
+
                         sst_status = (int)ResponseType.SUCCESS;
                         smg = "Thêm mới thành công";
                         id = data;
@@ -1030,6 +1036,8 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                     var data = await _hotelBookingCodeRepository.UpdateHotelBookingCode(model);
                     if (data != 0 && data > 0)
                     {
+                        workQueueClient.SyncES(model.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBookingCode"], _configuration["DataBaseConfig:Elastic:Index:HotelBookingCode"], ProjectType.ADAVIGO_CMS, "SetUpHotelBookingCode");
+
 
                         sst_status = (int)ResponseType.SUCCESS;
                         smg = "Sửa thành công ";
