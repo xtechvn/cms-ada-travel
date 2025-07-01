@@ -216,118 +216,135 @@ namespace WEB.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                var Update = await _debtGuaranteeRepository.UpdateDebtGuarantee(id, status, _UserId);
-                if (Update > 0)
-                {
-                    smg = "Thành công";
-                    if (status == (int)DebtGuaranteeStatus.TP_DUYET || status == (int)DebtGuaranteeStatus.TN_DUYET)
+                var userDetail = await _userRepository.GetDetailUser(current_user.Id);
+                var DebtLimit = ((double)userDetail.Entity.DebtLimit);
+                var UserUnderList = current_user.UserUnderList + "," + current_user.Id;
+                var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id.ToString(), UserUnderList);
+                var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
+                var order = await _orderRepository.GetOrderByID(detail.OrderId);
+                if ((order.Amount + AmountTotal) < DebtLimit) {
+                    var Update = await _debtGuaranteeRepository.UpdateDebtGuarantee(id, status, _UserId);
+                    if (Update > 0)
                     {
+                        smg = "Thành công";
+                        if (status == (int)DebtGuaranteeStatus.TP_DUYET || status == (int)DebtGuaranteeStatus.TN_DUYET)
+                        {
 
 
 
-                        var orderStatus = _allCodeRepository.GetListByType("ORDER_STATUS");
-                        var allCodes = orderStatus.Where(s => s.CodeValue == (int)OrderStatus.WAITING_FOR_OPERATOR).ToList();
-                        var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
-                        var user = await _userRepository.GetById(_UserId);
-                        var order = await _orderRepository.GetOrderByID(detail.OrderId);
-                        var modelLog = new LogActionModel();
-                        modelLog.Type = (int)AttachmentType.OrderDetail;
-                        modelLog.LogId = detail.OrderId;
-                        modelLog.CreatedUserName = user.FullName;
-                        modelLog.Log = allCodes[0].Description;
-                        modelLog.Note = user.FullName + " công nợ đơn hàng";
-                        var data = await _orderRepository.GetAllServiceByOrderId(detail.OrderId);
-                        if (data != null)
+                            var orderStatus = _allCodeRepository.GetListByType("ORDER_STATUS");
+                            var allCodes = orderStatus.Where(s => s.CodeValue == (int)OrderStatus.WAITING_FOR_OPERATOR).ToList();
+
+                            var user = await _userRepository.GetById(_UserId);
+
+                            var modelLog = new LogActionModel();
+                            modelLog.Type = (int)AttachmentType.OrderDetail;
+                            modelLog.LogId = detail.OrderId;
+                            modelLog.CreatedUserName = user.FullName;
+                            modelLog.Log = allCodes[0].Description;
+                            modelLog.Note = user.FullName + " công nợ đơn hàng";
+                            var data = await _orderRepository.GetAllServiceByOrderId(detail.OrderId);
+                            if (data != null)
+                                foreach (var item in data)
+                                {
+                                    item.Price += item.Profit;
+                                    if (item.Type.Equals("Tour"))
+                                    {
+                                        item.tour = await _tourRepository.GetDetailTourByID(Convert.ToInt32(item.ServiceId));
+                                    }
+                                    if (item.Type.Equals("Khách sạn"))
+                                    {
+                                        item.Hotel = await _hotelBookingRepositories.GetDetailHotelBookingByID(Convert.ToInt32(item.ServiceId));
+                                    }
+                                    if (item.Type.Equals("Vé máy bay"))
+                                    {
+                                        item.Flight = await _flyBookingDetailRepository.GetDetailFlyBookingDetailById(Convert.ToInt32(item.ServiceId));
+                                    }
+                                    if (item.Type.Equals("Dịch vụ khác"))
+                                    {
+                                        item.OtherBooking = await _otherBookingRepository.GetDetailOtherBookingById(Convert.ToInt32(item.ServiceId));
+                                    }
+                                    if (item.Type.Equals("Vinwonder"))
+                                    {
+                                        item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
+                                    }
+                                }
+                            if (data != null && data.Count > 1)
+                            {
+                                for (int o = 0; o < data.Count - 1; o++)
+                                {
+
+                                    if (data[o].Flight != null && data[o + 1].Flight != null)
+                                    {
+                                        if (data[o].Flight.GroupBookingId == data[o + 1].Flight.GroupBookingId && data[o].Flight.Leg != data[o + 1].Flight.Leg)
+                                        {
+                                            data[o].Flight.StartDistrict2 = data[o + 1].Flight.StartDistrict;
+                                            data[o].Flight.EndDistrict2 = data[o + 1].Flight.EndDistrict;
+                                            data[o].Flight.Leg2 = 3;
+                                            data[o].Flight.BookingCode2 = data[o + 1].Flight.BookingCode;
+                                            data[o].Amount = data[o].Flight.Amount + data[o + 1].Flight.Amount;
+                                            data[o].EndDate = data[o + 1].EndDate;
+
+                                            data.Remove(data[o + 1]);
+
+                                        }
+                                    }
+
+                                }
+                            }
+                            long status_order = Convert.ToInt32((int)OrderStatus.WAITING_FOR_OPERATOR);
+                            var data2 = await _orderRepository.UpdateOrderFinishPayment(detail.OrderId, status_order);
+
+                            string link = "/Order/" + detail.OrderId;
+                            apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DA_DUYET_CONG_NO).ToString(), detail.OrderNo, link, current_user.Role, detail.OrderNo);
                             foreach (var item in data)
                             {
-                                item.Price += item.Profit;
                                 if (item.Type.Equals("Tour"))
                                 {
-                                    item.tour = await _tourRepository.GetDetailTourByID(Convert.ToInt32(item.ServiceId));
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.tour.ServiceCode);
                                 }
                                 if (item.Type.Equals("Khách sạn"))
                                 {
-                                    item.Hotel = await _hotelBookingRepositories.GetDetailHotelBookingByID(Convert.ToInt32(item.ServiceId));
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Hotel[0].ServiceCode);
                                 }
                                 if (item.Type.Equals("Vé máy bay"))
                                 {
-                                    item.Flight = await _flyBookingDetailRepository.GetDetailFlyBookingDetailById(Convert.ToInt32(item.ServiceId));
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Flight.ServiceCode);
                                 }
                                 if (item.Type.Equals("Dịch vụ khác"))
                                 {
-                                    item.OtherBooking = await _otherBookingRepository.GetDetailOtherBookingById(Convert.ToInt32(item.ServiceId));
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.OtherBooking[0].ServiceCode);
                                 }
                                 if (item.Type.Equals("Vinwonder"))
                                 {
-                                    item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
+                                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.VinWonderBooking[0].ServiceCode);
                                 }
                             }
-                        if (data != null && data.Count > 1)
-                        {
-                            for (int o = 0; o < data.Count - 1; o++)
-                            {
-
-                                if (data[o].Flight != null && data[o + 1].Flight != null)
-                                {
-                                    if (data[o].Flight.GroupBookingId == data[o + 1].Flight.GroupBookingId && data[o].Flight.Leg != data[o + 1].Flight.Leg)
-                                    {
-                                        data[o].Flight.StartDistrict2 = data[o + 1].Flight.StartDistrict;
-                                        data[o].Flight.EndDistrict2 = data[o + 1].Flight.EndDistrict;
-                                        data[o].Flight.Leg2 = 3;
-                                        data[o].Flight.BookingCode2 = data[o + 1].Flight.BookingCode;
-                                        data[o].Amount = data[o].Flight.Amount + data[o + 1].Flight.Amount;
-                                        data[o].EndDate = data[o + 1].EndDate;
-
-                                        data.Remove(data[o + 1]);
-
-                                    }
-                                }
-
-                            }
+                            var modelEmail = new SendEmailViewModel();
+                            modelEmail.Orderid = detail.OrderId;
+                            modelEmail.ServiceType = (int)EmailType.SaleDH;
+                            var attach_file = new List<AttachfileViewModel>();
+                            bool resulstSendMail = await _emailService.SendEmail(modelEmail, attach_file);
                         }
-                        long status_order = Convert.ToInt32((int)OrderStatus.WAITING_FOR_OPERATOR);
-                        var data2 = await _orderRepository.UpdateOrderFinishPayment(detail.OrderId, status_order);
-
-                        string link = "/Order/" + detail.OrderId;
-                        apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DA_DUYET_CONG_NO).ToString(), detail.OrderNo, link, current_user.Role, detail.OrderNo);
-                        foreach (var item in data)
+                        else
                         {
-                            if (item.Type.Equals("Tour"))
-                            {
-                                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.tour.ServiceCode);
-                            }
-                            if (item.Type.Equals("Khách sạn"))
-                            {
-                                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Hotel[0].ServiceCode);
-                            }
-                            if (item.Type.Equals("Vé máy bay"))
-                            {
-                                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.Flight.ServiceCode);
-                            }
-                            if (item.Type.Equals("Dịch vụ khác"))
-                            {
-                                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.OtherBooking[0].ServiceCode);
-                            }
-                            if (item.Type.Equals("Vinwonder"))
-                            {
-                                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.DUYET_DICH_VU).ToString(), item.OrderNo, link, current_user.Role, item.VinWonderBooking[0].ServiceCode);
-                            }
+                           
+                            var user = await _userRepository.GetById(_UserId);
+                         
+                            string link = "/Order/" + detail.OrderId;
+                            apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.TU_CHOI_DON_CONG_NO).ToString(), detail.OrderNo, link, current_user.Role, detail.OrderNo);
                         }
-                        var modelEmail = new SendEmailViewModel();
-                        modelEmail.Orderid = detail.OrderId;
-                        modelEmail.ServiceType = (int)EmailType.SaleDH;
-                        var attach_file = new List<AttachfileViewModel>();
-                        bool resulstSendMail = await _emailService.SendEmail(modelEmail, attach_file);
-                    }
-                    else
-                    {
-                        var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
-                        var user = await _userRepository.GetById(_UserId);
-                        var order = await _orderRepository.GetOrderByID(detail.OrderId);
-                        string link = "/Order/" + detail.OrderId;
-                        apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.TU_CHOI_DON_CONG_NO).ToString(), detail.OrderNo, link, current_user.Role, detail.OrderNo);
                     }
                 }
+                else
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        smg = "Bảo lãnh không thành công,đã vượt quá hạn mức bảo lãnh"
+                    });
+                }
+              
 
             }
             catch (Exception ex)

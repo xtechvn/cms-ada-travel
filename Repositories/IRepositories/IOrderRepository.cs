@@ -51,6 +51,6 @@ namespace Repositories.IRepositories
         Task<long> CountOrderInYear();
         Task<double> CheckAmountRemainBySalerId(long SalerId);
         Task<int> UpdateOrderIsSalerDebtLimit(long OrderId, long IsSalerDebtLimit, long UpdatedBy, long UserVerify);
-        Task<double> AmountTotalBySalerId(long SalerId);
+        Task<double> AmountTotalBySalerId(string SalerId, string SalerPermission);
     }
 }

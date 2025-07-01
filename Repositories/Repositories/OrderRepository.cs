@@ -1195,7 +1195,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId);
+                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId.ToString(), SalerId.ToString());
                 if (dt != null && dt.Rows.Count > 0)
                 {
 
@@ -1222,11 +1222,11 @@ namespace Repositories.Repositories
                 return 0;
             }
         }
-        public async Task<double> AmountTotalBySalerId(long SalerId)
+        public async Task<double> AmountTotalBySalerId(string SalerId, string SalerPermission)
         {
             try
             {
-                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId);
+                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId, SalerPermission);
                 if (dt != null && dt.Rows.Count > 0)
                 {
 

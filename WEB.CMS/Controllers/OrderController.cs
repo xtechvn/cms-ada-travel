@@ -2652,7 +2652,7 @@ namespace WEB.Adavigo.CMS.Controllers
             var current_user = _ManagementUser.GetCurrentUser();
             var user = await _userRepository.GetDetailUser(current_user.Id);
             ViewBag.DebtLimit = ((double)user.Entity.DebtLimit).ToString("N0");
-            var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id);
+            var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id.ToString(), current_user.Id.ToString());
             ViewBag.AmountTotal = AmountTotal.ToString("N0");
             return View();
         }

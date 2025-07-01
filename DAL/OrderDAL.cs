@@ -1093,12 +1093,13 @@ namespace DAL
             }
             return null;
         }
-        public async Task<DataTable> CheckAmountRemainBySalerId(long SalerId)
+        public async Task<DataTable> CheckAmountRemainBySalerId(string SalerId,string SalerPermission)
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[1];
+                SqlParameter[] objParam = new SqlParameter[2];
                 objParam[0] = new SqlParameter("@SalerId", SalerId);
+                objParam[1] = new SqlParameter("@SalerPermission", SalerPermission);
                 return _DbWorker.GetDataTable(StoreProcedureConstant.SP_CheckAmountRemainBySalerId, objParam);
             }
             catch (Exception ex)
