@@ -30,7 +30,49 @@
             cache: true
         }
     });
+    const selectBtnStatus = document.querySelector(".select-btn-Status-type")
+    const itemsStatus = document.querySelectorAll(".item-Status-type");
+    $(document).click(function (event) {
+
+        var $target = $(event.target);
+        if (!$target.closest('#select-btn-Status-type').length) {//checkbox_trans_type_
+            if ($('#list-item-Status').is(":visible") && !$target[0].id.includes('Status_type_text') && !$target[0].id.includes('Status_type')
+                && !$target[0].id.includes('list-item-Status') && !$target[0].id.includes('checkbox_Status_type')) {
+                selectBtnStatus.classList.toggle("open");
+            }
+        }
+
+
+    });
+    selectBtnStatus.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectBtnStatus.classList.toggle("open");
+    });
+    itemsStatus.forEach(item => {
+        item.addEventListener("click", () => {
+            item.classList.toggle("checked");
+            let checked = document.querySelectorAll(".checked"),
+                btnText = document.querySelector(".btn-text-Status-type");
+            listStatus = []
+            let checked_list = []
+
+            for (var i = 0; i < checked.length; i++) {
+                id = checked[i].getAttribute('id')
+                if (id.includes('Status_type_')) {
+                    checked_list.push(checked[i]);
+                    listStatus.push(parseInt(id.replace('Status_type_', '')))
+                }
+            }
+
+            if (checked_list && checked_list.length > 0) {
+                btnText.innerText = `${checked_list.length} Selected`;
+            } else {
+                btnText.innerText = "Tất cả trạng thái";
+            }
+        });
+    })
 });
+let listStatus = [];
 let PageIndex = 1;
 let isPickerApprove = false;
 var _debt_guarantee = {
@@ -72,7 +114,7 @@ var _debt_guarantee = {
     getModel: function () {
         var _searchModel = {
             Code: $('#Code').val(),
-            Status: $('#Status').val(),
+            Status: listStatus.toString(),
             OrderId: $('#OrderId').val(),
             CreateTime: null,
             ToDateTime: null,
@@ -96,4 +138,26 @@ var _debt_guarantee = {
     onSelectPageSize: function () {
         _debt_guarantee.SearchData();
     },
+    Export: function () {
+        var searchModel = _debt_guarantee.getModel();
+        searchModel.PageIndex = -1;
+        _global_function.AddLoading()
+        $.ajax({
+            url: "/DebtGuarantee/ExportExcel",
+            type: "Post",
+            data: searchModel,
+            success: function (result) {
+                _global_function.RemoveLoading()
+                $('#btnExport').prop('disabled', false);
+                if (result.isSuccess) {
+                    _msgalert.success(result.message);
+                    window.location.href = result.path;
+                } else {
+                    _msgalert.error(result.message);
+                }
+                $('#icon-export').removeClass('fa-spinner fa-pulse');
+                $('#icon-export').addClass('fa-file-excel-o');
+            }
+        });
+    }
 }

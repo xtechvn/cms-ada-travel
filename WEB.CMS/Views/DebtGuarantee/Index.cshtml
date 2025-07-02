@@ -14,19 +14,40 @@
                 <div class="form-group mb10 mr-2">
                     <input type="text" class="form-control" id="Code" placeholder="Mã phiếu" style=" width: 200px;">
                 </div>
-                <div class="form-group mb10 mr-2">
-                    <select type="text" class="form-control" id="Status" style=" width: 200px;">
-                        <option value="-1">Tất cả</option>
-                        @foreach (var item in Status)
-                        {
-                            <option value="@item.CodeValue">@item.Description</option>
-                        }
-                    </select>
+                <div class="multiple-select form-group mb10 mr-2">
+                    <div class="multiple-select form-group mb10 mr-2" style=" width: 200px;    margin-top: 10px;">
+                        <div class="select-btn select-btn-Status-type" id="select-btn-Status-type">
+                            <span class="btn-text-Status-type">Tất cả trạng thái</span>
+                            <span class="arrow-dwn">
+                                <i class="fa fa-angle-down"></i>
+                            </span>
+                        </div>
+
+                        <ul class="list-items" id="list-item-Status">
+                            @if (Status != null && Status.Count > 0)
+                            {
+                                @foreach (var item in Status)
+                                {
+                                    if (item.CodeValue != 0)
+                                    {
+                                        <li class="item item-Status-type" id="Status_type_@item.CodeValue">
+                                            <span class="checkbox" id="checkbox_Status_type_@item.CodeValue">
+                                                <i class="fa fa-check"></i>
+                                            </span>
+                                            <span class="item-text" id="Status_type_text_@item.CodeValue">@item.Description</span>
+                                        </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </div>
+
                 </div>
+       
                 <div class="form-group mb10 mr-2" style="min-width:200px;">
                     <select class="select2 orderno-select main-staff-select" id="OrderId" style="min-width:200px;width:100% !important">
                     </select>
-                    @*<input type="text" class="form-control" id="OrderId" placeholder="Mã đơn hàng" style=" width: 200px;">*@
+                    <button type="reset" style="display:none;" class="btn_reset reset-order-id">×</button>
                 </div>
                 <div class="form-group mb10 mr-2">
                     <div class="datepicker-wrap" style="width:100%">
@@ -35,9 +56,9 @@
                     </div>
                 </div>
                 <div class="mb10 mr-2">
-                    @* <button class="btn-search btn-default" type="button" onclick="_payment_request_service.Export()" id="btnExport">
-                <i class="fa fa-file-excel-o" id="icon-export"></i>
-            </button> *@
+                    <button class="btn-search btn-default" type="button" onclick="_debt_guarantee.Export()" id="btnExport">
+                        <i class="fa fa-file-excel-o" id="icon-export"></i>
+                    </button>
                     <button type="button" class="btn btn-default bg-main" onclick="_debt_guarantee.SearchData()">
                         <svg class="icon-svg" style="vertical-align: sub;">
                             <use xlink:href="/images/icons/icon.svg#search"></use>

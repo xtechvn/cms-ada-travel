@@ -9,7 +9,7 @@ namespace Entities.ViewModels.DebtGuarantee
     public class SearchDebtGuarantee
     {
         public string Code { get; set; }
-        public int Status { get; set; } = -1;
+        public string Status { get; set; }
         public string OrderId { get; set; }
         public string CreateTime { get; set; }
         public string ToDateTime { get; set; }

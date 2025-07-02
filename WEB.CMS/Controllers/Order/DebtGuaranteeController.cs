@@ -3,6 +3,7 @@ using Caching.RedisWorker;
 using Entities.ViewModels;
 using Entities.ViewModels.Attachment;
 using Entities.ViewModels.DebtGuarantee;
+using Entities.ViewModels.HotelBooking;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Mongo;
 using Entities.ViewModels.Vinpearl;
@@ -37,9 +38,12 @@ namespace WEB.CMS.Controllers.Order
         private readonly IFlyBookingDetailRepository _flyBookingDetailRepository;
         private IOtherBookingRepository _otherBookingRepository;
         private readonly IVinWonderBookingRepository _vinWonderBookingRepository;
+        private readonly IWebHostEnvironment _WebHostEnvironment;
 
         public DebtGuaranteeController(IDebtGuaranteeRepository debtGuaranteeRepository, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
-            IOrderRepository orderRepository, IConfiguration configuration, ManagementUser managementUser, IEmailService emailService, ITourRepository tourRepository, IHotelBookingRepositories hotelBookingRepositories, IFlyBookingDetailRepository flyBookingDetailRepository, IOtherBookingRepository otherBookingRepository, IVinWonderBookingRepository vinWonderBookingRepository)
+            IOrderRepository orderRepository, IConfiguration configuration, ManagementUser managementUser, IEmailService emailService, ITourRepository tourRepository, 
+            IHotelBookingRepositories hotelBookingRepositories, IFlyBookingDetailRepository flyBookingDetailRepository, IOtherBookingRepository otherBookingRepository,
+            IVinWonderBookingRepository vinWonderBookingRepository, IWebHostEnvironment webHostEnvironment)
         {
             _debtGuaranteeRepository = debtGuaranteeRepository;
             _allCodeRepository = allCodeRepository;
@@ -53,6 +57,7 @@ namespace WEB.CMS.Controllers.Order
             _flyBookingDetailRepository = flyBookingDetailRepository;
             _otherBookingRepository = otherBookingRepository;
             _vinWonderBookingRepository = vinWonderBookingRepository;
+            _WebHostEnvironment = webHostEnvironment;
         }
         public IActionResult Index()
         {
@@ -358,6 +363,66 @@ namespace WEB.CMS.Controllers.Order
                 status = sst_status,
                 smg = smg
             });
+        }
+        [HttpPost]
+        public async Task<IActionResult> ExportExcel(SearchDebtGuarantee searchModel)
+        {
+            try
+            {
+                var current_user = _ManagementUser.GetCurrentUser();
+                string _FileName = "Danh sách đơn hàng công nợ(" + current_user.Id + ").xlsx";
+                string _UploadFolder = @"Template\Export";
+                string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, _UploadFolder);
+
+                if (!Directory.Exists(_UploadDirectory))
+                {
+                    Directory.CreateDirectory(_UploadDirectory);
+                }
+                //delete all file in folder before export
+                try
+                {
+                    System.IO.DirectoryInfo di = new DirectoryInfo(_UploadDirectory);
+                    foreach (FileInfo file in di.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                }
+                catch
+                {
+                }
+
+
+                string FilePath = Path.Combine(_UploadDirectory, _FileName);
+
+                var rsPath = await _debtGuaranteeRepository.ExportDeposit(searchModel, FilePath);
+
+                if (!string.IsNullOrEmpty(rsPath))
+                {
+                    return new JsonResult(new
+                    {
+                        isSuccess = true,
+                        message = "Xuất dữ liệu thành công",
+                        path = "/" + _UploadFolder + "/" + _FileName
+                    });
+                }
+                else
+                {
+                    return new JsonResult(new
+                    {
+                        isSuccess = false,
+                        message = "Xuất dữ liệu thất bại"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ExportExcel - FundingController: " + ex);
+                return new JsonResult(new
+                {
+                    isSuccess = false,
+                    message = ex.Message.ToString()
+                });
+            }
         }
     }
 }

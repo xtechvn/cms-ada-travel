@@ -16,5 +16,6 @@ namespace Repositories.IRepositories
         Task<long> InsertDebtGuarantee(DebtGuarantee model);
         Task<DebtGuaranteeViewModel> GetDetailDebtGuarantee(int Id);
         Task<DebtGuaranteeViewModel> DetailDebtGuaranteebyOrderid(int Orderid);
+        Task<string> ExportDeposit(SearchDebtGuarantee searchModel, string FilePath);
     }
 }
