@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types.InputFiles;
@@ -178,21 +179,24 @@ namespace Utilities
             }
         }*/
 
-        public static int InsertLogDiscord(string message)
+        public static async Task<int> InsertLogDiscord(string message)
         {
             var rs = 1;
             try
             {
-               var request = new LogDiscordModel();
+                HttpClient httpClient = new HttpClient();
+                var model = new LogDiscordModel();
                 using (StreamReader r = new StreamReader("appsettings.json"))
                 {
                     AppSettings _appconfig = new AppSettings();
                     string json = r.ReadToEnd();
                     _appconfig = JsonConvert.DeserializeObject<AppSettings>(json);
-                    request.project_name = _appconfig.API.project_name;
-                    request.log_content = _appconfig.API.Domain_Type + message;
+                    model.project_name = _appconfig.API.project_name;
+                    model.log_content = _appconfig.API.Domain_Type + message;
                     var url = _appconfig.API.Domain + _appconfig.API.log_Discord;
-                    var response = await httpClient.PostAsync(url, request);
+                    string jsonPayload = JsonConvert.SerializeObject(model);
+                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                    var response = await httpClient.PostAsync(url, content);
                 }
             }
             catch (Exception ex)
