@@ -60,6 +60,7 @@ namespace Utilities
             var rs = 1;
             try
             {
+                InsertLogDiscord(message);
                 LoadConfig();
                 TelegramBotClient alertMsgBot = new TelegramBotClient(botToken);
                 var rs_push=  alertMsgBot.SendTextMessageAsync(group_Id, "[" + enviromment + "-"+CompanyType+"] - " + message).Result;
@@ -176,11 +177,37 @@ namespace Utilities
                 }
             }
         }*/
+
+        public static int InsertLogDiscord(string message)
+        {
+            var rs = 1;
+            try
+            {
+               var request = new LogDiscordModel();
+                using (StreamReader r = new StreamReader("appsettings.json"))
+                {
+                    AppSettings _appconfig = new AppSettings();
+                    string json = r.ReadToEnd();
+                    _appconfig = JsonConvert.DeserializeObject<AppSettings>(json);
+                    request.project_name = _appconfig.API.project_name;
+                    request.log_content = _appconfig.API.Domain_Type + message;
+                    var url = _appconfig.API.Domain + _appconfig.API.log_Discord;
+                    var response = await httpClient.PostAsync(url, request);
+                }
+            }
+            catch (Exception ex)
+            {
+                rs = -1;
+            }
+            return rs;
+        }
+
     }
     public class AppSettings
     {
         public BotSetting BotSetting { get; set; }
         public string CompanyType { get; set; }
+        public API API { get; set; }
       
     }
 
@@ -201,6 +228,19 @@ namespace Utilities
         public string Log { get; set; } // nội dung log
         public DateTime CreatedTime { get; set; } // thời gian tạo
     }
+    public class LogDiscordModel
+    {
+        public string project_name { get; set; }
+        public string log_content { get; set; }
 
+    } 
+    public class API
+    {
+        public string Domain_Type { get; set; }
+        public string log_Discord { get; set; }
+        public string Domain { get; set; }
+        public string project_name { get; set; }
+
+    }
 }
 
