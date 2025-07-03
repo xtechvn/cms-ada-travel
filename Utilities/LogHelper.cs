@@ -63,7 +63,7 @@ namespace Utilities
             try
             {
                 TelegramBotClient alertMsgBot = new TelegramBotClient(botToken);
-                alertMsgBot.SendTextMessageAsync(group_Id, "DeepSeekTravelCMS - " + message);
+                alertMsgBot.SendTextMessageAsync(group_Id, "TravelLabCMS - " + message);
             }
             catch (Exception ex)
             {

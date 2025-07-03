@@ -13,7 +13,9 @@ namespace Caching.Elasticsearch
     public class FlyBookingESRepository : ESRepository<FlyBookingESViewModel>
     {
         private readonly IConfiguration _configuration;
+
         private readonly string index_name = "deepseektravel_sp_getdetailflybookingdetail";
+
         public FlyBookingESRepository(string Host, IConfiguration configuration) : base(Host)
         {
 

@@ -48,6 +48,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _contractESRepository = new ContractESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
+
             _clientRepository = clientRepository;
             _userAgentRepository = userAgentRepository;
             _policyRepository = policyRepository;

@@ -25,6 +25,7 @@ namespace Caching.Elasticsearch
             index_name = configuration["DataBaseConfig:Elastic:Index:Client"];
         }
 
+
         public async Task<List<CustomerESViewModel>> GetClientSuggesstion(string txt_search, int? tenant_id = null)
         {
             List<CustomerESViewModel> result = new List<CustomerESViewModel>();
@@ -112,6 +113,7 @@ namespace Caching.Elasticsearch
         }
 
         public int UpSert(ClientESViewModel entity, string index_name = "deepseektravel_sp_getclient")
+
         {
             try
             {

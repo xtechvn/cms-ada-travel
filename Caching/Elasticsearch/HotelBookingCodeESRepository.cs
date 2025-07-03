@@ -13,7 +13,9 @@ namespace Caching.Elasticsearch
    public class HotelBookingCodeESRepository : ESRepository<HotelBookingCodeESViewModel>
     {
         private readonly IConfiguration _configuration;
+
         private readonly string index_name = "deepseektravel_sp_gethotelbookingcode";
+
         public HotelBookingCodeESRepository(string Host, IConfiguration configuration) : base(Host)
         {
 

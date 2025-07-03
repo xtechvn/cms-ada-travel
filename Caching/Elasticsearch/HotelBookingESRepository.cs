@@ -14,6 +14,7 @@ namespace Caching.Elasticsearch
     {
         private readonly IConfiguration _configuration;
         private readonly string index_name = "deepseektravel_sp_gethotelbooking";
+
         public HotelBookingESRepository(string Host, IConfiguration configuration) : base(Host)
         {
 
