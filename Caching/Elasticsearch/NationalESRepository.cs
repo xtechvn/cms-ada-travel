@@ -10,7 +10,8 @@ namespace Caching.Elasticsearch
 {
     public class NationalESRepository : ESRepository<NationalESViewModel>
     {
-        private string index_name = "TravelLab_sp_getnational";
+        private string index_name = "deepseektravel_sp_getnational";
+
         public NationalESRepository(string Host) : base(Host) { }
 
         public async Task<List<NationalESViewModel>> SearchNational(string txt_search)

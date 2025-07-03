@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
+using WEB.CMS.Customize;
 
 namespace WEB.DeepSeekTravel.CMS.Controllers
 {
@@ -18,33 +19,34 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
         private readonly IAllCodeRepository _allCodeRepository;
         private readonly IContractRepository _contractRepository;
         private ClientESRepository clientESRepository;
-
+        private ManagementUser _ManagementUser;
         private IClientRepository _clientRepository;
         private IUserAgentRepository _userAgentRepository;
         private IPolicyRepository _policyRepository;
         private IUserRepository _userRepository;
 
         public ClientController(IConfiguration configuration, IAllCodeRepository allCodeRepository, IContractRepository contractRepository,  IUserRepository userRepository,
-            IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IPolicyRepository policyRepository)
+            IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IPolicyRepository policyRepository, ManagementUser managementUser)
         {
 
             _configuration = configuration;
             _allCodeRepository = allCodeRepository;
             _contractRepository = contractRepository;
-            clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _clientRepository = clientRepository;
             _userAgentRepository = userAgentRepository;
             _policyRepository = policyRepository;
             _userRepository = userRepository;
-
+            _ManagementUser = managementUser;
         }
         public async Task<IActionResult> ClientSuggestion(string txt_search)
         {
 
             try
             {
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
 
-                var clients = await clientESRepository.GetClientSuggesstion(txt_search);
+                var clients = await clientESRepository.GetClientSuggesstion(txt_search, tenant_id);
                 if(clients!=null && clients.Count > 0)
                 {
                     return Ok(new

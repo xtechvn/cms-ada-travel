@@ -13,7 +13,8 @@ namespace Caching.Elasticsearch
     public class UserESRepository : ESRepository<UserESViewModel>
     {
         private readonly IConfiguration _configuration;
-        private readonly string index_name = "TravelLab_sp_getorder";
+        private readonly string index_name = "deepseektravel_sp_getorder";
+
         public UserESRepository(string Host, IConfiguration configuration) : base(Host)
         {
 
@@ -107,7 +108,8 @@ namespace Caching.Elasticsearch
             }
 
         }
-        public async Task<UserESViewModel> GetUserByID(string id, string index_name = "TravelLab_sp_getuser")
+
+        public async Task<UserESViewModel> GetUserByID(string id, string index_name = "deepseektravel_sp_getuser")
         {
             List<UserESViewModel> result = new List<UserESViewModel>();
             try

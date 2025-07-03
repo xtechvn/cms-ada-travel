@@ -14,7 +14,9 @@ namespace Caching.Elasticsearch
    public class OrderESRepository :ESRepository<OrderElasticsearchViewModel>
     {
         private readonly IConfiguration _configuration;
-        private readonly string index_name = "TravelLab_sp_getorder";
+
+        private readonly string index_name = "deepseektravel_sp_getorder";
+
         public OrderESRepository(string Host, IConfiguration configuration) : base(Host) {
 
             _configuration = configuration;

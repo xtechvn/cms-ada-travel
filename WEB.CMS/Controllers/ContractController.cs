@@ -46,8 +46,9 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
             _allCodeRepository = allCodeRepository;
             _contractRepository = contractRepository;
             _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
-            _contractESRepository = new ContractESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
-            _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
+            _contractESRepository = new ContractESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
+            _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
+
             _clientRepository = clientRepository;
             _userAgentRepository = userAgentRepository;
             _policyRepository = policyRepository;
@@ -302,7 +303,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 //        msg = "Không có dữ liệu nào thỏa mãn từ khóa " + txt_search
                 //    });
                 //}
-                var data = await _clientESRepository.GetClientSuggesstion(txt_search);
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+                var data = await _clientESRepository.GetClientSuggesstion(txt_search, tenant_id);
                 return Ok(new
                 {
                     status = (int)ResponseType.SUCCESS,
@@ -336,8 +338,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 }
                 else
                 {
-
-                    var data = await _contractESRepository.GetContractNoSuggesstion(txt_search);
+                    int? tenant_id = _ManagementUser.GetCurrentTenantId();
+                    var data = await _contractESRepository.GetContractNoSuggesstion(txt_search, tenant_id);
                     if (data != null)
                     {
                         return Ok(new
@@ -435,7 +437,8 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                 //        msg = "Không có dữ liệu nào thỏa mãn từ khóa " + txt_search
                 //    });
                 //}
-                var data = await _clientESRepository.GetClientSuggesstion(txt_search);
+                int? tenant_id = _ManagementUser.GetCurrentTenantId();
+                var data = await _clientESRepository.GetClientSuggesstion(txt_search, tenant_id);
                 return Ok(new
                 {
                     status = (int)ResponseType.SUCCESS,
@@ -653,6 +656,7 @@ namespace WEB.DeepSeekTravel.CMS.Controllers
                     Contract_model.SalerId = model[0].SalerId;
                     Contract_model.PolicyId = model[0].PolicyId;
                     Contract_model.UserIdUpdate = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                    Contract_model.TenantId = model[0].TenantId;
                     if (Contract_model.SalerId == 0) { Contract_model.SalerId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value); }
 
                     var data = await _contractRepository.CreateContact2(Contract_model, Note);

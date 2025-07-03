@@ -413,6 +413,7 @@ namespace Repositories.Repositories
                                     IsPrivate = Convert.ToInt32(!row["IsPrivate"].Equals(DBNull.Value) ? row["IsPrivate"] : 0),
                                     DebtType = Convert.ToInt32(!row["DebtType"].Equals(DBNull.Value) ? row["DebtType"] : 0),
                                     Id = Convert.ToInt32(!row["Id"].Equals(DBNull.Value) ? row["Id"] : 0),
+                                    TenantId = Convert.ToInt32(!row["TenantId"].Equals(DBNull.Value) ? row["TenantId"] : 0),
 
 
                                 }).ToList();

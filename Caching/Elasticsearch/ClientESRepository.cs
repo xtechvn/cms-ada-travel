@@ -16,10 +16,17 @@ namespace Caching.Elasticsearch
 {
     public class ClientESRepository : ESRepository<CustomerESViewModel>
     {
-        public ClientESRepository(string Host) : base(Host) { }
+        private readonly string index_name = "deepseektravel_sp_getclient";
+        private readonly IConfiguration _configuration;
+        public ClientESRepository(string Host, IConfiguration configuration) : base(Host)
+        {
+
+            _configuration = configuration;
+            index_name = configuration["DataBaseConfig:Elastic:Index:Client"];
+        }
 
 
-        public async Task<List<CustomerESViewModel>> GetClientSuggesstion(string txt_search, string index_name = "TravelLab_sp_getclient")
+        public async Task<List<CustomerESViewModel>> GetClientSuggesstion(string txt_search, int? tenant_id = null)
         {
             List<CustomerESViewModel> result = new List<CustomerESViewModel>();
             try
@@ -29,13 +36,32 @@ namespace Caching.Elasticsearch
                 var connectionPool = new StaticConnectionPool(nodes);
                 var connectionSettings = new ConnectionSettings(connectionPool).DisableDirectStreaming().DefaultIndex(index_name);
                 var elasticClient = new ElasticClient(connectionSettings);
+                if (tenant_id == null)
+                {
+                    var result_all = elasticClient.Search<CustomerESViewModel>(s => s
+                        .Index(index_name)
+                        .Size(30)
+                        .Query(q => q.Bool(qb => qb.Should(q => q.MatchAll())
+                                      
+                                )
+                           ));
+                    result = result_all.Documents as List<CustomerESViewModel>;
+                    return result;
+                }
                 if (txt_search == null)
                 {
                     var result_all = elasticClient.Search<CustomerESViewModel>(s => s
                           .Index(index_name)
                           .Size(30)
-                          .Query(q => q.MatchAll()
-
+                          .Query(q =>
+                                    q.Bool(qb => qb.Should(q => q.MatchAll())
+                                       .Must(mu => mu
+                                            .Term(t => t
+                                                .Field(f => f.tenantid)
+                                                .Value(tenant_id)
+                                            )
+                                        )
+                                )
                            ));
                     result = result_all.Documents as List<CustomerESViewModel>;
                     return result;
@@ -59,7 +85,14 @@ namespace Caching.Elasticsearch
                                     .DefaultField(f => f.clientcode)
                                     .Query("*" + txt_search + "*"))
 
-                                ))
+                                )
+                                .Must(mu => mu
+                                            .Term(t => t
+                                                .Field(f => f.tenantid)
+                                                .Value(tenant_id)
+                                            )
+                                        )
+                                )
                            ));
 
                 if (!search_response.IsValid)
@@ -78,8 +111,9 @@ namespace Caching.Elasticsearch
             }
 
         }
-    
-        public int UpSert(ClientESViewModel entity, string index_name = "TravelLab_sp_getclient")
+
+        public int UpSert(ClientESViewModel entity, string index_name = "deepseektravel_sp_getclient")
+
         {
             try
             {

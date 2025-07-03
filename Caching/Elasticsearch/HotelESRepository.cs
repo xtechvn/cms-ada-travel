@@ -12,7 +12,9 @@ namespace Caching.Elasticsearch
     public class HotelESRepository : ESRepository<HotelESViewModel>
     {
         private readonly IConfiguration _configuration;
-        private readonly string index_name = "TravelLab_sp_gethotel";
+
+        private readonly string index_name = "deepseektravel_sp_gethotel";
+
         public HotelESRepository(string Host, IConfiguration configuration) : base(Host)
         {
 
