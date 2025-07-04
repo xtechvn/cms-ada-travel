@@ -2451,7 +2451,7 @@ namespace WEB.Adavigo.CMS.Service
                                                 AmountDVK += (double)item2.UnitPrice;
                                             };
 
-                                            if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.UnitPrice / (double)item2.Nights / (double)item2.Quantity), 0);
+                                            if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.Amount / (double)item2.Nights / (double)item2.Quantity), 0);
                                             if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
                                             chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageCode + "</td>" +
                                                                               "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageId + "</td>" +
@@ -3056,7 +3056,7 @@ namespace WEB.Adavigo.CMS.Service
                                         AmountDVK += (double)item2.UnitPrice;
                                     };
 
-                                    if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.UnitPrice / (double)item2.Nights / (double)item2.Quantity), 0);
+                                    if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.Amount / (double)item2.Nights / (double)item2.Quantity), 0);
                                     if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
                                     chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageCode + "</td>" +
                                                                       "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageId + "</td>" +
