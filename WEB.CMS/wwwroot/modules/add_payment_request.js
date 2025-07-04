@@ -1379,6 +1379,10 @@ var _add_payment_request = {
         var isPaymentBefore = $('#isPaymentBefore').is(":checked")
         if (isPaymentBefore === undefined || isPaymentBefore === null)
             isPaymentBefore = false
+        var amount_supplier_refund_2=0
+        if ($('#amount_supplier_refund').val() != undefined && $('#amount_supplier_refund').val() != null && $('#amount_supplier_refund').val() != '') {
+           amount_supplier_refund_2= parseFloat($('#amount_supplier_refund').val().replaceAll('.', '').replaceAll(',', '')) 
+        }
         let obj = {
             'id': parseInt($('#payId').val()),
             'status': parseInt($('#payStatus').val()),
@@ -1401,7 +1405,7 @@ var _add_payment_request = {
             'supplierId': parseInt(($('#supplier-select').val())),
             'amount': parseFloat($('#amount').val().replaceAll('.', '').replaceAll(',', '')),
             'totalAmountService': amount_service == 0 ? parseFloat($('#amount_service').val().replaceAll('.', '').replaceAll(',', '')) : amount_service,
-            'totalSupplierRefund': amount_supplier_refund == 0 ? parseFloat($('#amount_supplier_refund').val().replaceAll('.', '').replaceAll(',', '')) : amount_supplier_refund,
+            'totalSupplierRefund': amount_supplier_refund == 0 ? amount_supplier_refund_2 : amount_supplier_refund,
             'paymentRequestDetails': paymentRequestDetails,
             'ServiceId': parseInt($('#serviceId').val()),
             'ServiceType': parseInt($('#serviceType').val()),
