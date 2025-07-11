@@ -148,12 +148,12 @@ else
                                 <a href="/Order/Orderdetails?id=@item.OrderId"><div class="blue"> @item.OrderNo</div></a>
                             </td>
                             <td class=" text-break" style="min-width: 130px;">
-                                @if (item.Status == (int)(INVOICE_REQUEST_STATUS.CHO_TBP_DUYET)||item.Status == (int)(INVOICE_REQUEST_STATUS.CHO_KTT_DUYET))
+                                @if (item.Status == (int)(INVOICE_REQUEST_STATUS.CHO_TBP_DUYET) || item.Status == (int)(INVOICE_REQUEST_STATUS.CHO_KTT_DUYET) || item.Status == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP) || item.Status == (int)(INVOICE_REQUEST_STATUS.HOA_DON_NHAP))
                                 {
                                     <span class="status-wait">@item.InvoiceRequestStatus</span>
                                 }
                                 @if (item.Status == (int)(INVOICE_REQUEST_STATUS.DA_DUYET) ||
-                                   item.Status == (int)(INVOICE_REQUEST_STATUS.HOAN_THANH))
+                                  item.Status == (int)(INVOICE_REQUEST_STATUS.HOAN_THANH))
                                 {
                                     <span class="status-approve">@item.InvoiceRequestStatus</span>
                                 }
@@ -164,7 +164,7 @@ else
                                 @if (item.Status == (int)(INVOICE_REQUEST_STATUS.LUU_NHAP))
                                 {
                                     <span class="status-draft">@item.InvoiceRequestStatus</span>
-                                }
+                                }                            
                             </td>
                             <td class=" text-break">@item.CreatedDate.Value.ToString("dd-MM-yyyy HH:mm")</td>
                             <td class=" text-break">@item.UserName </td>

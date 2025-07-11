@@ -273,10 +273,7 @@ namespace DAL.Invoice
                 objParam_InvoiceRequest[9] = new SqlParameter("@VerifyDate", DBNull.Value);
                 objParam_InvoiceRequest[10] = new SqlParameter("@CreatedBy", model.CreatedBy);
                 objParam_InvoiceRequest[11] = new SqlParameter("@CreatedDate", DateTime.Now);
-                if (model.isSend == 0)
-                    objParam_InvoiceRequest[12] = new SqlParameter("@Status", Convert.ToInt32((int)INVOICE_REQUEST_STATUS.LUU_NHAP));
-                else
-                    objParam_InvoiceRequest[12] = new SqlParameter("@Status", (int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET);
+                objParam_InvoiceRequest[12] = new SqlParameter("@Status", model.isSend);
                 objParam_InvoiceRequest[13] = new SqlParameter("@Note", string.IsNullOrEmpty(model.Note) ?
                 DBNull.Value.ToString() : model.Note);
                 invoiceRequestId = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_InsertInvoiceRequest, objParam_InvoiceRequest);
