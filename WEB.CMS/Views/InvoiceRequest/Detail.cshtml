@@ -60,6 +60,14 @@
                     {
                         <span class="status-draft">@Model.InvoiceRequestStatus</span>
                     }
+                    @if (Model.Status == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP))
+                    {
+                        <span class="status-draft">@Model.InvoiceRequestStatus</span>
+                    }
+                    @if (Model.Status == (int)(INVOICE_REQUEST_STATUS.HOA_DON_NHAP))
+                    {
+                        <span class="status-draft">@Model.InvoiceRequestStatus</span>
+                    }
                 </div>
                 <div class="pd10">
                     <div class="row row_min">
@@ -226,7 +234,7 @@
                                 onclick="_invoice_request_service.BackToList()">
                             Quay lại
                         </button>
-                        @if (Model.Status == (int)(INVOICE_REQUEST_STATUS.LUU_NHAP) || Model.Status == (int)(INVOICE_REQUEST_STATUS.TU_CHOI))
+                        @if (Model.Status == (int)(INVOICE_REQUEST_STATUS.LUU_NHAP))
                         {
                             <button type="submit" class="btn btn-default red"
                                     onclick="_invoice_request_service.Delete(@Model.Id,'@Model.InvoiceRequestNo')">
@@ -237,23 +245,45 @@
                                 Chỉnh sửa
                             </button>
                         }
-                   
+                        @if (Model.Status == (int)(INVOICE_REQUEST_STATUS.TU_CHOI) || Model.Status == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP))
+                        {
+                            <button type="submit" class="btn btn-default red"
+                                    onclick="_invoice_request_service.Delete(@Model.Id,'@Model.InvoiceRequestNo')">
+                                Xóa
+                            </button>
+                            <button type="submit" class="btn btn-default red"
+                                    onclick="_invoice_request_service.Edit(@Model.Id)">
+                                Từ chối
+                            </button>
+                            <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
+                                    onclick="_invoice_request_service.Approve(@((int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET))">
+                                Duyệt
+                            </button>
+                        }
+                        @if ((Model.Status == (int)INVOICE_REQUEST_STATUS.HOA_DON_NHAP)
+                         && (isAdmin || KTV_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || KTT_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || TBP_DUYET_YEU_CAU_XUAT_HOA_DON == 1))
+                        {
+                            <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
+                                    onclick="_invoice_request_service.Approve(@((int)INVOICE_REQUEST_STATUS.DA_XUAT_NHAP))">
+                                Xuất nháp
+                            </button>
+                        }
                         @if ((Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET || Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_TBP_DUYET)
-                         && (isAdmin || KTV_DUYET_YEU_CAU_XUAT_HOA_DON == 1|| KTT_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || TBP_DUYET_YEU_CAU_XUAT_HOA_DON == 1))
+                     && (isAdmin || KTV_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || KTT_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || TBP_DUYET_YEU_CAU_XUAT_HOA_DON == 1))
                         {
                             <button type="button" class="btn btn-default ml-1" style="background:#0066ff !important;"
                                     onclick="_invoice_request_service.Approve(@((int)INVOICE_REQUEST_STATUS.DA_DUYET))">
                                 Duyệt
                             </button>
                         }
-                        @if ((Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET|| Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_TBP_DUYET)
-                           && (isAdmin || KTV_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || KTT_DUYET_YEU_CAU_XUAT_HOA_DON == 1|| TBP_DUYET_YEU_CAU_XUAT_HOA_DON==1))
-                        {
-                            <button type="submit" class="btn btn-default red"
-                                    onclick="_invoice_request_service.Reject()">
-                                Từ chối
-                            </button>
-                        }
+                        @*@if ((Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_KTT_DUYET|| Model.Status == (int)INVOICE_REQUEST_STATUS.CHO_TBP_DUYET)
+           && (isAdmin || KTV_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || KTT_DUYET_YEU_CAU_XUAT_HOA_DON == 1|| TBP_DUYET_YEU_CAU_XUAT_HOA_DON==1))
+        {
+            <button type="submit" class="btn btn-default red"
+                    onclick="_invoice_request_service.Reject()">
+                Từ chối
+            </button>
+        }*@
                         @if (Model.Status == (int)INVOICE_REQUEST_STATUS.DA_DUYET && (isAdmin || KTT_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || KTV_DUYET_YEU_CAU_XUAT_HOA_DON == 1 || TBP_DUYET_YEU_CAU_XUAT_HOA_DON == 1))
                         {
                             <button type="button" class="btn btn-success ml-1"

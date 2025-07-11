@@ -168,7 +168,16 @@
     <div class="text-right border-top pt-3">
         <button type="button" class="btn btn-default btn btn-default cancel" onclick="$.magnificPopup.close();">Bỏ qua</button>
         <button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(0)">Lưu nháp</button>
-        <button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(1)">Gửi đi</button>
+        @*<button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(1)">Gửi đi</button>*@
+        @if (Model.Status == (int)(INVOICE_REQUEST_STATUS.LUU_NHAP))
+        {
+            <button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(7)">Xuất nháp</button>
+        }
+        else
+        {
+            <button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(7)">Từ chối</button>
+        }
+
     </div>
 
 </div>

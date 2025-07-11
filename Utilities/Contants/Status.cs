@@ -70,6 +70,8 @@ namespace Utilities.Contants
         DA_DUYET = 4,
         HOAN_THANH = 5,
         CHO_KTT_DUYET = 6,
+        HOA_DON_NHAP = 7,
+        DA_XUAT_NHAP = 8,
     }
 
     public enum GET_CODE_MODULE
