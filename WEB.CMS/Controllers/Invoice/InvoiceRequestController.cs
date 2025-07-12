@@ -173,8 +173,13 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
             ViewBag.KTT_DUYET_YEU_CAU_XUAT_HOA_DON = 0;
             ViewBag.KTV_DUYET_YEU_CAU_XUAT_HOA_DON = 0;
             ViewBag.isAdmin = false;
+            ViewBag.isCreatedBy = false;
             if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
             {
+                if(detail.CreatedBy == current_user.Id)
+                {
+                    ViewBag.isCreatedBy = true;
+                }
                 bool isAdmin = _userRepository.IsAdmin(current_user.Id);
                 ViewBag.isAdmin = isAdmin;
 

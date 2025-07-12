@@ -21,6 +21,7 @@
     int KTV_DUYET_YEU_CAU_XUAT_HOA_DON = (int)ViewBag.KTV_DUYET_YEU_CAU_XUAT_HOA_DON;
     int isUploadFile = Model.Status == (int)(INVOICE_REQUEST_STATUS.DA_DUYET) ? 0 : 1;
     bool isAdmin = (bool)ViewBag.isAdmin;
+    bool isCreatedBy = (bool)ViewBag.isCreatedBy;
 }
 <style scoped>
     .main-pad-top {
@@ -245,7 +246,7 @@
                                 Chỉnh sửa
                             </button>
                         }
-                        @if (Model.Status == (int)(INVOICE_REQUEST_STATUS.TU_CHOI) || Model.Status == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP))
+                        @if ((Model.Status == (int)(INVOICE_REQUEST_STATUS.TU_CHOI) || Model.Status == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP)) && isCreatedBy==true)
                         {
                             <button type="submit" class="btn btn-default red"
                                     onclick="_invoice_request_service.Delete(@Model.Id,'@Model.InvoiceRequestNo')">
