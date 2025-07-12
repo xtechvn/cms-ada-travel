@@ -67,6 +67,7 @@ var _add_invoice_request = {
         $('input').attr('autocomplete', 'off');
         //$('#btnDeleteImage').hide()
         $('#attachFile').hide()
+        debugger
         if (!isEdit)
             _add_invoice_request.InitItemDetail()
         setTimeout(function () {
@@ -205,7 +206,7 @@ var _add_invoice_request = {
                     
                     
                 }
-                if (orderid != 0 && orderId != undefined) {
+                if (orderid != 0 && orderId != undefined && ($('#price_0').val() == undefined || _add_invoice_request.FormatNumberStr($('#price_0').val()) == 0)) {
                     $('#price_0').val(_add_invoice_request.FormatNumberStr(totalAmount));
                 }
                 
