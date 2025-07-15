@@ -19,11 +19,11 @@
                 <div class="line-bottom" style="padding-bottom: 0;">
                     <div class="flex flex-lg-nowrap gap10 justify-content-between align-items-center">
                         <div class="tab-default mb0">
-                            <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(1);_customer_manager_Detail.SetActive(1)" id="data_order" class="active">Lịch sử mua hàng</a>
+                            <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(5);_customer_manager_Detail.SetActive(5)" id="note_kh" class="active">Ghi chú về khách</a>
+                            <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(1);_customer_manager_Detail.SetActive(1)" id="data_order" >Lịch sử mua hàng</a>
                             <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(3);_customer_manager_Detail.SetActive(3)" id="data_deposit_history">Lịch sử ký quỹ</a>
                             <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(4);_customer_manager_Detail.SetActive(4)" id="data_Contract">Lịch sử hợp đồng</a>
                             <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(2);_customer_manager_Detail.SetActive(2)" id="data_payment_account">Thông tin thanh toán</a>
-                            <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(5);_customer_manager_Detail.SetActive(5)" id="note_kh">Ghi chú về khách</a>
                             <div id="bt_data_payment_account" style="display:none">
                                 <button type="button" class="btn btn-default bg-main mb10 mr-2" onclick="_customer_manager_Detail.OpenPopupPaymentAccount('')"><i class="fa fa-plus-circle"></i>Thêm thông tin thanh toán</button>
                             </div>
@@ -67,6 +67,7 @@
                     <div class="flex flex-end">
                         <b class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</b>
                         <button type="button" class="btn btn-default ml-1" onclick="_customer_manager.OpenPopup('@ViewBag.id')">Sửa thông tin khách hàng</button>
+                        <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.PopUpClientStatus('@ViewBag.id')">Cập nhật trạng thái khách hàng</button>
                         <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.OpenPopupUserAgent('')">Đổi nhân viên phụ trách</button>
                         @if (ViewBag.btnStatus == 1)
                         {

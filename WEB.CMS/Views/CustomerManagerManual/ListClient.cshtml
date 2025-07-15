@@ -1,4 +1,5 @@
 ﻿@using Utilities
+@using Utilities.Contants
 @using Entities.ViewModels
 @using Entities.ViewModels.CustomerManager
 @model GenericViewModel<CustomerManagerViewModel>
@@ -38,6 +39,7 @@ else
 
                         <th class="mfp-hide" style="width: 120px;">Người tạo</th>
                         <th class="mfp-hide" style="width: 100px;">Trạng thái</th>
+                        @*<th class="mfp-hide" style="width: 100px;">Trạng thái tài khoản</th>*@
                     </tr>
                 </thead>
 
@@ -72,8 +74,37 @@ else
                                 <td class="mfp-hide">@item.JoinDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                 <td class="mfp-hide">@(item.UpdateLast != "" ?Convert.ToDateTime(item.UpdateLast).ToString("dd/MM/yyy HH:mm:ss") : "N/A")</td>
                                 <td class="mfp-hide">@(item.Create_name == null ? "N/A" : item.Create_name)</td>
-
                                 <td class="mfp-hide">
+                                    @switch ((int)item.Status)
+                                    {
+                                        case (int)(ClientStatus.KH_MOI):
+                                        case (int)(ClientStatus.CHUA_TC):
+                                            {
+                                                <p class="m-0 status-oranger">
+                                                    @item.StatusName
+                                                </p>
+                                            }
+                                            break;
+                                        case (int)(ClientStatus.DA_TC):
+                                        case (int)(ClientStatus.TIEM_NANG):
+                                        case (int)(ClientStatus.DA_GUI_BG):
+                                        case (int)(ClientStatus.CHOT):
+                                            {
+                                                <p class="m-0 status-green">
+                                                    @item.StatusName
+                                                </p>
+                                            }
+                                            break;
+                                        case (int)(ClientStatus.MAT):
+                                            {
+                                                <p class="m-0 status-green">
+                                                    @item.StatusName
+                                                </p>
+                                            }
+                                            break;
+                                    }
+                                </td>
+                                @*<td class="mfp-hide">
                                     <div class="on-off-btn">
                                         @if (item.ACStatus == 0)
                                         {
@@ -86,7 +117,7 @@ else
                                             <i id="Status_1_@item.Id" class="fa fa-power-off status-red" aria-hidden="true" onclick="_customer_manager.OnResetStatus(@item.Id,'1')"></i>
                                         }
                                     </div>
-                                </td>
+                                </td>*@
 
                             </tr>
                         }

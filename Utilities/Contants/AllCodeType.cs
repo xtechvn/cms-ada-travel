@@ -43,6 +43,7 @@ namespace Utilities.Contants
         public static string DEBT_STATISTIC_STATUS = "DEBT_STATISTIC_STATUS";
         public static string HOTEL_GUEST_TYPE = "HOTEL_GUEST_TYPE";
         public static string WEEKDAY_TYPE = "WEEKDAY_TYPE";
+        public static string CLIENT_STATUS = "CLIENT_STATUS";
 
 
     }

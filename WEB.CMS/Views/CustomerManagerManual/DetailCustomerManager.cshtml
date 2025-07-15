@@ -2,10 +2,10 @@
 @using Utilities.Contants
 @using Entities.ViewModels.CustomerManager
 @using Entities.ViewModels.UserAgent
-@model CustomerManagerViewModel
 @{
     var data_UserAgent = (List<UserAgentViewModel>)ViewBag.userAgent;
 }
+@model CustomerManagerViewModel
 <style>
     .main-customer .btn-default {
         height: auto !important;
@@ -61,6 +61,41 @@
         <div class="col-7">
             <p class="m-0"> @Model.ClientCode</p>
 
+        </div>
+    </div>
+    <div class="row align-items-center mb-3">
+        <div class="col-5">
+            <p class="m-0">Trạng thái</p>
+        </div>
+        <div class="col-7">
+            @switch ((int)Model.Status)
+            {
+                case (int)(ClientStatus.KH_MOI):
+                case (int)(ClientStatus.CHUA_TC):
+                    {
+                        <p class="m-0 status-oranger">
+                            @Model.StatusName
+                        </p>
+                    }
+                    break;
+                case (int)(ClientStatus.DA_TC):
+                case (int)(ClientStatus.TIEM_NANG):
+                case (int)(ClientStatus.DA_GUI_BG):
+                case (int)(ClientStatus.CHOT):
+                    {
+                        <p class="m-0 status-green">
+                            @Model.StatusName
+                        </p>
+                    }
+                    break;
+                case (int)(ClientStatus.MAT):
+                    {
+                        <p class="m-0 status-green">
+                            @Model.StatusName
+                        </p>
+                    }
+                    break;
+            }
         </div>
     </div>
     <div class="row align-items-center mb-3">
@@ -122,7 +157,7 @@
 
                         @if (data_UserAgent != null && data_UserAgent.Count > 0)
                         {
-                            <span onclick="_customer_manager_Detail.OpenPopupUserAgent('@data_UserAgent[0].Id',@Model.Id)" >@data_UserAgent[0].UserId_Name </span>
+                            <span onclick="_customer_manager_Detail.OpenPopupUserAgent('@data_UserAgent[0].Id',@Model.Id)">@data_UserAgent[0].UserId_Name </span>
                             data_UserAgent.Remove(data_UserAgent[0]);
                         }
                     </p>

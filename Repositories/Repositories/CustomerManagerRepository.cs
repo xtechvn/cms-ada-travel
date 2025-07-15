@@ -222,31 +222,8 @@ namespace Repositories.Repositories
                 DataTable dt = await _ClientDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETGetAllClient_Search);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    var data = (from row in dt.AsEnumerable()
-                                select new CustomerManagerViewModel
-                                {
-                                    Id = !row["Id"].Equals(DBNull.Value) ? Convert.ToInt32(row["Id"]) : 0,
-                                    ClientName = !row["ClientName"].Equals(DBNull.Value) ? row["ClientName"].ToString() : "",
-                                    Email = !row["Email"].Equals(DBNull.Value) ? row["Email"].ToString() : "",
-                                    Phone = !row["Phone"].Equals(DBNull.Value) ? row["Phone"].ToString() : "",
-                                    client_type_name = !row["ClienType"].Equals(DBNull.Value) ? row["ClienType"].ToString() : "",
-                                    AgencyType_name = !row["AgencyType"].Equals(DBNull.Value) ? row["AgencyType"].ToString() : "",
-                                    PermisionType_name = !row["PermisionType"].Equals(DBNull.Value) ? row["PermisionType"].ToString() : "",
-                                    UserId = !row["UserId"].Equals(DBNull.Value) ? Convert.ToInt32(row["UserId"]) : 0,
-                                    CreateDate_UserAgent = !row["CreateDate"].Equals(DBNull.Value) ? row["CreateDate"].ToString() : "",
-                                    sum_payment = !row["SumPayment"].Equals(DBNull.Value) ? Convert.ToDouble(row["SumPayment"]) : 0,
-                                    UpdateLast = !row["UpdateTime"].Equals(DBNull.Value) ? row["UpdateTime"].ToString() : "",
-                                    VerifyDate = !row["CreateDate"].Equals(DBNull.Value) ? row["VerifyDate"].ToString() : "",
-                                    JoinDate = Convert.ToDateTime(!row["JoinDate"].Equals(DBNull.Value) ? row["JoinDate"].ToString() : ""),
-                                    UserId_name = !row["FullName"].Equals(DBNull.Value) ? row["FullName"].ToString() : "",
-                                    Create_name = !row["CreateName"].Equals(DBNull.Value) ? row["CreateName"].ToString() : "",
-                                    ACStatus = !row["ACStatus"].Equals(DBNull.Value) ? Convert.ToInt32(row["ACStatus"]) : 0,
-                                    ClientCode = !row["ClientCode"].Equals(DBNull.Value) ? row["ClientCode"].ToString() : "",
-
-
-                                }).ToList();
-
-
+                    var data = dt.ToList<CustomerManagerViewModel>();
+                   
                     model.ListData = data;
                     model.CurrentPage = currentPage;
                     model.PageSize = pageSize;
@@ -319,28 +296,7 @@ namespace Repositories.Repositories
                 DataTable dt = await _ClientDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize, StoreProcedureConstant.GETGetAllClient_Search);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    data = (from row in dt.AsEnumerable()
-                            select new CustomerManagerViewModel
-                            {
-                                Id = !row["Id"].Equals(DBNull.Value) ? Convert.ToInt32(row["Id"]) : 0,
-                                ClientName = !row["ClientName"].Equals(DBNull.Value) ? row["ClientName"].ToString() : "",
-                                Email = !row["Email"].Equals(DBNull.Value) ? row["Email"].ToString() : "",
-                                Phone = !row["Phone"].Equals(DBNull.Value) ? row["Phone"].ToString() : "",
-                                client_type_name = !row["ClienType"].Equals(DBNull.Value) ? row["ClienType"].ToString() : "",
-                                AgencyType_name = !row["AgencyType"].Equals(DBNull.Value) ? row["AgencyType"].ToString() : "",
-                                PermisionType_name = !row["PermisionType"].Equals(DBNull.Value) ? row["PermisionType"].ToString() : "",
-                                UserId = !row["UserId"].Equals(DBNull.Value) ? Convert.ToInt32(row["UserId"]) : 0,
-                                CreateDate_UserAgent = !row["CreateDate"].Equals(DBNull.Value) ? row["CreateDate"].ToString() : "",
-                                sum_payment = !row["SumPayment"].Equals(DBNull.Value) ? Convert.ToDouble(row["SumPayment"]) : 0,
-                                UpdateLast = !row["UpdateTime"].Equals(DBNull.Value) ? row["UpdateTime"].ToString() : "",
-                                VerifyDate = !row["CreateDate"].Equals(DBNull.Value) ? row["VerifyDate"].ToString() : "",
-                                JoinDate = Convert.ToDateTime(!row["JoinDate"].Equals(DBNull.Value) ? row["JoinDate"].ToString() : ""),
-                                UserId_name = !row["FullName"].Equals(DBNull.Value) ? row["FullName"].ToString() : "",
-                                Create_name = !row["CreateName"].Equals(DBNull.Value) ? row["CreateName"].ToString() : "",
-                                ACStatus = !row["ACStatus"].Equals(DBNull.Value) ? Convert.ToInt32(row["ACStatus"]) : 0,
-                                ClientCode = !row["ClientCode"].Equals(DBNull.Value) ? row["ClientCode"].ToString() : "",
-
-                            }).ToList();
+                    data = dt.ToList<CustomerManagerViewModel>();
 
                 }
                 if (data != null && data.Count > 0)
@@ -543,6 +499,18 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("ExportDeposit - CustomerManagerRepository: " + ex);
             }
             return pathResult;
+        }
+        public async Task<int> UpdateStatusClient(int status, int id)
+        {
+            try
+            {
+                return await _ClientDAL.UpdateStatusClient(status, id);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
+                return 0;
+            }
         }
     }
 }

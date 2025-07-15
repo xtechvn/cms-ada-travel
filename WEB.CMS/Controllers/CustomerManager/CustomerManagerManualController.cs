@@ -6,6 +6,7 @@ using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.Mongo;
 using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Repositories.Repositories;
@@ -67,7 +68,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                         foreach (var item in list)
                         {
                             //kiểm tra chức năng có đc phép sử dụng
-                            var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)SortOrder.THEM, (int)MenuId.QL_KHACH_HANG);
+                            var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.THEM, (int)MenuId.QL_KHACH_HANG);
                             if (listPermissions == true)
                             {
                                 ViewBag.buttomThem = 1;
@@ -360,8 +361,8 @@ namespace WEB.CMS.Controllers.CustomerManager
                         foreach (var item in list)
                         {
                             //kiểm tra chức năng có đc phép sử dụng
-                            var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)SortOrder.TRUY_CAP, (int)MenuId.QL_KHACH_HANG);
-                            var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)SortOrder.VIEW_ALL, (int)MenuId.QL_KHACH_HANG);
+                            var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.TRUY_CAP, (int)MenuId.QL_KHACH_HANG);
+                            var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.VIEW_ALL, (int)MenuId.QL_KHACH_HANG);
                             if (listPermissions == true)
                             {
                                 searchModel.SalerPermission = current_user.Id.ToString(); i++;
@@ -392,6 +393,69 @@ namespace WEB.CMS.Controllers.CustomerManager
             }
 
             return PartialView(model);
+        }
+        public async Task<IActionResult> PopStatusClient(string Clientid)
+        {
+            try
+            {
+                ViewBag.ClientId = Clientid;
+                var ClientType = _allCodeRepository.GetListByType(AllCodeType.CLIENT_STATUS);
+                ViewBag.ClientStatus = ClientType;
+                var data = await _customerManagerRepositories.GetDetailClient(Convert.ToInt64( Clientid));
+                if(data!= null) {
+                    ViewBag.Status = data.Status;
+                }
+                return PartialView();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("PopStatusClient - Comment: " + ex.ToString());
+
+            }
+            return PartialView();
+        } 
+        public async Task<IActionResult> SetUpStatusClient(int Clientid,int Status ,string Note )
+        {
+            try
+            {
+                var ClientType = _allCodeRepository.GetListByType(AllCodeType.CLIENT_STATUS);
+                int _UserId = 0;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                var model = new CommentClientMongoModel();
+                var detail_user = await _userRepository.GetById(_UserId);
+                model.FullName = detail_user.FullName;
+                model.UserName = detail_user.UserName;
+                model.UserId = _UserId;
+                model.ClientId = Clientid.ToString();
+                model.Note = "Cập nhật trạng thái khách hàng :"+ ClientType.FirstOrDefault(s=>s.CodeValue== Status).Description + ".Mô tả :" + Note;
+                var InsertComment = await _commentClientMongoService.InsertCommentClient(model);
+             var UpdateStatus=await   _customerManagerRepositories.UpdateStatusClient(Status, Clientid);
+                if (UpdateStatus > 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        msg = "Cập nhật trạng thái khách hàng thành công",
+                    });
+                }
+                return Ok(new
+                {
+                    status = (int)ResponseType.FAILED,
+                    msg = "Cập nhật trạng thái khách hàng không thành công",
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("PopStatusClient - Comment: " + ex.ToString());
+                return Ok(new
+                {
+                    status = (int)ResponseType.FAILED,
+                    msg = "Cập nhật trạng thái khách hàng không thành công",
+                });
+            }
         }
     }
 }

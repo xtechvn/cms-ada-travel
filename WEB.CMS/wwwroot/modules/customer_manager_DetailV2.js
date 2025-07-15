@@ -20,7 +20,8 @@ var _customer_manager_Detail = {
 
         this.SearchOrder(objSearch);
         this.SearchDetailCustomerManager(objSearch);
-
+        this.OnStatuse(5);
+        this.SetActive(5);
 
     },
     ReLoad: function () {
@@ -503,6 +504,52 @@ var _customer_manager_Detail = {
             });
         }
         
+    },
+    PopUpClientStatus: function (id) {
+        let title = 'Cập nhật trạng thái khách hàng';
+        let url = '/CustomerManagerManual/PopStatusClient';
+        let param = {
+            Clientid: id
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    UpdateClientStatus: function (id) {
+        let FromCreate = $('#CustomerManager_Detail_Status');
+        FromCreate.validate({
+            rules: {
+
+                "Client_Note": "required",
+
+               
+            },
+            messages: {
+                "Client_Note": "Mô tả không được bỏ trống",
+
+            }
+        });
+        if (FromCreate.valid()) {
+            var Client_Status = $('#Client_Status').val();
+            var Client_Note = $('#Client_Note').val();
+
+            $.ajax({
+                url: '/CustomerManagerManual/SetUpStatusClient',
+                type: "post",
+                data: { Clientid: id, Status: Client_Status, Note: Client_Note },
+                success: function (result) {
+                    if (result.status === 1) {
+                        _msgalert.error(result.msg);
+                    }
+                    if (result.status === 0) {
+                        _msgalert.success(result.msg);
+                        setTimeout(function () {
+                            $.magnificPopup.close();
+                            location.reload();
+                        }, 500);
+                     
+                    }
+                }
+            });
+        }
     },
 }
 

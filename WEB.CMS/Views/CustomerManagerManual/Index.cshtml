@@ -5,6 +5,40 @@
     var PermisionType = (List<AllCode>)ViewBag.PermisionType;
     var ClientType = (List<AllCode>)ViewBag.ClientType;
 }
+<style>
+    .row-main-head .down-up .form-down {
+        width: 370px !important;
+    }
+
+    .grid-slide {
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+
+    .token-input-input-token input {
+        background: #fff !important;
+        width: 100% !important;
+        font-size: 13px !important;
+        height: 30px !important;
+        line-height: 30px !important;
+        border: 1px solid #ccc !important;
+        padding: 0 5px !important;
+        outline: 0 !important;
+        box-shadow: none !important;
+        color: #000 !important;
+        border-radius: 0.25rem !important;
+    }
+
+
+    .client-suggestion {
+        overflow-y: scroll;
+        overflow-x: hidden;
+        max-height: 300px;
+        max-width: 40%;
+        cursor: pointer;
+        z-index: 2;
+    }
+</style>
 
 <div class="row-main container bg-white rounded p-3" style="overflow-x: hidden;">
     <div class="line-bottom" style="padding-bottom: 0;">
@@ -211,7 +245,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group flex justify-content-between mt-3 pt-3 border-top">
-                                    <a href="javascript:;" onclick="_customer_manager.SeverFilter()" class="text-primary">
+                                    <a href="javascript:;" onclick="_customer_managerV2.SeverFilter()" class="text-primary">
                                         <b>
                                             <i class="icofont-plus-circle"></i>Tạo bộ
                                             lọc
@@ -293,7 +327,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group flex justify-content-between mt-3 pt-3 border-top">
-                                    <a href="javascript:;" onclick="_customer_manager.SeverFilter()" class="text-primary">
+                                    <a href="javascript:;" onclick="_customer_managerV2.SeverFilter()" class="text-primary">
                                         <b>
                                             <i class="icofont-plus-circle"></i>Tạo bộ
                                             lọc
@@ -385,8 +419,8 @@
                                             </b>
                                         </a>
                                         <div class="flex align-items-center">
-                                            <a href="javascripts:;" onclick="_customer_manager.Clearboloc('bo-loc-tab3')" class="text-primary">Khôi phục mặc định</a>
-                                            <button type="button" onclick="_customer_manager.SearchData2()" class="btn btn-primary">Áp dụng</button>
+                                            <a href="javascripts:;" onclick="_customer_managerV2.Clearboloc('bo-loc-tab3')" class="text-primary">Khôi phục mặc định</a>
+                                            <button type="button" onclick="_customer_managerV2.SearchData2()" class="btn btn-primary">Áp dụng</button>
                                         </div>
                                     </div>
                                 </form>
@@ -498,7 +532,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group flex justify-content-between mt-3 pt-3 border-top">
-                                    <a href="javascript:;" onclick="_customer_manager.SeverFilter()" class="text-primary flex gap10">
+                                    <a href="javascript:;" onclick="_customer_managerV2.SeverFilter()" class="text-primary flex gap10">
                                         <i class="icofont-plus-circle"></i>Tạo bộ
                                         lọc
                                     </a>
@@ -627,8 +661,8 @@
                     </li>
                 </ul>
                 <div class="text-right">
-                    <a href="javascript:;" onclick="_customer_manager.Closeboloc()">Hủy bỏ</a>
-                    <a href="javascript:;" onclick="_customer_manager.getList()" class="ml-3 btn btn-primary">Áp dụng</a>
+                    <a href="javascript:;" onclick="_customer_managerV2.Closeboloc()">Hủy bỏ</a>
+                    <a href="javascript:;" onclick="_customer_managerV2.getList()" class="ml-3 btn btn-primary">Áp dụng</a>
                 </div>
             </div>
         </div>
@@ -642,11 +676,11 @@
         </div>
 
         <div class="form-group mb10 mr-2">
-            @*<button class="btn-search btn-default" type="button" onclick="_customer_manager.Export()" id="btnExport">
+            @*<button class="btn-search btn-default" type="button" onclick="_customer_managerV2.Export()" id="btnExport">
                     <i class="fa fa-file-excel-o" id="icon-export" title="Xuất excel">
                     </i>
                 </button>*@
-            <button type="button" class="btn btn-default bg-main" onclick="_customer_manager.SearchData()">
+            <button type="button" class="btn btn-default bg-main" onclick="_customer_managerV2.SearchData()">
                 <svg class="icon-svg" style="vertical-align: sub;">
                     <use xlink:href="/images/icons/icon.svg#search"></use>
                 </svg>
@@ -657,7 +691,7 @@
             <div class="">
                 @*@if (ViewBag.buttomThem == 1)
                     {
-                        <button type="button" class="btn btn-default bg-main mb10 mr-2" onclick="_customer_manager.OpenPopup('')"><i class="fa fa-plus-circle"></i>Tạo mới khách hàng</button>
+                        <button type="button" class="btn btn-default bg-main mb10 mr-2" onclick="_customer_managerV2.OpenPopup('')"><i class="fa fa-plus-circle"></i>Tạo mới khách hàng</button>
                     }*@
 
                 <div class="row-main-head mb10 mr-2" style="display:none;">
@@ -669,71 +703,71 @@
                         <div class="form-down text-nowrap" style="display: none;">
                             <div class="grid-slide">
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="STT" onclick="_customer_manager.ChangeSetting(1)" class="checkbox-tb-column" data-id="1">
+                                    <input type="checkbox" id="STT" onclick="_customer_managerV2.ChangeSetting(1)" class="checkbox-tb-column" data-id="1">
                                     <span class="checkmark"></span>
                                     STT
                                 </label>
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="MaKH" onclick="_customer_manager.ChangeSetting(2)" class="checkbox-tb-column" data-id="2">
+                                    <input type="checkbox" id="MaKH" onclick="_customer_managerV2.ChangeSetting(2)" class="checkbox-tb-column" data-id="2">
                                     <span class="checkmark"></span>
                                     Mã KH
                                 </label>
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="TenKH" onclick="_customer_manager.ChangeSetting(3)" class="checkbox-tb-column" data-id="3">
+                                    <input type="checkbox" id="TenKH" onclick="_customer_managerV2.ChangeSetting(3)" class="checkbox-tb-column" data-id="3">
                                     <span class="checkmark"></span>
                                     Tên KH
                                 </label>
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="LienHe" onclick="_customer_manager.ChangeSetting(4)" class="checkbox-tb-column" data-id="4">
+                                    <input type="checkbox" id="LienHe" onclick="_customer_managerV2.ChangeSetting(4)" class="checkbox-tb-column" data-id="4">
                                     <span class="checkmark"></span>
                                     Liên hệ
                                 </label>
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="DoiTuong" onclick="_customer_manager.ChangeSetting(5)" class="checkbox-tb-column" data-id="5">
+                                    <input type="checkbox" id="DoiTuong" onclick="_customer_managerV2.ChangeSetting(5)" class="checkbox-tb-column" data-id="5">
                                     <span class="checkmark"></span>
                                     Đối tượng
                                 </label>
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="LoaiKH" onclick="_customer_manager.ChangeSetting(6)" class="checkbox-tb-column" data-id="6">
+                                    <input type="checkbox" id="LoaiKH" onclick="_customer_managerV2.ChangeSetting(6)" class="checkbox-tb-column" data-id="6">
                                     <span class="checkmark"></span>
                                     Loại KH
                                 </label>
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="NhomKH" onclick="_customer_manager.ChangeSetting(7)" class="checkbox-tb-column" data-id="7">
+                                    <input type="checkbox" id="NhomKH" onclick="_customer_managerV2.ChangeSetting(7)" class="checkbox-tb-column" data-id="7">
                                     <span class="checkmark"></span>
                                     Nhóm KH
                                 </label>
 
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="TongTT" onclick="_customer_manager.ChangeSetting(8)" class="checkbox-tb-column" data-id="8">
+                                    <input type="checkbox" id="TongTT" onclick="_customer_managerV2.ChangeSetting(8)" class="checkbox-tb-column" data-id="8">
                                     <span class="checkmark"></span>
                                     Tổng thanh toán
                                 </label>
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="VNPhuTrach" onclick="_customer_manager.ChangeSetting(9)" class="checkbox-tb-column" data-id="9">
+                                    <input type="checkbox" id="VNPhuTrach" onclick="_customer_managerV2.ChangeSetting(9)" class="checkbox-tb-column" data-id="9">
                                     <span class="checkmark"></span>
                                     Nhân viên phụ trách
                                 </label>
 
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="NgayTao" onclick="_customer_manager.ChangeSetting(10)" class="checkbox-tb-column" data-id="10">
+                                    <input type="checkbox" id="NgayTao" onclick="_customer_managerV2.ChangeSetting(10)" class="checkbox-tb-column" data-id="10">
                                     <span class="checkmark"></span>
                                     Ngày tạo
                                 </label>
 
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="NgayCN" onclick="_customer_manager.ChangeSetting(11)" class="checkbox-tb-column" data-id="11">
+                                    <input type="checkbox" id="NgayCN" onclick="_customer_managerV2.ChangeSetting(11)" class="checkbox-tb-column" data-id="11">
                                     <span class="checkmark"></span>
                                     Ngày cập nhật
                                 </label>
 
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="NguoiTao" onclick="_customer_manager.ChangeSetting(12)" class="checkbox-tb-column" data-id="12">
+                                    <input type="checkbox" id="NguoiTao" onclick="_customer_managerV2.ChangeSetting(12)" class="checkbox-tb-column" data-id="12">
                                     <span class="checkmark"></span>
                                     Người tạo
                                 </label>
                                 <label class="check-list mb10 mr25">
-                                    <input type="checkbox" id="Status" onclick="_customer_manager.ChangeSetting(13)" class="checkbox-tb-column" data-id="13">
+                                    <input type="checkbox" id="Status" onclick="_customer_managerV2.ChangeSetting(13)" class="checkbox-tb-column" data-id="13">
                                     <span class="checkmark"></span>
                                     Trạng thái
                                 </label>
@@ -756,13 +790,13 @@
         </div>
         <div class="right-button flex gap10 ">
 
-            <button type="button" class="btn btn-outline-secondary" onclick="_customer_manager.Export()" id="btnExport">
+            <button type="button" class="btn btn-outline-secondary" onclick="_customer_managerV2.Export()" id="btnExport">
                 <i class="icofont-download" id="icon-export" title="Xuất excel"></i>
                 Xuất Excel
             </button>
             @if (ViewBag.buttomThem == 1)
             {
-                <button type="button" class="btn btn-primary" onclick="_customer_manager.OpenPopup('')">
+                <button type="button" class="btn btn-primary" onclick="_customer_managerV2.OpenPopup('')">
                     <i class="icofont-plus-circle"></i>
                     Tạo mới khách hàng
                 </button>
@@ -776,71 +810,71 @@
                     <div class="form-down text-nowrap" style="display: none;">
                         <div class="grid-slide">
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="STT" onclick="_customer_manager.ChangeSetting(1)" class="checkbox-tb-column" data-id="1">
+                                <input type="checkbox" id="STT" onclick="_customer_managerV2.ChangeSetting(1)" class="checkbox-tb-column" data-id="1">
                                 <span class="checkmark"></span>
                                 STT
                             </label>
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="MaKH" onclick="_customer_manager.ChangeSetting(2)" class="checkbox-tb-column" data-id="2">
+                                <input type="checkbox" id="MaKH" onclick="_customer_managerV2.ChangeSetting(2)" class="checkbox-tb-column" data-id="2">
                                 <span class="checkmark"></span>
                                 Mã KH
                             </label>
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="TenKH" onclick="_customer_manager.ChangeSetting(3)" class="checkbox-tb-column" data-id="3">
+                                <input type="checkbox" id="TenKH" onclick="_customer_managerV2.ChangeSetting(3)" class="checkbox-tb-column" data-id="3">
                                 <span class="checkmark"></span>
                                 Tên KH
                             </label>
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="LienHe" onclick="_customer_manager.ChangeSetting(4)" class="checkbox-tb-column" data-id="4">
+                                <input type="checkbox" id="LienHe" onclick="_customer_managerV2.ChangeSetting(4)" class="checkbox-tb-column" data-id="4">
                                 <span class="checkmark"></span>
                                 Liên hệ
                             </label>
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="DoiTuong" onclick="_customer_manager.ChangeSetting(5)" class="checkbox-tb-column" data-id="5">
+                                <input type="checkbox" id="DoiTuong" onclick="_customer_managerV2.ChangeSetting(5)" class="checkbox-tb-column" data-id="5">
                                 <span class="checkmark"></span>
                                 Đối tượng
                             </label>
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="LoaiKH" onclick="_customer_manager.ChangeSetting(6)" class="checkbox-tb-column" data-id="6">
+                                <input type="checkbox" id="LoaiKH" onclick="_customer_managerV2.ChangeSetting(6)" class="checkbox-tb-column" data-id="6">
                                 <span class="checkmark"></span>
                                 Loại KH
                             </label>
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="NhomKH" onclick="_customer_manager.ChangeSetting(7)" class="checkbox-tb-column" data-id="7">
+                                <input type="checkbox" id="NhomKH" onclick="_customer_managerV2.ChangeSetting(7)" class="checkbox-tb-column" data-id="7">
                                 <span class="checkmark"></span>
                                 Nhóm KH
                             </label>
 
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="TongTT" onclick="_customer_manager.ChangeSetting(8)" class="checkbox-tb-column" data-id="8">
+                                <input type="checkbox" id="TongTT" onclick="_customer_managerV2.ChangeSetting(8)" class="checkbox-tb-column" data-id="8">
                                 <span class="checkmark"></span>
                                 Tổng thanh toán
                             </label>
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="VNPhuTrach" onclick="_customer_manager.ChangeSetting(9)" class="checkbox-tb-column" data-id="9">
+                                <input type="checkbox" id="VNPhuTrach" onclick="_customer_managerV2.ChangeSetting(9)" class="checkbox-tb-column" data-id="9">
                                 <span class="checkmark"></span>
                                 Nhân viên phụ trách
                             </label>
 
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="NgayTao" onclick="_customer_manager.ChangeSetting(10)" class="checkbox-tb-column" data-id="10">
+                                <input type="checkbox" id="NgayTao" onclick="_customer_managerV2.ChangeSetting(10)" class="checkbox-tb-column" data-id="10">
                                 <span class="checkmark"></span>
                                 Ngày tạo
                             </label>
 
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="NgayCN" onclick="_customer_manager.ChangeSetting(11)" class="checkbox-tb-column" data-id="11">
+                                <input type="checkbox" id="NgayCN" onclick="_customer_managerV2.ChangeSetting(11)" class="checkbox-tb-column" data-id="11">
                                 <span class="checkmark"></span>
                                 Ngày cập nhật
                             </label>
 
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="NguoiTao" onclick="_customer_manager.ChangeSetting(12)" class="checkbox-tb-column" data-id="12">
+                                <input type="checkbox" id="NguoiTao" onclick="_customer_managerV2.ChangeSetting(12)" class="checkbox-tb-column" data-id="12">
                                 <span class="checkmark"></span>
                                 Người tạo
                             </label>
                             <label class="check-list mb10 mr25">
-                                <input type="checkbox" id="Status" onclick="_customer_manager.ChangeSetting(13)" class="checkbox-tb-column" data-id="13">
+                                <input type="checkbox" id="Status" onclick="_customer_managerV2.ChangeSetting(13)" class="checkbox-tb-column" data-id="13">
                                 <span class="checkmark"></span>
                                 Trạng thái
                             </label>
@@ -874,7 +908,7 @@
                 </div>
             </div>
             <div class="form-group align-right mt20 block">
-                <button type="button" class="btn btn-default bg-main" onclick="_customer_manager.SeverFilter()"><i class="fa fa-floppy-o"></i>Lưu</button>
+                <button type="button" class="btn btn-default bg-main" onclick="_customer_managerV2.SeverFilter()"><i class="fa fa-floppy-o"></i>Lưu</button>
                 <button type="button" class="btn btn-default cancel" onclick="$.magnificPopup.close();"><i class="fa fa-minus-circle"></i>Bỏ qua</button>
             </div>
         </div>
@@ -887,7 +921,7 @@
 
 @section scripts {
 
-    <script type="text/javascript" src="/modules/customer_manager.js"></script>
+    <script type="text/javascript" src="/modules/customer_managerV2.js" asp-append-version="true"></script>
     <script type="text/javascript" src="~/js/zebra_datepicker.min.js"></script>
     <script>
         $('#createdate').daterangepicker({

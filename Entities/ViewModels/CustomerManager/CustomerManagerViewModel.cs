@@ -41,6 +41,8 @@ namespace Entities.ViewModels.CustomerManager
         public long TotalProfit { get; set; }
         public long TotalFundCustomerCare { get; set; }
         public long AmountContractPay { get; set; }
+
+        public string StatusName { get; set; }
     }
     public class CustomerManagerViewSearchModel
     {
