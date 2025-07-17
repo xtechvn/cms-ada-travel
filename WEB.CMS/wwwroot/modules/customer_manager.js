@@ -881,8 +881,11 @@ var _customer_manager = {
                         if (result.stt_code === 0) {
                             _global_function.RemoveLoading()
                             _msgalert.success(result.msg);
-                            $.magnificPopup.close();
-                            _customer_manager.LoaddataClient();
+                            setTimeout(function () {
+                                $.magnificPopup.close();
+                                location.reload();
+                            }, 300);
+                          
 
                         }
                     }

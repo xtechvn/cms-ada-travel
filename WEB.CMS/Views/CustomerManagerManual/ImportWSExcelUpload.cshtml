@@ -1,0 +1,46 @@
+﻿@{
+    Layout = null;
+}
+@using Entities.ViewModels.OrderManual
+@using Entities.Models
+@model List<ClientExcelImportModel>
+<div class="red p-3 rounded mb20">
+    Tải lên khách hàng thành công :  @ViewBag.success_count bản ghi
+</div>
+@if (Model != null && Model.Count > 0)
+{
+
+    <div class="red p-3 rounded mb20">
+        Tải lên khách hàng không thành công :  @Model.Count bản ghi
+    </div>
+    <h6 class=" p-3 rounded mb20">
+        Danh sách khách hàng tải lên không thành công(Số điện thoại đã tồn tại)
+    </h6>
+    <div class="table-responsive table-default table-gray table-modal mb20" style="max-height:500px;">
+        <table class="table table-nowrap">
+            <thead>
+                <tr>
+
+                    <th>Tên khách hàng</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Ghi chú</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ClientName">@item.Client_name</td>
+                        <td class="Email">@item.email</td>
+                        <td class="Phone">@item.phone</td>
+                        <td class="Note">@item.Note</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+

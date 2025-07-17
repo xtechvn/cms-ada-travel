@@ -1,0 +1,143 @@
+﻿@using Entities.Models
+@using Entities.ViewModels.OrderManual
+
+@{
+    Layout = null;
+    var _DepartmentList = (List<Department>)ViewBag.DepartmentList;
+    var data = (List<AllCode>)ViewBag.data;
+    async Task ShowDepartment(Department item, int level = 0)
+    {
+        var childs = _DepartmentList.Where(s => s.ParentId == item.Id);
+        string str_level = string.Empty;
+        for (int i = 0; i < level; i++)
+        {
+            str_level += "---";
+        }
+
+        <option value="@item.Id">@str_level @item.DepartmentName</option>
+
+        @if (childs != null && childs.Any())
+        {
+            level++;
+            foreach (var child in childs)
+            {
+                await ShowDepartment(child, level);
+            }
+        }
+    }
+}
+@model List<ClientExcelImportModel>
+@if (Model != null)
+{
+    <div class="form-group">
+        <label class="lbl">Phòng ban</label>
+        <div class="wrap_input">
+            <select class="form-control DepartmentId" name="DepartmentId" id="DepartmentId" style="width:100%!important;">
+
+                @if (_DepartmentList != null && _DepartmentList.Any())
+                {
+                    var depParents = _DepartmentList.Where(s => s.ParentId == 0);
+                    foreach (var item in depParents)
+                    {
+                        await ShowDepartment(item);
+                    }
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Trưởng nhóm</label>
+        <div class="wrap_input">
+            <select class="form-control Userid" name="Userid" id="Userid" style="width:100%!important;">
+
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Nguồn khách hàng</label>
+        <div class="wrap_input">
+            <select class="select2 form-control" name="UtmSource" id="UtmSource" style="width: 100%;">
+                @foreach (var item2 in data)
+                {
+                    <option value="@item2.CodeValue">@item2.Description</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="table-responsive table-default table-gray table-modal mb20" style="max-height:500px;">
+        <table class="table table-nowrap">
+            <thead>
+                <tr>
+
+                    <th>Tên khách hàng</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Ghi chú</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ClientName">@item.Client_name</td>
+                        <td class="Email">@item.email</td>
+                        <td class="Phone">@item.phone</td>
+                        <td class="Note">@item.Note</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="table-responsive table-default table-gray table-modal mb20" style="max-height:500px;">
+        <table class="table table-nowrap">
+            <thead>
+                <tr>
+
+                    <th>Tên khách hàng</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Ghi chú</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+}
+<script>
+    $("#Userid").select2({
+        theme: 'bootstrap4',
+        placeholder: "Trưởng nhóm",
+        ajax: {
+            url: "/CustomerManagerManual/GetListUserByDepartmentId",
+            type: "post",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                var query = {
+                    DepartmentId: $('#DepartmentId').val(),
+                }
+                return query;
+            },
+            processResults: function (response) {
+                return {
+                    results: $.map(response.data, function (item) {
+                        return {
+                            text: item.fullName + ' - ' + item.userName,
+                            id: item.id,
+                        }
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+</script>

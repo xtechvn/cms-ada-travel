@@ -341,7 +341,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[16];
+                SqlParameter[] objParam = new SqlParameter[17];
                 objParam[0] = new SqlParameter("@MaKH", searchModel.MaKH);
                 objParam[1] = new SqlParameter("@TenKH", searchModel.TenKH);
                 objParam[2] = new SqlParameter("@Email", searchModel.Email);
@@ -357,7 +357,8 @@ namespace DAL
                 objParam[12] = new SqlParameter("@MinAmount", searchModel.MinAmount);
                 objParam[13] = new SqlParameter("@MaxAmount", searchModel.MaxAmount);
                 objParam[14] = new SqlParameter("@CreatedBy", searchModel.CreatedBy);
-                objParam[15] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
+                objParam[15] = new SqlParameter("@UtmSource", searchModel.UtmSource);
+                objParam[16] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
                 return _DbWorker.GetDataTable(proc, objParam);
             }
             catch (Exception ex)
@@ -493,6 +494,47 @@ namespace DAL
                 return 0;
             }
             return 0;
+        }
+        public async Task<List<Client>> GetClientByphone(string Phone)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    return await _DbContext.Client.AsNoTracking().Where(x => x.Phone == Phone).ToListAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SetUpClient - ClientDAL: " + ex.ToString());
+                return null;
+            }
+        }
+        public async Task<int> CreateClient(Client model)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var check = _DbContext.Client.Where(s => s.ClientCode == model.ClientCode).ToList();
+                    if (check != null && check.Count > 0)
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        var deta = _DbContext.Client.Add(model);
+                        _DbContext.SaveChanges();
+                    }
+                }
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SetUpClient - ClientDAL: " + ex.ToString());
+                return 0;
+            }
         }
     }
 }

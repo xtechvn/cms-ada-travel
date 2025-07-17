@@ -632,7 +632,7 @@ var _customer_managerV2 = {
     },
     OpenPopup: function (id) {
         let title = 'Thêm mới/Cập nhật khách hàng';
-        let url = '/CustomerManager/CustomerManagerDetail';
+        let url = '/CustomerManagerManual/CustomerManagerDetail';
         let param = {
         };
         if (id.trim() != "") {
@@ -883,8 +883,10 @@ var _customer_managerV2 = {
                         if (result.stt_code === 0) {
                             _global_function.RemoveLoading()
                             _msgalert.success(result.msg);
-                            $.magnificPopup.close();
-                            _customer_managerV2.LoaddataClient();
+                            setTimeout(function () {
+                                $.magnificPopup.close();
+                                location.reload();
+                            }, 300);
 
                         }
                     }

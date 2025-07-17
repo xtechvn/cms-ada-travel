@@ -1,0 +1,57 @@
+﻿@using Entities.Models
+@{
+    Layout = null;
+}
+@model List<AllCode>
+@if (Model != null)
+{
+    <div class="wrap_bg wrap_bg_no-padding mb20">
+        <div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding">
+            <table class="table table-nowrap">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id</th>
+                    
+                        <th class="text-center">Nguồn khách hàng</th>
+                        <th class="text-center">Chỉnh sửa</th>
+                  
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr class="list-row">
+                            <td class="text-center">@item.CodeValue</td>
+                           
+                            <td class="text-center"><a class="cursor-pointer blue" style="color: #056BD3!important" href="/CustomerManagerManual/ListClientSource/@item.CodeValue">@item.Description</a> </td>
+                            <td class="text-center">
+                                <a class="cursor-pointer" onclick="_source_client.OpenPopup(@item.Id)" title="Chỉnh sửa">
+                                    <i class="fa fa-edit"></i>
+                                </a>                          
+                            </td>
+                            @*<td class="text-center">
+                                <a class="cursor-pointer blue" style="color: #056BD3!important" onclick="_source_client.OpenPopupDetail(@item.CodeValue)" title="Xem chi tiết">
+                                    Xem chi tiết
+                                </a>
+                            </td>*@
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="search-null center mb40">
+        <div class="mb24">
+            <img src="/images/graphics/icon-search.png" alt="">
+        </div>
+        <h2 class="title txt_24">Không tìm thấy kết quả</h2>
+        <div class="gray">Chúng tôi không tìm thấy thông tin mà bạn cần, vui lòng thử lại</div>
+    </div>
+}

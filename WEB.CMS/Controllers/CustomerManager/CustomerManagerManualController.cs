@@ -1,5 +1,6 @@
 ﻿using APP_CHECKOUT.RabitMQ;
 using Caching.Elasticsearch;
+using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.CustomerManager;
 using Entities.ViewModels.ElasticSearch;
@@ -8,11 +9,14 @@ using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Mvc;
 using Nest;
 using Newtonsoft.Json;
+using OfficeOpenXml;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
+using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Service;
 
@@ -30,8 +34,10 @@ namespace WEB.CMS.Controllers.CustomerManager
         private LogCacheFilterMongoService _logCacheFilterMongoService;
         private UserESRepository _userESRepository;
         private CommentClientMongoService _commentClientMongoService;
+        private IDepartmentRepository _departmentRepository;
+        private readonly WorkQueueClient _workQueueClient;
         public CustomerManagerManualController(IConfiguration configuration, ManagementUser managementUser, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
-            ICustomerManagerRepository customerManagerRepositories, IClientRepository clientRepository, IUserAgentRepository userAgentRepository)
+            ICustomerManagerRepository customerManagerRepositories, IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IDepartmentRepository departmentRepository)
         {
             _configuration = configuration;
             _ManagementUser = managementUser;
@@ -43,6 +49,8 @@ namespace WEB.CMS.Controllers.CustomerManager
             _logCacheFilterMongoService = new LogCacheFilterMongoService(configuration);
             _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _commentClientMongoService = new CommentClientMongoService(_configuration);
+            _departmentRepository = departmentRepository;
+            _workQueueClient = new WorkQueueClient(configuration);
         }
         public async Task<IActionResult> Index()
         {
@@ -102,6 +110,33 @@ namespace WEB.CMS.Controllers.CustomerManager
                 LogHelper.InsertLogTelegram("Detail - CustomerManagerController: " + ex);
             }
             return View();
+        }
+        public async Task<IActionResult> CustomerManagerDetail(int id)
+        {
+            try
+            {
+                var key_token_api = _configuration["DataBaseConfig:key_api:api_manual"];
+                var AgencyType = _allCodeRepository.GetListByType("AGENCY_TYPE");
+                var PermisionType = _allCodeRepository.GetListByType("PERMISION_TYPE");
+                var ClientType = _allCodeRepository.GetListByType("CLIENT_TYPE");
+                ViewBag.AgencyType = AgencyType;
+                ViewBag.PermisionType = PermisionType;
+                ViewBag.ClientType = ClientType;
+
+                if (id != 0)
+                {
+                    var model = await _clientRepository.GetClientDetailByClientId(id);
+                    ViewBag.dataModel = model;
+                    return PartialView();
+                }
+                return PartialView();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("CustomerManagerDetail - CustomerManagerController: " + ex);
+                return PartialView();
+            }
+
         }
         public async Task<IActionResult> DetailCustomerManager(long id)
         {
@@ -277,17 +312,17 @@ namespace WEB.CMS.Controllers.CustomerManager
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-              var detail_user= await _userRepository.GetById(_UserId);
+                var detail_user = await _userRepository.GetById(_UserId);
                 model.FullName = detail_user.FullName;
                 model.UserName = detail_user.UserName;
                 model.UserId = _UserId;
-                var data =await _commentClientMongoService.InsertCommentClient(model);
-                if(data > 0)
-                return Ok(new
-                {
-                    status = (int)ResponseType.SUCCESS,
-                    msg = "Thêm comment thành công",
-                });
+                var data = await _commentClientMongoService.InsertCommentClient(model);
+                if (data > 0)
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        msg = "Thêm comment thành công",
+                    });
             }
             catch (Exception ex)
             {
@@ -401,8 +436,9 @@ namespace WEB.CMS.Controllers.CustomerManager
                 ViewBag.ClientId = Clientid;
                 var ClientType = _allCodeRepository.GetListByType(AllCodeType.CLIENT_STATUS);
                 ViewBag.ClientStatus = ClientType;
-                var data = await _customerManagerRepositories.GetDetailClient(Convert.ToInt64( Clientid));
-                if(data!= null) {
+                var data = await _customerManagerRepositories.GetDetailClient(Convert.ToInt64(Clientid));
+                if (data != null)
+                {
                     ViewBag.Status = data.Status;
                 }
                 return PartialView();
@@ -413,8 +449,8 @@ namespace WEB.CMS.Controllers.CustomerManager
 
             }
             return PartialView();
-        } 
-        public async Task<IActionResult> SetUpStatusClient(int Clientid,int Status ,string Note )
+        }
+        public async Task<IActionResult> SetUpStatusClient(int Clientid, int Status, string Note)
         {
             try
             {
@@ -430,9 +466,9 @@ namespace WEB.CMS.Controllers.CustomerManager
                 model.UserName = detail_user.UserName;
                 model.UserId = _UserId;
                 model.ClientId = Clientid.ToString();
-                model.Note = "Cập nhật trạng thái khách hàng :"+ ClientType.FirstOrDefault(s=>s.CodeValue== Status).Description + ".Mô tả :" + Note;
+                model.Note = "Cập nhật trạng thái khách hàng :" + ClientType.FirstOrDefault(s => s.CodeValue == Status).Description + ".Mô tả :" + Note;
                 var InsertComment = await _commentClientMongoService.InsertCommentClient(model);
-             var UpdateStatus=await   _customerManagerRepositories.UpdateStatusClient(Status, Clientid);
+                var UpdateStatus = await _customerManagerRepositories.UpdateStatusClient(Status, Clientid);
                 if (UpdateStatus > 0)
                 {
                     return Ok(new
@@ -456,6 +492,244 @@ namespace WEB.CMS.Controllers.CustomerManager
                     msg = "Cập nhật trạng thái khách hàng không thành công",
                 });
             }
+        }
+        public IActionResult Source()
+        {
+            var data = _allCodeRepository.GetAll();
+            ViewBag.data = data.GroupBy(s => s.Type).Select(i => i.First()).ToList();
+            return View();
+        }
+        public async Task<IActionResult> AddOrUpdateSource(int id)
+        {
+            ViewBag.id = id;
+            if (id != 0)
+            {
+                var data = await _allCodeRepository.GetById(id);
+                return View(data);
+            }
+            return View();
+        }
+        public IActionResult SearchSource(string type)
+        {
+            var data = _allCodeRepository.GetListByType(type);
+            return View(data);
+        }
+        public IActionResult ListClientSource(int Id)
+        {
+            ViewBag.id = Id;
+            return View();
+        }
+        public async Task<IActionResult> ListClientBySource(CustomerManagerViewSearchModel searchModel, int currentPage = 1, int pageSize = 20)
+        {
+            var model = new GenericViewModel<CustomerManagerViewModel>();
+
+            try
+            {
+                var current_user = _ManagementUser.GetCurrentUser();
+                if (current_user != null)
+                {
+                    var i = 0;
+                    if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
+                    {
+                        var list = Array.ConvertAll(current_user.Role.Split(','), int.Parse);
+                        foreach (var item in list)
+                        {
+                            //kiểm tra chức năng có đc phép sử dụng
+                            var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.TRUY_CAP, (int)MenuId.QL_KHACH_HANG);
+                            var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.VIEW_ALL, (int)MenuId.QL_KHACH_HANG);
+                            if (listPermissions == true)
+                            {
+                                searchModel.SalerPermission = current_user.Id.ToString(); i++;
+                            }
+                            if (listPermissions6 == true)
+                            {
+                                searchModel.SalerPermission = current_user.UserUnderList;
+                                i++;
+                            }
+                            if (item == (int)RoleType.Admin)
+                            {
+                                searchModel.SalerPermission = null;
+                                i++;
+                            }
+                        }
+                    }
+                    if (i != 0)
+                    {
+                        model = await _customerManagerRepositories.GetPagingList(searchModel, currentPage, pageSize);
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ListClient - CustomerManagerController: " + ex);
+            }
+
+            return PartialView(model);
+        }
+        public IActionResult ImportWSExcel()
+        {
+            return PartialView();
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> ImportWSExcelListing(IFormFile file)
+        {
+
+            try
+            {
+                ViewBag.DepartmentList = await _departmentRepository.GetAll(String.Empty);
+                ViewBag.data = _allCodeRepository.GetListByType(AllCodeType.CLIENT_SOURCE);
+                var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+                var data_list = new List<ClientExcelImportModel>();
+
+                using (var package = new ExcelPackage(stream))
+                {
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var endRow = ws.Cells.End.Row;
+                    var startRow = 2;
+
+                    for (int row = startRow; row <= endRow; row++)
+                    {
+                        var cellRange = ws.Cells[row, 1, row, 13];
+                        var isRowEmpty = cellRange.All(c => c.Value == null);
+                        if (isRowEmpty)
+                        {
+                            break;
+                        }
+                        var ClientName = ws.Cells[row, 1].Value;
+                        var Email = ws.Cells[row, 2].Value;
+                        var Phone = ws.Cells[row, 3].Value;
+                        var Note = ws.Cells[row, 4].Value;
+
+                        var data = new ClientExcelImportModel
+                        {
+                            Client_name = (ClientName == null ? "" : ClientName.ToString()),
+                            email = (Email == null ? "" : Email.ToString()),
+                            phone = (Phone == null ? "" : Phone.ToString()),
+                            Note = (Note == null ? "" : Note.ToString()),
+
+                        };
+                        data_list.Add(data);
+                    }
+
+
+                }
+
+                ViewBag.CheckedAll = true;
+                return PartialView(data_list);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ImportWSExcelListing - OrderController: " + ex.ToString());
+                return PartialView();
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> ImportWSExcelUpload(string model)
+        {
+
+            try
+            {
+                if (model != null && model != "")
+                {
+                    List<ClientExcelImportModel> success_model = new List<ClientExcelImportModel>();
+                    List<ClientExcelImportModel> summit_model = new List<ClientExcelImportModel>();
+                    List<ClientExcelImportModel> err_model = new List<ClientExcelImportModel>();
+                    try
+                    {
+                        success_model = JsonConvert.DeserializeObject<List<ClientExcelImportModel>>(model);
+                    }
+                    catch
+                    {
+                        return PartialView(success_model);
+                    }             
+                    foreach (var item in success_model)
+                    {
+                        var list_client = await _customerManagerRepositories.GetClientByPhone(item.phone);
+                        if (item.phone == null || item.phone == "" || (list_client != null && list_client.Count > 0))
+                        {
+                            err_model.Add(item);
+                            continue;
+                        }
+                        APIService apiService = new APIService(_configuration, _userRepository);
+                        var ClientCode = await apiService.buildClientCode(item.id_ClientType.ToString());
+                        var model_client = new CustomerManagerView();
+                        model_client.Id = 0;
+                        model_client.UserId = item.UserId;
+                        model_client.AgencyType = item.AgencyType;
+                        model_client.phone = item.phone;
+                        model_client.email = item.email;
+                        model_client.Client_name = item.Client_name;
+                        model_client.PermisionType = Convert.ToInt32(item.id_nhomkhach);
+                        model_client.id_loaikhach = item.id_loaikhach;
+                        model_client.id_nhomkhach = item.id_nhomkhach;
+                        model_client.id_ClientType = item.id_ClientType;
+                        model_client.ClientCode = ClientCode;
+                        model_client.UtmSource = item.UtmSource;
+                        model_client.JoinDate = DateTime.Now;
+
+                        var Result = await _customerManagerRepositories.CreateClient(model_client);
+
+                        if (Result > 0)
+                        {
+                            summit_model.Add(item);
+                            var clientdetail = await _clientRepository.GetClientByClientCode(item.ClientCode);
+                            _workQueueClient.SyncES(clientdetail.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
+
+                        }
+                       
+                    }
+                    ViewBag.success_count = summit_model.Count;
+                    return PartialView(err_model);
+                }
+                return PartialView();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ImportWSExcelUpload - OrderController: " + ex.ToString());
+                return PartialView();
+            }
+        }
+        public async Task<IActionResult> GetListUserByDepartmentId(int DepartmentId)
+        {
+            try
+            {
+                List<int?> deparments = new List<int?>();
+                deparments.Add(DepartmentId);
+                var list_user_ids = await _userRepository.GetListUserDepartById(deparments);
+                list_user_ids = list_user_ids.Where(s => s.UserPositionId == UserPositionType.TN && s.Status == (int)StatusType.BINH_THUONG).ToList();
+                if (list_user_ids == null || list_user_ids.Count == 0)
+                {
+
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        data = list_user_ids,
+
+                    });
+                }
+                return Ok(new
+                {
+                    status = (int)ResponseType.SUCCESS,
+                    data = list_user_ids,
+
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListUserByDepartmentId - CustomerManagerManualController: " + ex.ToString());
+            }
+            return Ok(new
+            {
+                status = (int)ResponseType.SUCCESS,
+                data = new List<User>(),
+
+            });
+
         }
     }
 }

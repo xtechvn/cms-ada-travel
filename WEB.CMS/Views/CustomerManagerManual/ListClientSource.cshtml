@@ -1,0 +1,85 @@
+﻿@{ ViewData["Title"] = "Quản lý khách hàng"; }
+@using Entities.Models
+@{
+    var AgencyType = (List<AllCode>)ViewBag.AgencyType;
+    var PermisionType = (List<AllCode>)ViewBag.PermisionType;
+    var ClientType = (List<AllCode>)ViewBag.ClientType;
+}
+<style>
+    .row-main-head .down-up .form-down {
+        width: 370px !important;
+    }
+
+    .grid-slide {
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+
+    .token-input-input-token input {
+        background: #fff !important;
+        width: 100% !important;
+        font-size: 13px !important;
+        height: 30px !important;
+        line-height: 30px !important;
+        border: 1px solid #ccc !important;
+        padding: 0 5px !important;
+        outline: 0 !important;
+        box-shadow: none !important;
+        color: #000 !important;
+        border-radius: 0.25rem !important;
+    }
+
+
+    .client-suggestion {
+        overflow-y: scroll;
+        overflow-x: hidden;
+        max-height: 300px;
+        max-width: 40%;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .white-popup {
+        max-width: 1200px !important;
+    }
+</style>
+
+<div class="row-main container bg-white rounded p-3" style="overflow-x: hidden;">
+    <input id="UtmSource" value="@ViewBag.id" style="display:none;" />
+    <div class="flex gap10 mb10 align-items-center justify-content-between">
+        <div class="flex gap10 left-button">
+
+            <div class="relative filter-nguonkh">
+
+            </div>
+
+        </div>
+        <div class="right-button flex gap10 ">
+            @*<button type="submit" class="btn btn-default" style="" onclick="_source_client.ImportWSExcel()">Import Khách hàng</button>*@
+            <button type="button" class="btn btn-default" onclick="_detail_source_client.Export()" id="btnExport">
+                <i class="icofont-download" id="icon-export" title="Xuất excel"></i>
+                Xuất Excel
+            </button>
+
+        </div>
+    </div>
+
+    <div class="wrap_bg wrap_bg_no-padding mb20">
+        <div id="grid_data_client">
+            <img src="/images/icons/loading.gif" style=" width: 100px; height: 100px; margin-left:46%;" id="imgLoading_client" />
+        </div>
+    </div>
+
+</div>
+
+@section scripts {
+    <script asp-append-version="true" type="text/javascript" src="/modules/detail_source_client.js"></script>
+
+}
+
+
+
+
+
+
+

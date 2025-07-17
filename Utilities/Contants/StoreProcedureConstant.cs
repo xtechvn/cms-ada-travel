@@ -298,6 +298,7 @@ namespace Utilities.Contants
         public static string SP_GetAllListOtherBookingPackagesOptionallBySupplierId = "SP_GetAllListOtherBookingPackagesOptionallBySupplierId";
         public static string SP_GetAllListTourPackagesOptionalBySupplierId = "SP_GetAllListTourPackagesOptionalBySupplierId";
         public static string SP_GetAllListVinWonderOptionalBySupplierId = "SP_GetAllListVinWonderOptionalBySupplierId";
+        public static string SP_GetListClientByUtmSource = "SP_GetListClientByUtmSource";
 
 
 

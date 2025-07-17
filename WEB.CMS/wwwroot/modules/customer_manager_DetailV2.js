@@ -18,7 +18,7 @@ var _customer_manager_Detail = {
 
         objSearch = _searchModel;
 
-        this.SearchOrder(objSearch);
+     /*   this.SearchOrder(objSearch);*/
         this.SearchDetailCustomerManager(objSearch);
         this.OnStatuse(5);
         this.SetActive(5);

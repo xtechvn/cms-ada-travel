@@ -14,6 +14,7 @@ using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -78,7 +79,8 @@ namespace Repositories.Repositories
                         TaxNo = model.Maso_Id,
                         ClientCode = model.ClientCode,
                         SaleMapId = (int?)model.UserId,
-                        ParentId = -1,
+                        ParentId = -1,                        
+                        UtmSource = Convert.ToInt32(model.UtmSource),                        
 
                     };
                     var CreateClient = _ClientDAL.SetUpClient(Client);
@@ -175,6 +177,7 @@ namespace Repositories.Repositories
                         TaxNo = model.Maso_Id,
                         ClientCode = model.ClientCode,
                         ParentId = data2.ParentId,
+                        UtmSource = data2.UtmSource,
                     };
 
                     var CreateClient = _ClientDAL.SetUpClient(Client);
@@ -219,7 +222,11 @@ namespace Repositories.Repositories
             var model = new GenericViewModel<CustomerManagerViewModel>();
             try
             {
+                var st2 = new Stopwatch();
+                st2.Start();
                 DataTable dt = await _ClientDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETGetAllClient_Search);
+                st2.Stop();
+                LogHelper.InsertLogTelegram("time sp SP_GetClientData: " + st2);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = dt.ToList<CustomerManagerViewModel>();
@@ -505,6 +512,63 @@ namespace Repositories.Repositories
             try
             {
                 return await _ClientDAL.UpdateStatusClient(status, id);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
+                return 0;
+            }
+        }
+        public async Task<List<Client>> GetClientByPhone(string phone)
+        {
+            try
+            {
+                return await _ClientDAL.GetClientByphone(phone);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
+                return null;
+            }
+        }
+        public async Task<int> CreateClient(CustomerManagerView model)
+        {
+            try
+            {
+                var Client = new Client
+                {
+                    Id = model.Id,
+                    AgencyType = model.AgencyType,
+                    ClientType = Convert.ToInt32(model.id_ClientType),
+                    PermisionType = Convert.ToInt32(model.id_nhomkhach),
+                    Email = model.email,
+                    ClientName = model.Client_name,
+                    Status = 0,
+                    Note = model.Note,
+                    JoinDate = DateTime.Now,
+                    Phone = model.phone,
+                    UpdateTime = DateTime.Now,
+                    Birthday = DateTime.Now,
+                    BusinessAddress = model.DiaChi_giaodich,
+                    ExportBillAddress = model.DC_hoadon,
+                    TaxNo = model.Maso_Id,
+                    ClientCode = model.ClientCode,
+                    SaleMapId = (int?)model.UserId,
+                    ParentId = -1,
+                    UtmSource = Convert.ToInt32(model.UtmSource),
+
+                };
+                var CreateClient= await _ClientDAL.CreateClient(Client);
+                var Detai_Client =await _ClientDAL.GetClientByClientCode(Client.ClientCode);
+                var CreateUserAgent = _UserAgentDAL.UpdataUserAgent(0, (int)model.UserId, (int)model.UserId, Detai_Client.Id);
+                if ( CreateUserAgent > 0)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
             }
             catch (Exception ex)
             {

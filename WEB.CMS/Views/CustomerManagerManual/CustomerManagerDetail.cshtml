@@ -162,7 +162,7 @@
         </div>
         <div class="text-center">
             <button onclick="$.magnificPopup.close();" class="btn btn-default btn btn-default cancel">Bỏ qua</button>
-            <button onclick="_customer_manager_Detail.OnUpdataClient()" class="btn btn-default">Lưu</button>
+            <button onclick="_customer_managerV2_Detail.OnUpdataClient()" class="btn btn-default">Lưu</button>
         </div>
     }
     else
@@ -175,12 +175,12 @@
                         <input type="hidden" value="0" asp-for="@Model.Id" name="Id">
                         <div class="col-md-4 mb10"><label class="lbl">Đối tượng <sup class="red">*</sup></label></div>
                         <div class="col-md-8 mb10">
-                            <label class="radio mr-3" onclick="_customer_manager.Showlabel(0)">
+                            <label class="radio mr-3" onclick="_customer_managerV2.Showlabel(0)">
                                 <input type="radio" value="0" id="optradio" name="optradio" checked="checked">
                                 <span class="checkmark"></span>
                                 Tổ chức
                             </label>
-                            <label class="radio mr-3" onclick="_customer_manager.Showlabel(1)">
+                            <label class="radio mr-3" onclick="_customer_managerV2.Showlabel(1)">
                                 <input value="1" type="radio" id="optradio" name="optradio">
                                 <span class="checkmark"></span>
                                 Cá nhân
@@ -218,7 +218,7 @@
                         </div>
                         <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Loại khách hàng <sup class="red">*</sup></label></div>
                         <div class="col-md-8 mb10">
-                            <select class="form-control select2" asp-for="@Model.id_loaikhach" style="width: 100%;" onchange="_customer_manager.OnChangeClientType()">
+                            <select class="form-control select2" asp-for="@Model.id_loaikhach" style="width: 100%;" onchange="_customer_managerV2.OnChangeClientType()">
                                 <option value="">Tất cả loại khách hàng</option>
                                 @if (ClientType != null)
                                 {
@@ -303,7 +303,7 @@
         </div>
         <div class="text-center">
             <button onclick="$.magnificPopup.close();" class="btn btn-default btn btn-default cancel">Bỏ qua</button>
-            <button onclick="_customer_manager.OnCreateClient()" class="btn btn-default">Thêm</button>
+            <button onclick="_customer_managerV2.OnCreateClient()" class="btn btn-default">Thêm</button>
         </div>
     }
 
