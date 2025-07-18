@@ -2798,10 +2798,10 @@ namespace WEB.Adavigo.CMS.Service
                         body = body.Replace("{{LinkQRTCB}}", jsonData["data"]["qrDataURL"].ToString());
                     }
 
-                    var selected_bank2 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("HDBANK".Trim().ToLower())) : null;
-                    string bank_code2 = "HDBANK";
+                    var selected_bank2 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
+                    string bank_code2 = "Techcombank";
                     if (selected_bank2 != null) bank_code2 = selected_bank2.bin;
-                    var result2 = await _APIService.GetVietQRCode("371704070000023", bank_code2, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var result2 = await _APIService.GetVietQRCode("19131835226016", bank_code2, order.OrderNo, Convert.ToDouble(order.Amount));
                     var jsonData2 = JObject.Parse(result2);
                     var status2 = int.Parse(jsonData2["code"].ToString());
                     if (status2 == (int)ResponseType.SUCCESS)
@@ -2818,6 +2818,16 @@ namespace WEB.Adavigo.CMS.Service
                     if (status3 == (int)ResponseType.SUCCESS)
                     {
                         body = body.Replace("{{LinkQRVTB}}", jsonData3["data"]["qrDataURL"].ToString());
+                    }
+                    var selected_bank4 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("MSB ".Trim().ToLower())) : null;
+                    string bank_code4 = "MSB";
+                    if (selected_bank4 != null) bank_code4 = selected_bank4.bin;
+                    var result4 = await _APIService.GetVietQRCode("3066010006688", bank_code4, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var jsonData4 = JObject.Parse(result4);
+                    var status4 = int.Parse(jsonData4["code"].ToString());
+                    if (status4 == (int)ResponseType.SUCCESS)
+                    {
+                        body = body.Replace("{{LinkQRMSB}}", jsonData4["data"]["qrDataURL"].ToString());
                     }
 
 
@@ -3323,16 +3333,15 @@ namespace WEB.Adavigo.CMS.Service
                         body = body.Replace("{{LinkQRTCB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path);
                     }
 
-                    var selected_bank2 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("HDBANK".Trim().ToLower())) : null;
-                    string bank_code2 = "HDBANK";
+                    var selected_bank2 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
+                    string bank_code2 = "Techcombank";
                     if (selected_bank2 != null) bank_code2 = selected_bank2.bin;
-                    var result2 = await _APIService.GetVietQRCode("371704070000023", bank_code2, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var result2 = await _APIService.GetVietQRCode("19131835226016", bank_code2, order.OrderNo, Convert.ToDouble(order.Amount));
                     var jsonData2 = JObject.Parse(result2);
                     var status2 = int.Parse(jsonData2["code"].ToString());
                     if (status2 == (int)ResponseType.SUCCESS)
                     {
-                        var url_path2 = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData2["data"]["qrDataURL"].ToString(), "371704070000023");
-                        body = body.Replace("{{LinkQRHDB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path2);
+                        body = body.Replace("{{LinkQRHDB}}", jsonData2["data"]["qrDataURL"].ToString());
                     }
 
                     var selected_bank3 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("VietinBank".Trim().ToLower())) : null;
@@ -3343,9 +3352,17 @@ namespace WEB.Adavigo.CMS.Service
                     var status3 = int.Parse(jsonData3["code"].ToString());
                     if (status3 == (int)ResponseType.SUCCESS)
                     {
-                        var url_path3 = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData3["data"]["qrDataURL"].ToString(), "113600558866");
-
-                        body = body.Replace("{{LinkQRVTB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path3);
+                        body = body.Replace("{{LinkQRVTB}}", jsonData3["data"]["qrDataURL"].ToString());
+                    }
+                    var selected_bank4 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("MSB ".Trim().ToLower())) : null;
+                    string bank_code4 = "MSB";
+                    if (selected_bank4 != null) bank_code4 = selected_bank4.bin;
+                    var result4 = await _APIService.GetVietQRCode("3066010006688", bank_code4, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var jsonData4 = JObject.Parse(result4);
+                    var status4 = int.Parse(jsonData4["code"].ToString());
+                    if (status4 == (int)ResponseType.SUCCESS)
+                    {
+                        body = body.Replace("{{LinkQRMSB}}", jsonData4["data"]["qrDataURL"].ToString());
                     }
                     //string TTChuyenKhoan = string.Empty;
                     //if (model.TTChuyenKhoan != null)
