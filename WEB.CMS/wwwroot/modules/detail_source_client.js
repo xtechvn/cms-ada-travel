@@ -3,7 +3,7 @@
 });
 $('#import-file-ws').change(function () {
     $('#file_import_hotel_error_message').addClass('mfp-hide');
-    _source_client.UploadFileExcel();
+    _detail_source_client.UploadFileExcel();
 });
 var _detail_source_client = {
     Init: function () {
@@ -109,10 +109,10 @@ var _detail_source_client = {
             }
         });
     },
-    ImportWSExcel: function () {
+    ImportWSExcel: function (id) {
         let title = 'Tải lên danh sách khách hàng';
         let url = '/CustomerManagerManual/ImportWSExcel';
-        let param = {};
+        let param = { type :id};
         _magnific.OpenSmallPopup(title, url, param);
     },
     UploadFileExcel: function () {
@@ -169,7 +169,7 @@ var _detail_source_client = {
                 id_nhomkhach: 0,
                 id_ClientType: 5,
                 AgencyType: 1,
-                UtmSource: $('#UtmSource').val(),
+                UtmSource: $('#Client_Source').val(),
                 DepartmentId: $('#DepartmentId').val(),
                 UserId: $('#UserId').val(),
             });
@@ -181,13 +181,7 @@ var _detail_source_client = {
             data: { model: JSON.stringify(data) },
             success: function (result) {
                 _global_function.RemoveLoading()
-                if (result.status == 0) {
-                    _msgalert.success(result.msg);
-                    $.magnificPopup.close()
-                } else {
-                    _msgalert.error(result.msg);
-                    $('#confirm-ws-import').show()
-                }
+                $('#data_upload_ex').html(result)
             }
         });
     },

@@ -226,7 +226,7 @@ namespace Repositories.Repositories
                 st2.Start();
                 DataTable dt = await _ClientDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETGetAllClient_Search);
                 st2.Stop();
-                LogHelper.InsertLogTelegram("time sp SP_GetClientData: " + st2);
+                LogHelper.InsertLogTelegram("time sp SP_GetClientData: " + st2.ElapsedMilliseconds);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = dt.ToList<CustomerManagerViewModel>();

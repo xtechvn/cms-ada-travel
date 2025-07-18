@@ -798,6 +798,7 @@ var _customer_managerV2 = {
         var diachi_chinhanh = $('#diachi_chinhanh').val();
         var Note = $('#Note').val();
         var user_Id = $('#id_userid').val();
+        var UtmSource = $('#UtmSource').val();
         let FromCreate = $('#CustomerManager_Detail');
         FromCreate.validate({
             rules: {
@@ -862,6 +863,7 @@ var _customer_managerV2 = {
                     Name_nh: Name_nh,
                     Note: Note,
                     Maso_Id: Maso_Id,
+                    UtmSource: UtmSource,
                 }
                 let data = JSON.stringify(object_summit)
                 _global_function.AddLoading()

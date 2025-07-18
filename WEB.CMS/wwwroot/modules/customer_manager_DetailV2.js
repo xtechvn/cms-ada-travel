@@ -301,6 +301,7 @@ var _customer_manager_Detail = {
         var Note = $('#Note').val();
         var user_Id = $('#id_userid').val();
         var ClientCode = $('#ClientCode').val();
+        var UtmSource = $('#UtmSource').val();
         let FromCreate = $('#CustomerManager_Detail');
         FromCreate.validate({
             rules: {
@@ -366,6 +367,7 @@ var _customer_manager_Detail = {
                 Note: Note,
                 Maso_Id: Maso_Id,
                 ClientCode: ClientCode,
+                UtmSource: UtmSource,
             }
             let data = JSON.stringify(object_summit)
             $.ajax({

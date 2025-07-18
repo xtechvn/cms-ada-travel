@@ -51,6 +51,8 @@ namespace Entities.ViewModels
         public string OperatorIdName { get; set; }
         public string UtmMedium { get; set; }
         public int IsFinishPayment { get; set; }
+        public string InvoiceRequestStatusName { get; set; }
+        public int InvoiceRequestStatus { get; set; }
 
 
 

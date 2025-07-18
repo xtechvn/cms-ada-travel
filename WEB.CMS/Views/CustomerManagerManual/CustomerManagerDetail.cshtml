@@ -5,6 +5,7 @@
     var PermisionType = (List<AllCode>)ViewBag.PermisionType;
     var ClientType = (List<AllCode>)ViewBag.ClientType;
     var dataModel = (Client)ViewBag.dataModel;
+    var Client_Source = (List<AllCode>)ViewBag.UtmSource;
 }
 @model CustomerManagerView
 <style>
@@ -120,13 +121,37 @@
                         </div>
                         <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Nhóm khách hàng <sup class="red">*</sup></label></div>
                         <div class="col-md-8 mb10">
-                            <select class="select2 form-control" asp-for="@Model.id_nhomkhach" value="@dataModel.PermisionType" style="width: 100%; background: #F1F5F9" disabled>
+                            <select class="select2 form-control" asp-for="@Model.id_nhomkhach" value="@dataModel.PermisionType" style="width: 100%; background: #F1F5F9" >
                                 <option value="-1">Tất cả nhóm khách hàng</option>
                                 @if (PermisionType != null)
                                 {
                                     foreach (var item in PermisionType)
                                     {
                                         if (item.CodeValue == dataModel.PermisionType)
+                                        {
+                                            <option value="@item.CodeValue" selected="selected">@item.Description</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.CodeValue">@item.Description</option>
+                                        }
+
+                                    }
+                                }
+
+
+                            </select>
+                            <label id="id_nhomkhach_err" class="lbl mt5 red"> </label>
+                        </div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Ngồn khách hàng <sup class="red">*</sup></label></div>
+                        <div class="col-md-8 mb10">
+                            <select class="select2 form-control" asp-for="@Model.UtmSource" value="@dataModel.UtmSource" style="width: 100%; background: #F1F5F9" >
+
+                                @if (Client_Source != null)
+                                {
+                                    foreach (var item in Client_Source)
+                                    {
+                                        if (item.CodeValue == dataModel.UtmSource)
                                         {
                                             <option value="@item.CodeValue" selected="selected">@item.Description</option>
                                         }
@@ -252,17 +277,29 @@
                             </select>
 
                         </div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Nguồn khách hàng <sup class="red">*</sup></label></div>
+                        <div class="col-md-8 mb10">
+                            <select class="select2 form-control" asp-for="@Model.UtmSource" style="width: 100%;">
+                                @if (Client_Source != null)
+                                {
+                                    foreach (var item in Client_Source)
+                                    {
+                                        <option value="@item.CodeValue">@item.Description</option>
+                                    }
+                                }
+                            </select>
 
+                        </div>
                         @*<div id="lbl_pass" style="display:none" class="col-md-4 mb10"><label class="lbl mt5 mb0">Mật khẩu <sup class="red">*</sup></label></div>
-                            <div id="pass" style="display:none" class="col-md-8 mb10">
-                                <input type="text" class="form-control" asp-for="@Model.pass">
+        <div id="pass" style="display:none" class="col-md-8 mb10">
+            <input type="text" class="form-control" asp-for="@Model.pass">
 
-                            </div>
-                            <div id="lbl_pass_backup" style="display:none" class="col-md-4 mb10"><label class="lbl mt5 mb0">Nhập lại mật khẩu <sup class="red">*</sup></label></div>
-                            <div id="pass_backup" style="display:none" class="col-md-8 mb10">
-                                <input type="text" class="form-control" asp-for="@Model.pass_backup">
+        </div>
+        <div id="lbl_pass_backup" style="display:none" class="col-md-4 mb10"><label class="lbl mt5 mb0">Nhập lại mật khẩu <sup class="red">*</sup></label></div>
+        <div id="pass_backup" style="display:none" class="col-md-8 mb10">
+            <input type="text" class="form-control" asp-for="@Model.pass_backup">
 
-                            </div>*@
+        </div>*@
 
 
                     </div>

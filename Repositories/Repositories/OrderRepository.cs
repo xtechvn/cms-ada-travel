@@ -113,6 +113,8 @@ namespace Repositories.Repositories
                                           SalerUserName = row["SalerUserName"].ToString(),
                                           SalerEmail = row["SalerEmail"].ToString(),
                                           UtmMedium = row["UtmMedium"].ToString(),
+                                          InvoiceRequestStatus = !row["InvoiceRequestStatus"].Equals(DBNull.Value) ? Convert.ToInt32(row["InvoiceRequestStatus"].ToString()) : 999,
+                                          InvoiceRequestStatusName = row["InvoiceRequestStatusName"].ToString(),
 
 
                                       }).ToList();
@@ -173,6 +175,8 @@ namespace Repositories.Repositories
                                           SalerEmail = md1.SalerEmail,
                                           SalerUserName = md1.SalerUserName,
                                           UtmMedium = md1.UtmMedium,
+                                          InvoiceRequestStatusName = md1.InvoiceRequestStatusName,
+                                          InvoiceRequestStatus = md1.InvoiceRequestStatus,
                                       }
                                                     ).ToList();
                 }

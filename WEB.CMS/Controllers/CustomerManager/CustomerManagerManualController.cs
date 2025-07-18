@@ -119,9 +119,11 @@ namespace WEB.CMS.Controllers.CustomerManager
                 var AgencyType = _allCodeRepository.GetListByType("AGENCY_TYPE");
                 var PermisionType = _allCodeRepository.GetListByType("PERMISION_TYPE");
                 var ClientType = _allCodeRepository.GetListByType("CLIENT_TYPE");
+                var UtmSource = _allCodeRepository.GetListByType(AllCodeType.CLIENT_SOURCE);
                 ViewBag.AgencyType = AgencyType;
                 ViewBag.PermisionType = PermisionType;
                 ViewBag.ClientType = ClientType;
+                ViewBag.UtmSource = UtmSource;
 
                 if (id != 0)
                 {
@@ -568,8 +570,9 @@ namespace WEB.CMS.Controllers.CustomerManager
 
             return PartialView(model);
         }
-        public IActionResult ImportWSExcel()
+        public IActionResult ImportWSExcel(int type)
         {
+            ViewBag.type = type;
             return PartialView();
 
         }

@@ -16,7 +16,7 @@
                         <div class="col-md-8 mb10" style="display:none;">
                             <input type="text" id="Type" value="@Model.Type" name="Type" class="form-control Type" disabled>
                         </div>
-                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Giá trị <sup class="red">*</sup></label></div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Id <sup class="red">*</sup></label></div>
                         <div class="col-md-8 mb10">
                             <input type="text" id="CodeValue" value="@Model.CodeValue" name="CodeValue" class="form-control CodeValue">
                         </div>
@@ -32,7 +32,7 @@
         </div>
         <div class="text-center">
             <button onclick="$.magnificPopup.close();" class="btn btn-default btn btn-default cancel">Bỏ qua</button>
-            <button onclick="_source_client.Summit()" class="btn btn-default">Cập nhật</button>
+            <button onclick="_detail_source_client.Summit()" class="btn btn-default">Cập nhật</button>
         </div>
     </form>
 }
@@ -49,7 +49,7 @@ else
                         <div class="col-md-8 mb10" style="display:none;">
                             <input type="text" id="Type" name="Type" class="form-control Type" value="CLIENT_SOURCE" disabled>
                         </div>
-                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Giá trị <sup class="red">*</sup></label></div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Id <sup class="red">*</sup></label></div>
                         <div class="col-md-8 mb10">
                             <input type="text" id="CodeValue" name="CodeValue" class="form-control CodeValue">
                         </div>
@@ -65,7 +65,7 @@ else
         </div>
         <div class="text-center">
             <button onclick="$.magnificPopup.close();" class="btn btn-default btn btn-default cancel">Bỏ qua</button>
-            <button onclick="_source_client.Summit()" class="btn btn-default">Lưu</button>
+            <button onclick="_detail_source_client.Summit()" class="btn btn-default">Lưu</button>
         </div>
     </form>
 }

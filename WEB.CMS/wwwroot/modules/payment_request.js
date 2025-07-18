@@ -1034,21 +1034,24 @@ var _payment_request_service = {
         };
         _magnific.OpenSmallPopup(title, url, param);
     },
-    KTNote: function (id) {
+    KTNote: function (id,noteid) {
         let title = 'Ghi chú';
         let url = '/PaymentRequest/PopupNoteKT';
         var param = {
-            id: id
+            id: id,
+            noteId: noteid,
+
         };
         _magnific.OpenSmallPopup(title, url, param);
     },
     SetupNoteKTRequest: function () {
         var id = $('#Id').val();
+        var noteid = $('#noteId').val();
         var notekt = $('#notekt').val();
         $.ajax({
             url: "/PaymentRequest/SetUpNoteKT",
             type: "Post",
-            data: { id: id, notekt: notekt },
+            data: { id: id, notekt: notekt, noteid: noteid },
             success: function (result) {
                 _global_function.RemoveLoading()
                 if (result.isSuccess === true) {

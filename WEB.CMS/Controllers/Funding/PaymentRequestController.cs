@@ -5,9 +5,12 @@ using Entities.ViewModels.HotelBookingRoom;
 using Entities.ViewModels.SetServices;
 using Entities.ViewModels.SupplierConfig;
 using Entities.ViewModels.Tour;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using System.Linq;
@@ -166,7 +169,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                     {
                         //kiểm tra chức năng có đc phép sử dụng
                         var checkRolePermission = _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item,
-                            (int)SortOrder.TRUY_CAP, (int)MenuId.PHIEU_CHI).Result;
+                            (int)Utilities.Contants.SortOrder.TRUY_CAP, (int)MenuId.PHIEU_CHI).Result;
                         if (checkRolePermission == true)
                         {
                             ViewBag.VIEW_PHIEU_CHI = 1;
@@ -508,7 +511,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 }
                 var current_user = _ManagementUser.GetCurrentUser();
                 string link = "/PaymentRequest/Detail?paymentRequestId=" + result;
-                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_YEU_CAU_CHI).ToString(), ((int)ActionType.TAO_YEU_CAU_CHI).ToString(), model.PaymentCode, link, current_user == null ? "0" : current_user.Role);
+                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_YEU_CAU_CHI).ToString(), ((int)Utilities.Contants.ActionType.TAO_YEU_CAU_CHI).ToString(), model.PaymentCode, link, current_user == null ? "0" : current_user.Role);
 
                 return Ok(new
                 {
@@ -734,7 +737,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 }
                 var current_user = _ManagementUser.GetCurrentUser();
                 string link = "/PaymentRequest/Detail?paymentRequestId=" + model.Id;
-                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_YEU_CAU_CHI).ToString(), ((int)ActionType.TU_CHOI_DUYET_YEU_CAU_CHI).ToString(), model.PaymentCode, link, current_user == null ? "0" : current_user.Role);
+                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_YEU_CAU_CHI).ToString(), ((int)Utilities.Contants.ActionType.TU_CHOI_DUYET_YEU_CAU_CHI).ToString(), model.PaymentCode, link, current_user == null ? "0" : current_user.Role);
                 return Ok(new
                 {
                     isSuccess = true,
@@ -778,7 +781,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 }
                 var current_user = _ManagementUser.GetCurrentUser();
                 string link = "/PaymentRequest/Detail?paymentRequestId=" + model.Id;
-                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_YEU_CAU_CHI).ToString(), ((int)ActionType.DUYET_YEU_CAU_CHI).ToString(), model.PaymentCode, link, current_user == null ? "0" : current_user.Role);
+                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_YEU_CAU_CHI).ToString(), ((int)Utilities.Contants.ActionType.DUYET_YEU_CAU_CHI).ToString(), model.PaymentCode, link, current_user == null ? "0" : current_user.Role);
 
                 return Ok(new
                 {
@@ -1483,7 +1486,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                     });
 
                 string link = "/PaymentRequest/Detail?paymentRequestId=" + model.Id;
-                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_YEU_CAU_CHI).ToString(), ((int)ActionType.BO_DUYET_YEU_CAU_CHI).ToString(), model.PaymentCode, link, current_user == null ? "0" : current_user.Role);
+                apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_YEU_CAU_CHI).ToString(), ((int)Utilities.Contants.ActionType.BO_DUYET_YEU_CAU_CHI).ToString(), model.PaymentCode, link, current_user == null ? "0" : current_user.Role);
 
                 return Ok(new
                 {
@@ -1579,12 +1582,24 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
 
             return PartialView(model);
         }
-        public IActionResult PopupNoteKT(int id)
+        public async Task<IActionResult> PopupNoteKT(int id,int noteId)
         {
             ViewBag.id = id;
-            return PartialView();
+            ViewBag.noteId = 0;
+            var data=new NoteViewModel();
+            if (noteId > 0)
+            {
+                var list_note = await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
+                if (list_note != null && list_note.Count > 0)
+                {
+                    var detail = list_note.FirstOrDefault(s => s.Id == noteId);
+                    data = detail;
+                    ViewBag.noteId = data.Id;
+                }
+            }
+            return PartialView(data);
         }
-        public async Task<IActionResult> SetUpNoteKT(int id, string notekt)
+        public async Task<IActionResult> SetUpNoteKT(int id, string notekt,int noteid)
         {
             try
             {
@@ -1603,6 +1618,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
                 var model = new Note();
+                model.Id = noteid;
                 model.Comment = notekt;
                 model.DataId = id;
                 model.UserId = _UserId;
