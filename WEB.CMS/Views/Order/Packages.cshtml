@@ -418,7 +418,7 @@
                             <td></td>
                             <td></td>
                             <td class="bold">Khách phải trả</td>
-                            <td class="red text-right">@((Model[0].OrderAmount - Convert.ToDouble(Model[0].Refund)) == 0 ? "0" : (Model[0].OrderAmount - Convert.ToDouble(Model[0].Refund) ).ToString("###,###,###"))</td>
+                            <td class="red text-right">@((Model[0].OrderAmount) == 0 ? "0" : (Model[0].OrderAmount ).ToString("###,###,###"))</td>
                             <td></td>
                         </tr>
                         <tr class="no-border hidden-tablet">
