@@ -39,6 +39,7 @@ else
 
                         <th class="mfp-hide" style="width: 120px;">Người tạo</th>
                         <th class="mfp-hide" style="width: 100px;">Trạng thái</th>
+                        <th  style="width: 100px;">Nguồn khách hàng</th>
                         @*<th class="mfp-hide" style="width: 100px;">Trạng thái tài khoản</th>*@
                     </tr>
                 </thead>
@@ -52,74 +53,75 @@ else
                         @foreach (var item in Model.ListData)
                         {
                             STT++;
-                            <tr>
-                                <td>@STT</td>
-                                <td>
-                                    <a class="blue" href="/CustomerManagerManual/Detail/@item.Id">@(item.ClientCode!=""? item.ClientCode: item.Id.ToString())</a>
+                    <tr>
+                        <td>@STT</td>
+                        <td>
+                            <a class="blue" href="/CustomerManagerManual/Detail/@item.Id">@(item.ClientCode!=""? item.ClientCode: item.Id.ToString())</a>
 
-                                </td>
-                                <td class="mfp-hide"> <a class="blue" href="/CustomerManagerManual/Detail/@item.Id">@item.ClientName</a></td>
-                                <td class="mfp-hide">
-                                    <div>@item.Phone</div>
-                                    <div>@item.Email</div>
-                                </td>
-                                <td class="mfp-hide">@(item.AgencyType_name != "" ? item.AgencyType_name : "Cá nhân")</td>
-                                <td class="mfp-hide">@item.client_type_name</td>
-                                <td class="mfp-hide">@(item.PermisionType_name != "" ? item.PermisionType_name : "Không được công nợ")</td>
+                        </td>
+                        <td class="mfp-hide"> <a class="blue" href="/CustomerManagerManual/Detail/@item.Id">@item.ClientName</a></td>
+                        <td class="mfp-hide">
+                            <div>@item.Phone</div>
+                            <div>@item.Email</div>
+                        </td>
+                        <td class="mfp-hide">@(item.AgencyType_name != "" ? item.AgencyType_name : "Cá nhân")</td>
+                        <td class="mfp-hide">@item.client_type_name</td>
+                        <td class="mfp-hide">@(item.PermisionType_name != "" ? item.PermisionType_name : "Không được công nợ")</td>
 
-                                <td class="mfp-hide text-right">@item.sum_payment.ToString("###,###,###")</td>
-                                <td class="mfp-hide">@(item.UserId_name == null ? "N/A" : item.UserId_name)</td>
+                        <td class="mfp-hide text-right">@item.sum_payment.ToString("###,###,###")</td>
+                        <td class="mfp-hide">@(item.UserId_name == null ? "N/A" : item.UserId_name)</td>
 
 
-                                <td class="mfp-hide">@item.JoinDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                <td class="mfp-hide">@(item.UpdateLast != "" ?Convert.ToDateTime(item.UpdateLast).ToString("dd/MM/yyy HH:mm:ss") : "N/A")</td>
-                                <td class="mfp-hide">@(item.Create_name == null ? "N/A" : item.Create_name)</td>
-                                <td class="mfp-hide">
-                                    @switch ((int)item.Status)
+                        <td class="mfp-hide">@item.JoinDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                        <td class="mfp-hide">@(item.UpdateLast != "" ?Convert.ToDateTime(item.UpdateLast).ToString("dd/MM/yyy HH:mm:ss") : "N/A")</td>
+                        <td class="mfp-hide">@(item.Create_name == null ? "N/A" : item.Create_name)</td>
+                        <td class="mfp-hide">
+                            @switch ((int)item.Status)
+                            {
+                                case (int)(ClientStatus.KH_MOI):
+                                case (int)(ClientStatus.CHUA_TC):
                                     {
-                                        case (int)(ClientStatus.KH_MOI):
-                                        case (int)(ClientStatus.CHUA_TC):
-                                            {
-                                                <p class="m-0 status-oranger">
-                                                    @item.StatusName
-                                                </p>
-                                            }
-                                            break;
-                                        case (int)(ClientStatus.DA_TC):
-                                        case (int)(ClientStatus.TIEM_NANG):
-                                        case (int)(ClientStatus.DA_GUI_BG):
-                                        case (int)(ClientStatus.CHOT):
-                                            {
-                                                <p class="m-0 status-green">
-                                                    @item.StatusName
-                                                </p>
-                                            }
-                                            break;
-                                        case (int)(ClientStatus.MAT):
-                                            {
-                                                <p class="m-0 status-green">
-                                                    @item.StatusName
-                                                </p>
-                                            }
-                                            break;
+                                        <p class="m-0 status-oranger">
+                                            @item.StatusName
+                                        </p>
                                     }
-                                </td>
-                                @*<td class="mfp-hide">
-                                    <div class="on-off-btn">
-                                        @if (item.ACStatus == 0)
-                                        {
-                                            <i id="Status_0_@item.Id" class="fa fa-check status-green" aria-hidden="true" onclick="_customer_manager.OnResetStatus(@item.Id,'0')"></i>
-                                            <i id="Status_1_@item.Id" class="fa fa-power-off status-grey" onclick="_customer_manager.OnResetStatus(@item.Id,'1')"></i>
-                                        }
-                                        else
-                                        {
-                                            <i id="Status_0_@item.Id" class="fa fa-check status-grey" onclick="_customer_manager.OnResetStatus(@item.Id,'0')"></i>
-                                            <i id="Status_1_@item.Id" class="fa fa-power-off status-red" aria-hidden="true" onclick="_customer_manager.OnResetStatus(@item.Id,'1')"></i>
-                                        }
-                                    </div>
-                                </td>*@
+                                    break;
+                                case (int)(ClientStatus.DA_TC):
+                                case (int)(ClientStatus.TIEM_NANG):
+                                case (int)(ClientStatus.DA_GUI_BG):
+                                case (int)(ClientStatus.CHOT):
+                                    {
+                                        <p class="m-0 status-green">
+                                            @item.StatusName
+                                        </p>
+                                    }
+                                    break;
+                                case (int)(ClientStatus.MAT):
+                                    {
+                                        <p class="m-0 status-green">
+                                            @item.StatusName
+                                        </p>
+                                    }
+                                    break;
+                            }
+                        </td>
+                        <td class="">@(item.UtmSourceName)</td>
+                        @*<td class="mfp-hide">
+            <div class="on-off-btn">
+                @if (item.ACStatus == 0)
+                {
+                    <i id="Status_0_@item.Id" class="fa fa-check status-green" aria-hidden="true" onclick="_customer_manager.OnResetStatus(@item.Id,'0')"></i>
+                    <i id="Status_1_@item.Id" class="fa fa-power-off status-grey" onclick="_customer_manager.OnResetStatus(@item.Id,'1')"></i>
+                }
+                else
+                {
+                    <i id="Status_0_@item.Id" class="fa fa-check status-grey" onclick="_customer_manager.OnResetStatus(@item.Id,'0')"></i>
+                    <i id="Status_1_@item.Id" class="fa fa-power-off status-red" aria-hidden="true" onclick="_customer_manager.OnResetStatus(@item.Id,'1')"></i>
+                }
+            </div>
+        </td>*@
 
-                            </tr>
+                    </tr>
                         }
 
                     }

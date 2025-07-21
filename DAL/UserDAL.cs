@@ -410,5 +410,29 @@ namespace DAL
                 return null;
             }
         }
+        public List<UserProfitReportViewModel> GetListUserProfitReport(UserProfitReportModel model)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[]
+                {
+                    new SqlParameter("@CreateDateFrom",model.CreateDateFrom ),
+                    new SqlParameter("@CreateDateTo", model.CreateDateTo),
+                    new SqlParameter("@Type", model.Type),
+                    new SqlParameter("@PageIndex", model.PageIndex),
+                    new SqlParameter("@PageSize",model.PageSize)
+                };
+                var dt = _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListUserProfitReport, objParam);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    return dt.ToList<UserProfitReportViewModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListUserProfitReport - UserDAL: " + ex);
+            }
+            return null;
+        }
     }
 }

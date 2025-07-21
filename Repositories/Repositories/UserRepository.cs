@@ -889,5 +889,19 @@ namespace Repositories.Repositories
             }
             return false;
         }
+        public  List<UserProfitReportViewModel> GetListUserProfitReport(UserProfitReportModel model)
+        {
+            try
+            {
+                var data =  _UserDAL.GetListUserProfitReport(model);
+                return data;
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetDetail - ClientDAL: " + ex);
+                return null;
+            }
+        }
     }
 }

@@ -49,5 +49,6 @@ namespace Repositories.IRepositories
         Task<List<User>> GetListUserDepartById(List<int?> ids);
         bool IsAccountantTour(long userId);
         bool IsHeadOfAccountantPhoTPKeToan(long userId);
+        List<UserProfitReportViewModel> GetListUserProfitReport(UserProfitReportModel model);
     }
 }

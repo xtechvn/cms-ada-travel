@@ -43,6 +43,7 @@ namespace Entities.ViewModels.CustomerManager
         public long AmountContractPay { get; set; }
 
         public string StatusName { get; set; }
+        public string UtmSourceName { get; set; }
     }
     public class CustomerManagerViewSearchModel
     {
