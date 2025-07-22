@@ -186,6 +186,9 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
                 bool isHeadOfAccountant = _userRepository.IsHeadOfAccountant(current_user.Id);
                 if (isHeadOfAccountant)
                     ViewBag.KTT_DUYET_YEU_CAU_XUAT_HOA_DON = 1;
+                bool IsHeadOfAccountantPhoTPKeToan = _userRepository.IsHeadOfAccountantPhoTPKeToan(current_user.Id);
+                if (IsHeadOfAccountantPhoTPKeToan)
+                    ViewBag.KTT_DUYET_YEU_CAU_XUAT_HOA_DON = 1;
 
                 bool IsAccountant = _userRepository.IsAccountant(current_user.Id);
                 if (IsAccountant)

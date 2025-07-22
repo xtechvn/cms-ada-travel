@@ -171,9 +171,10 @@ var _detail_source_client = {
                 AgencyType: 1,
                 UtmSource: $('#Client_Source').val(),
                 DepartmentId: $('#DepartmentId').val(),
-                UserId: $('#UserId').val(),
+                UserId: $('#Userid').select2("val"),
             });
         });
+        debugger
         _global_function.AddLoading()
         $.ajax({
             url: url,

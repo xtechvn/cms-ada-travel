@@ -36,7 +36,25 @@ else
             <tbody>
                 @if (Model.ListData != null && Model.ListData.Count > 0)
                 {
+                    <tr>
+                        <td class="center"></td>
+                        <td class="center"></td>
+                        <td class="center"></td>
+                        <td class="center "></td>
+                        <td> </td>
+                        <td></td>
+                        <td class="text-right">
+                            <div class="green">@Model.ListData[0].TotalPayment.ToString("#,##")/</div>
+                            <div class="red">@(Model.ListData[0].TotalAmount == 0 ? "0" : Model.ListData[0].TotalAmount.ToString("#,##"))</div>
+                        </td>
+                        <td>@Model.ListData[0].TotalProfit.ToString("#,##")</td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                    
 
+                        </td>
+                    </tr>
                     var counter = (Model.CurrentPage - 1) * Model.PageSize;
                     foreach (var item in Model.ListData)
                     {
@@ -52,7 +70,7 @@ else
                                 <div class="green">@item.Payment.ToString("#,##0")/</div>
                                 <div class="red">@(item.Amount == 0 ? "0" : item.Amount.ToString("#,##"))</div>
                             </td>
-                            <td>@item.Profit</td>
+                            <td>@item.Profit.ToString("#,##")</td>
                             <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
                             <td>@item.UserCreateName</td>
                             <td>
