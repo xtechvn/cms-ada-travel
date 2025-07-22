@@ -548,7 +548,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                             }
                             if (listPermissions6 == true)
                             {
-                                searchModel.SalerPermission = current_user.UserUnderList;
+                                searchModel.SalerPermission = null;
                                 i++;
                             }
                             if (item == (int)RoleType.Admin)
