@@ -1,22 +1,23 @@
-﻿using DAL;
+﻿using Aspose.Cells;
+using DAL;
 using Entities.ConfigModels;
-using Entities.ViewModels.Contract;
+using Entities.Models;
 using Entities.ViewModels;
+using Entities.ViewModels.Contract;
+using Entities.ViewModels.DebtGuarantee;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Nest;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Entities.ViewModels.DebtGuarantee;
 using Utilities;
-using Entities.Models;
-using Nest;
-using Aspose.Cells;
-using System.Drawing;
 
 namespace Repositories.Repositories
 {
@@ -258,6 +259,25 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("ExportPaymentRequest - HotelBookingRepositories: " + ex);
             }
             return pathResult;
+        }
+        public async Task<List<SumTotalGetListDebtGuaranteeModel>> SumTotalGetListDebtGuarantee(SearchDebtGuarantee Searchmodel)
+        {
+            try
+            {
+                var data = new List<SumTotalGetListDebtGuaranteeModel>();
+                DataTable dt = await debtGuaranteeDAL.SumTotalGetListDebtGuarantee(Searchmodel);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                     data = dt.ToList<SumTotalGetListDebtGuaranteeModel>();
+                    return data;
+                }
+                return data;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SumTotalGetListDebtGuarantee - DebtGuaranteeRepository: " + ex);
+                return null;
+            }
         }
     }
 }

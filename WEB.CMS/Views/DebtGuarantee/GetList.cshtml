@@ -37,17 +37,17 @@ else
                 @if (Model.ListData != null && Model.ListData.Count > 0)
                 {
                     <tr>
-                        <td class="center"></td>
+                        <td class="center">Tổng</td>
                         <td class="center"></td>
                         <td class="center"></td>
                         <td class="center "></td>
                         <td> </td>
                         <td></td>
                         <td class="text-right">
-                            <div class="green">@Model.ListData[0].TotalPayment.ToString("#,##")/</div>
-                            <div class="red">@(Model.ListData[0].TotalAmount == 0 ? "0" : Model.ListData[0].TotalAmount.ToString("#,##"))</div>
+                            <div class="green">@ViewBag.TotalPayment/</div>
+                            <div class="red">@ViewBag.TotalAmount</div>
                         </td>
-                        <td>@Model.ListData[0].TotalProfit.ToString("#,##")</td>
+                        <td>@ViewBag.TotalProfit</td>
                         <td></td>
                         <td></td>
                         <td>

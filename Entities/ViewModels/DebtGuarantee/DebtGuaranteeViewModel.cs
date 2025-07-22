@@ -27,8 +27,12 @@ namespace Entities.ViewModels.DebtGuarantee
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public DateTime UpdatedDate { get; set; }
-        public double TotalAmount { get; set; }
-        public double TotalProfit { get; set; }
-        public double TotalPayment { get; set; }
+
     }
+    public class SumTotalGetListDebtGuaranteeModel
+    {
+        public double TotalAmount { get; set; }
+    public double TotalProfit { get; set; }
+    public double TotalPayment { get; set; }
+}
 }

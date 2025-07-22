@@ -125,6 +125,18 @@ namespace WEB.CMS.Controllers.Order
 
                 }
                 model = await _debtGuaranteeRepository.GetListDebtGuarantee(Searchmodel);
+                ViewBag.TotalAmount = 0;
+                ViewBag.TotalPayment = 0;
+                ViewBag.TotalProfit = 0;
+                var data_amount = await _debtGuaranteeRepository.SumTotalGetListDebtGuarantee(Searchmodel);
+                if (data_amount != null  && data_amount.Count > 0)
+                {
+                    ViewBag.TotalAmount = data_amount[0].TotalAmount.ToString("N0");
+                    ViewBag.TotalPayment = data_amount[0].TotalPayment.ToString("N0");
+                    ViewBag.TotalProfit = data_amount[0].TotalProfit.ToString("N0");
+                }
+               
+
             }
             catch (Exception ex)
             {

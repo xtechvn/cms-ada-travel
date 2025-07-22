@@ -127,5 +127,25 @@ namespace DAL
 
             return _date != DateTime.MinValue ? _date : DateTime.MinValue;
         }
+        public async Task<DataTable>SumTotalGetListDebtGuarantee(SearchDebtGuarantee model)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[6];
+                objParam[0] = new SqlParameter("@Code", model.Code);
+                objParam[1] = new SqlParameter("@Status", model.Status);
+                objParam[2] = new SqlParameter("@OrderId", model.OrderId);
+                objParam[3] = new SqlParameter("@SalerPermission", model.SalerPermission);
+                objParam[4] = (CheckDate(model.CreateTime) == DateTime.MinValue) ? new SqlParameter("@CreateTime", DBNull.Value) : new SqlParameter("@CreateTime", CheckDate(model.CreateTime));
+                objParam[5] = (CheckDate(model.ToDateTime) == DateTime.MinValue) ? new SqlParameter("@ToDateTime", DBNull.Value) : new SqlParameter("@ToDateTime", CheckDate(model.ToDateTime).AddDays(1));
+                return _dbWorker.GetDataTable(StoreProcedureConstant.SP_SumTotalGetListDebtGuarantee, objParam);
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SumTotalGetListDebtGuarantee GetListDebtGuarantee" + ex);
+                return null;
+            }
+        }
     }
 }

@@ -519,6 +519,9 @@ namespace WEB.CMS.Controllers.CustomerManager
         public IActionResult ListClientSource(int Id)
         {
             ViewBag.id = Id;
+            var CLIENT_SOURCE = _allCodeRepository.GetListByType(AllCodeType.CLIENT_SOURCE);
+           var detail= CLIENT_SOURCE.FirstOrDefault(s => s.CodeValue == Id);
+           ViewBag.Description= detail.Description;
             return View();
         }
         public async Task<IActionResult> ListClientBySource(CustomerManagerViewSearchModel searchModel, int currentPage = 1, int pageSize = 20)
