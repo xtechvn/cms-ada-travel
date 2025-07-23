@@ -79,8 +79,8 @@ namespace Repositories.Repositories
                         TaxNo = model.Maso_Id,
                         ClientCode = model.ClientCode,
                         SaleMapId = (int?)model.UserId,
-                        ParentId = -1,                        
-                        UtmSource = Convert.ToInt32(model.UtmSource),                        
+                        ParentId = -1,
+                        UtmSource = Convert.ToInt32(model.UtmSource),
 
                     };
                     var CreateClient = _ClientDAL.SetUpClient(Client);
@@ -97,10 +97,10 @@ namespace Repositories.Repositories
                                 Password = EncodeHelpers.MD5Hash("123456"),
                                 PasswordBackup = EncodeHelpers.MD5Hash("123456"),
                                 Status = 0,
-                                GroupPermission= GroupPermissionStatus.Admin,
+                                GroupPermission = GroupPermissionStatus.Admin,
 
                             };
-                          
+
                             var CreateAccountClient = _AccountClientDAL.CreateAccountClient(Account_Client);
 
                             if (Convert.ToInt32(model.id_loaikhach) != -1)
@@ -133,7 +133,7 @@ namespace Repositories.Repositories
                                 UserId = (int)model.UserId,
                             };
                             var CreateUserAgent = _UserAgentDAL.CreateUserAgent(UserAgent);
-                            if(CreateAccountClient==1 && CreateUserAgent == 1)
+                            if (CreateAccountClient == 1 && CreateUserAgent == 1)
                             {
                                 return 1;
                             }
@@ -208,7 +208,7 @@ namespace Repositories.Repositories
                     var data = dt.ToList<CustomerManagerViewModel>();
                     model = data[0];
                 }
-               
+
                 return model;
             }
             catch (Exception ex)
@@ -230,7 +230,7 @@ namespace Repositories.Repositories
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = dt.ToList<CustomerManagerViewModel>();
-                   
+
                     model.ListData = data;
                     model.CurrentPage = currentPage;
                     model.PageSize = pageSize;
@@ -247,14 +247,14 @@ namespace Repositories.Repositories
             }
 
         }
-        public int ResetStatusAc(long clientId, long Status,int type)
+        public int ResetStatusAc(long clientId, long Status, int type)
         {
             try
             {
 
                 var model = _AccountClientDAL.AccountClientByClientId(clientId);
                 model.Status = (byte?)Status;
-                if(type != 0)
+                if (type != 0)
                 {
                     model.ClientType = type;
                 }
@@ -431,7 +431,7 @@ namespace Repositories.Repositories
                                 }
                                 if (listfield2[f] == 3)
                                 {
-                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.Phone + "\n" + item.Email);
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.Phone + " - \n" + item.Email);
                                     listfield2.Remove(listfield2[f]); f--; break;
                                 }
                                 if (listfield2[f] == 4)
@@ -476,16 +476,10 @@ namespace Repositories.Repositories
                                 }
                                 if (listfield2[f] == 12)
                                 {
-                                    if (item.ACStatus == 0)
-                                    {
-                                        ws.Cells[Cell[I] + RowIndex].PutValue("Đang hoạt động");
-                                        listfield2.Remove(listfield2[f]); f--; break;
-                                    }
-                                    else
-                                    {
-                                        ws.Cells[Cell[I] + RowIndex].PutValue("Ngừng hoạt động");
-                                        listfield2.Remove(listfield2[f]); f--; break;
-                                    }
+
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.UtmSourceName);
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
                                 }
 
                             }
@@ -558,10 +552,10 @@ namespace Repositories.Repositories
                     UtmSource = Convert.ToInt32(model.UtmSource),
 
                 };
-                var CreateClient= await _ClientDAL.CreateClient(Client);
-                var Detai_Client =await _ClientDAL.GetClientByClientCode(Client.ClientCode);
+                var CreateClient = await _ClientDAL.CreateClient(Client);
+                var Detai_Client = await _ClientDAL.GetClientByClientCode(Client.ClientCode);
                 var CreateUserAgent = _UserAgentDAL.UpdataUserAgent(0, (int)model.UserId, (int)model.UserId, Detai_Client.Id);
-                if ( CreateUserAgent > 0)
+                if (CreateUserAgent > 0)
                 {
                     return 1;
                 }
