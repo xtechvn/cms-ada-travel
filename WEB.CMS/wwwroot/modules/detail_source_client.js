@@ -153,6 +153,10 @@ var _detail_source_client = {
         });
     },
     ConfirmImport: function () {
+        if ($('#Userid').select2("val") == undefined || $('#Userid').select2("val") == null || $('#Userid').select2("val") == '') {
+            _msgalert.error('Vui lòng chọn trưởng nhóm');
+            return false;
+        }
         let url = '/CustomerManagerManual/ImportWSExcelUpload';
         let data = [];
         $('#import-ws-error').hide()
@@ -174,7 +178,6 @@ var _detail_source_client = {
                 UserId: $('#Userid').select2("val"),
             });
         });
-        debugger
         _global_function.AddLoading()
         $.ajax({
             url: url,
@@ -183,6 +186,39 @@ var _detail_source_client = {
             success: function (result) {
                 _global_function.RemoveLoading()
                 $('#data_upload_ex').html(result)
+            }
+        });
+    },
+    loadkh: function () {
+        window.location.reload();
+    },
+    loaduser: function () {
+        $('#Userid').html('')
+        $("#Userid").select2({
+            theme: 'bootstrap4',
+            placeholder: "Trưởng nhóm",
+            ajax: {
+                url: "/CustomerManagerManual/GetListUserByDepartmentId",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        DepartmentId: $('#DepartmentId').val(),
+                    }
+                    return query;
+                },
+                processResults: function (response) {
+                    return {
+                        results: $.map(response.data, function (item) {
+                            return {
+                                text: item.fullName + ' - ' + item.userName,
+                                id: item.id,
+                            }
+                        })
+                    };
+                },
+                
             }
         });
     },

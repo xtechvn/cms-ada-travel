@@ -32,7 +32,7 @@
     <div class="form-group">
         <label class="lbl">Phòng ban</label>
         <div class="wrap_input">
-            <select class="form-control DepartmentId" name="DepartmentId" id="DepartmentId" style="width:100%!important;">
+            <select class="form-control DepartmentId" name="DepartmentId" onchange="_detail_source_client.loaduser()" id="DepartmentId" style="width:100%!important;">
 
                 @if (_DepartmentList != null && _DepartmentList.Any())
                 {
@@ -113,31 +113,5 @@ else
     </div>
 }
 <script>
-    $("#Userid").select2({
-        theme: 'bootstrap4',
-        placeholder: "Trưởng nhóm",
-        ajax: {
-            url: "/CustomerManagerManual/GetListUserByDepartmentId",
-            type: "post",
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                var query = {
-                    DepartmentId: $('#DepartmentId').val(),
-                }
-                return query;
-            },
-            processResults: function (response) {
-                return {
-                    results: $.map(response.data, function (item) {
-                        return {
-                            text: item.fullName + ' - ' + item.userName,
-                            id: item.id,
-                        }
-                    })
-                };
-            },
-            cache: true
-        }
-    });
+    _detail_source_client.loaduser()
 </script>

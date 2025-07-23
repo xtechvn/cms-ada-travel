@@ -544,14 +544,9 @@ namespace WEB.CMS.Controllers.CustomerManager
                             var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.VIEW_ALL, (int)MenuId.QL_KHACH_HANG);
                             if (listPermissions == true)
                             {
-                                searchModel.SalerPermission = current_user.Id.ToString(); i++;
-                            }
-                            if (listPermissions6 == true)
-                            {
-                                searchModel.SalerPermission = null;
-                                i++;
-                            }
-                            if (item == (int)RoleType.Admin)
+                                searchModel.SalerPermission = current_user.UserUnderList+","+ current_user.Id.ToString(); i++;
+                            } 
+                            if (listPermissions6 == true || item == (int)RoleType.Admin)
                             {
                                 searchModel.SalerPermission = null;
                                 i++;
