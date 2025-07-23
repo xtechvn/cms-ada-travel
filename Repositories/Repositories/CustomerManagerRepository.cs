@@ -337,7 +337,7 @@ namespace Repositories.Repositories
 
                     if (field.NguoiTao) { listfieldtext.Add("Người tạo"); listfield.Add(11); }
                     if (field.Status) { listfieldtext.Add("Trạng thái"); listfield.Add(12); }
-
+                    listfieldtext.Add("Nguôn khách hàng"); listfield.Add(13);
                     cell.SetColumnWidth(0, 8);
                     for (int i = 1; i <= listfield.Count; i++)
                     {
@@ -477,11 +477,17 @@ namespace Repositories.Repositories
                                 if (listfield2[f] == 12)
                                 {
 
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.StatusName);
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                } 
+                                if (listfield2[f] == 13)
+                                {
+
                                     ws.Cells[Cell[I] + RowIndex].PutValue(item.UtmSourceName);
                                     listfield2.Remove(listfield2[f]); f--; break;
 
                                 }
-
                             }
 
 
