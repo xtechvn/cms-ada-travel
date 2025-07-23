@@ -530,6 +530,8 @@ namespace WEB.CMS.Controllers.CustomerManager
 
             try
             {
+                currentPage= searchModel.PageIndex;
+                pageSize = searchModel.PageSize;
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
                 {
