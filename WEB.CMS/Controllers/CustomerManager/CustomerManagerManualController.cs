@@ -542,8 +542,8 @@ namespace WEB.CMS.Controllers.CustomerManager
                         foreach (var item in list)
                         {
                             //kiểm tra chức năng có đc phép sử dụng
-                            var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.TRUY_CAP, (int)MenuId.QL_KHACH_HANG);
-                            var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.VIEW_ALL, (int)MenuId.QL_KHACH_HANG);
+                            var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.TRUY_CAP, (int)MenuId.XEP_HANG);
+                            var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.VIEW_ALL, (int)MenuId.XEP_HANG);
                             if (listPermissions == true)
                             {
                                 searchModel.SalerPermission = current_user.UserUnderList+","+ current_user.Id.ToString(); i++;

@@ -26,6 +26,7 @@ namespace Utilities.Contants
         YEU_CAU_XUAT_HOA_DON = 86,//quản lý phiếu thu
         CHUONG_TRINH = 90,//quản chương trình qc
         //CHUONG_TRINH = 82,//quản chương trình pro
+        XEP_HANG = 99,//Bảng xếp hạng
 
     }
 }

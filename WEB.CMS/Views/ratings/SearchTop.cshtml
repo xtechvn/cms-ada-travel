@@ -3,168 +3,68 @@
 @{
     Layout = null;
 }
-<style>
 
-    .ranking {
-        display: flex;
-        justify-content: center;
-        gap: 30px;
-        flex-wrap: wrap;
-    }
+<div class="bg-white pd15 radius-10 mb30">
 
-    .medal {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1 1 150px;
-        max-width: 200px;
-    }
-
-    .avatar-wrapper {
-        position: relative;
-        width: 100px;
-        height: 100px;
-        margin-bottom: 10px;
-    }
-
-        .avatar-wrapper img.avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid transparent;
-        }
-
-    .medal.gold .avatar-wrapper img.avatar {
-        border-color: gold;
-    }
-
-    .medal.silver .avatar-wrapper img.avatar {
-        border-color: silver;
-    }
-
-    .medal.bronze .avatar-wrapper img.avatar {
-        border-color: #cd7f32;
-    }
-
-    .medal-icon {
-        position: absolute;
-        bottom: -10px;
-        right: -10px;
-        width: 40px;
-        height: 40px;
-    }
-
-    .info {
-        background: #f5f9ff;
-        padding: 10px;
-        border-radius: 10px;
-        text-align: center;
-    }
-
-        .info .name {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .info .amount {
-            font-weight: bold;
-            color: #000088;
-            font-size: 16px;
-        }
-</style>
-
-<body>
-
-    <div class="container">
-
-        <h5>Danh hiệu Vàng – Lợi nhuận đỉnh cao</h5>
-        <div class="ranking">
-            @if (Model != null)
+    <h5>Danh hiệu Vàng – Lợi nhuận đỉnh cao</h5>
+    <div class="box-vinhdanh">
+        @if (Model != null)
+        {
+            <!-- Silver -->
+            @if (Model.Count >= 2)
             {
-                <!-- Silver -->
-                @if (Model.Count >= 2)
-                {
-                    <div class="medal silver" style="margin-top:10px;">
-                        <div class="avatar-wrapper">
-                            <img class="avatar" src="@(Model[1].Avata ==null ||Model[1].Avata ==""? "/images/graphics/user.jpeg" :Model[0].Avata)" alt="Silver">
-                            <img class="medal-icon" src="https://img.icons8.com/emoji/48/2nd-place-medal-emoji.png" alt="Silver medal">
+                <div class="item n2nd">
+                    <div class="image-avt">
+                        <div class="avt">
+                            <img src="@(Model[1].Avata ==null ||Model[1].Avata ==""? "/images/graphics/user.jpeg" :Model[0].Avata)" alt="" />
                         </div>
-                        <div class="info">
-                            <div class="name">@Model[1].FullName</div>
-                            <div class="amount">@Model[1].TotalProfit.ToString("N0") vnd</div>
-                        </div>
+                        <img class="tag" src="/images/graphics/2nd.png" alt="" />
                     </div>
-                }
-
-
-                <!-- Gold -->
-                @if (Model.Count >= 1)
-                {<div class="medal gold">
-                        <div class="avatar-wrapper">
-                            <img class="avatar" src="@(Model[0].Avata ==null ||Model[0].Avata ==""? "/images/graphics/user.jpeg" :Model[0].Avata)" alt="Gold">
-                            <img class="medal-icon" src="https://img.icons8.com/emoji/48/1st-place-medal-emoji.png" alt="Gold medal">
-                        </div>
-                        <div class="info">
-                            <div class="name">@Model[0].FullName</div>
-                            <div class="amount">@Model[0].TotalProfit.ToString("N0") vnd</div>
-                        </div>
+                    <div class="info">
+                        <h4 class="name">@Model[1].FullName</h4>
+                        <p class="price">@Model[1].TotalProfit.ToString("N0") vnđ</p>
                     </div>
-
-                }
-
-
-                <!-- Bronze -->
-                @if (Model.Count >= 3)
-                {
-                    <div class="medal bronze" style="margin-top:20px;">
-                        <div class="avatar-wrapper">
-                            <img class="avatar" src="@(Model[2].Avata ==null ||Model[2].Avata ==""? "/images/graphics/user.jpeg" :Model[0].Avata)" alt="Bronze">
-                            <img class="medal-icon" src="https://img.icons8.com/emoji/48/3rd-place-medal-emoji.png" alt="Bronze medal">
-                        </div>
-                        <div class="info">
-                            <div class="name">@Model[2].FullName</div>
-                            <div class="amount">@Model[2].TotalProfit.ToString("N0") vnd</div>
-                        </div>
-                    </div>
-                }
+                </div>
             }
 
 
-        </div>
+            <!-- Gold -->
+            @if (Model.Count >= 1)
+            {
+                <div class="item n1st">
+                    <div class="image-avt">
+                        <div class="avt">
+                            <img src="@(Model[0].Avata ==null ||Model[0].Avata ==""? "/images/graphics/user.jpeg" :Model[0].Avata)" alt="" />
+                        </div>
+                        <img class="tag" src="/images/graphics/1st.png" alt="" />
+                    </div>
+                    <div class="info">
+                        <h4 class="name">@Model[0].FullName</h4>
+                        <p class="price">@Model[0].TotalProfit.ToString("N0") vnđ</p>
+                    </div>
+                </div>
+
+            }
+
+
+            <!-- Bronze -->
+            @if (Model.Count >= 3)
+            {
+                <div class="item n3rd">
+                    <div class="image-avt">
+                        <div class="avt">
+                            <img src="@(Model[2].Avata ==null ||Model[2].Avata ==""? "/images/graphics/user.jpeg" :Model[0].Avata)" alt="" />
+                        </div>
+                        <img class="tag" src="/images/graphics/3rd.png" alt="" />
+                    </div>
+                    <div class="info">
+                        <h4 class="name">@Model[2].FullName</h4>
+                        <p class="price">@Model[2].TotalProfit.ToString("N0") vnđ</p>
+                    </div>
+                </div>
+            }
+        }
+
+
     </div>
-
-</body>
-
-@*@if (Model != null)
-{
-
-    <div class="wrap_bg wrap_bg_no-padding mb20">
-        <div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding">
-            <table class="table table-nowrap">
-                <thead>
-                    <tr>
-                        <th class="text-center">Họ tên</th>
-                        <th class="text-center">Doanh thu</th>
-
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    @foreach (var item in Model)
-                    {
-                        <tr class="list-row">
-                            <td class="text-center">@item.FullName</td>
-                            <td class="text-center">@item.TotalProfit</td>
-
-
-                        </tr>
-                    }
-
-                </tbody>
-            </table>
-        </div>
-
-    </div>
-}*@
+</div>

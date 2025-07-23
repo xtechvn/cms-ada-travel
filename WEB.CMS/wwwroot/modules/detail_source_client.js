@@ -222,4 +222,88 @@ var _detail_source_client = {
             }
         });
     },
+    ClientOnPaging: function (value) {
+        var input = {
+            MaKH: null,
+            CreatedBy: null,
+            TenKH: null,
+            Email: null,
+            Phone: null,
+            AgencyType: null,
+            ClientType: null,
+            PermissionType: null,
+            PageIndex: value,
+            PageSize: 10,
+            MinAmount: null,
+            MaxAmount: null,
+            UtmSource: $('#UtmSource').val(),
+        }
+            ;
+        _global_function.AddLoading()
+        $.ajax({
+            url: "/CustomerManagerManual/ListClientBySource",
+            type: "Post",
+            data: input,
+            success: function (result) {
+                _global_function.RemoveLoading()
+                $('#imgLoading_client').hide();
+                $('#grid_data_client').html(result);
+                $('.checkbox-tb-column').each(function () {
+                    let seft = $(this);
+                    let id = seft.data('id');
+                    if (seft.is(':checked')) {
+                        $('td:nth-child(' + id + '),th:nth-child(' + id + ')').removeClass('mfp-hide');
+                    }
+                    else {
+                        $('td:nth-child(' + id + '),th:nth-child(' + id + ')').addClass('mfp-hide');
+                    }
+                });
+                $('#selectPaggingOptions').val(input.PageSize).attr("selected", "selected");
+
+            }
+        });
+    },
+    onSelectPageSize: function (value) {
+
+        var input = {
+            MaKH: null,
+            CreatedBy: null,
+            TenKH: null,
+            Email: null,
+            Phone: null,
+            AgencyType: null,
+            ClientType: null,
+            PermissionType: null,
+            PageIndex: 1,
+            PageSize: value,
+            MinAmount: null,
+            MaxAmount: null,
+            UtmSource: $('#UtmSource').val(),
+        }
+            ;
+        _global_function.AddLoading()
+        $.ajax({
+            url: "/CustomerManagerManual/ListClientBySource",
+            type: "Post",
+            data: input,
+            success: function (result) {
+                _global_function.RemoveLoading()
+                $('#imgLoading_client').hide();
+                $('#grid_data_client').html(result);
+                $('.checkbox-tb-column').each(function () {
+                    let seft = $(this);
+                    let id = seft.data('id');
+                    if (seft.is(':checked')) {
+                        $('td:nth-child(' + id + '),th:nth-child(' + id + ')').removeClass('mfp-hide');
+                    }
+                    else {
+                        $('td:nth-child(' + id + '),th:nth-child(' + id + ')').addClass('mfp-hide');
+                    }
+                });
+                $('#selectPaggingOptions').val(input.PageSize).attr("selected", "selected");
+
+            }
+        });
+
+    },
 }
