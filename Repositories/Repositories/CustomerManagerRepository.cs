@@ -222,11 +222,7 @@ namespace Repositories.Repositories
             var model = new GenericViewModel<CustomerManagerViewModel>();
             try
             {
-                var st2 = new Stopwatch();
-                st2.Start();
                 DataTable dt = await _ClientDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETGetAllClient_Search);
-                st2.Stop();
-                LogHelper.InsertLogTelegram("time sp SP_GetClientData: " + st2.ElapsedMilliseconds);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = dt.ToList<CustomerManagerViewModel>();

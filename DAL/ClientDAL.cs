@@ -360,11 +360,8 @@ namespace DAL
                 objParam[14] = new SqlParameter("@CreatedBy", searchModel.CreatedBy);
                 objParam[15] = new SqlParameter("@UtmSource", searchModel.UtmSource);
                 objParam[16] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
-                var st2 = new Stopwatch();
-                st2.Start();
+      
                 var data =_DbWorker.GetDataTable(proc, objParam);
-                st2.Stop();
-                LogHelper.InsertLogTelegram("time sp SP_GetClientData-GetPagingList: " + st2.ElapsedMilliseconds);
                 return data;
             }
             catch (Exception ex)
