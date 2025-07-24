@@ -251,3 +251,47 @@ var _source_client = {
     },
 
 }
+var _detail_source_client = {
+    Summit: function () {
+        let FromCreate = $('#_source_client_Detail');
+        FromCreate.validate({
+            rules: {
+
+                "Type": "required",
+                "CodeValue": "required",
+                "Description": "required",
+            },
+            messages: {
+                "Type": "Type không được bỏ trống",
+                "CodeValue": "CodeValue không được bỏ trống",
+                "Description": "Description không được bỏ trống",
+
+            }
+        });
+        if (FromCreate.valid()) {
+            var object_summit = {
+                Id: $('#id').val(),
+                Type: $('#Type').val(),
+                CodeValue: $('#CodeValue').val(),
+                Description: $('#Description').val(),
+            }
+            _global_function.AddLoading()
+            $.ajax({
+                url: '/AllCode/Setup',
+                type: "post",
+                data: { model: object_summit },
+                success: function (result) {
+                    _global_function.RemoveLoading()
+                    if (result.status == 0) {
+                        _msgalert.success(result.msg);
+                        $.magnificPopup.close()
+                        _source_client.SearchData()
+                    } else {
+                        _msgalert.error(result.msg);
+                    }
+
+                }
+            });
+        }
+    },
+}
