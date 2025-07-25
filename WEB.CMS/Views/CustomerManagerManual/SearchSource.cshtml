@@ -13,8 +13,7 @@
                         <th class="text-center">Id</th>
                     
                         <th class="text-center">Nguồn khách hàng</th>
-                        <th class="text-center">Chỉnh sửa</th>
-                  
+                        <th class="text-center">Hành động</th>
                     </tr>
                 </thead>
 
@@ -25,8 +24,13 @@
                         <tr class="list-row">
                             <td class="text-center">@item.CodeValue</td>
                            
-                            <td class="text-center"><a class="cursor-pointer blue" style="color: #056BD3!important" href="/CustomerManagerManual/ListClientSource/@item.CodeValue">@item.Description</a> </td>
+                            <td class="text-center"><a class="cursor-pointer " href="/CustomerManagerManual/ListClientSource/@item.CodeValue">@item.Description</a> </td>
                             <td class="text-center">
+                                <a class="cursor-pointer blue"href="/CustomerManagerManual/ListClientSource/@item.CodeValue" >
+                                  Xem chi tiết
+                                </a>                          
+                            </td>
+                            <td class="text-center mfp-hide">
                                 <a class="cursor-pointer" onclick="_source_client.OpenPopup(@item.Id)" title="Chỉnh sửa">
                                     <i class="fa fa-edit"></i>
                                 </a>                          

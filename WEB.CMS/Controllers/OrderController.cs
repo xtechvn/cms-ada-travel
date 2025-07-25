@@ -4,6 +4,7 @@ using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.Attachment;
 using Entities.ViewModels.Contract;
+using Entities.ViewModels.DebtGuarantee;
 using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Invoice;
@@ -1236,7 +1237,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 {
                                     var allCodes = orderStatus.Where(s => s.CodeValue == status).ToList();
                                     model.Log = allCodes[0].Description;
-                                    model.Note = user.FullName + " cập nhật trạng thái đơn " + allCodes[0].Description ;
+                                    model.Note = user.FullName + " cập nhật trạng thái đơn " + allCodes[0].Description;
                                     LogActionMongo.InsertLog(model);
                                     string link = "/Order/" + OrderId;
 
@@ -1249,11 +1250,17 @@ namespace WEB.Adavigo.CMS.Controllers
                         case (int)OrderStatus.CANCEL:
                             {
                                 var data2 = await _orderRepository.UpdateOrderStatus(OrderId, status, UpdatedBy, UserVerify);
+                                var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid((int)OrderId);
+                                if (DetailDebtGuarantee != null)
+                                {
+                                    _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.TU_CHOI, (int)UserVerify);
+
+                                }
                                 if (data2 > 0)
                                 {
                                     var allCodes = orderStatus.Where(s => s.CodeValue == status).ToList();
                                     model.Log = allCodes[0].Description;
-                                    model.Note = user.FullName + " cập nhật trạng thái đơn " + allCodes[0].Description ;
+                                    model.Note = user.FullName + " cập nhật trạng thái đơn " + allCodes[0].Description;
                                     LogActionMongo.InsertLog(model);
                                     var updateOrderService = await _orderRepository.UpdateAllServiceStatusByOrderId(OrderId, (int)ServiceStatus.Cancel);
 
@@ -2294,7 +2301,7 @@ namespace WEB.Adavigo.CMS.Controllers
 
                     var orderStatus = _allCodeRepository.GetListByType("ORDER_STATUS");
                     var allCodes = orderStatus.Where(s => s.CodeValue == Convert.ToInt32(model.OrderStatus)).ToList();
-                    modelLog.Note +=  allCodes[0].Description;
+                    modelLog.Note += allCodes[0].Description;
                     long UserVerify = 0;
 
                     var modelOrder = new Entities.Models.Order();
@@ -2652,46 +2659,17 @@ namespace WEB.Adavigo.CMS.Controllers
             var current_user = _ManagementUser.GetCurrentUser();
             var user = await _userRepository.GetDetailUser(current_user.Id);
             ViewBag.DebtLimit = ((double)user.Entity.DebtLimit).ToString("N0");
-            var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id.ToString(), current_user.Id.ToString());
+            var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id.ToString(), current_user.UserUnderList.ToString());
             ViewBag.AmountTotal = AmountTotal.ToString("N0");
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> SearchSaleDebtLimit(OrderViewSearchModel searchModel, int currentPage = 1, int pageSize = 20)
+        public async Task<IActionResult> SearchSaleDebtLimit(SearchDebtGuarantee Searchmodel)
         {
-            var model = new GenericViewModel<OrderViewModel>();
-            var model2 = new TotalCountSumOrder();
+            var model = new GenericViewModel<DebtGuaranteeViewModel>();
             try
             {
-                if (searchModel.OrderNo != null && searchModel.OrderNo.Trim() != "") searchModel.OrderNo = searchModel.OrderNo.ToUpper();
-                if (searchModel.HINHTHUCTT != null && searchModel.HINHTHUCTT[0] != null)
-                {
-                    foreach (var item in searchModel.HINHTHUCTT)
-                    {
-                        var listHINHTHUCTT = item.Split('_');
-                        if (searchModel.PermisionType == null)
-                        {
-                            searchModel.PermisionType = listHINHTHUCTT[0];
-                        }
-                        else
-                        {
-                            searchModel.PermisionType += "," + listHINHTHUCTT[0];
-                        }
-                        if (searchModel.PaymentStatus == null)
-                        {
-                            searchModel.PaymentStatus = listHINHTHUCTT[1];
-                        }
-                        else
-                        {
-                            searchModel.PaymentStatus += "," + listHINHTHUCTT[1];
-                        }
-
-                    }
-
-
-                }
                 var current_user = _ManagementUser.GetCurrentUser();
-                searchModel.Sale = current_user.Id.ToString();
                 if (current_user != null)
                 {
                     if (current_user.Role != "")
@@ -2717,13 +2695,13 @@ namespace WEB.Adavigo.CMS.Controllers
                                 case (int)RoleType.GDHN:
                                 case (int)RoleType.GDHPQ:
                                     {
-                                        if (searchModel.SalerPermission == null || searchModel.SalerPermission.Trim() == "")
+                                        if (Searchmodel.SalerPermission == null || Searchmodel.SalerPermission.Trim() == "")
                                         {
-                                            searchModel.SalerPermission = current_user.UserUnderList;
+                                            Searchmodel.SalerPermission = current_user.UserUnderList;
                                         }
                                         else
                                         {
-                                            searchModel.SalerPermission += "," + current_user.UserUnderList;
+                                            Searchmodel.SalerPermission += "," + current_user.UserUnderList;
 
                                         }
                                     }
@@ -2733,8 +2711,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 case (int)RoleType.GD:
                                 case (int)RoleType.PhoTPKeToan:
                                     {
-                                        searchModel.Sale = null;
-                                        searchModel.SalerPermission = null;
+                                        Searchmodel.SalerPermission = null;
                                         is_admin = true;
                                     }
                                     break;
@@ -2742,75 +2719,18 @@ namespace WEB.Adavigo.CMS.Controllers
                             if (is_admin) break;
                         }
 
-                        model = await _orderRepository.GetList(searchModel, currentPage, pageSize);
-                        model2 = await _orderRepository.GetTotalCountSumOrder(searchModel, -1, pageSize);
+
                     }
 
                 }
+                model = await _debtGuaranteeRepository.GetListDebtGuarantee(Searchmodel);
+        
 
-                long records;
-
-                switch (searchModel.StatusTab)
-                {
-                    case 99:
-                        records = model.TotalRecord;
-                        break;
-                    case 0:
-                        records = model.TotalRecord4;
-                        break;
-                    case 1:
-                        records = model.TotalRecord1;
-                        break;
-                    case 2:
-                        records = model.TotalRecord2;
-                        break;
-                    case 3:
-                        records = model.TotalRecord3;
-                        break;
-                    default:
-                        records = model.TotalrecordErr;
-                        break;
-                }
-                //model.TotalPage = (int)Math.Ceiling((double)records / model.PageSize);
-
-                ViewBag.FilterOrder = new FilterOrder()
-                {
-                    Totalrecord = model.TotalRecord,
-                    TotalData = records,
-                    Totalrecord1 = model.TotalRecord1,
-                    Totalrecord2 = model.TotalRecord2,
-                    Totalrecord3 = model.TotalRecord3,
-                    Totalrecord4 = model.TotalRecord4,
-                    TotalrecordErr = model.TotalrecordErr,
-                    TotalValueOrder = new TotalValueOrder()
-                    {
-                        //theo All
-                        TotalAmmount = model2.Amount.ToString("N0"),
-                        TotalDone = model?.ListData?.Sum(x => x.Amount).ToString("N0"),
-                        TotalProductService = model2.Price.ToString("N0"),
-                        TotalProfit = model2.Profit.ToString("N0")
-
-                        //theo pageSize
-                        //TotalAmmount = model?.ListData?.Sum(x => x.Amount).ToString("N0"),
-                        //TotalDone = model?.ListData?.Sum(x => x.Amount).ToString("N0"),
-                        //TotalProductService = model?.ListData?.Sum(x => x.Payment).ToString("N0"),
-                        //TotalProfit = model?.ListData?.Sum(x => x.Profit).ToString("N0")
-                    }
-                };
-                //model = await _orderRepository.GetPagingList(searchModel, currentPage, pageSize);
-                // Add Invoice Code:
-                ViewBag.Invoice = new List<InvoiceRequestViewModel>();
-                if (model != null && model.ListData != null && model.ListData.Count > 0)
-                {
-                    var order_ids = string.Join(",", model.ListData.Select(x => x.OrderId));
-                    ViewBag.Invoice = await _invoiceRepository.GetListInvoiceRequestbyOrderId(order_ids);
-                }
-            }
+                return PartialView(model); }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("Search - OrderController: " + ex);
+                LogHelper.InsertLogTelegram("GetList - DebtGuaranteeController: " + ex);
             }
-
             return PartialView(model);
         }
     }

@@ -3,6 +3,7 @@
     $("#OrderId").select2({
         theme: 'bootstrap4',
         placeholder: "Mã đơn hàng",
+        maximumSelectionLength: 1,
         /* tags: true,*/
         ajax: {
             url: "/Order/OrderNoSuggestion",
@@ -27,6 +28,36 @@
                 };
             },
 
+            cache: true
+        }
+    });
+    $("#ClientId").select2({
+        theme: 'bootstrap4',
+        placeholder: "khách hàng",
+        maximumSelectionLength: 1,
+        ajax: {
+            url: "/Contract/ClientSuggestion",
+            type: "post",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                var query = {
+                    txt_search: params.term,
+                }
+
+                // Query parameters will be ?search=[term]&type=public
+                return query;
+            },
+            processResults: function (response) {
+                return {
+                    results: $.map(response.data, function (item) {
+                        return {
+                            text: item.clientname + ' - ' + item.email + ' - ' + item.phone,
+                            id: item.id,
+                        }
+                    })
+                };
+            },
             cache: true
         }
     });
@@ -80,8 +111,10 @@ var _debt_guarantee = {
         var _searchModel = {
             Code: null,
             Status: null,
-            OrderId: null,
+            ClientId: null,
+            DepartmentId: null,
             CreateTime: null,
+            ToDateTime: null,
             ToDateTime: null,
             PageIndex: 1,
             PageSize: 20,
@@ -115,12 +148,15 @@ var _debt_guarantee = {
         var _searchModel = {
             Code: $('#Code').val(),
             Status: listStatus.toString(),
-            OrderId: $('#OrderId').val(),
+            OrderId: $('#OrderId').select2("val"),
+            ClientId: $('#ClientId').select2("val"),
+            DepartmentId: $('#DepartmentId').val(),
             CreateTime: null,
             ToDateTime: null,
             PageIndex: PageIndex,
             PageSize: $("#selectPaggingOptions").find(':selected').val(),
         }
+        if (_searchModel.PageSize == undefined) _searchModel.PageSize = 20;
         if (isPickerApprove) {
             _searchModel.CreateTime = $('#filter_date_daterangepicker').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
             _searchModel.ToDateTime = $('#filter_date_daterangepicker').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");

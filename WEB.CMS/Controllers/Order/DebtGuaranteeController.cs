@@ -39,11 +39,12 @@ namespace WEB.CMS.Controllers.Order
         private IOtherBookingRepository _otherBookingRepository;
         private readonly IVinWonderBookingRepository _vinWonderBookingRepository;
         private readonly IWebHostEnvironment _WebHostEnvironment;
+        private readonly IDepartmentRepository _DepartmentRepository;
 
         public DebtGuaranteeController(IDebtGuaranteeRepository debtGuaranteeRepository, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
             IOrderRepository orderRepository, IConfiguration configuration, ManagementUser managementUser, IEmailService emailService, ITourRepository tourRepository, 
             IHotelBookingRepositories hotelBookingRepositories, IFlyBookingDetailRepository flyBookingDetailRepository, IOtherBookingRepository otherBookingRepository,
-            IVinWonderBookingRepository vinWonderBookingRepository, IWebHostEnvironment webHostEnvironment)
+            IVinWonderBookingRepository vinWonderBookingRepository, IWebHostEnvironment webHostEnvironment, IDepartmentRepository departmentRepository)
         {
             _debtGuaranteeRepository = debtGuaranteeRepository;
             _allCodeRepository = allCodeRepository;
@@ -58,11 +59,14 @@ namespace WEB.CMS.Controllers.Order
             _otherBookingRepository = otherBookingRepository;
             _vinWonderBookingRepository = vinWonderBookingRepository;
             _WebHostEnvironment = webHostEnvironment;
+            _DepartmentRepository = departmentRepository;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var STATUS = _allCodeRepository.GetListByType("DEBTSTATISTIC_STATUS");
+            var departments = await _DepartmentRepository.GetAll("");
             ViewBag.Status = STATUS;
+            ViewBag.departments = departments;
             return View();
         }
         public async Task<IActionResult> GetList(SearchDebtGuarantee Searchmodel)

@@ -1,0 +1,265 @@
+﻿@using Entities.Models
+@{
+    var departments = (List<Department>)ViewBag.departments;
+    var orderStatus = (List<AllCode>)ViewBag.orderStatus;
+    var branchs = (List<AllCode>)ViewBag.Branch;
+    var Type = (List<AllCode>)ViewBag.serviceType;
+    var PAYMENT_STATUS = (List<AllCode>)ViewBag.PAYMENT_STATUS;
+    var PERMISION_TYPE = (List<AllCode>)ViewBag.PERMISION_TYPE;
+
+    ViewData["Title"] = "Báo cáo Doanh thu theo phòng ban";
+
+}
+<style>
+    .btn_reset {
+        position: absolute;
+        right: 32px;
+        top: 7px;
+        width: 20px;
+        height: 20px;
+        border: 0;
+        outline: 0;
+        border-radius: 50%;
+        cursor: pointer;
+        background: #C4C4C4
+    }
+
+    .Zebra_DatePicker_Icon_Wrapper {
+        width: 100% !important;
+    }
+</style>
+<section style=" overflow-x: hidden; min-height:720px;">
+    <div id="filter" class="row-main container">
+        <div class="flex ">
+            <div class="form-group mb10 mr-2" style="min-width: 220px;">
+                <select class="select2 client-select main-staff-select" id="Type" style="width:100% !important" disabled>
+                    <option selected value="4">Báo cáo phòng ban sale</option>
+                </select>
+            </div>
+            <div class="form-group mb10 mr-2" style="min-width: 220px;">
+                <select class="select2 client-select main-staff-select" id="DepartmentType" style="width:100% !important">
+                    <option value="1">Theo phòng ban bán hàng</option>
+                    <option value="2">Theo nhân viên bán hàng</option>
+                    @*<option value="3">Theo nhà cung cấp</option>*@
+                    <option value="4">Theo khách hàng</option>
+                </select>
+            </div>
+            <nw id="filter-departmentSale" class="flex ">
+                <div class="form-group mb10 mr-2" style="min-width: 220px;">
+                    <div class="datepicker-wrap add-lbl " style="width:100%;">
+                        <span class="lbl" style="width:30%;">Ngày tạo</span>
+                        <div style="width: 100%; margin-left: 28% !important;">
+                            <input class="form-control date text-left " id="filter_date_daterangepicker_DateFrom" type="text" name="datetimeApprove" placeholder="Từ ngày" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb10 mr-2" style="min-width: 220px; margin-left: 5%;">
+                    <div class="datepicker-wrap add-lbl " style="width:100%;">
+                        <span class="lbl" style="width:30%;">Ngày tạo</span>
+                        <div style="width: 100%; margin-left: 28% !important;">
+                            <input class="form-control date text-left " id="filter_date_daterangepicker_DateTo" type="text" name="datetimeApprove" placeholder="Đến ngày" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb10 mr-2 " style="min-width: 220px; margin-left: 5%;">
+
+                    <select class="select2 client-select main-staff-select" id="SalerId_sale" multiple style="width:100% !important">
+                    </select>
+                </div>
+                <div class="form-group mb10 mr-2" style="min-width: 220px;">
+
+                    <select class="select2 client-select main-staff-select" id="sale-DepartmentId" style="width:100% !important">
+                        <option value="0">Tất cả phòng ban</option>
+                        @if (departments != null)
+                        {
+                            foreach (var item in departments)
+                            {
+                                <option value="@item.Id">@item.DepartmentName</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+                <div class="form-group mb10 mr-2" id="ServiceType_BC" style="display:none">
+                    <div class="multiple-select form-group mb10 mr-2" style="width: 180px;">
+                        <div class="select-btn select-service-type-BC" id="ServiceTypeBC">
+                            <span class="btn-text-service-BC">Tất cả dịch vụ</span>
+                            <span class="arrow-dwn">
+                                <i class="fa fa-angle-down"></i>
+                            </span>
+                        </div>
+
+                        <ul class="list-items" id="list-item-service-type-BC">
+                            @foreach (var item in Type)
+                            {
+                                <li class="item item-services-BC" id="service_data_BC_@item.CodeValue">
+                                    <span class="checkbox" id="checkbox_service_type_BC_@item.CodeValue">
+                                        <i class="fa fa-check"></i>
+                                    </span>
+                                    <span class="item-text" id="service_text_BC_@item.CodeValue">@item.Description</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group mb10 mr-2" style="display:none;">
+                    <div class="multiple-select form-group mb10 mr-2" style=" width: 200px; ">
+                        <div class="select-btn select-btn-OrderStatus-type" id="select-btn-OrderStatus-type">
+                            <span class="btn-text-OrderStatus-type">Tất cả trạng thái</span>
+                            <span class="arrow-dwn">
+                                <i class="fa fa-angle-down"></i>
+                            </span>
+                        </div>
+
+                        <ul class="list-items" id="list-item-OrderStatus">
+                            @foreach (var item in orderStatus)
+                            {
+                                <li class="item item-OrderStatus-type" id="OrderStatus_type_@item.CodeValue">
+                                    <span class="checkbox" id="checkbox_OrderStatus_type_@item.CodeValue">
+                                        <i class="fa fa-check"></i>
+                                    </span>
+                                    <span class="item-text" id="OrderStatus_type_text_@item.CodeValue">@item.Description</span>
+                                </li>
+                            }
+
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group mb10 mr-2">
+                    <div class="multiple-select form-group mb10 mr-2" style=" width: 200px; ">
+                        <div class="select-btn select-btn-OrderStatus-sale-type" id="select-btn-OrderStatus-sale-type">
+                            <span class="btn-text-OrderStatus-sale-type">Tất cả trạng thái</span>
+                            <span class="arrow-dwn">
+                                <i class="fa fa-angle-down"></i>
+                            </span>
+                        </div>
+
+                        <ul class="list-items" id="list-item-OrderStatus-sale">
+                            @foreach (var item in orderStatus)
+                            {
+                                <li class="item item-OrderStatus-sale-type" id="OrderStatus_sale_type_@item.CodeValue">
+                                    <span class="checkbox" id="checkbox_OrderStatus_sale_type_@item.CodeValue">
+                                        <i class="fa fa-check"></i>
+                                    </span>
+                                    <span class="item-text" id="OrderStatus_sale_type_text_@item.CodeValue">@item.Description</span>
+                                </li>
+                            }
+
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="mb10 mr-2" style="min-width: 220px;">
+                    <button class="btn btn-default" type="button" onclick="_ReportDepartment.ExportDepartmentBysaler()" id="btnExport">
+                        <i class="fa fa-file-excel-o" id="icon-export" title="Xuất excel">
+                        </i>
+                    </button>
+                    <button type="button" class="btn btn-default bg-main" onclick="_ReportDepartment.SearchData()">
+                        <svg class="icon-svg" style="vertical-align: sub;">
+                            <use xlink:href="/images/icons/icon.svg#search"></use>
+                        </svg>
+                        Tìm kiếm
+                    </button>
+                </div>
+            </nw>
+        </div>
+        <div class="">
+            <div id="grid-data">
+            </div>
+            <img src="~/images/icons/loading.gif" style="margin-left:45%; width: 100px; height: 100px; display:none" class="loading" id="imgLoading" />
+        </div>
+
+    </div>
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="~/modules/ReportDepartment.js"></script>
+    <script type="text/javascript" src="~/modules/report_operator.js"></script>
+    <script type="text/javascript" src="/js/zebra_datepicker.min.js"></script>
+    <script>
+
+
+        $('#filter_date_daterangepicker').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+        $('#filter_date_daterangepicker').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            isPickerApprove = false;
+        });
+        $('#filter_date_daterangepicker').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+            isPickerApprove = true;
+        });
+
+        $('#CreateDate').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+        $('#CreateDate').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            isPickerApprove4 = false;
+        });
+        $('#CreateDate').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+            isPickerApprove4 = true;
+        });
+        $('input[name="StartDate"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+        $('input[name="StartDate"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            isPickerApprove2 = false;
+        });
+        $('input[name="StartDate"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+            isPickerApprove2 = true;
+        });
+
+        $('input[name="EndDate"]').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+        $('input[name="EndDate"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            isPickerApprove3 = false;
+        });
+        $('input[name="EndDate"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+            isPickerApprove3 = true;
+        });
+
+
+        $("#filter_date_daterangepicker_DateFrom").Zebra_DatePicker({
+            onSelect: function () {
+                var fromDate = $("#filter_date_daterangepicker_DateFrom").val()
+                var lstFromDate = fromDate.split('-')
+                $("#filter_date_daterangepicker_DateFrom").val(lstFromDate[2] + '/' + lstFromDate[1] + '/' + lstFromDate[0])
+            },
+            onClear: function () {
+
+            }
+        });
+        $("#filter_date_daterangepicker_DateTo").Zebra_DatePicker({
+            onSelect: function () {
+                var fromDate = $("#filter_date_daterangepicker_DateTo").val()
+                var lstFromDate = fromDate.split('-')
+                $("#filter_date_daterangepicker_DateTo").val(lstFromDate[2] + '/' + lstFromDate[1] + '/' + lstFromDate[0])
+            },
+            onClear: function () {
+
+            }
+        });
+    </script>
+
+}

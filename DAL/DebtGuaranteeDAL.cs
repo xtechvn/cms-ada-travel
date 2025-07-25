@@ -27,7 +27,7 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[8];
+                SqlParameter[] objParam = new SqlParameter[10];
                 objParam[0] = new SqlParameter("@Code", model.Code);
                 objParam[1] = new SqlParameter("@Status", model.Status);
                 objParam[2] = new SqlParameter("@OrderId", model.OrderId);
@@ -36,6 +36,8 @@ namespace DAL
                 objParam[5] = new SqlParameter("@SalerPermission", model.SalerPermission);
                 objParam[6] = (CheckDate(model.CreateTime) == DateTime.MinValue) ? new SqlParameter("@CreateTime", DBNull.Value) : new SqlParameter("@CreateTime", CheckDate(model.CreateTime));
                 objParam[7] = (CheckDate(model.ToDateTime) == DateTime.MinValue) ? new SqlParameter("@ToDateTime", DBNull.Value) : new SqlParameter("@ToDateTime", CheckDate(model.ToDateTime).AddDays(1));
+                objParam[8] = new SqlParameter("@ClientId", model.ClientId); 
+                objParam[9] = new SqlParameter("@DepartmentId", model.DepartmentId); 
                 return _dbWorker.GetDataTable(StoreProcedureConstant.SP_GetListDebtGuarantee, objParam);
 
             }
@@ -131,13 +133,15 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[6];
+                SqlParameter[] objParam = new SqlParameter[8];
                 objParam[0] = new SqlParameter("@Code", model.Code);
                 objParam[1] = new SqlParameter("@Status", model.Status);
                 objParam[2] = new SqlParameter("@OrderId", model.OrderId);
                 objParam[3] = new SqlParameter("@SalerPermission", model.SalerPermission);
                 objParam[4] = (CheckDate(model.CreateTime) == DateTime.MinValue) ? new SqlParameter("@CreateTime", DBNull.Value) : new SqlParameter("@CreateTime", CheckDate(model.CreateTime));
                 objParam[5] = (CheckDate(model.ToDateTime) == DateTime.MinValue) ? new SqlParameter("@ToDateTime", DBNull.Value) : new SqlParameter("@ToDateTime", CheckDate(model.ToDateTime).AddDays(1));
+                objParam[6] = new SqlParameter("@ClientId", model.ClientId);
+                objParam[7] = new SqlParameter("@DepartmentId", model.DepartmentId);
                 return _dbWorker.GetDataTable(StoreProcedureConstant.SP_SumTotalGetListDebtGuarantee, objParam);
 
             }

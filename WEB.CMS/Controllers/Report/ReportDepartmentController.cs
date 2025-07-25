@@ -1796,5 +1796,41 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                 });
             }
         }
+        public async Task<IActionResult> ReportDepartmentBysalerIndex()
+        {
+            var departments = await _DepartmentRepository.GetAll("");
+            var orderStatus = _allCodeRepository.GetListByType(AllCodeType.ORDER_STATUS);
+            var branchs = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
+            var serviceType = _allCodeRepository.GetListByType(AllCodeType.SERVICE_TYPE);
+            var PAYMENT_STATUS = _allCodeRepository.GetListByType(AllCodeType.PAYMENT_STATUS);
+            var PERMISION_TYPE = _allCodeRepository.GetListByType(AllCodeType.PERMISION_TYPE);
+
+            ViewBag.PAYMENT_STATUS = PAYMENT_STATUS;
+            ViewBag.PERMISION_TYPE = PERMISION_TYPE;
+            ViewBag.departments = departments;
+            ViewBag.orderStatus = orderStatus;
+            ViewBag.Role = 0;
+            ViewBag.Branch = branchs;
+            ViewBag.serviceType = serviceType;
+            var current_user = _ManagementUser.GetCurrentUser();
+            if (current_user.Role != "")
+            {
+                var list = current_user.Role.Split(',');
+                foreach (var item in list)
+                {
+                    switch (Convert.ToInt32(item))
+                    {
+                        case (int)RoleType.SaleOnl:
+                        case (int)RoleType.SaleTour:
+                        case (int)RoleType.SaleKd:
+                            {
+                                ViewBag.Role = 1;
+                            }
+                            break;
+                    }
+                }
+            }
+            return View();
+        }
     }
 }

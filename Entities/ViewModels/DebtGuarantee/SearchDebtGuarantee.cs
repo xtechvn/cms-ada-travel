@@ -10,6 +10,8 @@ namespace Entities.ViewModels.DebtGuarantee
     {
         public string Code { get; set; }
         public string Status { get; set; }
+        public string ClientId { get; set; }
+        public string DepartmentId { get; set; }
         public string OrderId { get; set; }
         public string CreateTime { get; set; }
         public string ToDateTime { get; set; }
