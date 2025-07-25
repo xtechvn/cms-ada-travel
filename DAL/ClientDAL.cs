@@ -539,5 +539,19 @@ namespace DAL
                 return 0;
             }
         }
+        public async Task<DataTable> GetSumContractPayByUtmSource()
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[0];
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetSumContractPayByUtmSource, objParam);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("getClientid - ClientDal: " + ex);
+            }
+            return null;
+        }
     }
 }

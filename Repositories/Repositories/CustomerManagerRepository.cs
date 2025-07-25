@@ -8,6 +8,7 @@ using Entities.ViewModels;
 using Entities.ViewModels.CustomerManager;
 using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.Funding;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Repositories.IRepositories;
@@ -476,7 +477,7 @@ namespace Repositories.Repositories
                                     ws.Cells[Cell[I] + RowIndex].PutValue(item.StatusName);
                                     listfield2.Remove(listfield2[f]); f--; break;
 
-                                } 
+                                }
                                 if (listfield2[f] == 13)
                                 {
 
@@ -570,6 +571,24 @@ namespace Repositories.Repositories
             {
                 LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
                 return 0;
+            }
+        }
+        public async Task<List<SumContractPayByUtmSource>> GetSumContractPayByUtmSource()
+        {
+            try
+            {
+                DataTable dt = await _ClientDAL.GetSumContractPayByUtmSource();
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<SumContractPayByUtmSource>();
+                    return data;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
+                return null;
             }
         }
     }

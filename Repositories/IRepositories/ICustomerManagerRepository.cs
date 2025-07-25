@@ -21,5 +21,6 @@ namespace Repositories.IRepositories
         Task<int> UpdateStatusClient(int status, int id);
         Task<List<Client>> GetClientByPhone(string phone);
         Task<int> CreateClient(CustomerManagerView model);
+        Task<List<SumContractPayByUtmSource>> GetSumContractPayByUtmSource();
     }
 }

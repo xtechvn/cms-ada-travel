@@ -14,6 +14,7 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service;
@@ -511,17 +512,32 @@ namespace WEB.CMS.Controllers.CustomerManager
             }
             return View();
         }
-        public IActionResult SearchSource(string type)
+        public async Task<IActionResult> SearchSource(string type)
         {
+            var data_model = new List<SumContractPayByUtmSource>();
             var data = _allCodeRepository.GetListByType(type);
-            return View(data);
+            var sum = await _customerManagerRepositories.GetSumContractPayByUtmSource();
+            if (data != null && data.Count > 0)
+            {
+                foreach (var item in data)
+                {
+                    var data_detail = new SumContractPayByUtmSource();
+                    data_detail.CodeValue = item.CodeValue;
+                    data_detail.Description = item.Description;
+                    var sum_detai = sum.FirstOrDefault(s => s.UtmSource == item.CodeValue);
+                    data_detail.TotalAmount = sum_detai != null ? sum_detai.TotalAmount : 0;
+                    data_model.Add(data_detail);
+                }
+            }
+
+            return View(data_model);
         }
         public IActionResult ListClientSource(int Id)
         {
             ViewBag.id = Id;
             var CLIENT_SOURCE = _allCodeRepository.GetListByType(AllCodeType.CLIENT_SOURCE);
-           var detail= CLIENT_SOURCE.FirstOrDefault(s => s.CodeValue == Id);
-           ViewBag.Description= detail.Description;
+            var detail = CLIENT_SOURCE.FirstOrDefault(s => s.CodeValue == Id);
+            ViewBag.Description = detail.Description;
             return View();
         }
         public async Task<IActionResult> ListClientBySource(CustomerManagerViewSearchModel searchModel, int currentPage = 1, int pageSize = 20)
@@ -530,7 +546,7 @@ namespace WEB.CMS.Controllers.CustomerManager
 
             try
             {
-                currentPage= searchModel.PageIndex;
+                currentPage = searchModel.PageIndex;
                 pageSize = searchModel.PageSize;
                 var current_user = _ManagementUser.GetCurrentUser();
                 if (current_user != null)
@@ -546,8 +562,8 @@ namespace WEB.CMS.Controllers.CustomerManager
                             var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.VIEW_ALL, (int)MenuId.XEP_HANG);
                             if (listPermissions == true)
                             {
-                                searchModel.SalerPermission = current_user.UserUnderList+","+ current_user.Id.ToString(); i++;
-                            } 
+                                searchModel.SalerPermission = current_user.UserUnderList + "," + current_user.Id.ToString(); i++;
+                            }
                             if (listPermissions6 == true || item == (int)RoleType.Admin)
                             {
                                 searchModel.SalerPermission = null;
@@ -649,7 +665,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                     catch
                     {
                         return PartialView(success_model);
-                    }             
+                    }
                     foreach (var item in success_model)
                     {
                         var list_client = await _customerManagerRepositories.GetClientByPhone(item.phone);
@@ -684,7 +700,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                             _workQueueClient.SyncES(clientdetail.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
 
                         }
-                       
+
                     }
                     ViewBag.success_count = summit_model.Count;
                     return PartialView(err_model);

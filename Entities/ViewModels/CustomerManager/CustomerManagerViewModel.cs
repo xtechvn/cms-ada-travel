@@ -119,4 +119,10 @@ namespace Entities.ViewModels.CustomerManager
         public bool Status { get; set; }
 
     }
+    public class SumContractPayByUtmSource:AllCode
+    {
+        public int UtmSource { get; set; }
+        public double TotalAmount { get; set; }
+        
+    }
 }
