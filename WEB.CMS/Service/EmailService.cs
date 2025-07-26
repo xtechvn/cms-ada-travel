@@ -4408,9 +4408,9 @@ namespace WEB.Adavigo.CMS.Service
                     {
                         body = body.Replace("{{CongNo}}", "Không công nợ với NCC");
                     }
-                    if (model.Note != null && model.Note != "")
+                    if (model.Description != null && model.Description != "")
                     {
-                        body = body.Replace("{{DHNote}}", model.Note);
+                        body = body.Replace("{{DHNote}}", model.Description);
                     }
                     else
                     {
@@ -4497,9 +4497,9 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{DoanhT}}", model.RelateData.Sum(n => n.Amount).ToString("N0"));
                     body = body.Replace("{{GhiChu}}", Emailmodel.GhiChu);
                     body = body.Replace("{{BChuDT}}", NumberToString.So_chu((double)model.RelateData.Sum(n => n.Amount)));
-                    if (model.Note != null && model.Note != "")
+                    if (model.Description != null && model.Description != "")
                     {
-                        body = body.Replace("{{DHNote}}", model.Note);
+                        body = body.Replace("{{DHNote}}", model.Description);
                     }
                     else
                     {
