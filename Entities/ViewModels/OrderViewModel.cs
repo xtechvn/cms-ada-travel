@@ -120,6 +120,7 @@ namespace Entities.ViewModels
         public string UtmSource { get; set; }
         public List<int>? ServiceType { get; set; }
         public List<int>? Status { get; set; }
+        public List<int>? InvoiceRequestStatus { get; set; }
         public string CreateTime { get; set; }
         public string ToDateTime { get; set; }
         public string CreateName { get; set; }

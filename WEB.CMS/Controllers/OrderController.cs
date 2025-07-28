@@ -127,10 +127,12 @@ namespace WEB.Adavigo.CMS.Controllers
                 var orderStatus = _allCodeRepository.GetListByType("ORDER_STATUS");
                 var PAYMENT_STATUS = _allCodeRepository.GetListByType("PAYMENT_STATUS");
                 var PERMISION_TYPE = _allCodeRepository.GetListByType("PERMISION_TYPE");
+                var INVOICE_REQUEST_STATUS = _allCodeRepository.GetListByType(AllCodeType.INVOICE_REQUEST_STATUS);
                 //var model = await _orderRepository.GetPagingList(new OrderViewSearchModel(), currentPage, pageSize);
                 //var model = await _orderRepository.GetList(new OrderViewSearchModel(), currentPage, pageSize);
                 ViewBag.PAYMENT_STATUS = PAYMENT_STATUS;
                 ViewBag.PERMISION_TYPE = PERMISION_TYPE;
+                ViewBag.INVOICE_REQUEST_STATUS = INVOICE_REQUEST_STATUS;
                 ViewBag.FilterOrder = new FilterOrder()
                 {
                     SysTemType = systemtype,
