@@ -123,5 +123,6 @@ namespace Entities.ViewModels
         public string PackageName { get; set; }
         public List<AttachFile> AttachFile { get; set; }
         public string AttachFiles { get; set; }
+        public int Count { get; set; }
     }
 }

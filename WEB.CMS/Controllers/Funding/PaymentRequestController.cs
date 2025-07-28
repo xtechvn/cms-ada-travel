@@ -20,6 +20,7 @@ using Utilities.Contants;
 using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
+using WEB.CMS.Service;
 
 namespace WEB.Adavigo.CMS.Controllers.Funding
 {
@@ -45,6 +46,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         private IndentiferService _indentiferService;
         private INoteRepository _noteRepository;
         private IVinWonderBookingRepository _vinWonderBookingRepository;
+        private readonly CountYCCMongoService _countYCCMongoService;
         public PaymentRequestController(IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser,
            IPaymentRequestRepository paymentRequestRepository, ISupplierRepository supplierRepository, IUserRepository userRepository,
            ITourPackagesOptionalRepository tourPackagesOptionalRepository, IConfiguration configuration, IFlyBookingDetailRepository flyBookingDetailRepository,
@@ -69,6 +71,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
             _noteRepository = noteRepository;
             _vinWonderBookingRepository = vinWonderBookingRepository;
+            _countYCCMongoService = new CountYCCMongoService(configuration);
         }
 
         public IActionResult Index()
@@ -579,6 +582,8 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
 
         public async Task<IActionResult> Detail(int paymentRequestId)
         {
+            ViewBag.count_ycc = 0;
+            ViewBag.count_ycc = _countYCCMongoService.GetCountYCC(paymentRequestId);
             var model = _paymentRequestRepository.GetById(paymentRequestId);
             if (model.RelateData == null) model.RelateData = new List<PaymentRequestDetailViewModel>();
             var current_user = _ManagementUser.GetCurrentUser();

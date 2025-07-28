@@ -33,6 +33,7 @@ using WEB.Adavigo.CMS.Service;
 using WEB.Adavigo.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
+using WEB.CMS.Service;
 using static Utilities.Contants.OrderConstants;
 using static Utilities.DepositHistoryConstant;
 
@@ -73,6 +74,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
         private readonly HotelBookingMongoService hotelBookingMongoService;
         private LogActionMongoService LogActionMongo;
         private readonly WorkQueueClient workQueueClient;
+        private readonly CountYCCMongoService _countYCCMongoService;
 
         public SetServiceController(IConfiguration configuration, IHotelBookingRepositories hotelBookingRepositories, IOrderRepositor orderRepositor, IOrderRepository orderRepository, IWebHostEnvironment WebHostEnvironment
             , IHotelBookingRoomRepository hotelBookingRoomRepository, IHotelBookingGuestRepository hotelBookingGuestRepository, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository,
@@ -112,6 +114,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
             hotelBookingMongoService = new HotelBookingMongoService(configuration);
             LogActionMongo = new LogActionMongoService(configuration);
             workQueueClient = new WorkQueueClient(configuration);
+            _countYCCMongoService = new CountYCCMongoService(configuration);
         }
         public async Task<IActionResult> SetServiceHotel()
         {
@@ -555,6 +558,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 listContractPay.Add(item);
             }
             ViewBag.listContractPay = listContractPay;
+            foreach (var item in data)
+            {
+                item.Count=_countYCCMongoService.GetCountYCC(item.Id);
+            }
             return PartialView(data);
         }
 
@@ -1719,7 +1726,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
             {
                 EmailYCChiViewModel Model = null;
                 if (id > 0)
-                {
+                { 
                     ViewBag.EmailBody = await _emailService.TemplatePaymentRequest(id, profit, type, Model);
                 }
                 ViewBag.id = id;
@@ -1740,6 +1747,13 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
 
                 if (id > 0)
                 {
+                    var current_user = _ManagementUser.GetCurrentUser();
+                    var detailUser =await _userRepository.GetById(current_user.Id);
+                    var model_data = new PaymentRequestMongoModel();
+                    model_data.PaymentRequestId = id;
+                    model_data.Count = 1;
+                    model_data.CreatedUserName = detailUser.FullName;
+                    _countYCCMongoService.Insert(model_data);
                     string html = await _emailService.TemplatePaymentRequest(id, profit, type, model);
                     // var result = SendToPrinterHelper.SendToPrinter(html);
                     var result = 0;
@@ -2030,7 +2044,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                     }
                     commit_booking.reservations.Add(item);
                 }
-                VinpearlLib vinpearlLib = new VinpearlLib(_configuration);
+                API_CORE.Service.Vin.VinpearlLib vinpearlLib = new API_CORE.Service.Vin.VinpearlLib(_configuration);
                 var commit_input = JsonConvert.SerializeObject(commit_booking);
                 //--Create Booking
                 var commit = await vinpearlLib.getVinpearlCreateBooking(commit_input);
