@@ -52,10 +52,11 @@ namespace WEB.Adavigo.CMS.Service
         private readonly IBankingAccountRepository _bankingAccountRepository;
         private readonly APIService _APIService;
         private readonly IPaymentVoucherRepository _paymentVoucherRepository;
+        private INoteRepository _noteRepository;
         public EmailService(IConfiguration configuration, IHotelBookingCodeRepository hotelBookingCodeRepository, IHotelBookingRepositories hotelBookingRepositories, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository, IHotelBookingRoomRatesRepository hotelBookingRoomRatesRepository,
         IFlyBookingDetailRepository flyBookingDetailRepository, IBagageRepository bagageRepository, IPassengerRepository passengerRepository, IOrderRepository orderRepository, IContactClientRepository contactClientRepository, IHotelBookingRoomRepository hotelBookingRoomRepository, IOtherBookingRepository otherBookingRepository,
              IUserRepository userRepository, IClientRepository clientRepository, ITourRepository tourRepository, IFlightSegmentRepository flightSegmentRepository, IAirlinesRepository airlinesRepository, ISupplierRepository supplierRepository, IPaymentRequestRepository paymentRequestRepository,
-             IVinWonderBookingRepository vinWonderBookingRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, IBankingAccountRepository bankingAccountRepository, IPaymentVoucherRepository paymentVoucherRepository)
+             IVinWonderBookingRepository vinWonderBookingRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, IBankingAccountRepository bankingAccountRepository, IPaymentVoucherRepository paymentVoucherRepository, INoteRepository noteRepository)
         {
 
             _configuration = configuration;
@@ -83,6 +84,7 @@ namespace WEB.Adavigo.CMS.Service
             _contractPayRepository = contractPayRepository;
             _APIService = new APIService(configuration, userRepository);
             _paymentVoucherRepository = paymentVoucherRepository;
+            _noteRepository = noteRepository;
         }
         public async Task<bool> SendEmail(SendEmailViewModel model, List<AttachfileViewModel> attach_file)
         {
@@ -4370,6 +4372,7 @@ namespace WEB.Adavigo.CMS.Service
                 if (Emailmodel == null)
                 {
                     var model = _paymentRequestRepository.GetById((int)id);
+                    var list_note= await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
                     string ngay = "Ngày " + model.CreatedDate.Value.Day.ToString();
                     string thang = "Tháng " + model.CreatedDate.Value.Month.ToString();
@@ -4404,6 +4407,31 @@ namespace WEB.Adavigo.CMS.Service
                     else
                     {
                         body = body.Replace("{{CongNo}}", "Không công nợ với NCC");
+                    }
+                    if (model.Description != null && model.Description != "")
+                    {
+                        body = body.Replace("{{DHNote}}", model.Description);
+                    }
+                    else
+                    {
+                        body = body.Replace("{{DHstyle}}", "display: none");
+                       
+                    }
+                    if (list_note != null && list_note.Count > 0)
+                    {
+                        var ktnote = "";
+
+                        foreach (var item in list_note)
+                        {
+
+                            ktnote += "<div" + "<span>"+item.FullName +" :"+ item.Comment + "</span></div>";
+                        }
+                        body = body.Replace("{{KTNote}}", ktnote);
+                    }
+                    else
+                    {
+                        body = body.Replace("{{KTstyle}}", "display: none");
+                       
                     }
 
 
@@ -4455,7 +4483,7 @@ namespace WEB.Adavigo.CMS.Service
                 {
                     var model = _paymentRequestRepository.GetById((int)id);
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
-
+                    var list_note = await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
                     string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
                     var template = workingDirectory + @"EmailTemplate\TemplatePaymentRequest.html";
                     string ngay = "Ngày " + model.CreatedDate.Value.Day.ToString();
@@ -4469,6 +4497,31 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{DoanhT}}", model.RelateData.Sum(n => n.Amount).ToString("N0"));
                     body = body.Replace("{{GhiChu}}", Emailmodel.GhiChu);
                     body = body.Replace("{{BChuDT}}", NumberToString.So_chu((double)model.RelateData.Sum(n => n.Amount)));
+                    if (model.Description != null && model.Description != "")
+                    {
+                        body = body.Replace("{{DHNote}}", model.Description);
+                    }
+                    else
+                    {
+                        body = body.Replace("{{DHstyle}}", "display: none");
+                        
+                    }
+                    if (list_note != null && list_note.Count > 0)
+                    {
+                        var ktnote = "";
+
+                        foreach (var item in list_note)
+                        {
+
+                            ktnote += "<div" + "<span>" + item.FullName + " :" + item.Comment + "</span></div>";
+
+                        }
+                        body = body.Replace("{{KTNote}}", ktnote);
+                    }
+                    else
+                    {
+                        body = body.Replace("{{KTstyle}}", "display: none");
+                    }
                     if (type != 1)
                     {
                         body = body.Replace("{{DoanhTITLE}}", "Doanh thu");
