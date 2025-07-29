@@ -103,6 +103,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 
                 var hotePositionB2B = hotelPosition != null && hotelPosition.Count > 0 ? hotelPosition.Where(S => S.PositionType == Utilities.Contants.PositionType.B2B).ToList() : null;
                 var hotePositionB2C = hotelPosition != null && hotelPosition.Count > 0 ? hotelPosition.Where(S => S.PositionType == Utilities.Contants.PositionType.B2C).ToList() : null;
+                var PositionBanChay = hotelPosition != null && hotelPosition.Count > 0 ? hotelPosition.Where(S => S.PositionType == Utilities.Contants.PositionType.BANCHAY).ToList() : null;
                 var hotel = _HotelRepository.GetHotelById(id);
                 //var HotelPosition = _HotelRepository.GetListHotelPosition(id);
 
@@ -134,6 +135,7 @@ namespace WEB.Adavigo.CMS.Controllers
                         Star = hotel.Star,
                         PositionB2B = hotePositionB2B != null && hotePositionB2B.Count > 0 ? (int)hotePositionB2B[0].Position : 0,
                         PositionB2C = hotePositionB2C != null && hotePositionB2C.Count > 0 ? (int)hotePositionB2C[0].Position : 0,
+                        PositionBanChay = PositionBanChay != null && PositionBanChay.Count > 0 ? (int)PositionBanChay[0].Position : 0,
                     };
                 }
             }
@@ -161,13 +163,15 @@ namespace WEB.Adavigo.CMS.Controllers
             try
             {
                 var result = _HotelRepository.SaveHotel(model);
-                
-                
-                
-             
+                int db_index = Convert.ToInt32(_configuration["Redis:Database:db_search_result"]);
+                if(model.PositionBanChay > 0)
+                {
+                    string cache_name_Ban_Chay = CacheName.HotelExclusiveList_BAN_CHAY_POSITION;
+                    _redisService.DeleteCacheByKeyword(cache_name_Ban_Chay, db_index);
+                }
                 if (result > 0)
                 {
-                    int db_index = Convert.ToInt32(_configuration["Redis:Database:db_search_result"]);
+                   
                     string cache_name = CacheName.HotelExclusiveListB2C_POSITION + model.City.Trim();
                     _redisService.DeleteCacheByKeyword(cache_name, db_index);
                     _workQueueClient.SyncES(result, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotel"], _configuration["DataBaseConfig:Elastic:Index:Hotel"], ProjectType.ADAVIGO_CMS, "SetUpHotel HotelController");

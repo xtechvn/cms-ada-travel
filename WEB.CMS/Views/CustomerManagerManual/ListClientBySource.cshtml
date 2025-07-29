@@ -27,6 +27,7 @@ else
                         <th class="" style="width: 100px;">Liên hệ</th>
                         <th class=" text-right" style="width: 100px;">Tổng thanh toán</th>
                         <th class="" style="width: 150px;">Nhân viên phụ trách</th>
+                        <th>Nhu cầu</th>
                     </tr>
                 </thead>
 
@@ -53,6 +54,18 @@ else
                                 <td class=" text-right">@item.sum_payment.ToString("###,###,###")</td>
                                 <td class="">@(item.UserId_name == null ? "N/A" : item.UserId_name)</td>
 
+                                <td class="">
+                                    @if (item.ListCommentNhuCau != null && item.ListCommentNhuCau.Count > 0)
+                                    {
+                                        foreach (var item2 in item.ListCommentNhuCau)
+                                        {
+                                            <div>
+                                                @item2.Note
+                                            </div>
+                                        }
+                                    }
+
+                                </td>
                             </tr>
                         }
 

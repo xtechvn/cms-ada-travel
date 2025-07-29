@@ -948,7 +948,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.HotelPosition.Where(s => s.HotelId == HotelId).ToList();
+                    var model = _DbContext.HotelPosition.Where(s => s.HotelId == HotelId && s.Status == PositionStatus.HD).ToList();
 
                     return model;
                 }

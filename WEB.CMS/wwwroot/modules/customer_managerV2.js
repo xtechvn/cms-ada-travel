@@ -8,10 +8,10 @@ let fieldsV2 = {
     MaKH: true,
     TenKH: true,
     LienHe: true,
-    DoiTuong: true,
-    LoaiKH: true,
-    NhomKH: true,
-    TongTT: true,
+    DoiTuong: false,
+    LoaiKH: false,
+    NhomKH: false,
+    TongTT: false,
     VNPhuTrach: true,
     NgayTao: false,
     NgayCN: false,
@@ -52,12 +52,12 @@ $(document).ready(function () {
         
     }
    
-    if (_customer_managerV2.getCookie('customer_manager_filterV2') != null) {
-        let cookie = _customer_managerV2.getCookie(cookieNameV2)
-        fieldsV2 = JSON.parse(cookie)
-    } else {
-        _customer_managerV2.setCookie(cookieNameV2, JSON.stringify(fieldsV2), 10)
-    }
+    //if (_customer_managerV2.getCookie('customer_manager_filterV2') != null) {
+    //    let cookie = _customer_managerV2.getCookie(cookieNameV2)
+    //    fieldsV2 = JSON.parse(cookie)
+    //} else {
+    //    _customer_managerV2.setCookie(cookieNameV2, JSON.stringify(fieldsV2), 10)
+    //}
 
     if (_customer_managerV2.getCookie('customer_manager_searchModelV2') != null) {
         let cookie2 = _customer_managerV2.getCookie(cookiesearchModel)

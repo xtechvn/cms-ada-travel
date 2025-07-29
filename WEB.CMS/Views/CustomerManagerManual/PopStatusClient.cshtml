@@ -17,18 +17,26 @@
                     <div class="col-md-6 mb10"><label class="lbl mt5 mb0">Trạng thái </label></div>
                     <div class="col-md-12 mb10">
                         <select class="select2 form-control" name="" id="Client_Status" style="width: 100%;">
-                            @foreach (var item2 in ClientStatus)
+                            @if (ViewBag.Type == 1)
                             {
-                                if (item2.CodeValue == Status)
-                                {
-                                    <option value="@item2.CodeValue" selected>@item2.Description</option>
-                                }
-                                else
-                                {
-                                    <option value="@item2.CodeValue">@item2.Description</option>
-                                }
-
+                                <option value="99" selected>Phản hồi khách hàng</option>
                             }
+                            else
+                            {
+                                @foreach (var item2 in ClientStatus)
+                                {
+                                    if (item2.CodeValue == Status)
+                                    {
+                                        <option value="@item2.CodeValue" selected>@item2.Description</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item2.CodeValue">@item2.Description</option>
+                                    }
+
+                                }
+                            }
+
                         </select>
                     </div>
 

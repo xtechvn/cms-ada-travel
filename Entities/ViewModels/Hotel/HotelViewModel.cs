@@ -22,6 +22,7 @@ namespace Entities.ViewModels.Hotel
         public string SupplierName { get; set; }
         public int PositionB2C { get; set; }
         public int PositionB2B { get; set; }
+        public int PositionBanChay { get; set; }
     }
 
 

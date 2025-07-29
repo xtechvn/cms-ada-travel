@@ -102,11 +102,15 @@
         let formData = hotel_management.GetFormData(Form);
         var b2c = $('#PositionB2C :checked').text();
         var b2B = $('#PositionB2B :checked').text();
+        var BanChay = $('#PositionBanChay :checked').text();
         if (parseFloat(formData.PositionB2B) != 0 && parseFloat(formData.PositionB2B) != parseFloat(b2B)) {
             formData.PositionB2B = b2B
         }
         if (parseFloat(formData.PositionB2C) != 0 && parseFloat(formData.PositionB2C) != parseFloat(b2c)) {
             formData.PositionB2C = b2c
+        }
+        if (parseFloat(formData.PositionBanChay) != 0 && parseFloat(formData.PositionBanChay) != parseFloat(BanChay)) {
+            formData.PositionBanChay = BanChay
         }
         
         let avatar = $('#avatar_image').attr('src');

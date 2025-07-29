@@ -507,11 +507,15 @@ var _customer_manager_Detail = {
         }
         
     },
-    PopUpClientStatus: function (id) {
+    PopUpClientStatus: function (id,type) {
         let title = 'Cập nhật trạng thái khách hàng';
+        if (type == 99) {
+            title='Phản hồi khách hàng'
+        }
         let url = '/CustomerManagerManual/PopStatusClient';
         let param = {
-            Clientid: id
+            Clientid: id,
+            Type:type
         };
         _magnific.OpenSmallPopup(title, url, param);
     },
@@ -532,12 +536,13 @@ var _customer_manager_Detail = {
         if (FromCreate.valid()) {
             var Client_Status = $('#Client_Status').val();
             var Client_Note = $('#Client_Note').val();
-
+            _global_function.AddLoading()
             $.ajax({
                 url: '/CustomerManagerManual/SetUpStatusClient',
                 type: "post",
                 data: { Clientid: id, Status: Client_Status, Note: Client_Note },
                 success: function (result) {
+                    _global_function.RemoveLoading()
                     if (result.status === 1) {
                         _msgalert.error(result.msg);
                     }

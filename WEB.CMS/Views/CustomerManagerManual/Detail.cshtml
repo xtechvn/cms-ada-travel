@@ -72,6 +72,10 @@
                         @if (ViewBag.btnStatus == 1)
                         {
                             <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.SendMailResetPasswordb2b(@ViewBag.id)">Gửi email tài khoản</button>
+                        } 
+                        @if (ViewBag.btnphanhoi == 1)
+                        {
+                            <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.PopUpClientStatus('@ViewBag.id',99)">Phản hồi</button>
                         }
                     </div>
                 </div>

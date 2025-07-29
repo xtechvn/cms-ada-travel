@@ -13,6 +13,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using Repositories.Repositories;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
@@ -37,8 +38,9 @@ namespace WEB.CMS.Controllers.CustomerManager
         private CommentClientMongoService _commentClientMongoService;
         private IDepartmentRepository _departmentRepository;
         private readonly WorkQueueClient _workQueueClient;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
         public CustomerManagerManualController(IConfiguration configuration, ManagementUser managementUser, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
-            ICustomerManagerRepository customerManagerRepositories, IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IDepartmentRepository departmentRepository)
+            ICustomerManagerRepository customerManagerRepositories, IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IDepartmentRepository departmentRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
             _configuration = configuration;
             _ManagementUser = managementUser;
@@ -52,6 +54,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             _commentClientMongoService = new CommentClientMongoService(_configuration);
             _departmentRepository = departmentRepository;
             _workQueueClient = new WorkQueueClient(configuration);
+            _identifierServiceRepository = identifierServiceRepository;
         }
         public async Task<IActionResult> Index()
         {
@@ -98,6 +101,18 @@ namespace WEB.CMS.Controllers.CustomerManager
         {
             try
             {
+                ViewBag.btnphanhoi = 0;
+                var CommentClient = new CommentClientMongoModel();
+                CommentClient.ClientId = id.ToString();
+                var ListComment = _commentClientMongoService.GetListComment(CommentClient);
+                if (ListComment != null && ListComment.Count > 0)
+                {
+                    var List_Comment = ListComment.Where(s => s.Type == (int)CommentClientMongoType.Phan_hoi).ToList();
+                    if (List_Comment != null && List_Comment.Count < 3)
+                    {
+                        ViewBag.btnphanhoi = 1;
+                    }
+                }
                 var model = await _clientRepository.GetClientDetailByClientId(id);
 
                 if (model != null && model.ClientType != ClientType.kl)
@@ -429,13 +444,33 @@ namespace WEB.CMS.Controllers.CustomerManager
             {
                 LogHelper.InsertLogTelegram("ListClient - CustomerManagerController: " + ex);
             }
-
+            if(model.ListData != null && model.ListData.Count > 0)
+            {
+                foreach (var item in model.ListData)
+                {
+                    var CommentClient = new CommentClientMongoModel();
+                    CommentClient.ClientId = item.Id.ToString();
+                    var ListComment = _commentClientMongoService.GetListComment(CommentClient);
+                    if(ListComment != null && ListComment.Count > 0)
+                    {
+                        item.ListComment = ListComment.Where(s => s.Type == (int)CommentClientMongoType.Phan_hoi).OrderBy(s=>s.CreatedTime).ToList();
+                        item.ListCommentNhuCau = ListComment.Where(s => s.Type == (int)CommentClientMongoType.nhu_cau).ToList();
+                    }
+             
+                }
+            }
             return PartialView(model);
         }
-        public async Task<IActionResult> PopStatusClient(string Clientid)
+        public async Task<IActionResult> PopStatusClient(string Clientid,int Type)
         {
             try
             {
+                ViewBag.Type = 0;
+                if (Type == 99)
+                {
+                    ViewBag.Type = 1;
+                }
+               
                 ViewBag.ClientId = Clientid;
                 var ClientType = _allCodeRepository.GetListByType(AllCodeType.CLIENT_STATUS);
                 ViewBag.ClientStatus = ClientType;
@@ -469,16 +504,27 @@ namespace WEB.CMS.Controllers.CustomerManager
                 model.UserName = detail_user.UserName;
                 model.UserId = _UserId;
                 model.ClientId = Clientid.ToString();
-                model.Note = "Cập nhật trạng thái khách hàng :" + ClientType.FirstOrDefault(s => s.CodeValue == Status).Description + ".Mô tả :" + Note;
-                var InsertComment = await _commentClientMongoService.InsertCommentClient(model);
-                var UpdateStatus = await _customerManagerRepositories.UpdateStatusClient(Status, Clientid);
-                if (UpdateStatus > 0)
+                if (Status == 99)
                 {
-                    return Ok(new
+                    model.Type = (int)CommentClientMongoType.Phan_hoi;//phẩn hồi
+                    model.Note= "Phản hồi : " + Note;
+                }
+                else
+                {
+                    model.Note = "Cập nhật trạng thái khách hàng :" + ClientType.FirstOrDefault(s => s.CodeValue == Status).Description + ".Mô tả :" + Note;
+                }
+                var InsertComment = await _commentClientMongoService.InsertCommentClient(model);
+                if (Status != 99)
+                {
+                    var UpdateStatus = await _customerManagerRepositories.UpdateStatusClient(Status, Clientid);
+                    if (UpdateStatus > 0)
                     {
-                        status = (int)ResponseType.SUCCESS,
-                        msg = "Cập nhật trạng thái khách hàng thành công",
-                    });
+                        return Ok(new
+                        {
+                            status = (int)ResponseType.SUCCESS,
+                            msg = "Cập nhật trạng thái khách hàng thành công",
+                        });
+                    }
                 }
                 return Ok(new
                 {
@@ -583,7 +629,20 @@ namespace WEB.CMS.Controllers.CustomerManager
             {
                 LogHelper.InsertLogTelegram("ListClient - CustomerManagerController: " + ex);
             }
+            if (model.ListData != null && model.ListData.Count > 0)
+            {
+                foreach (var item in model.ListData)
+                {
+                    var CommentClient = new CommentClientMongoModel();
+                    CommentClient.ClientId = item.Id.ToString();
+                    var ListComment = _commentClientMongoService.GetListComment(CommentClient);
+                    if (ListComment != null && ListComment.Count > 0)
+                    {
+                        item.ListCommentNhuCau = ListComment.Where(s => s.Type == (int)CommentClientMongoType.nhu_cau).ToList();
+                    }
 
+                }
+            }
             return PartialView(model);
         }
         public IActionResult ImportWSExcel(int type)
@@ -674,8 +733,8 @@ namespace WEB.CMS.Controllers.CustomerManager
                             err_model.Add(item);
                             continue;
                         }
-                        APIService apiService = new APIService(_configuration, _userRepository);
-                        var ClientCode = await apiService.buildClientCode(item.id_ClientType.ToString());
+                       
+                        var ClientCode =await _identifierServiceRepository.buildClientNo(Convert.ToInt32(item.id_ClientType));
                         var model_client = new CustomerManagerView();
                         model_client.Id = 0;
                         model_client.UserId = item.UserId;
@@ -690,15 +749,30 @@ namespace WEB.CMS.Controllers.CustomerManager
                         model_client.ClientCode = ClientCode;
                         model_client.UtmSource = item.UtmSource;
                         model_client.JoinDate = DateTime.Now;
+                        
 
                         var Result = await _customerManagerRepositories.CreateClient(model_client);
 
                         if (Result > 0)
                         {
+                            int _UserId = 0;
+                            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                            {
+                                _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                            }
+                            
                             summit_model.Add(item);
-                            var clientdetail = await _clientRepository.GetClientByClientCode(item.ClientCode);
+                            var clientdetail = await _clientRepository.GetClientByClientCode(ClientCode);
                             _workQueueClient.SyncES(clientdetail.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
-
+                            var modelClientMongo = new CommentClientMongoModel();
+                            var detail_user = await _userRepository.GetById(_UserId);
+                            modelClientMongo.FullName = detail_user.FullName;
+                            modelClientMongo.UserName = detail_user.UserName;
+                            modelClientMongo.UserId = _UserId;
+                            modelClientMongo.ClientId = clientdetail.Id.ToString();
+                            modelClientMongo.Type = (int)CommentClientMongoType.nhu_cau;//Nhu cầu
+                            modelClientMongo.Note = item.Note;
+                            var InsertComment = await _commentClientMongoService.InsertCommentClient(modelClientMongo);
                         }
 
                     }

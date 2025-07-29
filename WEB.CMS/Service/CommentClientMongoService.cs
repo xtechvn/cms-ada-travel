@@ -31,7 +31,8 @@ namespace WEB.CMS.Service
                     FullName = model.FullName,
                     ClientId = model.ClientId,
                     UserName = model.UserName,
-                    CreatedTime = DateTime.Now
+                    CreatedTime = DateTime.Now,
+                    Type = model.Type,
 
                 };
                 IMongoCollection<CommentClientMongoModel> affCollection = db.GetCollection<CommentClientMongoModel>(configuration["DataBaseConfig:MongoServer:Comment_Clent_collection"]);

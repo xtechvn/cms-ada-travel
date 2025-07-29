@@ -326,8 +326,35 @@ namespace Repositories.Repositories
                             _HotelDAL.InsertHotelPosition(modelPosition);
                         }
                     }
-
-                    return id;
+                    if (model.PositionBanChay > 0)
+                    {
+                        var ListHotelPosition = _HotelDAL.GetDetailHotelPositionByPosition(model.PositionBanChay, PositionType.BANCHAY);
+                        if (ListHotelPosition != null)
+                        {
+                            foreach (var item in ListHotelPosition)
+                            {
+                                var DetailHotel = GetHotelDetailById((int)item.HotelId);
+                                if (DetailHotel.City != null && model.City.Trim().ToUpper() == DetailHotel.City.Trim().ToUpper())
+                                {
+                                    item.Status = PositionStatus.khoa;
+                                    _HotelDAL.UpdateHotelPosition(item);
+                                }
+                            }
+                        }
+                        var list_BANCHAY = list_HotelPosition.Where(s => s.PositionType == (short?)PositionType.BANCHAY).ToList();
+                        modelPosition.Position = model.PositionBanChay;
+                        modelPosition.PositionType = (short?)PositionType.BANCHAY;
+                        if (list_BANCHAY != null && list_BANCHAY.Count > 0)
+                        {
+                            modelPosition.Id = list_BANCHAY[0].Id;
+                            _HotelDAL.UpdateHotelPosition(modelPosition);
+                        }
+                        else
+                        {
+                            _HotelDAL.InsertHotelPosition(modelPosition);
+                        }
+                    }
+                        return id;
                 }
                 else
                 {
@@ -380,7 +407,28 @@ namespace Repositories.Repositories
                         modelPosition.CreatedBy = model.CreatedBy;
                         _HotelDAL.InsertHotelPosition(modelPosition);
                     }
-
+                    if (model.PositionBanChay > 0)
+                    {
+                        var ListHotelPosition = _HotelDAL.GetDetailHotelPositionByPosition(model.PositionBanChay, PositionType.BANCHAY);
+                        if (ListHotelPosition != null)
+                        {
+                            foreach (var item in ListHotelPosition)
+                            {
+                                var DetailHotel = GetHotelDetailById((int)item.HotelId);
+                                if (DetailHotel.City != null && model.City.Trim().ToUpper() == DetailHotel.City.Trim().ToUpper())
+                                {
+                                    item.Status = PositionStatus.khoa;
+                                    _HotelDAL.UpdateHotelPosition(item);
+                                }
+                            }
+                        }
+                        var modelPosition = new HotelPosition();
+                        modelPosition.HotelId = id;
+                        modelPosition.Position = model.PositionBanChay;
+                        modelPosition.PositionType = (short?)PositionType.BANCHAY;
+                        modelPosition.CreatedBy = model.CreatedBy;
+                        _HotelDAL.InsertHotelPosition(modelPosition);
+                    }
                     return id;
                 }
             }

@@ -13,6 +13,7 @@ namespace Entities.ViewModels.Mongo
         public string ClientId { get; set; }
         public string FullName { get; set; }
         public int UserId { get; set; }
+        public int Type { get; set; }
         public string UserName { get; set; }
         public DateTime CreatedTime { get; set; }
     }

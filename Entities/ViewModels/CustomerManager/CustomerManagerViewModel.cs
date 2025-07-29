@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.ViewModels.Mongo;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -44,6 +45,8 @@ namespace Entities.ViewModels.CustomerManager
 
         public string StatusName { get; set; }
         public string UtmSourceName { get; set; }
+        public List<CommentClientMongoModel> ListComment { get; set; }
+        public List<CommentClientMongoModel> ListCommentNhuCau { get; set; }
     }
     public class CustomerManagerViewSearchModel
     {

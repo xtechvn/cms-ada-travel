@@ -8,6 +8,7 @@ namespace Utilities.Contants
     {
         public static int B2B = 1;
         public static int B2C = 2;
+        public static int BANCHAY = 3;
     }
 
 }

@@ -37,5 +37,6 @@ namespace Utilities.Contants
         public const string B2B_TOUR_LOCATION_START_ = "B2B_TOUR_LOCATION_START_";
         public const string B2B_TOUR_LOCATION_END_ = "B2B_TOUR_LOCATION_END_";
         public const string B2B_TOUR_SEARCH = "B2B_TOUR_SEARCH_";
+        public const string HotelExclusiveList_BAN_CHAY_POSITION = "HEXL_BAN_CHAY_B2C_POSITION_";
     }
 }
