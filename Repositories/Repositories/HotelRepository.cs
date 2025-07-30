@@ -21,7 +21,7 @@ namespace Repositories.Repositories
     {
         private readonly HotelDAL _HotelDAL;
         private readonly string _UrlStaticImage;
- 
+
         public HotelRepository(IHttpContextAccessor context, IOptions<DataBaseConfig> dataBaseConfig, IOptions<DomainConfig> domainConfig, IUserRepository userRepository, IConfiguration configuration) : base(context, dataBaseConfig, configuration, userRepository)
         {
             _HotelDAL = new HotelDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
@@ -252,17 +252,17 @@ namespace Repositories.Repositories
         {
             try
             {
-       
+
                 if (!string.IsNullOrEmpty(model.ImageThumb))
-                    model.ImageThumb = _UrlStaticImage +  UpLoadHelper.UploadBase64Src(model.ImageThumb, _UrlStaticImage).Result;
+                    model.ImageThumb = _UrlStaticImage + UpLoadHelper.UploadBase64Src(model.ImageThumb, _UrlStaticImage).Result;
                 if (model.Id > 0)
                 {
-                    if(model.HotelId == "0"|| model.HotelId == null|| model.HotelId =="")
+                    if (model.HotelId == "0" || model.HotelId == null || model.HotelId == "")
                     {
                         model.HotelId = model.Id.ToString();
                     }
                     model.UpdatedBy = _SysUserModel.Id;
-                   var id=  _HotelDAL.UpdateHotel(model);
+                    var id = _HotelDAL.UpdateHotel(model);
                     var modelPosition = new HotelPosition();
                     modelPosition.HotelId = model.Id;
                     modelPosition.CreatedBy = model.UpdatedBy;
@@ -276,7 +276,7 @@ namespace Repositories.Repositories
                         {
                             foreach (var item in ListHotelPosition)
                             {
-                                var DetailHotel =  GetHotelDetailById((int)item.HotelId);
+                                var DetailHotel = GetHotelDetailById((int)item.HotelId);
                                 if (DetailHotel.City != null && model.City.Trim().ToUpper() == DetailHotel.City.Trim().ToUpper())
                                 {
                                     item.Status = PositionStatus.khoa;
@@ -306,7 +306,7 @@ namespace Repositories.Repositories
                             foreach (var item in ListHotelPosition)
                             {
                                 var DetailHotel = GetHotelDetailById((int)item.HotelId);
-                                if (DetailHotel.City !=null && model.City.Trim().ToUpper() == DetailHotel.City.Trim().ToUpper())
+                                if (DetailHotel.City != null && model.City.Trim().ToUpper() == DetailHotel.City.Trim().ToUpper())
                                 {
                                     item.Status = PositionStatus.khoa;
                                     _HotelDAL.UpdateHotelPosition(item);
@@ -333,12 +333,9 @@ namespace Repositories.Repositories
                         {
                             foreach (var item in ListHotelPosition)
                             {
-                                var DetailHotel = GetHotelDetailById((int)item.HotelId);
-                                if (DetailHotel.City != null && model.City.Trim().ToUpper() == DetailHotel.City.Trim().ToUpper())
-                                {
-                                    item.Status = PositionStatus.khoa;
-                                    _HotelDAL.UpdateHotelPosition(item);
-                                }
+
+                                item.Status = PositionStatus.khoa;
+                                _HotelDAL.UpdateHotelPosition(item);
                             }
                         }
                         var list_BANCHAY = list_HotelPosition.Where(s => s.PositionType == (short?)PositionType.BANCHAY).ToList();
@@ -354,13 +351,13 @@ namespace Repositories.Repositories
                             _HotelDAL.InsertHotelPosition(modelPosition);
                         }
                     }
-                        return id;
+                    return id;
                 }
                 else
                 {
                     model.CreatedBy = _SysUserModel.Id;
                     model.SalerId = _SysUserModel.Id;
-                    var id =_HotelDAL.CreateHotel(model);
+                    var id = _HotelDAL.CreateHotel(model);
 
                     if (model.PositionB2B > 0)
                     {
@@ -414,12 +411,9 @@ namespace Repositories.Repositories
                         {
                             foreach (var item in ListHotelPosition)
                             {
-                                var DetailHotel = GetHotelDetailById((int)item.HotelId);
-                                if (DetailHotel.City != null && model.City.Trim().ToUpper() == DetailHotel.City.Trim().ToUpper())
-                                {
-                                    item.Status = PositionStatus.khoa;
-                                    _HotelDAL.UpdateHotelPosition(item);
-                                }
+                                item.Status = PositionStatus.khoa;
+                                _HotelDAL.UpdateHotelPosition(item);
+
                             }
                         }
                         var modelPosition = new HotelPosition();
@@ -534,7 +528,7 @@ namespace Repositories.Repositories
                     foreach (var image in model.OtherImages)
                     {
                         var img = UpLoadHelper.UploadBase64Src(image, _UrlStaticImage).Result;
-                        if(img!=null&& img.Trim() != "")
+                        if (img != null && img.Trim() != "")
                         {
                             arrImage.Add(img);
                         }
@@ -605,19 +599,19 @@ namespace Repositories.Repositories
         {
             try
             {
-                return await _HotelDAL.UpdateHotelSurchargeNote(body,id);
+                return await _HotelDAL.UpdateHotelSurchargeNote(body, id);
             }
             catch
             {
                 throw;
             }
         }
-       
-        public List<HotelPricePolicyViewModel> GetHotelRoomPricePolicy(string hotel_id, string room_ids,  string client_types)
+
+        public List<HotelPricePolicyViewModel> GetHotelRoomPricePolicy(string hotel_id, string room_ids, string client_types)
         {
             try
             {
-                var dataTable = _HotelDAL.GetHotelPricePolicy(hotel_id, room_ids,  client_types);
+                var dataTable = _HotelDAL.GetHotelPricePolicy(hotel_id, room_ids, client_types);
                 return dataTable.ToList<HotelPricePolicyViewModel>();
             }
             catch
@@ -629,10 +623,10 @@ namespace Repositories.Repositories
         {
             try
             {
-                    var list = _HotelDAL.GetListHotelPosition(hotelid);
-                  
-                    return list;
-                
+                var list = _HotelDAL.GetListHotelPosition(hotelid);
+
+                return list;
+
             }
             catch
             {
