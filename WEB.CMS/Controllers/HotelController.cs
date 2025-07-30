@@ -164,10 +164,12 @@ namespace WEB.Adavigo.CMS.Controllers
             {
                 var result = _HotelRepository.SaveHotel(model);
                 int db_index = Convert.ToInt32(_configuration["Redis:Database:db_search_result"]);
+               
                 if(model.PositionBanChay > 0)
                 {
+                    int db_index_1 = Convert.ToInt32(_configuration["Redis:Database:db_search_result_hotel"]);
                     string cache_name_Ban_Chay = CacheName.HotelExclusiveList_BAN_CHAY_POSITION;
-                    _redisService.DeleteCacheByKeyword(cache_name_Ban_Chay, db_index);
+                    _redisService.DeleteCacheByKeyword(cache_name_Ban_Chay, db_index_1);
                 }
                 if (result > 0)
                 {
