@@ -167,9 +167,8 @@ namespace WEB.Adavigo.CMS.Controllers
                
                 if(model.PositionBanChay > 0)
                 {
-                    int db_index_1 = Convert.ToInt32(_configuration["Redis:Database:db_search_result_hotel"]);
                     string cache_name_Ban_Chay = CacheName.HotelExclusiveList_BAN_CHAY_POSITION;
-                    _redisService.DeleteCacheByKeyword(cache_name_Ban_Chay, db_index_1);
+                    _redisService.DeleteCacheByKeyword(cache_name_Ban_Chay, db_index);
                 }
                 if (result > 0)
                 {
