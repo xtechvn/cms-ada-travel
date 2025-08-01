@@ -20,22 +20,6 @@
         var max_range = dd + '/' + mm + '/' + yyyy;
         var start_day_of_month = new Date(yyyy, mm - 1, 1);
 
-        $('#report_date').each(function (index, item) {
-            var element = $(item)
-            element.daterangepicker({
-                autoApply: true,
-                autoUpdateInput: false,
-                showDropdowns: true,
-                drops: 'down',
-                minDate: min_range,
-                maxDate: max_range,
-                locale: {
-                    format: 'DD/MM/YYYY'
-                }
-            });
-            element.data('daterangepicker').setStartDate(start_day_of_month);
-            element.data('daterangepicker').setEndDate(max_range);
-        })
         _report_client_debt.SearchData()
     },
     ExportExcel: function () {

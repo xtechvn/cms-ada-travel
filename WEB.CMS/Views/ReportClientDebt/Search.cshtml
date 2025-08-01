@@ -74,7 +74,7 @@ else
                             <td style="text-align: right;">@((item.AmountDebit != null ? (double)item.AmountDebit : 0).ToString("N0"))</td>
                             <td style="text-align: right;">@((item.AmountCredit != null ? (double)item.AmountCredit : 0).ToString("N0"))</td>
                             <td style="text-align: right;">@((item.AmountClosingBalanceDebit != null ? (double)item.AmountClosingBalanceDebit : 0).ToString("N0"))</td>
-                            <td style="text-align: right;"></td>
+                            <td style="text-align: right;">@((item.AmountClosingBalanceCredit != null ? (double)item.AmountClosingBalanceCredit : 0).ToString("N0"))</td>
                             <td style="text-align: center;">
                                 <a href="javascript:;" onclick="_report_client_debt_detail.Detail(@item.ClientId,@item.AmountOpeningBalanceDebit);">Xem chi tiết</a>
                             </td>
