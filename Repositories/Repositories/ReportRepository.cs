@@ -852,7 +852,7 @@ namespace Repositories.Repositories
                 {
                     Workbook wb = new Workbook();
                     Worksheet ws = wb.Worksheets[0];
-                    ws.Name = "Nợ phải thu của KH";
+                    ws.Name = "danh sách";
                     Cells cell = ws.Cells;
 
                     var range = ws.Cells.CreateRange(0, 0, 1, 1);

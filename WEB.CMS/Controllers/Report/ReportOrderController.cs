@@ -182,7 +182,7 @@ namespace WEB.CMS.Controllers.Report
                 }
 
                 string folder = @"\Template\Export\";
-                string file_name = StringHelpers.GenFileName("Tổng hợp Yêu cầu ci theo đớn hàng", _UserId, "xlsx");
+                string file_name = StringHelpers.GenFileName("Tổng hợp Yêu cầu chi theo đớn hàng", _UserId, "xlsx");
                 string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, folder);
                 string file_path_combine = Path.Combine(_UploadDirectory, file_name);
                 if (!Directory.Exists(folder))
