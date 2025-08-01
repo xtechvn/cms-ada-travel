@@ -103,7 +103,7 @@ var _report_order = {
         };
         return _searchModel;
     },
-    OnPaging: function (values) {
+    ClientOnPaging: function (values) {
         objSearch = this.GetParam();
         objSearch.PageIndex = values;
         if (objSearch.PageSize == undefined) {
