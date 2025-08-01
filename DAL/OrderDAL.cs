@@ -6,6 +6,7 @@ using Entities.ViewModels.Funding;
 using Entities.ViewModels.OrderManual;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -1094,7 +1095,7 @@ namespace DAL
             }
             return null;
         }
-        public async Task<DataTable> CheckAmountRemainBySalerId(string SalerId,string SalerPermission)
+        public async Task<DataTable> CheckAmountRemainBySalerId(string SalerId, string SalerPermission)
         {
             try
             {
@@ -1126,6 +1127,34 @@ namespace DAL
                 LogHelper.InsertLogTelegram("GetDetailOrderServiceByOrderId - OrderDal: " + ex);
             }
             return 0;
+        }
+        public async Task<DataTable> GetListOrder(SearchReportOrderModels searchModel)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[13];
+                objParam[0] = new SqlParameter("@StartDateFrom", searchModel.StartDateFrom == null ? DBNull.Value : searchModel.StartDateFrom);
+                objParam[1] = new SqlParameter("@StartDateTo", searchModel.StartDateTo == null ? DBNull.Value : searchModel.StartDateTo);
+                objParam[2] = new SqlParameter("@EndDateFrom", searchModel.EndDateFrom == null ? DBNull.Value : searchModel.EndDateFrom);
+                objParam[3] = new SqlParameter("@EndDateTo", searchModel.EndDateTo == null ? DBNull.Value : searchModel.EndDateTo);
+                objParam[4] = new SqlParameter("@CreateDateFrom", searchModel.CreateDateFrom == null ? DBNull.Value : searchModel.CreateDateFrom);
+                objParam[5] = new SqlParameter("@CreateDateTo", searchModel.CreateDateTo == null ? DBNull.Value : searchModel.CreateDateTo);
+                objParam[6] = new SqlParameter("@ClientId", searchModel.ClientId == null ? DBNull.Value : searchModel.ClientId);
+                objParam[7] = new SqlParameter("@SupplierId", searchModel.SupplierId == null ? DBNull.Value : searchModel.SupplierId);
+                objParam[8] = new SqlParameter("@OrderId", searchModel.OrderId == null ? DBNull.Value : searchModel.OrderId);
+                objParam[9] = new SqlParameter("@OrderStatus", searchModel.OrderStatus == null ? DBNull.Value : searchModel.OrderStatus);
+                objParam[10] = new SqlParameter("@Module", searchModel.Module == null ? DBNull.Value : searchModel.Module);
+                objParam[11] = new SqlParameter("@PageIndex", searchModel.PageIndex);
+                objParam[12] = new SqlParameter("@PageSize", searchModel.pageSize);
+
+
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListReportOrder, objParam);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListOrder - OrderDal: " + ex);
+            }
+            return null;
         }
     }
 }

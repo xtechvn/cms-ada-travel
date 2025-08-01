@@ -16,6 +16,7 @@ namespace Repositories.IRepositories
         public Task<string> ExportTotalDebtRevenueByClient(GenericViewModel<ReportClientDebtViewModel> model, string file_path);
         public Task<GenericViewModel<ReportDetailClientDebtViewModel>> GetDetailDebtRevenueByClient(ReportDetailClientDebtSearchModel searchModel);
         public Task<string> ExportDetailDebtRevenueByClient(GenericViewModel<ReportDetailClientDebtViewModel> model, string file_path, ReportDetailClientDebtSearchModel searchModel);
+        Task<string> ExportReportOrder(List<ReportOrderViewModel> model, string file_path);
 
     }
 }

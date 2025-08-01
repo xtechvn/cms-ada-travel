@@ -1245,5 +1245,45 @@ namespace Repositories.Repositories
             }
             return -1;
         }
+        public async Task<GenericViewModel<ReportOrderViewModel>> GetlistReportOrder(SearchReportOrderModels searchModel)
+        {
+            var model = new GenericViewModel<ReportOrderViewModel>();
+            try
+            {
+                DataTable dt = await _OrderDal.GetListOrder(searchModel);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<ReportOrderViewModel>();
+                    model.ListData = data;
+                    model.CurrentPage = searchModel.PageIndex;
+                    model.PageSize = searchModel.pageSize;
+                    model.TotalRecord = Convert.ToInt32(dt.Rows[0]["TotalRow"]);
+                    model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / model.PageSize);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetlistReportOrder in OrderRepository: " + ex);
+            }
+            return model;
+        }
+        public async Task<List<ReportOrderServiceViewModel>> GetReportOrderAllServiceByOrderId(long OrderId)
+        {
+            //var data = new List<OrderServiceViewModel>();
+            try
+            {
+                DataTable dt = await _OrderDal.GetAllServiceByOrderId(OrderId);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var listData = dt.ToList<ReportOrderServiceViewModel>();
+                    return listData;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetReportOrderAllServiceByOrderId - OrderRepository: " + ex);
+            }
+            return null;
+        }
     }
 }

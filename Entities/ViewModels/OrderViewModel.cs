@@ -285,4 +285,48 @@ namespace Entities.ViewModels
         public double Price { get; set; }
    
     }
+    public class SearchReportOrderModels
+    {
+        public string OrderId { get; set; } = null;
+        public string ClientId { get; set; } = null;
+        public string SupplierId { get; set; } = null;
+        public string OrderStatus { get; set; } = null;
+        public string Module { get; set; } = null;
+        public DateTime? StartDateFrom { get; set; } = null;
+        public DateTime? StartDateTo { get; set; } = null;
+        public DateTime? EndDateTo { get; set; } = null;
+        public DateTime? EndDateFrom { get; set; } = null;
+        public DateTime? CreateDateFrom { get; set; } = null;
+        public DateTime? CreateDateTo { get; set; } = null;
+        public int PageIndex { get; set; }
+        public int pageSize { get; set; }
+    }
+    public class ReportOrderViewModel
+    {
+        public long OrderId { get; set; } 
+        public string OrderNo { get; set; } 
+        public string Amount { get; set; } 
+        public string StatusName { get; set; } 
+        public string StatusCode { get; set; } 
+        public DateTime CreatedDate { get; set; } 
+        public string CreateName { get; set; }
+        public int CountService { get; set; }
+        public List<ReportOrderServiceViewModel> ListService { get; set; }
+    }
+    public class ReportOrderServiceViewModel
+    {
+        public string ServiceId { get; set; }
+        public double Amount { get; set; }
+        public double Price { get; set; }
+        public double Profit { get; set; }
+        public double Refund { get; set; }
+        public double OrderAmount { get; set; }
+        public string Type { get; set; }
+        public string StatusName { get; set; }
+        public string ServiceCode { get; set; }
+        public int Status { get; set; }
+        public int CountPaymentRequest { get; set; }
+      public List<PaymentRequestViewModel> ListPaymentRequest { get; set; }
+
+    }
 }

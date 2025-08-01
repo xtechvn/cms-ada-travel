@@ -467,6 +467,7 @@ namespace Utilities.Contants
         public static string SP_InsertUserAgent = "SP_InsertUserAgent";
         public static string sp_UpdateUserAgent = "sp_UpdateUserAgent";
         public static string SP_GetListUserProfitReport = "SP_GetListUserProfitReport";
+        public static string SP_GetListReportOrder = "SP_GetListReportOrder";
 
 
 
