@@ -61,9 +61,10 @@
             branch = branch_element.val()
         }
         var daterange_element = $('#report_date')
+        var daterange_element2 = $('#report_date').val()
         var min_date = null
         var max_date=null
-        if (daterange_element != undefined && daterange_element != null) {
+        if (daterange_element != undefined && daterange_element != null && daterange_element2 != "") {
             min_date = _global_function.GetDayText(daterange_element.data('daterangepicker').startDate._d,true).split(' ')[0]
             max_date = _global_function.GetDayText(daterange_element.data('daterangepicker').endDate._d, true).split(' ')[0]
         }
