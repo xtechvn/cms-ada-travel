@@ -86,13 +86,14 @@ namespace WEB.CMS.Controllers.Report
                                     if (service.ListPaymentRequest != null && service.ListPaymentRequest.Count > 0)
                                     {
                                         service.CountPaymentRequest = service.ListPaymentRequest.Count + 1;
-                                        CountService = service.ListPaymentRequest.Count;
+
                                     }
 
                                 }
                                 if (AllService != null && AllService.Count > 0)
                                 {
-                                    item.CountService = AllService.Count * 2 + CountService;
+                                    CountService = AllService.Max(s => s.CountPaymentRequest)==2? AllService.Max(s => s.CountPaymentRequest)-1: AllService.Max(s => s.CountPaymentRequest);
+                                    item.CountService = AllService.Count * 2 + CountService ;
                                 }
                                 item.ListService = AllService;
 
