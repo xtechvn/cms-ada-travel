@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using Repositories.Repositories;
+using StackExchange.Redis;
 using System.Linq;
 using System.Security.Claims;
 using Utilities;
@@ -413,10 +414,12 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
 
             if (model.Type == (int)PAYMENT_VOUCHER_TYPE.THANH_TOAN_DICH_VU && isEdit && model.IsEditAmountReject && !model.IsAdminEdit && model.SupplierId != 0)//check admin edit Amount
             {
+
                 var requestDetail = _paymentRequestRepository.GetById((int)model.Id);
+
                 foreach (var item in requestDetail.RelateData)
                 {
-                    if ((double)model.Amount > item.ServicePrice)
+                    if ((double)model.Amount > (item.ServicePrice - Convert.ToInt32(model.TotalSupplierRefund == null ? 0 : model.TotalSupplierRefund)))
                     {
                         message = "Vui lòng nhập số tiền nhỏ hơn hoặc bằng số tiền yêu cầu chi cho nhà cung cấp. " +
                             "Tổng tiền yêu cầu chi tối đa: " + item.ServicePrice.ToString("N0");
@@ -438,9 +441,10 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             {
                 var listPaymentRequestByServiceId = _paymentRequestRepository.GetByServiceId(model.PaymentRequestDetails != null ? model.PaymentRequestDetails[0].ServiceId : model.ServiceId,
                    model.PaymentRequestDetails != null ? model.PaymentRequestDetails[0].ServiceType : model.ServiceType);
-                if(model.TotalAmountService==0&& model.TotalSupplierRefund == 0)
+
+                if (model.TotalAmountService == 0 && model.TotalSupplierRefund == 0)
                 {
-                    model.TotalAmountService= listPaymentRequestByServiceId.Where(n => n.Status != (int)PAYMENT_REQUEST_STATUS.LUU_NHAP).Sum(n => n.Amount);
+                    model.TotalAmountService = listPaymentRequestByServiceId.Where(n => n.Status != (int)PAYMENT_REQUEST_STATUS.LUU_NHAP).Sum(n => n.Amount);
                 }
                 var totalPaymentRequest = listPaymentRequestByServiceId.Where(n => n.Status != (int)PAYMENT_REQUEST_STATUS.TU_CHOI).Sum(n => n.Amount);
                 if (model.TotalAmountService + model.TotalSupplierRefund < totalPaymentRequest + model.Amount)
@@ -947,6 +951,10 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 var listTourPackageReturn = new List<TourPackagesOptionalViewModel>();
                 foreach (var item in listTourPackage)
                 {
+                    var listContractPay = _contractPayRepository.GetContractPayBySupplierId(orderId, item.Id, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
+                    var listContractPays = listContractPay.Where(n => (n.IsDelete == null || n.IsDelete.Value == false)
+                           && n.Type == ContractType.TT_NCC_HT && n.SupplierId == item.SupplierId).ToList();
+                    item.TotalContractPay = listContractPays.Sum(n => n.AmountPayDetail);
                     var getBySupplierId = listTourPackageReturn.Where(n => n.SupplierId != null && n.SupplierId == item.SupplierId).ToList();
                     if (getBySupplierId.Count > 0)
                     {
@@ -955,6 +963,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                             if (sup.SupplierId == item.SupplierId)
                             {
                                 sup.Amount += item.Amount;
+                                sup.TotalContractPay += item.TotalContractPay;
                             }
                         }
                     }
@@ -1055,6 +1064,10 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 var listOtherPackageReturn = new List<OtherBookingPackagesOptionalViewModel>();
                 foreach (var item in listOtherPackage)
                 {
+                    var listContractPay = _contractPayRepository.GetContractPayBySupplierId(orderId, item.Id, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
+                    var listContractPays = listContractPay.Where(n => (n.IsDelete == null || n.IsDelete.Value == false)
+                           && n.Type == ContractType.TT_NCC_HT && n.SupplierId == item.SuplierId).ToList();
+                    item.TotalContractPay = listContractPays.Sum(n => n.AmountPayDetail);
                     var getBySupplierId = listOtherPackageReturn.Where(n => n.SuplierId == item.SuplierId).ToList();
                     if (getBySupplierId.Count > 0)
                     {
@@ -1063,6 +1076,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                             if (sup.SuplierId == item.SuplierId)
                             {
                                 sup.Amount += item.Amount;
+                                sup.TotalContractPay += item.TotalContractPay;
                             }
                         }
                     }
@@ -1195,6 +1209,10 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 var listHotelPackageReturn = new List<HotelBookingsRoomOptionalViewModel>();
                 foreach (var item in listHotelPackages)
                 {
+                    var listContractPay = _contractPayRepository.GetContractPayBySupplierId(orderId, item.Id, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
+                    var listContractPays = listContractPay.Where(n => (n.IsDelete == null || n.IsDelete.Value == false)
+                           && n.Type == ContractType.TT_NCC_HT && n.SupplierId == item.SupplierId).ToList();
+                    item.TotalContractPay = listContractPays.Sum(n => n.AmountPayDetail);
                     item.Amount = item.TotalAmount;
                     var getBySupplierId = listHotelPackageReturn.Where(n => n.SupplierId == item.SupplierId).ToList();
                     if (getBySupplierId.Count > 0)
@@ -1205,6 +1223,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                             {
                                 sup.TotalAmount += item.TotalAmount;
                                 sup.Amount += item.Amount;
+                                sup.TotalContractPay += item.TotalContractPay;
                             }
                         }
                     }
@@ -1229,13 +1248,18 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 //    });
                 //}
                 var listPaymentRequest = _paymentRequestRepository.GetByServiceId(serviceId, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
+                
                 if (listPaymentRequest.Count > 0)
                 {
+
+
                     foreach (var item in listHotelPackageReturn)
                     {
                         var paymentRequests = listPaymentRequest.Where(n => (n.IsDelete == null || n.IsDelete.Value == false)
                             && n.Status != (int)PAYMENT_REQUEST_STATUS.TU_CHOI && n.SupplierId == item.SupplierId).ToList();
+                       
                         item.TotalAmountPay = paymentRequests.Sum(n => n.Amount);
+                        
                     }
                 }
                 return Ok(new
@@ -1261,6 +1285,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
         {
             try
             {
+
                 var listHotelPackages = _hotelBookingRepositories.GetHotelBookingOptionalListByHotelBookingId(serviceId).Result;
                 var listHotelExtraPackages = _hotelBookingRepositories.GetListHotelBookingRoomExtraPackagesHotelBookingId(serviceId).Result;
                 foreach (var item in listHotelExtraPackages)
@@ -1309,6 +1334,10 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 var listFlyBookingPackagesOptionalReturn = new List<FlyBookingPackagesOptionalViewModel>();
                 foreach (var item in listFlyBookingPackagesOptional)
                 {
+                    var listContractPay = _contractPayRepository.GetContractPayBySupplierId(orderId, item.Id, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
+                    var listContractPays = listContractPay.Where(n => (n.IsDelete == null || n.IsDelete.Value == false)
+                           && n.Type == ContractType.TT_NCC_HT && n.SupplierId == item.SupplierId).ToList();
+                    item.TotalContractPay = listContractPays.Sum(n => n.AmountPayDetail);
                     var getBySupplierId = listFlyBookingPackagesOptionalReturn.Where(n => n.SuplierId == item.SuplierId && n.Status != 1).ToList();
                     if (getBySupplierId.Count > 0)
                     {
@@ -1317,6 +1346,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                             if (sup.SuplierId == item.SuplierId)
                             {
                                 sup.Amount += item.Amount;
+                                sup.TotalContractPay += item.TotalContractPay;
                             }
                         }
                     }
@@ -1587,11 +1617,11 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
 
             return PartialView(model);
         }
-        public async Task<IActionResult> PopupNoteKT(int id,int noteId)
+        public async Task<IActionResult> PopupNoteKT(int id, int noteId)
         {
             ViewBag.id = id;
             ViewBag.noteId = 0;
-            var data=new NoteViewModel();
+            var data = new NoteViewModel();
             if (noteId > 0)
             {
                 var list_note = await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
@@ -1604,7 +1634,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             }
             return PartialView(data);
         }
-        public async Task<IActionResult> SetUpNoteKT(int id, string notekt,int noteid)
+        public async Task<IActionResult> SetUpNoteKT(int id, string notekt, int noteid)
         {
             try
             {
@@ -1659,10 +1689,14 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
             try
             {
                 var listVinwonderTicket = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(serviceId);
-                listVinwonderTicket = listVinwonderTicket.Where(n => n.SupplierId != null && n.SupplierId != 0 ).ToList();
+                listVinwonderTicket = listVinwonderTicket.Where(n => n.SupplierId != null && n.SupplierId != 0).ToList();
                 var listVinwonderTicketReturn = new List<VinWonderBookingTicketViewModel>();
                 foreach (var item in listVinwonderTicket)
                 {
+                    var listContractPay = _contractPayRepository.GetContractPayBySupplierId(orderId, item.Id, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
+                    var listContractPays = listContractPay.Where(n => (n.IsDelete == null || n.IsDelete.Value == false)
+                           && n.Type == ContractType.TT_NCC_HT && n.SupplierId == item.SupplierId).ToList();
+                    item.TotalContractPay = listContractPays.Sum(n => n.AmountPayDetail);
                     item.Amount = item.BasePrice;
                     var getBySupplierId = listVinwonderTicketReturn.Where(n => n.SupplierId != null && n.SupplierId == item.SupplierId).ToList();
                     if (getBySupplierId.Count > 0)
@@ -1672,6 +1706,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                             if (sup.SupplierId == item.SupplierId)
                             {
                                 sup.Amount += item.Amount;
+                                sup.TotalContractPay += item.TotalContractPay;
                             }
                         }
                     }
@@ -1680,7 +1715,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                         listVinwonderTicketReturn.Add(item);
                     }
                 }
- 
+
                 var listPaymentRequest = _paymentRequestRepository.GetByServiceId(serviceId, serviceType);
                 if (listPaymentRequest.Count > 0)
                 {

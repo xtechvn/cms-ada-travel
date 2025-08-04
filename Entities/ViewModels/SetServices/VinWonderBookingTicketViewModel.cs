@@ -11,5 +11,6 @@ namespace Entities.ViewModels.SetServices
     {
         public string SupplierName { get; set; }
         public decimal TotalAmountPay { get; set; }
+        public double TotalContractPay { get; set; }
     }
 }

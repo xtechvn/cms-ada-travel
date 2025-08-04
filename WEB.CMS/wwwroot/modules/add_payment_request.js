@@ -1252,8 +1252,9 @@ var _add_payment_request = {
         if (serviceId !== undefined && serviceId !== null && parseInt(serviceId) !== 0 && (parseInt(serviceType) === 5 || parseInt(serviceType) === 9 || parseInt(serviceType) === 1 || parseInt(serviceType) === 3 || parseInt(serviceType) === 6)) {
             var supplierId = parseInt(($('#supplier-select').val()))
             for (var i = 0; i < listTourPackageOption.length; i++) {
+                debugger
                 if (listTourPackageOption[i].supplierId == supplierId || listTourPackageOption[i].suplierId == supplierId) {
-                    var amountRemain = listTourPackageOption[i].amount - listTourPackageOption[i].totalAmountPay
+                    var amountRemain = listTourPackageOption[i].amount - listTourPackageOption[i].totalAmountPay + listTourPackageOption[i].totalContractPay
                     $('#amount').val(_add_payment_request.FormatNumberStr(amountRemain < 0 ? 0 : amountRemain))
                     break
                 }
