@@ -425,6 +425,11 @@ namespace WEB.Adavigo.CMS.Controllers
                     {
                         _emailService.SendEmail(modelEmail, attach_file);
                     }
+                    var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(item.OrderId);
+                    if (DetailDebtGuarantee != null)
+                    {
+                        _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)userLogin);
+                    }
                 }
 
                 return Ok(new
