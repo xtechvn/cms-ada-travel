@@ -51,7 +51,7 @@
                                 <div class="col-5 mb10">Giá trị đơn hàng</div>
                                 <div class="col-7 mb10">: @(Model.Amount == 0 ? "0" : Model.Amount.ToString("#,##"))</div> 
                                 <div class="col-5 mb10">Lợi nhuận</div>
-                                <div class="col-7 mb10">: @Model.Profit</div> 
+                                <div class="col-7 mb10">: @Model.Profit.ToString("#,##")</div> 
                                 <div class="col-5 mb10">Ngày bắt đầu - kết thúc</div>
                                 <div class="col-7 mb10">: @Model.StartDate.ToString("dd/MM/yyyy") - @Model.EndDate.ToString("dd/MM/yyyy")</div>
                                 
