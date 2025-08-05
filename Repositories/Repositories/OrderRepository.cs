@@ -65,6 +65,9 @@ namespace Repositories.Repositories
                     model.TotalRecord3 = dt.Rows[0]["TotalStatusTab3"].Equals(DBNull.Value) ? 0 : Convert.ToInt32(dt.Rows[0]["TotalStatusTab3"]);
                     model.TotalrecordErr = dt.Rows[0]["TotalStatusTab4"].Equals(DBNull.Value) ? 0 : Convert.ToInt32(dt.Rows[0]["TotalStatusTab4"]);
                     model.TotalRecord4 = dt.Rows[0]["TotalStatusTab5"].Equals(DBNull.Value) ? 0 : Convert.ToInt32(dt.Rows[0]["TotalStatusTab5"]);
+                    model.Profit = dt.Rows[0]["Profit"].Equals(DBNull.Value) ? 0 : Convert.ToDouble(dt.Rows[0]["Profit"]);
+                    model.Amount = dt.Rows[0]["Amount"].Equals(DBNull.Value) ? 0 : Convert.ToDouble(dt.Rows[0]["Amount"]);
+                    model.Price = dt.Rows[0]["Price"].Equals(DBNull.Value) ? 0 : Convert.ToDouble(dt.Rows[0]["Price"]);
                 }
             }
             catch (Exception ex)
@@ -193,7 +196,10 @@ namespace Repositories.Repositories
                 model.TotalRecord2 = model3.TotalRecord2;
                 model.TotalRecord3 = model3.TotalRecord3;
                 model.TotalRecord4 = model3.TotalRecord4;
-                model.TotalrecordErr = model3.TotalrecordErr;
+                model.Amount = model3.Amount;
+                model.Price = model3.Price;
+                model.Profit = model3.Profit;
+         
             }
             catch (Exception ex)
             {

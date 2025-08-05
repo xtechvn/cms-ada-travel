@@ -154,7 +154,7 @@ namespace WEB.Adavigo.CMS.Controllers
         public async Task<IActionResult> Search(OrderViewSearchModel searchModel, int currentPage = 1, int pageSize = 20)
         {
             var model = new GenericViewModel<OrderViewModel>();
-            var model2 = new TotalCountSumOrder();
+            //var model2 = new TotalCountSumOrder();
             try
             {
                 if (searchModel.OrderNo != null && searchModel.OrderNo.Trim() != "") searchModel.OrderNo = searchModel.OrderNo.ToUpper();
@@ -236,7 +236,7 @@ namespace WEB.Adavigo.CMS.Controllers
                         }
 
                         model = await _orderRepository.GetList(searchModel, currentPage, pageSize);
-                        model2 = await _orderRepository.GetTotalCountSumOrder(searchModel, -1, pageSize);
+                        //model2 = await _orderRepository.GetTotalCountSumOrder(searchModel, -1, pageSize);
                     }
 
                 }
@@ -278,10 +278,10 @@ namespace WEB.Adavigo.CMS.Controllers
                     TotalValueOrder = new TotalValueOrder()
                     {
                         //theo All
-                        TotalAmmount = model2.Amount.ToString("N0"),
+                        TotalAmmount = model.Amount.ToString("N0"),
                         TotalDone = model?.ListData?.Sum(x => x.Amount).ToString("N0"),
-                        TotalProductService = model2.Price.ToString("N0"),
-                        TotalProfit = model2.Profit.ToString("N0")
+                        TotalProductService = model.Price.ToString("N0"),
+                        TotalProfit = model.Profit.ToString("N0")
 
                         //theo pageSize
                         //TotalAmmount = model?.ListData?.Sum(x => x.Amount).ToString("N0"),
