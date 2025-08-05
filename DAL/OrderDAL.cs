@@ -10,6 +10,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -125,9 +126,12 @@ namespace DAL
                 objParam[23] = new SqlParameter("@OrderId", searchModel.BoongKingCode);
                 objParam[24] = new SqlParameter("@IsSalerDebtLimit", searchModel.IsSalerDebtLimit);
                 objParam[25] = new SqlParameter("@InvoiceRequestStatus", searchModel.InvoiceRequestStatus == null ? "" : string.Join(",", searchModel.InvoiceRequestStatus));
-
-
-                return _DbWorker.GetDataTable(proc, objParam);
+                var st = new Stopwatch();
+                st.Start();
+                var data = _DbWorker.GetDataTable(proc, objParam);
+                st.Stop();
+                LogHelper.InsertLogTelegram("GetDataTable  - " + proc+"-" + st.ElapsedMilliseconds + "ms");
+                return data;
             }
             catch (Exception ex)
             {
