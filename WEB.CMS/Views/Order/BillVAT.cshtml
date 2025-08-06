@@ -9,7 +9,7 @@
     <div class="flex space-between row-main-head pd10">
         <div class="bold">Yêu cầu xuất hóa đơn</div>
         <div>
-            @if (totalRequest == 0 && orderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR)
+            @if (totalRequest == 0 &&( orderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR || orderStatus == (int)OrderStatus.OPERATOR_DECLINE || orderStatus == (int)OrderStatus.WAITING_FOR_ACCOUNTANT || orderStatus == (int)OrderStatus.ACCOUNTANT_DECLINE || orderStatus == (int)OrderStatus.FINISHED))
             {
                 <button onclick="_orderDetail.AddInvoiceRequest();" type="button" class="btn btn-default bg-main ">
                     <i class="fa fa-plus"></i>Thêm
