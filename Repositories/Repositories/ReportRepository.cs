@@ -821,6 +821,42 @@ namespace Repositories.Repositories
                         ws.Cells["K" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["L" + RowIndex].SetStyle(numberStyle);
 
+                        if(item.Refund > 0)
+                        {
+                            RowIndex++;
+                            ws.Cells["A" + RowIndex].PutValue(RowIndex - 2);
+                            ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle);
+
+                            ws.Cells["B" + RowIndex].PutValue(item.CreatedDate.ToString("dd/MM/yyyy HH:mm"));
+                            ws.Cells["B" + RowIndex].SetStyle(alignCenterStyle);
+
+                            ws.Cells["C" + RowIndex].PutValue(item.CreatedDate.ToString("dd/MM/yyyy HH:mm"));
+                            ws.Cells["C" + RowIndex].SetStyle(alignCenterStyle);
+
+
+                            ws.Cells["D" + RowIndex].PutValue(item.LicenceNo);
+                            ws.Cells["E" + RowIndex].PutValue(item.BillNo);
+
+                            ws.Cells["F" + RowIndex].PutValue(item.Description);
+                            ws.Cells["G" + RowIndex].PutValue(item.DebtAccount);
+                            ws.Cells["H" + RowIndex].PutValue(item.CorrespondingAccount);
+
+                            opening_credit = opening_credit + (item.Refund != null ? (double)item.Refund : 0) - (item.AmountCredit != null ? (double)item.AmountCredit : 0);
+
+                            ws.Cells["I" + RowIndex].PutValue((item.Refund != null ? (double)item.Refund : 0));
+                            ws.Cells["I" + RowIndex].SetStyle(alignCenterStyle);
+                            ws.Cells["J" + RowIndex].PutValue((item.AmountCredit != null ? (double)item.AmountCredit : 0));
+                            ws.Cells["J" + RowIndex].SetStyle(alignCenterStyle);
+                            ws.Cells["K" + RowIndex].PutValue(opening_credit.ToString("N0"));
+                            ws.Cells["K" + RowIndex].SetStyle(alignCenterStyle);
+                            ws.Cells["L" + RowIndex].PutValue("");
+
+
+                            ws.Cells["I" + RowIndex].SetStyle(numberStyle);
+                            ws.Cells["J" + RowIndex].SetStyle(numberStyle);
+                            ws.Cells["K" + RowIndex].SetStyle(numberStyle);
+                            ws.Cells["L" + RowIndex].SetStyle(numberStyle);
+                        }
                     }
                     #endregion
                     wb.Save(full_path);

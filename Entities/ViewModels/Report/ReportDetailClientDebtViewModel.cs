@@ -17,6 +17,7 @@ namespace Entities.ViewModels.Report
         public double? AmountDebit { get; set; }
         public double? AmountCredit { get; set; }
         public double? AmountRemain { get; set; }
+        public double Refund { get; set; }
         public int TotalRow { get; set; }
 
     }

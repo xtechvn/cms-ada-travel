@@ -10,8 +10,7 @@
 
     index = (model.CurrentPage - 1) * model.PageSize;
     double opening_credit = (double)ViewBag.OpeningCredit;
-    double current_amount_credit = opening_credit + (sum_model.AmountDebit != null ? (double)sum_model.AmountDebit : 0) - (sum_model.AmountCredit != null ? (double)sum_model.AmountCredit : 0);
-
+    double current_amount_credit = opening_credit + sum_model.Refund + (sum_model.AmountDebit != null ? (double)sum_model.AmountDebit : 0) - (sum_model.AmountCredit != null ? (double)sum_model.AmountCredit : 0);
 }
 
 
@@ -106,7 +105,7 @@
 
 <script>
     $('#report-detail-fromdate').html('@(((DateTime)search_model.FromDate).ToString("dd/MM/yyyy"))')
-    $('#report-detail-todate').html('@(((DateTime)search_model.ToDate).ToString("dd/MM/yyyy"))')
+     $('#report-detail-todate').html('@(((DateTime)search_model.ToDate).ToString("dd/MM/yyyy"))')
     $('#report-detail-client-name').html('@(sum_model.ClientName)')
 </script>
 
