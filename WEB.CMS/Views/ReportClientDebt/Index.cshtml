@@ -118,36 +118,7 @@
 </div>
 @section scripts{
     <script type="text/javascript" src="~/modules/report_client_debt.js"></script>
-   
-    <script>_report_client_debt.Initialization()</script>
-    <script>
-        var today = new Date();
-        var yyyy = today.getFullYear();
-        var mm = today.getMonth() + 1; // Months start at 0!
-        var dd = today.getDate();
-        if (dd < 10) dd = '0' + dd;
-        if (mm < 10) mm = '0' + mm;
-        var min_range = '01/01/2020';
-        var max_range = dd + '/' + mm + '/' + yyyy;
-        $('input[name="report_date"]').daterangepicker({
-            autoApply: true,
-            autoUpdateInput: false,
-            minDate: min_range,
-            maxDate: max_range,
-            locale: {
-                format: 'DD/MM/YYYY'
-            }
-          
-        });
-        $('input[name="report_date"]').on('cancel.daterangepicker', function (ev, picker) {
-            $(this).val('');
-            isPickerApprove = false;
-        });
-        $('input[name="report_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
-            isPickerApprove = true;
-        });
-       
 
-    </script>
+    <script>_report_client_debt.Initialization()</script>
+    
 }
