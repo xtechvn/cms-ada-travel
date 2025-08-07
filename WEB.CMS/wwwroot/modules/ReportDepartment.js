@@ -515,8 +515,8 @@ var _ReportDepartment = {
             CreateDateFrom = $('#CreateDate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
             CreateDateTo = $('#CreateDate').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
         } else {
-            CreateDateFrom = null
-            CreateDateTo = null
+            CreateDateFrom = _global_function.GetDayText($('#CreateDate').data('daterangepicker').startDate._d, true).split(' ')[0]
+            CreateDateTo = _global_function.GetDayText($('#CreateDate').data('daterangepicker').endDate._d, true).split(' ')[0]
         }
         let _searchModel = {
             DepartmentType: $("#DepartmentType").val(),

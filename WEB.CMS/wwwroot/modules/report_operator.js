@@ -77,7 +77,7 @@ var _report_operator = {
                         format: 'DD/MM/YYYY'
                     }
                 });
-                element.data('daterangepicker').setStartDate(min_range);
+                element.data('daterangepicker').setStartDate(start_day_of_month);
                 element.data('daterangepicker').setEndDate(today);
             })
             $('#operator-from-date').each(function (index, item) {
