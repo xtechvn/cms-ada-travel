@@ -89,8 +89,8 @@
         var min_date = null
         var max_date=null
         if (daterange_element != undefined && daterange_element != null ) {
-            min_date = daterange_element.data('daterangepicker').startDate._d.toLocaleDateString("en-GB") 
-            max_date = daterange_element.data('daterangepicker').endDate._d.toLocaleDateString("en-GB")
+            min_date = _global_function.GetDayText(daterange_element.data('daterangepicker').startDate._d, true)
+            max_date = _global_function.GetDayText(daterange_element.data('daterangepicker').endDate._d, true) 
         }
 
         var client_element = $('#report-clientdebt-filter-clientId')
@@ -244,8 +244,8 @@ var _report_client_debt_detail = {
         var max_date = null
         var a = daterange_element.data('daterangepicker').startDate._d.toLocaleDateString("en-GB") 
         if (daterange_element != undefined && daterange_element != null) {
-            min_date = daterange_element.data('daterangepicker').startDate._d.toLocaleDateString("en-GB") 
-            max_date = daterange_element.data('daterangepicker').endDate._d.toLocaleDateString("en-GB")  
+            min_date = _global_function.GetDayText(daterange_element.data('daterangepicker').startDate._d, true) 
+            max_date = _global_function.GetDayText(daterange_element.data('daterangepicker').endDate._d, true) 
         }
         _report_client_debt_detail.searchModel.FromDate = min_date
         _report_client_debt_detail.searchModel.ToDate = max_date
