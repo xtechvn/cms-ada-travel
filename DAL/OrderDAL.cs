@@ -1138,7 +1138,7 @@ namespace DAL
                 objParam[2] = new SqlParameter("@EndDateFrom", searchModel.EndDateFrom == null ? DBNull.Value : searchModel.EndDateFrom);
                 objParam[3] = new SqlParameter("@EndDateTo", searchModel.EndDateTo == null ? DBNull.Value : searchModel.EndDateTo);
                 objParam[4] = new SqlParameter("@CreateDateFrom", searchModel.CreateDateFrom == null ? DBNull.Value : searchModel.CreateDateFrom);
-                objParam[5] = new SqlParameter("@CreateDateTo", searchModel.CreateDateTo == null ? DBNull.Value : searchModel.CreateDateTo);
+                objParam[5] = new SqlParameter("@CreateDateTo", searchModel.CreateDateTo == null ? DBNull.Value : searchModel.CreateDateTo );
                 objParam[6] = new SqlParameter("@ClientId", searchModel.ClientId == null ? DBNull.Value : searchModel.ClientId);
                 objParam[7] = new SqlParameter("@SupplierId", searchModel.SupplierId == null ? DBNull.Value : searchModel.SupplierId);
                 objParam[8] = new SqlParameter("@OrderId", searchModel.OrderId == null ? DBNull.Value : searchModel.OrderId);

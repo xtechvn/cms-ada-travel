@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Utilities;
 
 namespace Entities.ViewModels
 {
@@ -296,10 +297,24 @@ namespace Entities.ViewModels
         public DateTime? StartDateTo { get; set; } = null;
         public DateTime? EndDateTo { get; set; } = null;
         public DateTime? EndDateFrom { get; set; } = null;
-        public DateTime? CreateDateFrom { get; set; } = null;
-        public DateTime? CreateDateTo { get; set; } = null;
+        public string CreateDateFromStr { get; set; } = null;
+        public string CreateDateToStr { get; set; } = null;
         public int PageIndex { get; set; }
         public int pageSize { get; set; }
+        public DateTime? CreateDateFrom
+        {
+            get
+            {
+                return DateUtil.StringToDate(CreateDateFromStr);
+            }
+        }
+        public DateTime? CreateDateTo
+        {
+            get
+            {
+                return DateUtil.StringToDate(CreateDateToStr);
+            }
+        }
     }
     public class ReportOrderViewModel
     {
