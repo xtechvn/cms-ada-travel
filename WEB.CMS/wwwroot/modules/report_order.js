@@ -87,8 +87,8 @@ var _report_order = {
         var ToDate; //Ngày hết hạn
 
         if ($('#report_date').data('daterangepicker') !== undefined && $('#report_date').data('daterangepicker') != null) {
-            FromDate = $('#report_date').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
-            ToDate = $('#report_date').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
+            FromDate = _global_function.GetDayText($('#report_date').data('daterangepicker').startDate._d).split(' ')[0]
+            ToDate = _global_function.GetDayText($('#report_date').data('daterangepicker').endDate._d).split(' ')[0]
         } else {
             FromDate = null
             ToDate = null
@@ -96,8 +96,8 @@ var _report_order = {
 
         let _searchModel = {
             OrderId: $('#OrderNo').select2("val"),
-            CreateDateFrom: FromDate,
-            CreateDateTo: ToDate,
+            CreateDateFromStr: FromDate,
+            CreateDateToStr: ToDate,
             PageIndex: 1,
             PageSize: $("#selectPaggingOptions").find(':selected').val(),
         };
