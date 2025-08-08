@@ -92,8 +92,8 @@ namespace WEB.CMS.Controllers.Report
                                 }
                                 if (AllService != null && AllService.Count > 0)
                                 {
-                                    CountService = AllService.Max(s => s.CountPaymentRequest)==2? AllService.Max(s => s.CountPaymentRequest)-1: AllService.Max(s => s.CountPaymentRequest);
-                                    item.CountService = AllService.Count * 2 + CountService ;
+                                    CountService = AllService.Sum(s => s.CountPaymentRequest);
+                                    item.CountService = CountService + (2 * AllService.Count - CountService == 0 ? 1 : AllService.Count);
                                 }
                                 item.ListService = AllService;
 
