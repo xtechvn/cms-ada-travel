@@ -214,8 +214,8 @@
             return false;
         }
 
-        if (file.size > (5 * 1024 * 1024)) {
-            _msgalert.error("Ảnh tải lên phải có dung lượng bé hơn hoặc bằng 5MB.");
+        if (file.size > (2.5 * 1024 * 1024)) {
+            _msgalert.error("Ảnh tải lên phải có dung lượng bé hơn hoặc bằng 2.5MB.");
             return false;
         }
 
