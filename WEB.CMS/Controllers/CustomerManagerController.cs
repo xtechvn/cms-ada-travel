@@ -196,7 +196,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                 searchModel.SalerPermission = current_user.UserUnderList;
                                 i++;
                             }
-                            if (item == (int)RoleType.Admin)
+                            if (item == (int)RoleType.Admin|| item == (int)RoleType.KeToanTruong || item == (int)RoleType.PhoTPKeToan)
                             {
                                 searchModel.SalerPermission = null;
                                 i++;
