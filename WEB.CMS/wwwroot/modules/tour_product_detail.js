@@ -150,7 +150,7 @@
         formData.Surcharge = tinyMCE.get(`Surcharge`).getContent();
         formData.Note = tinyMCE.get(`Note`).getContent();
         formData.OldPrice = isNaN(formData.OldPrice) ? ConvertMoneyToNumber(formData.OldPrice) : null;
-        formData.Price = isNaN(formData.Price) ? ConvertMoneyToNumber(formData.Price) : 0;
+        formData.Price = parseFloat($('#Price').val().replaceAll(',', ''));
         formData.Status = status;
 
         var b2c = $('#PositionB2C :checked').text();
@@ -448,7 +448,19 @@
                 element.removeClass('tour-product-price-item-todate-new')
 
             });
+            var obj = []
+            $('#tour-product-price').find('.tour-product-price-tr').each(function (index, item) {
+                var element = $(this)
+                var item = {
+                    AdultPrice: element.find('.tour-product-price-item-adult-price').val().replaceAll(',', ''),
+                }
+                obj.push(item)
+            });
+            var minAdultPrice = Math.min(...obj.map(o => parseFloat(o.AdultPrice)));
+            var day = $('#Days').val();
+            $('#Price').val(_global_function.Comma(minAdultPrice * day))
         });
+       
     },
     GetTourPriceID: function () {
         var id = 0;
@@ -535,6 +547,9 @@
             }
             obj.push(item)
         });
+        var minAdultPrice = Math.min(...obj.map(o => parseFloat(o.AdultPrice)));
+        var day = $('#Days').val();
+        $('#Price').val(_global_function.Comma( minAdultPrice * day))
         _ajax_caller.post('/TourProduct/UpSertProductPrices', { model_upload: obj, tour_product_id: tour_product_id }, function (result) {
             if (notification && result) {
                 if (result.isSuccess) {
