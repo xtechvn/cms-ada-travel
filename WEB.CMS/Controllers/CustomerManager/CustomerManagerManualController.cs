@@ -526,6 +526,18 @@ namespace WEB.CMS.Controllers.CustomerManager
                         });
                     }
                 }
+                else
+                {
+                    if(InsertComment > 0)
+                    {
+                        return Ok(new
+                        {
+                            status = (int)ResponseType.SUCCESS,
+                            msg = "Phản hồi khách hàng thành công",
+                        });
+                    }
+
+                }
                 return Ok(new
                 {
                     status = (int)ResponseType.FAILED,
@@ -629,7 +641,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             {
                 LogHelper.InsertLogTelegram("ListClient - CustomerManagerController: " + ex);
             }
-            if (model.ListData != null && model.ListData.Count > 0)
+            if (model!=null && model.ListData != null && model.ListData.Count > 0)
             {
                 foreach (var item in model.ListData)
                 {
@@ -823,6 +835,97 @@ namespace WEB.CMS.Controllers.CustomerManager
 
             });
 
+        }
+        public async Task<IActionResult> PopupAddclient(int type)
+        {
+            ViewBag.type = type;
+            ViewBag.DepartmentList = await _departmentRepository.GetAll(String.Empty);
+
+            return PartialView();
+        }
+        public async Task<IActionResult> Addclient(string model)
+        {
+
+            try
+            {
+                if (model != null && model != "")
+                {
+                    List<ClientExcelImportModel> success_model = new List<ClientExcelImportModel>();
+              
+                    try
+                    {
+                        success_model = JsonConvert.DeserializeObject<List<ClientExcelImportModel>>(model);
+                    }
+                    catch
+                    {
+                        return PartialView(success_model);
+                    }
+                    foreach (var item in success_model)
+                    {
+                        var list_client = await _customerManagerRepositories.GetClientByPhone(item.phone);
+                        if (list_client != null && list_client.Count > 0)
+                        {
+                            return Ok(new
+                            {
+                                isSuccess = (int)ResponseType.FAILED,
+                                message = "Số điện thoại đã tồn tại",
+
+                            });
+                        }
+                        var ClientCode = await _identifierServiceRepository.buildClientNo(Convert.ToInt32(item.id_ClientType));
+                        var model_client = new CustomerManagerView();
+                        model_client.Id = 0;
+                        model_client.UserId = item.UserId;
+                        model_client.AgencyType = item.AgencyType;
+                        model_client.phone = item.phone;
+                        model_client.email = item.email;
+                        model_client.Client_name = item.Client_name;
+                        model_client.PermisionType = Convert.ToInt32(item.id_nhomkhach);
+                        model_client.id_loaikhach = item.id_loaikhach;
+                        model_client.id_nhomkhach = item.id_nhomkhach;
+                        model_client.id_ClientType = item.id_ClientType;
+                        model_client.ClientCode = ClientCode;
+                        model_client.UtmSource = item.UtmSource;
+                        model_client.JoinDate = DateTime.Now;
+
+
+                        var Result = await _customerManagerRepositories.CreateClient(model_client);
+
+                        if (Result > 0)
+                        {
+                            return Ok(new
+                            {
+                                isSuccess = (int)ResponseType.SUCCESS,
+                                message = "Thêm mới thành công ",
+
+                            });
+                        }
+
+                    }
+                    return Ok(new
+                    {
+                        isSuccess = (int)ResponseType.FAILED,
+                        message = "Thêm mới không thành công ",
+
+                    });
+                }
+                return Ok(new
+                {
+                    isSuccess = (int)ResponseType.FAILED,
+                    message = "Thêm mới không thành công ",
+
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Addclient - OrderController: " + ex.ToString());
+                return Ok(new
+                {
+                    isSuccess = (int)ResponseType.FAILED,
+                    message = "Thêm mới không thành công ",
+
+                });
+            }
         }
     }
 }

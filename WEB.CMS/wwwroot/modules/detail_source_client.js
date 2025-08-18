@@ -112,7 +112,7 @@ var _detail_source_client = {
     ImportWSExcel: function (id) {
         let title = 'Tải lên danh sách khách hàng';
         let url = '/CustomerManagerManual/ImportWSExcel';
-        let param = { type :id};
+        let param = { type: id };
         _magnific.OpenSmallPopup(title, url, param);
     },
     UploadFileExcel: function () {
@@ -218,7 +218,7 @@ var _detail_source_client = {
                         })
                     };
                 },
-                
+
             }
         });
     },
@@ -304,6 +304,83 @@ var _detail_source_client = {
 
             }
         });
+
+    },
+    PopupAddClientNhanh: function (id) {
+        let title = 'Thêm mới khách hàng';
+        let url = '/CustomerManagerManual/PopupAddclient';
+        let param = { type: id };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    AddClientNhanh: function () {
+        let url = '/CustomerManagerManual/Addclient';
+        let data = [];
+        var FromCreate = $('#_source_add_client');
+        FromCreate.validate({
+            rules: {
+                "Userid": {
+                    required: true,
+
+                },
+                "ClientName": "required",
+                "phone": {
+                    required: true,
+                    number: true,
+                },
+                "email": {
+
+                    email: true
+                },
+
+            },
+            messages: {
+                "Userid": "Trưởng nhóm không được để trống",
+                "ClientName": "Tên khách hàng không được để trống",
+                "phone": {
+                    required: "Số điện thoại không được bỏ trống",
+                    number: "Nhập đúng định dạng số",
+                },
+                "email": {
+
+                    email: "Nhập đúng định dạnh email",
+                },
+            }
+        });
+        if (FromCreate.valid()) {
+
+            data.push({
+                Client_name: $('#ClientName').val(),
+                email: $('#email').val(),
+                phone: $('#phone').val(),
+                Note: $('#Note').val(),
+                Status: 0,
+                id_loaikhach: 1,
+                id_nhomkhach: 0,
+                id_ClientType: 5,
+                AgencyType: 1,
+                UtmSource: $('#Client_Source').val(),
+                DepartmentId: $('#DepartmentId').val(),
+                UserId: $('#Userid').select2("val"),
+            });
+            _global_function.AddLoading()
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: { model: JSON.stringify(data) },
+                success: function (result) {
+                    _global_function.RemoveLoading()
+                    if (result.isSuccess == 0) {
+                        _msgalert.success(result.message);
+                        setTimeout(function () {
+                            $.magnificPopup.close();
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        _msgalert.error(result.message);
+                    }
+                }
+            });
+        }
 
     },
 }

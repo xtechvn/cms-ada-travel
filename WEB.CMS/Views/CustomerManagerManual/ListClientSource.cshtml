@@ -50,11 +50,12 @@
         <div class="flex gap10 left-button">
 
             <div class="relative filter-nguonkh">
-              Nguồn khách hàng : @ViewBag.Description
+                <a class="blue" href="/CustomerManagerManual/Source"> Nguồn khách hàng </a>: @ViewBag.Description
             </div>
 
         </div>
         <div class="right-button flex gap10 ">
+            <button type="submit" class="btn btn-default" style="" onclick="_detail_source_client.PopupAddClientNhanh(@ViewBag.id)">Thêm khách hàng nhanh</button>
             <button type="submit" class="btn btn-default" style="" onclick="_detail_source_client.ImportWSExcel(@ViewBag.id)">Upload Khách hàng</button>
             <button type="button" class="btn btn-default" onclick="_detail_source_client.Export()" id="btnExport">
                 <i class="icofont-download" id="icon-export" title="Xuất excel"></i>
