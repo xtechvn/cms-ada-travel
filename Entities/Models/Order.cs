@@ -74,6 +74,7 @@ namespace Entities.Models
         public bool? IsLock { get; set; }
         public DateTime? ClosingEndDate { get; set; }
         public bool? IsSalerDebtLimit { get; set; }
+        public DateTime? CutOffDate { get; set; }
 
         public virtual ContactClient ContactClient { get; set; }
         public virtual Contract Contract { get; set; }

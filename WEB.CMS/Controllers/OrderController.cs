@@ -1030,6 +1030,9 @@ namespace WEB.Adavigo.CMS.Controllers
         {
             try
             {
+                ViewBag.id = orderId;
+                ViewBag.CutOffDate = null;
+              
                 var dataallcode = _allCodeRepository.GetListByType(AllCodeType.SYSTEM_TYPE);
                 var BRANCH_CODE = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
                 var Order_CODE = _allCodeRepository.GetListByType(AllCodeType.ORDER_STATUS);
@@ -1046,6 +1049,7 @@ namespace WEB.Adavigo.CMS.Controllers
                         {
                             ViewBag.SalerDebtLimit = "Bảo lãnh công nợ";
                         }
+                        ViewBag.CutOffDate = dataOrder.CutOffDate;
                         ViewBag.BranchCode = dataOrder.BranchCode;
                         ViewBag.Label = dataOrder.Label;
                         ViewBag.Note = dataOrder.Note;
@@ -2726,14 +2730,50 @@ namespace WEB.Adavigo.CMS.Controllers
 
                 }
                 model = await _debtGuaranteeRepository.GetListDebtGuarantee(Searchmodel);
-        
 
-                return PartialView(model); }
+
+                return PartialView(model);
+            }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetList - DebtGuaranteeController: " + ex);
             }
             return PartialView(model);
+        }
+        public async Task<IActionResult> UpdateOrder(long OrderId, string date)
+        {
+            var sst_status = (int)ResponseType.FAILED;
+            var smg = "Lưu thông tin không thành công";
+            try
+            {
+                var _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                if (OrderId != 0)
+                {
+                    var order = await _orderRepository.UpdateOrderCutOffDate(OrderId, _UserId, date);
+                    if (order > 0)
+                    {
+
+                        return Ok(new
+                        {
+                            sst_status = (int)ResponseType.SUCCESS,
+                            smg = "Lưu thông tin thành công"
+                        });
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateOrderStatus - OrderController: " + ex);
+                sst_status = (int)ResponseType.ERROR;
+                smg = "Đã xảy ra lỗi, vui lòng liên hệ IT";
+            }
+
+            return Ok(new
+            {
+                sst_status = sst_status,
+                smg = smg
+            });
         }
     }
 }

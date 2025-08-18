@@ -54,5 +54,6 @@ namespace Repositories.IRepositories
         Task<double> AmountTotalBySalerId(string SalerId, string SalerPermission);
         Task<GenericViewModel<ReportOrderViewModel>> GetlistReportOrder(SearchReportOrderModels searchModel);
         Task<List<ReportOrderServiceViewModel>> GetReportOrderAllServiceByOrderId(long OrderId);
+        Task<long> UpdateOrderCutOffDate(long order_id, int user_commit, string CutOffDate);
     }
 }

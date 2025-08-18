@@ -1,7 +1,7 @@
 ﻿let input = $('#order_Id').val();
 let type = 7;
 $(document).ready(function () {
-   
+
     _orderDetail.LoadClientDetai(input);
     _orderDetail.LoadPackages(input);
     _orderDetail.LoadContractPay(input);
@@ -39,7 +39,7 @@ var _orderDetail = {
         $.ajax({
             url: "/Order/Packages",
             type: "Post",
-            data: { orderId: input},
+            data: { orderId: input },
             success: function (result) {
                 $('#imgLoading_Packages').hide();
                 $('#grid_data_Packages').html(result);
@@ -80,7 +80,7 @@ var _orderDetail = {
         });
     },
     LoadFile: function (input, type) {
-        _global_function.RenderFileAttachment($('#grid_data_File'), input,type)
+        _global_function.RenderFileAttachment($('#grid_data_File'), input, type)
         $('#imgLoading_File').hide();
         /*
         $.ajax({
@@ -130,8 +130,8 @@ var _orderDetail = {
     UpdateOrderStatus: function (status, Orderid) {
         var ServiceCode = $('#ServiceCode').val();
         var title = 'Xác nhận thay đổi trạng thái';
-       
-        _msgconfirm.openDialog(title,'Xác nhận thay đổi trạng thái không?', function () {
+
+        _msgconfirm.openDialog(title, 'Xác nhận thay đổi trạng thái không?', function () {
             $.ajax({
                 url: "/Order/UpdateOrderStatus",
                 type: "Post",
@@ -152,14 +152,14 @@ var _orderDetail = {
         });
     },
     ChangeOrderSaler: function (order_id, order_no) {
-       
+
         var title = 'Nhận xử lý đơn hàng';
         var description = 'Bạn có chắc chắn muốn nhận xử lý đơn hàng này không?';
         _msgconfirm.openDialog(title, description, function () {
             $.ajax({
                 url: "/Order/ChangeOrderSaler",
                 type: "Post",
-                data: { order_id: order_id, saleid: 0, OrderNo: order_no},
+                data: { order_id: order_id, saleid: 0, OrderNo: order_no },
                 success: function (result) {
                     if (result.status === 0) {
                         _msgalert.success(result.msg);
@@ -176,9 +176,9 @@ var _orderDetail = {
         });
     },
     UpdateOrder: function () {
-       
+
         var model = {
-            
+
             OrderId: $('#order_Id').val(),
             SalerId: $('#SalerId').val(),
             SalerGroupId: $('#SalerGroup').val() != null ? $('#SalerGroup').val().toString() : null,
@@ -210,12 +210,12 @@ var _orderDetail = {
         let param = {
             Id: Id,
             OrderId: OrderId,
-           
+
         };
         _magnific.OpenSmallPopup(title, url, param);
     },
     CommitSendEmailCode: function (Id, OrderId) {
-     
+
         let FromCreateCode = $('#form-send-email-code');
         FromCreateCode.validate({
             rules: {
@@ -259,7 +259,7 @@ var _orderDetail = {
                 }
             });
         }
-        
+
     },
     PopupSendEmail: function () {
         let title = 'Gửi email đơn hàng';
@@ -302,7 +302,7 @@ var _orderDetail = {
         }
         var id = $("#CC_Email").val()
         var _bodyTTNote = tinyMCE.get('TTNote').getContent();
-       /* var _bodyTTChuyenKhoan = tinyMCE.get('TTChuyenKhoan').getContent();*/
+        /* var _bodyTTChuyenKhoan = tinyMCE.get('TTChuyenKhoan').getContent();*/
         var _bodyTTChuyenKhoan = "";
         let OtherEmail = [];
         let TourEmail = [];
@@ -386,7 +386,7 @@ var _orderDetail = {
                 VinWonderStartDate: element.find('#VinWonderStartDate').val(),
                 VinWonderAmount: element.find('#VinWonderAmount').val(),
                 VinWonderName: element.find('#VinWonderName').val(),
-       
+
             };
             VinWonderEmail.push(obj_package);
         });
@@ -506,8 +506,8 @@ var _orderDetail = {
         });
 
     },
-    
-    UpdateOrderFinishPayment: function (Orderid,type) {
+
+    UpdateOrderFinishPayment: function (Orderid, type) {
         var ServiceCode = $('#ServiceCode').val();
         var title = 'Xác nhận đơn hàng được công nợ';
 
@@ -516,7 +516,7 @@ var _orderDetail = {
             $.ajax({
                 url: "/Order/UpdateOrderFinishPayment",
                 type: "Post",
-                data: { OrderId: Orderid ,type:type},
+                data: { OrderId: Orderid, type: type },
                 success: function (result) {
                     if (result.sst_status === 0) {
                         _global_function.RemoveLoading()
@@ -649,22 +649,22 @@ var _orderDetail = {
         };
         _magnific.OpenSmallPopup(title, url, param);
     },
-    UpdateOrderandService: function (OrderNo,id) {
-        let title = 'Xác nhận Cập nhật trạng thái đơn hàng '+OrderNo;
-        let description = 'Bạn xác nhận Cập nhật trạng thái đơn hàng ' + OrderNo+"?";
-      
-        
+    UpdateOrderandService: function (OrderNo, id) {
+        let title = 'Xác nhận Cập nhật trạng thái đơn hàng ' + OrderNo;
+        let description = 'Bạn xác nhận Cập nhật trạng thái đơn hàng ' + OrderNo + "?";
+
+
         var model = {
             OrderId: $('#OrderId').val(),
             OrderStatus: $('#OrderStatus').val(),
             PaymentStatus: $('#PaymentStatus').val(),
-            ListFly:[],
-            ListVin:[],
-            ListTour:[],
-            ListHotel:[],
-            ListOther:[],
+            ListFly: [],
+            ListVin: [],
+            ListTour: [],
+            ListHotel: [],
+            ListOther: [],
         }
-       
+
         $(".SetService-fly-row").each(function (index, item) {
             var element = $(item);
             var obj_package = {
@@ -709,7 +709,7 @@ var _orderDetail = {
             $.ajax({
                 url: "/Order/UpdateOrderandServiceStatus",
                 type: "post",
-                data:  model ,
+                data: model,
                 success: function (result) {
                     if (result.status == 0) {
                         _msgalert.success(result.smg);
@@ -769,7 +769,7 @@ var _orderDetail = {
                 }
             });
         }
-           
+
         );
     },
     SaleUpdateOrderFinishPayment: function (Orderid, type, SalerId, Amount) {
@@ -797,6 +797,38 @@ var _orderDetail = {
                     }
                 }
             });
+        });
+    },
+    OpenEditCutOffDate: function (type) {
+        if (type == 1) {
+            $('.from_CutOffDate').show()
+            $('.hide_popup').show()
+            $('.show_popup').hide()
+
+        } else {
+            $('.from_CutOffDate').hide()
+            $('.hide_popup').hide()
+            $('.show_popup').show()
+        }
+    },
+    EditCutOffDate: function (id) {
+        var date = $('#CutOffDate').val();
+        $.ajax({
+            url: "/Order/UpdateOrderCutOffDate",
+            type: "Post",
+            data: { OrderId: id, date: date },
+            success: function (result) {
+                if (result.sst_status === 0) {
+                    _msgalert.success(result.smg);
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
+                }
+                else {
+                    _msgalert.error(result.smg);
+
+                }
+            }
         });
     },
 }
@@ -890,7 +922,7 @@ var _OrderDetail_Sendemail = {
         element.select2({
             theme: 'bootstrap4',
             placeholder: "Chọn Email",
-          
+
             ajax: {
                 url: "/Order/UserSuggestion",
                 type: "post",
@@ -915,7 +947,7 @@ var _OrderDetail_Sendemail = {
                 cache: true
             }
         });
-    }, 
+    },
 
 
 }

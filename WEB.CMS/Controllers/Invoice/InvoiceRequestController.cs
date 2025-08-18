@@ -585,7 +585,7 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
         {
             try
             {
-                var listOrder = _invoiceRequestRepository.GetByClientId(clientId, invoiceRequestId, (int)OrderStatus.WAITING_FOR_OPERATOR);
+                var listOrder = _invoiceRequestRepository.GetByClientId(clientId, invoiceRequestId, (int)OrderStatus.CREATED_ORDER);
                 var clientInfo = _clientRepository.GetClientDetailByClientId(clientId).Result;
                 return Ok(new
                 {

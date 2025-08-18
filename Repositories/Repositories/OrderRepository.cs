@@ -1291,5 +1291,18 @@ namespace Repositories.Repositories
             }
             return null;
         }
+        public async Task<long> UpdateOrderCutOffDate(long order_id, int user_commit, string CutOffDate)
+        {
+            //var data = new List<OrderServiceViewModel>();
+            try
+            {
+                return await _OrderDal.UpdateOrderCutOffDate(order_id, user_commit, CutOffDate);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetReportOrderAllServiceByOrderId - OrderRepository: " + ex);
+            }
+            return -1;
+        }
     }
 }

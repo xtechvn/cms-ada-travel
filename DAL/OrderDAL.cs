@@ -1156,5 +1156,29 @@ namespace DAL
             }
             return null;
         }
+        public async Task<long> UpdateOrderCutOffDate(long order_id, int user_commit,string CutOffDate)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var exists = _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderId == order_id);
+                    if (exists != null && exists.OrderId > 0)
+                    {
+                        exists.UpdateLast = DateTime.Now;
+                        exists.UserUpdateId = user_commit;
+                        exists.CutOffDate = CheckDate(CutOffDate);
+                        _DbContext.Order.Update(exists);
+                        await _DbContext.SaveChangesAsync();
+                    }
+                    return 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateOrderSaler - OrderDal: " + ex);
+                return -2;
+            }
+        }
     }
 }

@@ -113,6 +113,10 @@ namespace WEB.CMS.Controllers.CustomerManager
                         ViewBag.btnphanhoi = 1;
                     }
                 }
+                else
+                {
+                    ViewBag.btnphanhoi = 1;
+                }
                 var model = await _clientRepository.GetClientDetailByClientId(id);
 
                 if (model != null && model.ClientType != ClientType.kl)
@@ -444,24 +448,24 @@ namespace WEB.CMS.Controllers.CustomerManager
             {
                 LogHelper.InsertLogTelegram("ListClient - CustomerManagerController: " + ex);
             }
-            if(model.ListData != null && model.ListData.Count > 0)
+            if (model.ListData != null && model.ListData.Count > 0)
             {
                 foreach (var item in model.ListData)
                 {
                     var CommentClient = new CommentClientMongoModel();
                     CommentClient.ClientId = item.Id.ToString();
                     var ListComment = _commentClientMongoService.GetListComment(CommentClient);
-                    if(ListComment != null && ListComment.Count > 0)
+                    if (ListComment != null && ListComment.Count > 0)
                     {
-                        item.ListComment = ListComment.Where(s => s.Type == (int)CommentClientMongoType.Phan_hoi).OrderBy(s=>s.CreatedTime).ToList();
+                        item.ListComment = ListComment.Where(s => s.Type == (int)CommentClientMongoType.Phan_hoi).OrderBy(s => s.CreatedTime).ToList();
                         item.ListCommentNhuCau = ListComment.Where(s => s.Type == (int)CommentClientMongoType.nhu_cau).ToList();
                     }
-             
+
                 }
             }
             return PartialView(model);
         }
-        public async Task<IActionResult> PopStatusClient(string Clientid,int Type)
+        public async Task<IActionResult> PopStatusClient(string Clientid, int Type)
         {
             try
             {
@@ -470,7 +474,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 {
                     ViewBag.Type = 1;
                 }
-               
+
                 ViewBag.ClientId = Clientid;
                 var ClientType = _allCodeRepository.GetListByType(AllCodeType.CLIENT_STATUS);
                 ViewBag.ClientStatus = ClientType;
@@ -507,7 +511,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 if (Status == 99)
                 {
                     model.Type = (int)CommentClientMongoType.Phan_hoi;//phẩn hồi
-                    model.Note= "Phản hồi : " + Note;
+                    model.Note = "Phản hồi : " + Note;
                 }
                 else
                 {
@@ -528,7 +532,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 }
                 else
                 {
-                    if(InsertComment > 0)
+                    if (InsertComment > 0)
                     {
                         return Ok(new
                         {
@@ -641,7 +645,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             {
                 LogHelper.InsertLogTelegram("ListClient - CustomerManagerController: " + ex);
             }
-            if (model!=null && model.ListData != null && model.ListData.Count > 0)
+            if (model != null && model.ListData != null && model.ListData.Count > 0)
             {
                 foreach (var item in model.ListData)
                 {
@@ -745,8 +749,8 @@ namespace WEB.CMS.Controllers.CustomerManager
                             err_model.Add(item);
                             continue;
                         }
-                       
-                        var ClientCode =await _identifierServiceRepository.buildClientNo(Convert.ToInt32(item.id_ClientType));
+
+                        var ClientCode = await _identifierServiceRepository.buildClientNo(Convert.ToInt32(item.id_ClientType));
                         var model_client = new CustomerManagerView();
                         model_client.Id = 0;
                         model_client.UserId = item.UserId;
@@ -761,7 +765,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                         model_client.ClientCode = ClientCode;
                         model_client.UtmSource = item.UtmSource;
                         model_client.JoinDate = DateTime.Now;
-                        
+
 
                         var Result = await _customerManagerRepositories.CreateClient(model_client);
 
@@ -772,7 +776,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                             {
                                 _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                             }
-                            
+
                             summit_model.Add(item);
                             var clientdetail = await _clientRepository.GetClientByClientCode(ClientCode);
                             _workQueueClient.SyncES(clientdetail.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
@@ -851,7 +855,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 if (model != null && model != "")
                 {
                     List<ClientExcelImportModel> success_model = new List<ClientExcelImportModel>();
-              
+
                     try
                     {
                         success_model = JsonConvert.DeserializeObject<List<ClientExcelImportModel>>(model);
@@ -893,6 +897,23 @@ namespace WEB.CMS.Controllers.CustomerManager
 
                         if (Result > 0)
                         {
+                            int _UserId = 0;
+                            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                            {
+                                _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                            }
+
+                            var clientdetail = await _clientRepository.GetClientByClientCode(ClientCode);
+                            _workQueueClient.SyncES(clientdetail.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
+                            var modelClientMongo = new CommentClientMongoModel();
+                            var detail_user = await _userRepository.GetById(_UserId);
+                            modelClientMongo.FullName = detail_user.FullName;
+                            modelClientMongo.UserName = detail_user.UserName;
+                            modelClientMongo.UserId = _UserId;
+                            modelClientMongo.ClientId = clientdetail.Id.ToString();
+                            modelClientMongo.Type = (int)CommentClientMongoType.nhu_cau;//Nhu cầu
+                            modelClientMongo.Note = item.Note;
+                            var InsertComment = await _commentClientMongoService.InsertCommentClient(modelClientMongo);
                             return Ok(new
                             {
                                 isSuccess = (int)ResponseType.SUCCESS,
