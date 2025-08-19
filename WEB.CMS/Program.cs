@@ -144,7 +144,7 @@ if (!app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Error/Index");
+    //app.UseExceptionHandler("/Error/Index");
     app.UseHsts();
 }
 
