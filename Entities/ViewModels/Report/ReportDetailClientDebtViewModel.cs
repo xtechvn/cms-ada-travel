@@ -8,6 +8,7 @@ namespace Entities.ViewModels.Report
     {
         public int ClientID { get; set; }
         public DateTime CreatedDate { get; set; }
+        public DateTime? CutOffDate { get; set; }
         public string LicenceNo { get; set; }
         public string BillNo { get; set; }
         public string Description { get; set; }

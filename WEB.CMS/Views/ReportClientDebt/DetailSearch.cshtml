@@ -24,6 +24,7 @@
             <td style="text-align: right;">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
             <td style="text-align: right;">@item.LicenceNo</td>
             <td style="text-align: right;">@item.BillNo</td>
+            <td style="text-align: right;">@(item.CutOffDate == null?"": ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy"))</td>
             <td style="text-align: right;">@item.Description</td>
             <td style="text-align: right;">@item.DebtAccount</td>
             <td style="text-align: right;">@item.CorrespondingAccount</td>
@@ -44,6 +45,7 @@
                 <td style="text-align: right;">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
                 <td style="text-align: right;">@item.LicenceNo (Hoàn trả)</td>
                 <td style="text-align: right;">@item.BillNo</td>
+                <td style="text-align: right;">@(item.CutOffDate == null ? "" : ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy"))</td>
                 <td style="text-align: right;">@item.Description</td>
                 <td style="text-align: right;">@item.DebtAccount</td>
                 <td style="text-align: right;">@item.CorrespondingAccount</td>
