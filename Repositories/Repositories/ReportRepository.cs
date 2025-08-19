@@ -734,6 +734,7 @@ namespace Repositories.Repositories
 
                     ws.Cells["K2"].PutValue("Nợ");
                     ws.Cells["L2"].PutValue("Có");
+                    ws.Cells["M2"].PutValue("Ngày thu hồi");
 
 
                     cell.Merge(0, 0, 2, 1);
@@ -814,7 +815,7 @@ namespace Repositories.Repositories
                         ws.Cells["K" + RowIndex].PutValue(opening_credit.ToString("N0"));
                         ws.Cells["K" + RowIndex].SetStyle(alignCenterStyle);
                         ws.Cells["L" + RowIndex].PutValue("");
-
+                        ws.Cells["M" + RowIndex].PutValue(item.CutOffDate==null?"": ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy"));
 
                         ws.Cells["I" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["J" + RowIndex].SetStyle(numberStyle);
@@ -850,7 +851,7 @@ namespace Repositories.Repositories
                             ws.Cells["K" + RowIndex].PutValue(opening_credit.ToString("N0"));
                             ws.Cells["K" + RowIndex].SetStyle(alignCenterStyle);
                             ws.Cells["L" + RowIndex].PutValue("");
-
+                            ws.Cells["M" + RowIndex].PutValue(item.CutOffDate == null ? "" : ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy"));
 
                             ws.Cells["I" + RowIndex].SetStyle(numberStyle);
                             ws.Cells["J" + RowIndex].SetStyle(numberStyle);
