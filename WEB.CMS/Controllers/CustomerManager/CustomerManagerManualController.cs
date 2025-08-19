@@ -448,7 +448,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             {
                 LogHelper.InsertLogTelegram("ListClient - CustomerManagerController: " + ex);
             }
-            if (model.ListData != null && model.ListData.Count > 0)
+            if (model!= null && model.ListData != null && model.ListData.Count > 0)
             {
                 foreach (var item in model.ListData)
                 {
