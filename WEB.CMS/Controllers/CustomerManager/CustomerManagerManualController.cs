@@ -420,6 +420,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                             //kiểm tra chức năng có đc phép sử dụng
                             var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.TRUY_CAP, (int)MenuId.QL_KHACH_HANG);
                             var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.VIEW_ALL, (int)MenuId.QL_KHACH_HANG);
+                            var listPermissions7 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.DUYET, (int)MenuId.QL_KHACH_HANG);
                             if (listPermissions == true)
                             {
                                 searchModel.SalerPermission = current_user.Id.ToString(); i++;
@@ -427,6 +428,11 @@ namespace WEB.CMS.Controllers.CustomerManager
                             if (listPermissions6 == true)
                             {
                                 searchModel.SalerPermission = current_user.UserUnderList;
+                                i++;
+                            } 
+                            if (listPermissions7 == true && listPermissions6 == true)
+                            {
+                                searchModel.SalerPermission = null;
                                 i++;
                             }
                             if (item == (int)RoleType.Admin || item == (int)RoleType.KeToanTruong || item == (int)RoleType.PhoTPKeToan)
