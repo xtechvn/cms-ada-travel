@@ -816,7 +816,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 List<int?> deparments = new List<int?>();
                 deparments.Add(DepartmentId);
                 var list_user_ids = await _userRepository.GetListUserDepartById(deparments);
-                list_user_ids = list_user_ids.Where(s => s.UserPositionId == UserPositionType.TN && s.Status == (int)StatusType.BINH_THUONG).ToList();
+                list_user_ids = list_user_ids.Where(s => (s.UserPositionId == UserPositionType.TN || s.UserPositionId == UserPositionType.TP) && s.Status == (int)StatusType.BINH_THUONG).ToList();
                 if (list_user_ids == null || list_user_ids.Count == 0)
                 {
 

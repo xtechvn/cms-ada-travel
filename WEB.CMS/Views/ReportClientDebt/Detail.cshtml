@@ -69,8 +69,10 @@
                 </td>
                 <td></td>
                 <td></td>
+                <td></td>
                 <td style="text-align: right; font-weight: bold;">@(opening_credit.ToString("N0"))</td>
                 <td style="text-align: right;"> </td>
+           
 
             </tr>
 
@@ -78,11 +80,13 @@
                 <td style="text-align: center; font-weight: bold;" colspan="8">
                     Tổng cộng
                 </td>
+                <td style="text-align: right; "> </td>
                 <td style="text-align: right; font-weight: bold; ">@((sum_model.AmountDebit != null ? (double)sum_model.AmountDebit : 0).ToString("N0"))</td>
                 <td style="text-align: right; font-weight: bold; ">@((sum_model.AmountCredit != null ? (double)sum_model.AmountCredit : 0).ToString("N0"))</td>
-              
+
                 <td style="text-align: right; "> </td>
                 <td style="text-align: right; "></td>
+
             </tr>
             <tr style=" background-color: var(--yellow); ">
 
@@ -91,8 +95,10 @@
                 </td>
                 <td style="text-align: right; "></td>
                 <td style="text-align: right; "></td>
+                <td style="text-align: right; "></td>
                 <td style="text-align: right;  font-weight: bold; ">@(current_amount_credit.ToString("N0"))</td>
                 <td style="text-align: right; "></td>
+          
             </tr>
         </tbody>
         <tbody>
