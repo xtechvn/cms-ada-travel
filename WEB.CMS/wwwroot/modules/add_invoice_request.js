@@ -217,7 +217,7 @@ var _add_invoice_request = {
                     "</tr>"
                 );
                 setTimeout(function () {
-                    if (orderId !== 0 && orderId !== null && orderId != undefined)
+                    if (orderid !== 0 && orderid !== null && orderid != undefined)
                         $('#order_radio_' + orderId).prop('checked', true)
                     _add_invoice_request.OnCheckBox();
                 }, 1000)

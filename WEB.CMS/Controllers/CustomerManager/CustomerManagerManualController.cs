@@ -13,6 +13,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using Repositories.Repositories;
+using StackExchange.Redis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -38,6 +39,7 @@ namespace WEB.CMS.Controllers.CustomerManager
         private CommentClientMongoService _commentClientMongoService;
         private IDepartmentRepository _departmentRepository;
         private readonly WorkQueueClient _workQueueClient;
+        private APIService apiService;
         private readonly IIdentifierServiceRepository _identifierServiceRepository;
         public CustomerManagerManualController(IConfiguration configuration, ManagementUser managementUser, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
             ICustomerManagerRepository customerManagerRepositories, IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IDepartmentRepository departmentRepository, IIdentifierServiceRepository identifierServiceRepository)
@@ -55,6 +57,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             _departmentRepository = departmentRepository;
             _workQueueClient = new WorkQueueClient(configuration);
             _identifierServiceRepository = identifierServiceRepository;
+            apiService = new APIService(configuration, userRepository);
         }
         public async Task<IActionResult> Index()
         {
@@ -121,7 +124,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 }
                 var model = await _clientRepository.GetClientDetailByClientId(id);
 
-                if (model != null && model.ClientType != ClientType.kl)
+                if (model != null && model.ClientType != Utilities.Contants.ClientType.kl)
                 {
                     ViewBag.btnStatus = 1;
                 }
@@ -256,16 +259,19 @@ namespace WEB.CMS.Controllers.CustomerManager
             }
             return PartialView();
         }
-        public IActionResult UpdatalUserAgent(int id, int userId, long clientId)
+        public async Task<IActionResult> UpdatalUserAgent(int id, int userId, long clientId)
         {
 
             try
             {
-
+                var data = await _customerManagerRepositories.GetDetailClient(clientId);
                 var create_id = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 var model = _userAgentRepository.UpdataUserAgent(id, userId, create_id, clientId);
                 if (model > 0)
                 {
+                    var link = "/CustomerManagerManual/Detail/" + clientId;
+                    apiService.SendMessage(userId.ToString(), ((int)ModuleType.KHACH_HANG).ToString(), ((int)Utilities.Contants.ActionType.KHACH_HANG).ToString(), data.ClientCode, link, "2", data.ClientName);
+
                     return Ok(new
                     {
                         stt_code = (int)ResponseType.SUCCESS,
@@ -905,6 +911,9 @@ namespace WEB.CMS.Controllers.CustomerManager
 
                         if (Result > 0)
                         {
+                            var link= "/CustomerManagerManual/Detail/"+Result;
+                            apiService.SendMessage(item.UserId.ToString(), ((int)ModuleType.KHACH_HANG).ToString(), ((int)Utilities.Contants.ActionType.KHACH_HANG).ToString(), ClientCode, link, "1", item.Client_name);
+
                             int _UserId = 0;
                             if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                             {

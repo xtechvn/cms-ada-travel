@@ -560,7 +560,7 @@ namespace Repositories.Repositories
                 var CreateUserAgent = _UserAgentDAL.UpdataUserAgent(0, (int)model.UserId, (int)model.UserId, Detai_Client.Id);
                 if (CreateUserAgent > 0)
                 {
-                    return 1;
+                    return (int)Detai_Client.Id;
                 }
                 else
                 {

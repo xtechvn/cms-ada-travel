@@ -2,11 +2,13 @@
 using Entities.ViewModels;
 using Entities.ViewModels.Funding;
 using Entities.ViewModels.Invoice;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -15,8 +17,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
+using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
@@ -33,10 +37,11 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private ManagementUser _ManagementUser;
-
+        private APIService apiService;
+        private readonly IConfiguration _configuration;
         public InvoiceRequestController(IAllCodeRepository allCodeRepository, IInvoiceRequestRepository invoiceRequestRepository,
             IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser, IUserRepository userRepository,
-            IClientRepository clientRepository, IOrderRepositor orderRepository)
+            IClientRepository clientRepository, IOrderRepositor orderRepository, IConfiguration configuration)
         {
             _allCodeRepository = allCodeRepository;
             _invoiceRequestRepository = invoiceRequestRepository;
@@ -45,6 +50,7 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _orderRepository = orderRepository;
+            apiService = new APIService(configuration, userRepository);
         }
 
         public IActionResult Index()
@@ -371,6 +377,17 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
                         isSuccess = false,
                         message = "Cập nhật yêu cầu xuất hóa đơn thất bại"
                     });
+                var detail = _invoiceRequestRepository.GetById((int)model.Id);
+                var link = "/Order/" + detail.OrderId;
+                if (model.isSend == (int)INVOICE_REQUEST_STATUS.DA_XUAT_NHAP)
+                {
+                    apiService.SendMessage(detail.CreatedBy.ToString(), ((int)ModuleType.YEU_CAU_XUAT_HD).ToString(), ((int)ActionType.YEU_CAU_XUAT_HD).ToString(), detail.OrderNo, link, "1", detail.OrderNo);
+                }
+                if (model.isSend == (int)INVOICE_REQUEST_STATUS.HOAN_THANH)
+                {
+                    apiService.SendMessage(detail.CreatedBy.ToString(), ((int)ModuleType.YEU_CAU_XUAT_HD).ToString(), ((int)ActionType.YEU_CAU_XUAT_HD).ToString(), detail.OrderNo, link, "1", detail.OrderNo);
+
+                }
                 return Ok(new
                 {
                     isSuccess = true,
