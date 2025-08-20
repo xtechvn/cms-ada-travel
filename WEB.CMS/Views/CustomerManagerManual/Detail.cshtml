@@ -1,5 +1,8 @@
 ﻿@{ ViewData["Title"] = "Chi tiết khách hàng"; }
-
+@using Entities.ViewModels.UserAgent
+@{
+    var data_UserAgent = (List<UserAgentViewModel>)ViewBag.userAgent;
+}
 
 
 <section class="main-container main-customer">
@@ -20,7 +23,7 @@
                     <div class="flex flex-lg-nowrap gap10 justify-content-between align-items-center">
                         <div class="tab-default mb0">
                             <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(5);_customer_manager_Detail.SetActive(5)" id="note_kh" class="active">Ghi chú về khách</a>
-                            <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(1);_customer_manager_Detail.SetActive(1)" id="data_order" >Lịch sử mua hàng</a>
+                            <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(1);_customer_manager_Detail.SetActive(1)" id="data_order">Lịch sử mua hàng</a>
                             <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(3);_customer_manager_Detail.SetActive(3)" id="data_deposit_history">Lịch sử ký quỹ</a>
                             <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(4);_customer_manager_Detail.SetActive(4)" id="data_Contract">Lịch sử hợp đồng</a>
                             <a href="javascript:;" onclick="_customer_manager_Detail.OnStatuse(2);_customer_manager_Detail.SetActive(2)" id="data_payment_account">Thông tin thanh toán</a>
@@ -46,15 +49,12 @@
                         <!--<div id="grid_data_payment_account" style="display:none">
                             <img src="/images/icons/loading.gif" style=" width: 100px; height: 100px; margin-left:46%;" id="imgLoading_payment_account(" />
                         </div>-->
-
                         @*lịch sử ký quỹ*@
 
 
                         <!--<div id="grid_data_deposit_history" style="display:none">
                             <img src="/images/icons/loading.gif" style=" width: 100px; height: 100px; margin-left:46%;" id="imgLoading_deposit_history" />
                         </div>-->
-
-
                         @*lịch sử hợp đồng*@
 
 
@@ -68,11 +68,20 @@
                         <b class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</b>
                         <button type="button" class="btn btn-default ml-1" onclick="_customer_managerV2.OpenPopup('@ViewBag.id')">Sửa thông tin khách hàng</button>
                         <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.PopUpClientStatus('@ViewBag.id')">Cập nhật trạng thái khách hàng</button>
-                        <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.OpenPopupUserAgent('')">Đổi nhân viên phụ trách</button>
+                        @if (data_UserAgent != null && data_UserAgent.Count > 0)
+                        {
+                            <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.OpenPopupUserAgent('@data_UserAgent[0].Id',@ViewBag.id)">Đổi nhân viên phụ trách</button>
+                           
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.OpenPopupUserAgent('')">Thêm nhân viên phụ trách</button>
+                        }
+
                         @if (ViewBag.btnStatus == 1)
                         {
                             <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.SendMailResetPasswordb2b(@ViewBag.id)">Gửi email tài khoản</button>
-                        } 
+                        }
                         @if (ViewBag.btnphanhoi == 1)
                         {
                             <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.PopUpClientStatus('@ViewBag.id',99)">Phản hồi</button>
@@ -115,6 +124,4 @@
         .client-list-wrapper::-webkit-scrollbar-track {
             background-color: #f1f1f1;
         }
-
-
 </style>

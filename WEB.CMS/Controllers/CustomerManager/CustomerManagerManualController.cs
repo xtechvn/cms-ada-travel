@@ -101,6 +101,8 @@ namespace WEB.CMS.Controllers.CustomerManager
         {
             try
             {
+                var dataUserAgent = _userAgentRepository.UserAgentByClient((int)id, 0);
+                ViewBag.userAgent = dataUserAgent;
                 ViewBag.btnphanhoi = 0;
                 var CommentClient = new CommentClientMongoModel();
                 CommentClient.ClientId = id.ToString();
