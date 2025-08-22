@@ -458,7 +458,7 @@
             });
             var minAdultPrice = Math.min(...obj.map(o => parseFloat(o.AdultPrice)));
             var day = $('#Days').val();
-            $('#Price').val(_global_function.Comma(minAdultPrice * day))
+            $('#Price').val(_global_function.Comma(minAdultPrice ))
         });
        
     },
