@@ -549,7 +549,7 @@
         });
         var minAdultPrice = Math.min(...obj.map(o => parseFloat(o.AdultPrice)));
         var day = $('#Days').val();
-        $('#Price').val(_global_function.Comma( minAdultPrice * day))
+        $('#Price').val(_global_function.Comma( minAdultPrice))
         _ajax_caller.post('/TourProduct/UpSertProductPrices', { model_upload: obj, tour_product_id: tour_product_id }, function (result) {
             if (notification && result) {
                 if (result.isSuccess) {
@@ -635,6 +635,18 @@ $('body').on('click', '.tour-product-price-item-confirm', function () {
     _tour_product_detail.ConfirmProductPrice(tr)
     if ($('#Id').val() != undefined && !isNaN(parseInt($('#Id').val())) && parseInt($('#Id').val()) > 0) {
         _tour_product_detail.UpSertProductPrices($('#Id').val(), true, tr)
+    } else {
+        var obj = []
+        $('#tour-product-price').find('.tour-product-price-tr').each(function (index, item) {
+            var element = $(this)
+            var item = {
+                AdultPrice: element.find('.tour-product-price-item-adult-price').val().replaceAll(',', ''),
+            }
+            obj.push(item)
+        });
+        var minAdultPrice = Math.min(...obj.map(o => parseFloat(o.AdultPrice)));
+        var day = $('#Days').val();
+        $('#Price').val(_global_function.Comma(minAdultPrice))
     }
 });
 $('body').on('click', '.tour-product-price-item-delete', function () {
