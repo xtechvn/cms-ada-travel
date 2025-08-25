@@ -17,6 +17,7 @@ using MongoDB.Driver.Linq;
 using Nest;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
+using Repositories.Repositories;
 using StackExchange.Redis;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -2315,6 +2316,11 @@ namespace WEB.Adavigo.CMS.Controllers
                     modelOrder.OrderStatus = (byte?)Convert.ToInt32(model.OrderStatus);
                     modelOrder.PaymentStatus = Convert.ToInt32(model.PaymentStatus);
                     var updateOrder = _orderRepository.UpdateOrder(modelOrder);
+                    if(Convert.ToInt32(model.OrderStatus)== (int)OrderStatus.CANCEL)
+                    {
+                       var detail= _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(Convert.ToInt32(model.OrderId));
+                        _debtGuaranteeRepository.UpdateDebtGuarantee(detail.Id, (int)DebtGuaranteeStatus.TU_CHOI, (int)UpdatedBy);
+                    }
                     //var data2 = await _orderRepository.UpdateOrderStatus(Convert.ToInt32(model.OrderId), Convert.ToInt32(model.OrderStatus), UpdatedBy, UserVerify);
                     if (updateOrder > 0)
                     {
