@@ -269,6 +269,15 @@ namespace WEB.CMS.Controllers.CustomerManager
                 var model = _userAgentRepository.UpdataUserAgent(id, userId, create_id, clientId);
                 if (model > 0)
                 {
+                    var Request_token = _configuration["BotSetting:Request_token"];
+                    var Request_group_id = _configuration["BotSetting:Request_group_id"];
+                    var user =await _userRepository.GetById(userId);
+                    var log2 = user.NickName != null && user.NickName != "" ? user.NickName : "";
+                    string log = "Khách hàng " + data.ClientCode + " đã đổi nhân viên phụ trách " +
+                        "\n Sale phụ trách : " + log2 + "  " + user.Email + " - " + user.FullName + "" +
+                  "\n Vào lúc : " + ((DateTime.Now).ToString("dd/MM/yyyy HH:mm"));
+                    LogHelper.InsertLogTelegramRequest(log, Request_token, Request_group_id);
+
                     var link = "/CustomerManagerManual/Detail/" + clientId;
                     apiService.SendMessage(userId.ToString(), ((int)ModuleType.KHACH_HANG).ToString(), ((int)Utilities.Contants.ActionType.KHACH_HANG).ToString(), data.ClientCode, link, "2", data.ClientName);
 
@@ -911,6 +920,15 @@ namespace WEB.CMS.Controllers.CustomerManager
 
                         if (Result > 0)
                         {
+                            var Request_token = _configuration["BotSetting:Request_token"];
+                            var Request_group_id = _configuration["BotSetting:Request_group_id"];
+                            var user = await _userRepository.GetById(item.UserId);
+                            var log2 = user.NickName != null && user.NickName != "" ? user.NickName : "";
+                            string log = "Khách hàng " + ClientCode + " đã đổi nhân viên phụ trách " +
+                                "\n Sale phụ trách : " + log2 + "  " + user.Email + " - " + user.FullName + "" +
+                          "\n Vào lúc : " + ((DateTime.Now).ToString("dd/MM/yyyy HH:mm"));
+                            LogHelper.InsertLogTelegramRequest(log, Request_token, Request_group_id);
+
                             var link= "/CustomerManagerManual/Detail/"+Result;
                             apiService.SendMessage(item.UserId.ToString(), ((int)ModuleType.KHACH_HANG).ToString(), ((int)Utilities.Contants.ActionType.KHACH_HANG).ToString(), ClientCode, link, "1", item.Client_name);
 
