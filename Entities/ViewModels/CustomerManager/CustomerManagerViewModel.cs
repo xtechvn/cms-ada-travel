@@ -58,6 +58,7 @@ namespace Entities.ViewModels.CustomerManager
         public string Phone { get; set; }
         public int AgencyType { get; set; } = -1;
         public int ClientType { get; set; } = -1;
+        public int ClientStatus { get; set; } = -1;
         public int PermissionType { get; set; } = -1;
         public int PageIndex { get; set; }
         public int PageSize { get; set; }

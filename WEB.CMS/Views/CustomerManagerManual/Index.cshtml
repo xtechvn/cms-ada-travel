@@ -4,6 +4,7 @@
     var AgencyType = (List<AllCode>)ViewBag.AgencyType;
     var PermisionType = (List<AllCode>)ViewBag.PermisionType;
     var ClientType = (List<AllCode>)ViewBag.ClientType;
+    var ClientStatus = (List<AllCode>)ViewBag.ClientStatus;
 }
 <style>
     .row-main-head .down-up .form-down {
@@ -369,6 +370,24 @@
                                                         @if (ClientType != null)
                                                         {
                                                             foreach (var item in ClientType)
+                                                            {
+                                                                <option value="@item.CodeValue">@item.Description</option>
+
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="lbl">Trạng thái</label>
+                                                <div class="wrap_input">
+                                                    <select class="select2" id="ClientStatus" name="" style="width: 220px; height: 30px;">
+                                                        <option value="-1">Tất cả trạng thái</option>
+                                                        @if (ClientStatus != null)
+                                                        {
+                                                            foreach (var item in ClientStatus)
                                                             {
                                                                 <option value="@item.CodeValue">@item.Description</option>
 

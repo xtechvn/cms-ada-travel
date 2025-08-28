@@ -33,6 +33,7 @@ let _searchModel = {
     PageSize: 10,
     MinAmount: null,
     MaxAmount: null,
+    ClientStatus: null,
 
 };
 let cookieNameV2 = 'customer_manager_filterV2';
@@ -219,6 +220,7 @@ var _customer_managerV2 = {
             _searchModel.MaxAmount = input.MaxAmount
             _searchModel.CreateDate = input.CreateDate
             _searchModel.EndDate = input.EndDate
+            _searchModel.ClientStatus = input.ClientStatus
             objSearch = _searchModel
         }
         else {
@@ -235,6 +237,7 @@ var _customer_managerV2 = {
             PageSize: 10,
             MinAmount: null,
             MaxAmount: null,
+            ClientStatus: null,
             };
             objSearch = _searchModel;
         }
@@ -268,6 +271,10 @@ var _customer_managerV2 = {
             if (input.ClientType != null) {
                 $('#ClientType').val(input.ClientType).attr("selected", "selected");
                 $('#select2-ClientType-container').html($("#ClientType").find(':selected').text());
+            }
+            if (input.ClientStatus != null) {
+                $('#ClientStatus').val(input.ClientStatus).attr("selected", "selected");
+                $('#select2-ClientStatus-container').html($("#ClientStatus").find(':selected').text());
             }
             if (input.CreateDate != null)
                 $('#createdate').html(input.CreateDate + " - " + input.EndDate);
@@ -406,6 +413,7 @@ var _customer_managerV2 = {
             Phone: null,
             AgencyType: $('#AgencyType').val(),
             ClientType: $('#ClientType').val(),
+            ClientStatus: $('#ClientStatus').val(),
             PermissionType: $('#PermisionType').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
@@ -735,6 +743,7 @@ var _customer_managerV2 = {
             CacheName: null,
             AgencyType: $('#AgencyType').val(),
             ClientType: $('#ClientType').val(),
+            ClientStatus: $('#ClientStatus').val(),
             PermissionType: $('#PermisionType').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
@@ -1138,6 +1147,9 @@ var _customer_managerV2 = {
     },
 
     SearchData2: function () {
+        $('.form-down-filter').attr("style","width: 600px; display: none;")
+        $('.onclick-active').addClass("onclick")
+        $('.onclick').removeClass("onclick-active")
         var CreateDate;
         var EndDate;
         var CacheName_data = $('#filter-client').select2("val");
@@ -1166,6 +1178,7 @@ var _customer_managerV2 = {
             AgencyType: $('#AgencyType').val(),
             ClientType: $('#ClientType').val(),
             PermissionType: $('#PermisionType').val(),
+            ClientStatus: $('#ClientStatus').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),

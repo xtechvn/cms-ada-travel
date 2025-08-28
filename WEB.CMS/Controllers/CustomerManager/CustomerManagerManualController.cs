@@ -68,9 +68,11 @@ namespace WEB.CMS.Controllers.CustomerManager
                 var AgencyType = _allCodeRepository.GetListByType(AllCodeType.AGENCY_TYPE);
                 var PermisionType = _allCodeRepository.GetListByType(AllCodeType.PERMISION_TYPE);
                 var ClientType = _allCodeRepository.GetListByType(AllCodeType.CLIENT_TYPE);
+                var ClientStatus = _allCodeRepository.GetListByType(AllCodeType.CLIENT_STATUS);
                 ViewBag.AgencyType = AgencyType;
                 ViewBag.PermisionType = PermisionType;
                 ViewBag.ClientType = ClientType;
+                ViewBag.ClientStatus = ClientStatus;
 
                 var current_user = _ManagementUser.GetCurrentUser();
                 ViewBag.buttomThem = 0;
@@ -420,6 +422,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                             searchModel.Phone = searchModel.Phone == null ? data[0].Phone : searchModel.Phone;
                             searchModel.AgencyType = searchModel.AgencyType == -1 ? data[0].AgencyType : searchModel.AgencyType;
                             searchModel.ClientType = searchModel.ClientType == -1 ? data[0].ClientType : searchModel.ClientType;
+                            searchModel.ClientStatus = searchModel.ClientStatus == -1 ? data[0].ClientStatus : searchModel.ClientStatus;
                             searchModel.PermissionType = searchModel.PermissionType == -1 ? data[0].PermissionType : searchModel.PermissionType;
                             searchModel.CreateDate = searchModel.CreateDate == null ? data[0].CreateDate : searchModel.CreateDate;
                             searchModel.EndDate = searchModel.EndDate == null ? data[0].EndDate : searchModel.EndDate;
