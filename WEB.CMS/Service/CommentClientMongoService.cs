@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Utilities;
+using Utilities.Contants;
 using WEB.Adavigo.CMS.Service;
 
 namespace WEB.CMS.Service
@@ -64,6 +65,54 @@ namespace WEB.CMS.Service
 
 
                 list_comment = collection.Find(filter).Sort(S).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListLogActions - CommentClientMongoService. " + JsonConvert.SerializeObject(ex));
+            }
+            return list_comment;
+        }
+        public CommentClientMongoModel CommentNew(CommentClientMongoModel searchModel)
+        {
+            var list_comment = new CommentClientMongoModel();
+            try
+            {
+                var db = MongodbService.GetDatabase();
+
+
+                var collection = db.GetCollection<CommentClientMongoModel>(configuration["DataBaseConfig:MongoServer:Comment_Clent_collection"]);
+                var filter = Builders<CommentClientMongoModel>.Filter.Empty;
+                filter &= Builders<CommentClientMongoModel>.Filter.Eq(n => n.ClientId, searchModel.ClientId);
+                filter &= Builders<CommentClientMongoModel>.Filter.Where(n => n.Type != (int)CommentClientMongoType.nhu_cau);
+                var S = Builders<CommentClientMongoModel>.Sort.Descending("CreatedTime");
+
+
+                list_comment = collection.Find(filter).Sort(S).FirstOrDefault();
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListLogActions - CommentClientMongoService. " + JsonConvert.SerializeObject(ex));
+            }
+            return list_comment;
+        }
+        public CommentClientMongoModel CommentNhuCau(CommentClientMongoModel searchModel)
+        {
+            var list_comment = new CommentClientMongoModel();
+            try
+            {
+                var db = MongodbService.GetDatabase();
+
+
+                var collection = db.GetCollection<CommentClientMongoModel>(configuration["DataBaseConfig:MongoServer:Comment_Clent_collection"]);
+                var filter = Builders<CommentClientMongoModel>.Filter.Empty;
+                filter &= Builders<CommentClientMongoModel>.Filter.Eq(n => n.ClientId, searchModel.ClientId);
+                filter &= Builders<CommentClientMongoModel>.Filter.Eq(n => n.Type, (int)CommentClientMongoType.nhu_cau);
+                var S = Builders<CommentClientMongoModel>.Sort.Descending("CreatedTime");
+
+
+                list_comment = collection.Find(filter).Sort(S).FirstOrDefault();
 
             }
             catch (Exception ex)

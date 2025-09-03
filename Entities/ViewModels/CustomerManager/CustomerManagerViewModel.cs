@@ -45,8 +45,8 @@ namespace Entities.ViewModels.CustomerManager
 
         public string StatusName { get; set; }
         public string UtmSourceName { get; set; }
-        public List<CommentClientMongoModel> ListComment { get; set; }
-        public List<CommentClientMongoModel> ListCommentNhuCau { get; set; }
+        public CommentClientMongoModel ListComment { get; set; }
+        public CommentClientMongoModel ListCommentNhuCau { get; set; }
     }
     public class CustomerManagerViewSearchModel
     {

@@ -481,11 +481,9 @@ namespace WEB.CMS.Controllers.CustomerManager
                     var CommentClient = new CommentClientMongoModel();
                     CommentClient.ClientId = item.Id.ToString();
                     var ListComment = _commentClientMongoService.GetListComment(CommentClient);
-                    if (ListComment != null && ListComment.Count > 0)
-                    {
-                        item.ListComment = ListComment.Where(s => s.Type == (int)CommentClientMongoType.Phan_hoi).OrderBy(s => s.CreatedTime).ToList();
-                        item.ListCommentNhuCau = ListComment.Where(s => s.Type == (int)CommentClientMongoType.nhu_cau).ToList();
-                    }
+
+                    item.ListComment = _commentClientMongoService.CommentNew(CommentClient); ;
+                    item.ListCommentNhuCau = _commentClientMongoService.CommentNhuCau(CommentClient); ;
 
                 }
             }
@@ -677,11 +675,8 @@ namespace WEB.CMS.Controllers.CustomerManager
                 {
                     var CommentClient = new CommentClientMongoModel();
                     CommentClient.ClientId = item.Id.ToString();
-                    var ListComment = _commentClientMongoService.GetListComment(CommentClient);
-                    if (ListComment != null && ListComment.Count > 0)
-                    {
-                        item.ListCommentNhuCau = ListComment.Where(s => s.Type == (int)CommentClientMongoType.nhu_cau).ToList();
-                    }
+                    item.ListCommentNhuCau = _commentClientMongoService.CommentNhuCau(CommentClient);
+                   
 
                 }
             }

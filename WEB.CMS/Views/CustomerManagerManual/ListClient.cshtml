@@ -41,9 +41,7 @@ else
                         <th class="mfp-hide" style="width: 100px;">Trạng thái</th>
                         <th style="width: 100px;">Nguồn</th>
                         <th>Nhu cầu</th>
-                        <th>Phản hồi lần 1</th>
-                        <th>Phản hồi lần 2</th>
-                        <th>Phản hồi lần 3</th>
+                        <th>Phản hồi gần nhất</th>
 
                         @*<th class="mfp-hide" style="width: 100px;">Trạng thái tài khoản</th>*@
                     </tr>
@@ -112,40 +110,21 @@ else
                                 </td>
                                 <td class="">@(item.UtmSourceName)</td>
                                 <td class="">
-                                    @if (item.ListCommentNhuCau != null && item.ListCommentNhuCau.Count > 0)
-                                    {
-                                        foreach (var item2 in item.ListCommentNhuCau)
+                                    <div>
+                                        @if (item.ListCommentNhuCau != null)
                                         {
-                                            <div>
-                                                @item2.Note
-                                            </div>
+                                            @item.ListCommentNhuCau.Note
                                         }
-                                    }
+                                    </div>
 
                                 </td>
                                 <td class="">
-                                    @if (item.ListComment != null && item.ListComment.Count > 0)
-                                    {
-                                        <div>
-                                            @item.ListComment[0].Note
-                                        </div>
-                                    }
-                                </td>
-                                <td class="">
-                                    @if (item.ListComment != null && item.ListComment.Count > 1)
-                                    {
-                                        <div>
-                                            @item.ListComment[1].Note
-                                        </div>
-                                    }
-                                </td>
-                                <td class="">
-                                    @if (item.ListComment != null && item.ListComment.Count > 2)
-                                    {
-                                        <div>
-                                            @item.ListComment[2].Note
-                                        </div>
-                                    }
+                                    <div>
+                                        @if (item.ListComment != null)
+                                        {
+                                            @item.ListComment.Note
+                                        }                                        
+                                    </div>
                                 </td>
                                 @*<td class="mfp-hide">
                                         <div class="on-off-btn">

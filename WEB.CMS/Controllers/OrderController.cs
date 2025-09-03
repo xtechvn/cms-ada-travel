@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver.Linq;
 using Nest;
 using Newtonsoft.Json;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using StackExchange.Redis;
@@ -840,6 +841,7 @@ namespace WEB.Adavigo.CMS.Controllers
                             ViewBag.OrderStatus_Type = 0;
                         }
                         var data = await _orderRepository.GetAllServiceByOrderId(dataOrder.OrderId);
+                        data = data.OrderBy(s => s.StartDate).ToList();
                         if (data != null)
                             foreach (var item in data)
                             {
@@ -909,7 +911,8 @@ namespace WEB.Adavigo.CMS.Controllers
                                         data[o].Flight.BookingCode2 = data[o + 1].Flight.BookingCode;
                                         data[o].Amount = data[o].Flight.Amount + data[o + 1].Flight.Amount;
                                         data[o].EndDate = data[o + 1].EndDate;
-
+                                        data[o].Flight.AirlineName_Vi2 = data[o + 1].Flight.AirlineName_Vi;
+                                       
                                         data.Remove(data[o + 1]);
 
                                     }

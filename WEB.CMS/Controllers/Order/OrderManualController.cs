@@ -673,6 +673,8 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 if (order_id > 0)
                 {
                     var fly_detail = await _flyBookingDetailRepository.GetListByGroupFlyID(order_id, group_fly);
+                    if(fly_detail!=null && fly_detail.Count > 0)
+                    fly_detail = fly_detail.OrderBy(s => s.StartDate).ToList();
                     int fly_status = (int)ServiceStatus.OnExcution;
                     if (fly_detail != null && fly_detail.Count > 0)
                     {

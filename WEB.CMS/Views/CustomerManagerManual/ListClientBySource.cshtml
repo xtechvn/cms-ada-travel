@@ -43,7 +43,7 @@ else
                             <tr>
                                 <td>@STT</td>
                                 <td>
-                                    <a class="blue" href="/CustomerManagerManual/Detail/@item.Id">@(item.ClientCode!=""? item.ClientCode: item.Id.ToString())</a>
+                                    <a class="blue" href="/CustomerManagerManual/Detail/@item.Id">@(item.ClientCode != "" ? item.ClientCode : item.Id.ToString())</a>
 
                                 </td>
                                 <td class=""> <a class="blue" href="/CustomerManagerManual/Detail/@item.Id">@item.ClientName</a></td>
@@ -55,15 +55,15 @@ else
                                 <td class="">@(item.UserId_name == null ? "N/A" : item.UserId_name)</td>
 
                                 <td class="">
-                                    @if (item.ListCommentNhuCau != null && item.ListCommentNhuCau.Count > 0)
-                                    {
-                                        foreach (var item2 in item.ListCommentNhuCau)
+
+                                    <div>
+                                        @if (item.ListCommentNhuCau!= null)
                                         {
-                                            <div>
-                                                @item2.Note
-                                            </div>
+                                            @item.ListCommentNhuCau.Note
                                         }
-                                    }
+                                     
+                                    </div>
+
 
                                 </td>
                             </tr>
@@ -96,18 +96,18 @@ else
             })*@
         <input id="countClient" value="@Model.TotalRecord" style="display:none" />
         @await Component.InvokeAsync("PagingNew", new
-    {
-
-            pageModel = new Paging()
             {
-                TotalRecord = Model.TotalRecord,
-                TotalPage = Model.TotalPage,
-                CurrentPage = Model.CurrentPage,
-                PageSize = Model.PageSize,
-                RecordName = "Khách hàng",
-                PageAction = "_detail_source_client.ClientOnPaging({0})",
-                PageSelectPageSize = "_detail_source_client.onSelectPageSize()"
-            }
-        })
+
+                pageModel = new Paging()
+    {
+        TotalRecord = Model.TotalRecord,
+        TotalPage = Model.TotalPage,
+        CurrentPage = Model.CurrentPage,
+        PageSize = Model.PageSize,
+        RecordName = "Khách hàng",
+        PageAction = "_detail_source_client.ClientOnPaging({0})",
+        PageSelectPageSize = "_detail_source_client.onSelectPageSize()"
+    }
+            })
     </div>
 }
