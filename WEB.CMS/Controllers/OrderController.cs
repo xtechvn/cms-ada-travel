@@ -841,8 +841,11 @@ namespace WEB.Adavigo.CMS.Controllers
                             ViewBag.OrderStatus_Type = 0;
                         }
                         var data = await _orderRepository.GetAllServiceByOrderId(dataOrder.OrderId);
-                        data = data.OrderBy(s => s.StartDate).ToList();
+                      
                         if (data != null)
+                        {
+                            data = data.OrderBy(s => s.StartDate).ToList();
+                      
                             foreach (var item in data)
                             {
                                 item.Price += item.Profit;
@@ -893,6 +896,7 @@ namespace WEB.Adavigo.CMS.Controllers
                                         break;
                                 }
                             }
+                        }
                         st3.Stop();
                         if (st3.ElapsedMilliseconds > 1000)
                             LogHelper.InsertLogTelegram("Packages-OrderController-GetAllServiceByOrderId" + st3.ElapsedMilliseconds + "ms");
