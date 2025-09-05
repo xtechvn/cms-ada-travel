@@ -45,9 +45,10 @@ namespace WEB.Adavigo.CMS.Controllers
         private IAccountClientRepository _accountClientRepository;
         private readonly WorkQueueClient _workQueueClient;
         private LogCacheFilterMongoService _logCacheFilterMongoService;
+        private IIdentifierServiceRepository _identifierServiceRepository;
 
         public CustomerManagerController(IConfiguration configuration, ICustomerManagerRepository customerManagerRepositories, IDepositHistoryRepository depositHistoryRepository, ManagementUser ManagementUser, IWebHostEnvironment WebHostEnvironment, IAccountClientRepository accountClientRepository,
-        IOrderRepositor orderRepositor, IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IPaymentAccountRepository paymentAccountRepository, IClientRepository clientRepository, IUserRepository userRepository, IContractRepository contractRepository, IBankingAccountRepository bankingAccountRepository)
+        IOrderRepositor orderRepositor, IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IPaymentAccountRepository paymentAccountRepository, IClientRepository clientRepository, IUserRepository userRepository, IContractRepository contractRepository, IBankingAccountRepository bankingAccountRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
             _customerManagerRepositories = customerManagerRepositories;
             _depositHistoryRepository = depositHistoryRepository;
@@ -65,6 +66,7 @@ namespace WEB.Adavigo.CMS.Controllers
             _accountClientRepository = accountClientRepository;
             _workQueueClient = new WorkQueueClient(configuration);
             _logCacheFilterMongoService = new LogCacheFilterMongoService(configuration);
+            _identifierServiceRepository = identifierServiceRepository;
         }
         public async Task<IActionResult> Index()
         {
@@ -308,7 +310,8 @@ namespace WEB.Adavigo.CMS.Controllers
                 if (email == null && DataModel.Id == 0)
                 {
                     APIService apiService = new APIService(_configuration, _userRepository);
-                    DataModel.ClientCode = await apiService.buildClientCode(DataModel.id_ClientType);
+                    //DataModel.ClientCode = await apiService.buildClientCode(DataModel.id_ClientType);
+                    DataModel.ClientCode = _identifierServiceRepository.buildClientCode(DataModel.id_ClientType);
                     var Result = _customerManagerRepositories.SetUpClient(DataModel);
                     if (Result != 0)
                     {
