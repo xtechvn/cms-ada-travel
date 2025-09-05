@@ -2753,7 +2753,7 @@ namespace WEB.Adavigo.CMS.Controllers
             }
             return PartialView(model);
         }
-        public async Task<IActionResult> UpdateOrder(long OrderId, string date)
+        public async Task<IActionResult> UpdateOrderCutOffDate(long OrderId, string date)
         {
             var sst_status = (int)ResponseType.FAILED;
             var smg = "Lưu thông tin không thành công";

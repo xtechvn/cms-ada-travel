@@ -814,7 +814,7 @@ var _orderDetail = {
     EditCutOffDate: function (id) {
         var date = $('#CutOffDate').val();
         $.ajax({
-            url: "/Order/UpdateOrder",
+            url: "/Order/UpdateOrderCutOffDate",
             type: "Post",
             data: { OrderId: id, date: date },
             success: function (result) {
