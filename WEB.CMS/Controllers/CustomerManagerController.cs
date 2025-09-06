@@ -311,7 +311,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 {
                     APIService apiService = new APIService(_configuration, _userRepository);
                     //DataModel.ClientCode = await apiService.buildClientCode(DataModel.id_ClientType);
-                    DataModel.ClientCode = _identifierServiceRepository.buildClientCode(DataModel.id_ClientType);
+                    DataModel.ClientCode =await _identifierServiceRepository.buildClientNo(Convert.ToInt32(DataModel.id_ClientType));
                     var Result = _customerManagerRepositories.SetUpClient(DataModel);
                     if (Result != 0)
                     {

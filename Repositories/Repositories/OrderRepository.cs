@@ -210,7 +210,7 @@ namespace Repositories.Repositories
             return model;
         }
 
-        public async Task<Order> CreateOrder(Order order)
+        public async Task<Entities.Models.Order> CreateOrder(Entities.Models.Order order)
         {
             try
             {
@@ -229,7 +229,7 @@ namespace Repositories.Repositories
             return null;
         }
 
-        public async Task<Order> GetOrderByID(long id)
+        public async Task<Entities.Models.Order> GetOrderByID(long id)
         {
             try
             {
@@ -350,7 +350,7 @@ namespace Repositories.Repositories
             return new List<OrderViewModel>();
         }
 
-        public async Task<Order> GetOrderByOrderNo(string orderNo)
+        public async Task<Entities.Models.Order> GetOrderByOrderNo(string orderNo)
         {
             try
             {
@@ -561,7 +561,7 @@ namespace Repositories.Repositories
             }
             return new List<OrderViewModel>();
         }
-        public int UpdateOrder(Order model)
+        public int UpdateOrder(Entities.Models.Order model)
         {
             return _OrderDal.UpdateOrder(model);
         }
@@ -570,7 +570,7 @@ namespace Repositories.Repositories
             try
             {
                 var client = await _clientDAL.GetClientDetail(client_id);
-                if (client != null && client.ClientType == (int)ClientType.kl)
+                if (client != null && client.ClientType == (int)Utilities.Contants.ClientType.kl)
                 {
                     return (int)DebtType.DEBT_ACCEPTED;
                 }
@@ -688,6 +688,8 @@ namespace Repositories.Repositories
                                 SalerUserName = row["SalerUserName"].ToString(),
                                 SalerEmail = row["SalerEmail"].ToString(),
                                 UtmMedium = row["UtmMedium"].ToString(),
+                                CutOffDate = row["CutOffDate"].Equals(DBNull.Value) ? "" : Convert.ToDateTime(row["CutOffDate"]).ToString("dd/MM/yyyy ", CultureInfo.InvariantCulture),
+
                             }).ToList();
                 }
                 else
@@ -1020,19 +1022,18 @@ namespace Repositories.Repositories
                                     {
                                         var ListHotelBookingCode = dt_HotelBookingCode.ToList<HotelBookingCodeModel>();
                                         ws.Cells[Cell[I] + RowIndex].PutValue(string.Join(",", ListHotelBookingCode.Select(x => x.BookingCode)));
-                                        listfield2.Remove(listfield2[f]);
-                                        f--;
-
                                     }
-
+                                    listfield2.Remove(listfield2[f]);
+                                    f--;
                                     break;
 
                                 }
                                 if (listfield2[f] == 20)
                                 {
-                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.CutOffDate != null ?  ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy") : string.Empty);
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.CutOffDate);
                                     listfield2.Remove(listfield2[f]);
                                     f--;
+                                    break;
                                 }
                             }
 
@@ -1043,7 +1044,7 @@ namespace Repositories.Repositories
 
                     }
                     #endregion
-                    wb.Save(FilePath);
+                     wb.Save(FilePath);
                     pathResult = FilePath;
                 }
             }
