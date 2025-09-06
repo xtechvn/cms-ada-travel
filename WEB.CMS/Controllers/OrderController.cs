@@ -2212,7 +2212,6 @@ namespace WEB.Adavigo.CMS.Controllers
                 {
                 }
                 string FilePath = Path.Combine(_UploadDirectory, _FileName);
-                searchModel.OrderNo = "CVB25K057250";
 
                 var rsPath = await _orderRepository.ExportDeposit(searchModel, FilePath, field, searchModel.PageIndex, searchModel.pageSize);
 
