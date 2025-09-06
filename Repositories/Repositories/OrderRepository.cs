@@ -14,6 +14,7 @@ using Nest;
 using Newtonsoft.Json;
 using PdfSharp;
 using Repositories.IRepositories;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -21,6 +22,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 using Utilities;
 using Utilities.Contants;
 
@@ -745,6 +747,7 @@ namespace Repositories.Repositories
                     if (field.HINHTHUCTT) { listfieldtext.Add("Hình thức thanh toán"); listfield.Add(18); }
 
                     listfieldtext.Add("Mã code dịch vụ"); listfield.Add(19);
+                    listfieldtext.Add("Ngày thu hồi"); listfield.Add(20);
 
                     cell.SetColumnWidth(0, 8);
                     for (int i = 1; i <= listfieldtext.Count; i++)
@@ -1024,6 +1027,12 @@ namespace Repositories.Repositories
 
                                     break;
 
+                                }
+                                if (listfield2[f] == 20)
+                                {
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.CutOffDate != null ?  ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy") : string.Empty);
+                                    listfield2.Remove(listfield2[f]);
+                                    f--;
                                 }
                             }
 

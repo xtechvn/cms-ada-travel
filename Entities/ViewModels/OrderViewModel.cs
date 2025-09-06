@@ -54,7 +54,7 @@ namespace Entities.ViewModels
         public int IsFinishPayment { get; set; }
         public string InvoiceRequestStatusName { get; set; }
         public int InvoiceRequestStatus { get; set; }
-
+        public DateTime? CutOffDate { get; set; }
 
 
     }
