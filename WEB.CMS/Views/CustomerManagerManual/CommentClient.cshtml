@@ -19,7 +19,7 @@
                                 <p><b> @comment.UserName.ToString() - @comment.FullName </b></p>
                                 <span style="color:#698096">@comment.CreatedTime.ToString("dd/MM/yyyy")<b class="ml-2"></b></span>
                             </div>
-                            <div>@comment.Note</div>
+                            <div style="white-space: pre-line;"> @comment.Note</div>
                            
                         </div>
                     </div>
@@ -42,7 +42,32 @@
         </form>
     </div>
 </div>
+<script>
+    const textarea = document.getElementById('commentContent');
+  
+    textarea.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        if (e.shiftKey || e.ctrlKey) {
+            e.preventDefault(); // chặn hành vi mặc định
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const value = textarea.value;
 
+            // chèn \n vào vị trí con trỏ
+            textarea.value = value.substring(0, start) + "\n" + value.substring(end);
+            // đưa con trỏ xuống sau ký tự \n
+            textarea.selectionStart = textarea.selectionEnd = start + 1;
+
+            console.log('Xuống dòng (Shift+Enter hoặc Ctrl+Enter)');
+        } else {
+          // Enter thường => gửi comment
+        
+          console.log('Enter gửi comment');
+        
+        }
+      }
+    });
+</script>
 <style>
     .comment-list-wrapper {
         max-height: 400px; /* Giới hạn chiều cao của danh sách comment */
