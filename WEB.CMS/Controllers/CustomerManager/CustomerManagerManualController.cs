@@ -922,7 +922,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                             var Request_group_id = _configuration["BotSetting:Request_group_id"];
                             var user = await _userRepository.GetById(item.UserId);
                             var log2 = user.NickName != null && user.NickName != "" ? user.NickName : "";
-                            string log = "Khách hàng " + ClientCode +" Số ddienj thoại:"+ model_client.phone+ "Nhu cầu : "+ item.Note + " .Đã đổi nhân viên phụ trách " +
+                            string log = "Khách hàng " + ClientCode +" Số điện thoại:"+ model_client.phone+ "Nhu cầu : "+ item.Note + " .Đã đổi nhân viên phụ trách " +
                                 "\n Sale phụ trách : " + log2 + "  " + user.Email + " - " + user.FullName + "" +
                           "\n Vào lúc : " + ((DateTime.Now).ToString("dd/MM/yyyy HH:mm"));
                             LogHelper.InsertLogTelegramRequest(log, Request_token, Request_group_id);
