@@ -334,7 +334,7 @@ namespace Repositories.Repositories
 
                     if (field.NguoiTao) { listfieldtext.Add("Người tạo"); listfield.Add(11); }
                     if (field.Status) { listfieldtext.Add("Trạng thái"); listfield.Add(12); }
-                    listfieldtext.Add("Nguôn khách hàng"); listfield.Add(13);
+                    listfieldtext.Add("Nguồn khách hàng"); listfield.Add(13);
                     cell.SetColumnWidth(0, 8);
                     for (int i = 1; i <= listfield.Count; i++)
                     {

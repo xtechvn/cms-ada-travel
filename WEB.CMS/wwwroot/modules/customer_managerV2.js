@@ -214,6 +214,7 @@ var _customer_managerV2 = {
             _searchModel.AgencyType = input.AgencyType
             _searchModel.ClientType = input.ClientType
             _searchModel.PermissionType = input.PermissionType
+            _searchModel.UtmSource = input.UtmSource
             _searchModel.PageIndex = 1
             _searchModel.PageSize = 10
             _searchModel.MinAmount = input.MinAmount
@@ -233,6 +234,7 @@ var _customer_managerV2 = {
             AgencyType: null,
             ClientType: null,
             PermissionType: null,
+            UtmSource: null,
             PageIndex: 1,
             PageSize: 10,
             MinAmount: null,
@@ -415,6 +417,7 @@ var _customer_managerV2 = {
             ClientType: $('#ClientType').val(),
             ClientStatus: $('#ClientStatus').val(),
             PermissionType: $('#PermisionType').val(),
+            UtmSource: $('#UtmSource').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -745,6 +748,7 @@ var _customer_managerV2 = {
             ClientType: $('#ClientType').val(),
             ClientStatus: $('#ClientStatus').val(),
             PermissionType: $('#PermisionType').val(),
+            UtmSource: $('#UtmSource').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -1024,6 +1028,7 @@ var _customer_managerV2 = {
             AgencyType: $('#AgencyType').val(),
             ClientType: $('#ClientType').val(),
             PermissionType: $('#PermisionType').val(),
+            UtmSource: $('#UtmSource').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -1108,6 +1113,7 @@ var _customer_managerV2 = {
             AgencyType: $('#AgencyType').val(),
             ClientType: $('#ClientType').val(),
             PermissionType: $('#PermisionType').val(),
+            UtmSource: $('#UtmSource').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -1179,6 +1185,7 @@ var _customer_managerV2 = {
             ClientType: $('#ClientType').val(),
             PermissionType: $('#PermisionType').val(),
             ClientStatus: $('#ClientStatus').val(),
+            UtmSource: $('#UtmSource').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -1259,6 +1266,7 @@ var _customer_managerV2 = {
             AgencyType: $('#AgencyType').val(),
             ClientType: $('#ClientType').val(),
             PermissionType: $('#PermisionType').val(),
+            UtmSource: $('#UtmSource').val(),
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),

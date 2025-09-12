@@ -21,6 +21,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service.ServiceInterface;
 using WEB.CMS.Models;
+using WEB.CMS.Service;
 
 namespace WEB.Adavigo.CMS.Service
 {
@@ -53,6 +54,7 @@ namespace WEB.Adavigo.CMS.Service
         private readonly APIService _APIService;
         private readonly IPaymentVoucherRepository _paymentVoucherRepository;
         private INoteRepository _noteRepository;
+        private readonly CountYCCMongoService _countYCCMongoService;
         public EmailService(IConfiguration configuration, IHotelBookingCodeRepository hotelBookingCodeRepository, IHotelBookingRepositories hotelBookingRepositories, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository, IHotelBookingRoomRatesRepository hotelBookingRoomRatesRepository,
         IFlyBookingDetailRepository flyBookingDetailRepository, IBagageRepository bagageRepository, IPassengerRepository passengerRepository, IOrderRepository orderRepository, IContactClientRepository contactClientRepository, IHotelBookingRoomRepository hotelBookingRoomRepository, IOtherBookingRepository otherBookingRepository,
              IUserRepository userRepository, IClientRepository clientRepository, ITourRepository tourRepository, IFlightSegmentRepository flightSegmentRepository, IAirlinesRepository airlinesRepository, ISupplierRepository supplierRepository, IPaymentRequestRepository paymentRequestRepository,
@@ -85,6 +87,7 @@ namespace WEB.Adavigo.CMS.Service
             _APIService = new APIService(configuration, userRepository);
             _paymentVoucherRepository = paymentVoucherRepository;
             _noteRepository = noteRepository;
+            _countYCCMongoService = new CountYCCMongoService(configuration);
         }
         public async Task<bool> SendEmail(SendEmailViewModel model, List<AttachfileViewModel> attach_file)
         {
@@ -4377,6 +4380,7 @@ namespace WEB.Adavigo.CMS.Service
             {
                 if (Emailmodel == null)
                 {
+                    var Count = _countYCCMongoService.GetCountYCC(id);
                     var model = _paymentRequestRepository.GetById((int)id);
                     var list_note= await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
@@ -4483,10 +4487,12 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{MaDV}}", model.ServiceCode);
                     body = body.Replace("{{NDTT}}", model.Note);
                     body = body.Replace("{{HanTT}}", model.PaymentDate.Value.ToString("dd/MM/yyyy HH:mm"));
+                    body = body.Replace("{{SLIN}}", (Count+1).ToString());
                     return body;
                 }
                 else
                 {
+                    var Count=_countYCCMongoService.GetCountYCC(id);
                     var model = _paymentRequestRepository.GetById((int)id);
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
                     var list_note = await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
@@ -4571,7 +4577,7 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{HanTT}}", model.PaymentDate.Value.ToString("dd/MM/yyyy HH:mm"));
                     body = body.Replace("{{MaDH}}", model.OrderNo);
                     body = body.Replace("{{MaDV}}", model.ServiceCode);
-
+                    body = body.Replace("{{SLIN}}", Count.ToString());
                     return body;
                 }
             }

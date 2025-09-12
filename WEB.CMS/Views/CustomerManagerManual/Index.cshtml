@@ -5,6 +5,7 @@
     var PermisionType = (List<AllCode>)ViewBag.PermisionType;
     var ClientType = (List<AllCode>)ViewBag.ClientType;
     var ClientStatus = (List<AllCode>)ViewBag.ClientStatus;
+    var CLIENT_SOURCE = (List<AllCode>)ViewBag.CLIENT_SOURCE;
 }
 <style>
     .row-main-head .down-up .form-down {
@@ -345,22 +346,22 @@
                                     <div class="row">
 
                                         @*<div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label class="lbl">Đối tượng</label>
-                                                    <div class="wrap_input">
-                                                        <select class="select2" name="" id="AgencyType" style="width: 150px; height: 30px;">
-                                                            <option value="-1">Tất cả đối tượng</option>
-                                                            @if (AgencyType != null)
-                                                            {
-                                                                foreach (var item in AgencyType)
-                                                                {
-                                                                    <option value="@item.CodeValue">@item.Description</option>
-                                                                }
-                                                            }
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>*@
+            <div class="form-group">
+                <label class="lbl">Đối tượng</label>
+                <div class="wrap_input">
+                    <select class="select2" name="" id="AgencyType" style="width: 150px; height: 30px;">
+                        <option value="-1">Tất cả đối tượng</option>
+                        @if (AgencyType != null)
+                        {
+                            foreach (var item in AgencyType)
+                            {
+                                <option value="@item.CodeValue">@item.Description</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>*@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="lbl">loại khách hàng</label>
@@ -397,17 +398,53 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        @*<div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label class="lbl">Thời gian tạo</label>
-                                                    <div class="wrap_input">
-                                                        <div class="datepicker-wrap" style="width:100%">
-                                                            <input class="form-control date text-left filter_date_daterangepicker" id="createdate" type="text"
-                                                                   name="datetimeApprove" style="min-width: 180px !important" placeholder="Thời gian tạo" />
-                                                        </div>
-                                                    </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="lbl">Nhóm khách hàng</label>
+                                                <div class="wrap_input">
+                                                    <select class="select2" id="PermisionType" name="" style="width: 220px; height: 30px;">
+                                                        <option value="-1">Tất cả nhóm khách hàng</option>
+                                                        @if (PermisionType != null)
+                                                        {
+                                                            foreach (var item in PermisionType)
+                                                            {
+                                                                <option value="@item.CodeValue">@item.Description</option>
+                                                            }
+                                                        }
+                                                    </select>
                                                 </div>
-                                            </div>*@
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="lbl">Nguồn khách hàng</label>
+                                                <div class="wrap_input">
+                                                    <select class="select2" id="UtmSource" name="" style="width: 220px; height: 30px;">
+                                                        <option value="-1">Tất cả nguồn khách hàng</option>
+                                                        @if (CLIENT_SOURCE != null)
+                                                        {
+                                                            foreach (var item in CLIENT_SOURCE)
+                                                            {
+                                                                <option value="@item.CodeValue">@item.Description</option>
+
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @*<div class="col-md-6">
+            <div class="form-group">
+                <label class="lbl">Thời gian tạo</label>
+                <div class="wrap_input">
+                    <div class="datepicker-wrap" style="width:100%">
+                        <input class="form-control date text-left filter_date_daterangepicker" id="createdate" type="text"
+                               name="datetimeApprove" style="min-width: 180px !important" placeholder="Thời gian tạo" />
+                    </div>
+                </div>
+            </div>
+        </div>*@
 
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -571,18 +608,7 @@
             <select class="select2 client-select main-staff-select" id="filter-client" multiple="multiple" style="width:100% !important" placeholder="Bộ lọc đã lưu">
             </select>
         </div>
-        <div class="form-group mb10 mr-2">
-            <select class="select2" id="PermisionType" name="" style="width: 220px; height: 30px;">
-                <option value="-1">Tất cả nhóm khách hàng</option>
-                @if (PermisionType != null)
-                {
-                    foreach (var item in PermisionType)
-                    {
-                        <option value="@item.CodeValue">@item.Description</option>
-                    }
-                }
-            </select>
-        </div>
+    
 
         <div class="form-group mb10 mr-2" style="min-width: 260px;">
             <select class="select2 client-select main-staff-select" id="txtNguoiTao" multiple="multiple" style="width:100% !important">
@@ -685,14 +711,7 @@
                 </div>
             </div>
         </div>
-        <div class="form-group mb10 mr-2" style="display:none">
-            <select class="select2" name="" style="width: 180px;">
-                <option value="">Tất cả bộ phận phụ trách</option>
-                <option value="">Đại lý</option>
-                <option value="">Cộng tác viên</option>
-                <option value="">Mice/Corp/Doanh nghiệp</option>
-            </select>
-        </div>
+
 
         <div class="form-group mb10 mr-2">
             @*<button class="btn-search btn-default" type="button" onclick="_customer_managerV2.Export()" id="btnExport">
