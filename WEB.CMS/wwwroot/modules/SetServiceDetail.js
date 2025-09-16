@@ -850,7 +850,7 @@ var _SetService_Detail = {
                 PaymentNotification: $('#payment_notification').val(),
                 ServiceType: $('#Type').val(),
                 Type: $('#ServiceType').val(),
-                Email: $('#Email').val().toString(),
+                Email: $('#Email').val() != undefined && $("#Email").val().length > 0 ? $("#Email").val().toString() : '',
                 group_booking_id: $('#Type').attr('data-group-booking'),
 
                 OrderAmount: $('#OrderAmount').val() != undefined ? $('#OrderAmount').val().replaceAll(',', '') : 0,
