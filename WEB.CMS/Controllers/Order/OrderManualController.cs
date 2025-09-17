@@ -375,6 +375,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                       case (int)ServiceType.PRODUCT_FLY_TICKET:
                             {
                                 deparments.Add(ReadFile.LoadConfig().Department_Operator_Fly);
+                                deparments.Add(ReadFile.LoadConfig().Department_Operator_Fly_SG);
 
                             }
                             break;
@@ -389,6 +390,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                             {
                                 deparments.Add(ReadFile.LoadConfig().Department_Operator_Hotel);
                                 deparments.Add(ReadFile.LoadConfig().Department_Operator_Fly);
+                                deparments.Add(ReadFile.LoadConfig().Department_Operator_Fly_SG);
                                 deparments.Add(ReadFile.LoadConfig().Department_Operator_Tour);
                             }
                             break;
