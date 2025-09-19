@@ -543,7 +543,8 @@ namespace WEB.Adavigo.CMS.Service
                                     else
                                     {
                                         AmountDVK += (double)item.UnitPrice;
-                                    };
+                                    }
+                                    ;
 
                                     if (item.UnitPrice != null) operator_price = Math.Round(((double)item.UnitPrice / (double)item.Nights / (double)item.Quantity), 0);
                                     if (operator_price <= 0) operator_price = item.OperatorPrice != null ? (double)item.OperatorPrice : 0;
@@ -800,7 +801,7 @@ namespace WEB.Adavigo.CMS.Service
 
                                         chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Name + "</td>" +
 
-                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice != null ? ((double)item.UnitPrice/ (double)item.Quantity) : 0).ToString("N0") + "</td>" +
+                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice != null ? ((double)item.UnitPrice / (double)item.Quantity) : 0).ToString("N0") + "</td>" +
                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Quantity + "</td>" +
                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item.UnitPrice).ToString("N0") + "</td>"
                                                                     + "</tr>";
@@ -1356,7 +1357,7 @@ namespace WEB.Adavigo.CMS.Service
                                 body = body.Replace("{{payment_notification}}", modelEmail.PaymentNotification);
 
                                 return body;
-                            }                           
+                            }
                             break;
                     }
 
@@ -2454,7 +2455,8 @@ namespace WEB.Adavigo.CMS.Service
                                             else
                                             {
                                                 AmountDVK += (double)item2.UnitPrice;
-                                            };
+                                            }
+                                            ;
 
                                             if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.Amount / (double)item2.Nights / (double)item2.Quantity), 0);
                                             if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
@@ -3069,7 +3071,8 @@ namespace WEB.Adavigo.CMS.Service
                                     else
                                     {
                                         AmountDVK += (double)item2.UnitPrice;
-                                    };
+                                    }
+                                    ;
 
                                     if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.Amount / (double)item2.Nights / (double)item2.Quantity), 0);
                                     if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
@@ -3951,7 +3954,8 @@ namespace WEB.Adavigo.CMS.Service
                                         else
                                         {
                                             AmountDVK += (double)item2.UnitPrice;
-                                        };
+                                        }
+                                        ;
 
                                         if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.UnitPrice / (double)item2.Nights / (double)item2.Quantity), 0);
                                         if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
@@ -4382,7 +4386,7 @@ namespace WEB.Adavigo.CMS.Service
                 {
                     var Count = _countYCCMongoService.GetCountYCC(id);
                     var model = _paymentRequestRepository.GetById((int)id);
-                    var list_note= await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
+                    var list_note = await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
                     string ngay = "Ngày " + model.CreatedDate.Value.Day.ToString();
                     string thang = "Tháng " + model.CreatedDate.Value.Month.ToString();
@@ -4425,7 +4429,7 @@ namespace WEB.Adavigo.CMS.Service
                     else
                     {
                         body = body.Replace("{{DHstyle}}", "display: none");
-                       
+
                     }
                     if (list_note != null && list_note.Count > 0)
                     {
@@ -4434,14 +4438,14 @@ namespace WEB.Adavigo.CMS.Service
                         foreach (var item in list_note)
                         {
 
-                            ktnote += "<div" + "<span>"+item.FullName +" :"+ item.Comment + "</span></div>";
+                            ktnote += "<div" + "<span>" + item.FullName + " :" + item.Comment + "</span></div>";
                         }
                         body = body.Replace("{{KTNote}}", ktnote);
                     }
                     else
                     {
                         body = body.Replace("{{KTstyle}}", "display: none");
-                       
+
                     }
 
 
@@ -4487,12 +4491,12 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{MaDV}}", model.ServiceCode);
                     body = body.Replace("{{NDTT}}", model.Note);
                     body = body.Replace("{{HanTT}}", model.PaymentDate.Value.ToString("dd/MM/yyyy HH:mm"));
-                    body = body.Replace("{{SLIN}}", (Count+1).ToString());
+                    body = body.Replace("{{SLIN}}", (Count + 1).ToString());
                     return body;
                 }
                 else
                 {
-                    var Count=_countYCCMongoService.GetCountYCC(id);
+                    var Count = _countYCCMongoService.GetCountYCC(id);
                     var model = _paymentRequestRepository.GetById((int)id);
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
                     var list_note = await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
@@ -4516,7 +4520,7 @@ namespace WEB.Adavigo.CMS.Service
                     else
                     {
                         body = body.Replace("{{DHstyle}}", "display: none");
-                        
+
                     }
                     if (list_note != null && list_note.Count > 0)
                     {
@@ -4577,7 +4581,7 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{HanTT}}", model.PaymentDate.Value.ToString("dd/MM/yyyy HH:mm"));
                     body = body.Replace("{{MaDH}}", model.OrderNo);
                     body = body.Replace("{{MaDV}}", model.ServiceCode);
-                    body = body.Replace("{{SLIN}}", Count.ToString());
+                    body = body.Replace("{{SLIN}}", (Count == 0 ? 1 : Count).ToString());
                     return body;
                 }
             }
