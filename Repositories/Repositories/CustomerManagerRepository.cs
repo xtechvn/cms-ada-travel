@@ -178,7 +178,7 @@ namespace Repositories.Repositories
                         TaxNo = model.Maso_Id,
                         ClientCode = model.ClientCode,
                         ParentId = data2.ParentId,
-                        UtmSource = data2.UtmSource,
+                        UtmSource = model.UtmSource,
                     };
 
                     var CreateClient = _ClientDAL.SetUpClient(Client);
