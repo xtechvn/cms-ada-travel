@@ -154,8 +154,8 @@ namespace Entities.Models
         public virtual DbSet<Ward> Ward { get; set; }
         public virtual DbSet<HotelPosition> HotelPosition { get; set; }
         public virtual DbSet<TourPosition> TourPosition { get; set; }
-        public virtual DbSet<Recruitment> Recruitments { get; set; }
-        public virtual DbSet<RecruitmentCategory> RecruitmentCategories { get; set; }
+        public virtual DbSet<Recruitment> Recruitment { get; set; }
+        public virtual DbSet<RecruitmentCategory> RecruitmentCategory { get; set; }
        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
