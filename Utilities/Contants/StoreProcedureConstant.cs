@@ -469,7 +469,7 @@ namespace Utilities.Contants
         public static string SP_GetListUserProfitReport = "SP_GetListUserProfitReport";
         public static string SP_GetListReportOrder = "SP_GetListReportOrder";
 
-
+        public const string SP_GetlistRecruitment = "SP_GetlistRecruitment";
 
     }
 }

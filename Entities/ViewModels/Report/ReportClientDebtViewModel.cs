@@ -7,6 +7,7 @@ namespace Entities.ViewModels.Report
     public class ReportClientDebtViewModel
     {
         public int ClientId { get; set; }
+        public int ClientCode { get; set; }
         public string ClientName { get; set; }
         public int DebtAccount { get; set; }
         public double? AmountOpeningBalanceCredit { get; set; }

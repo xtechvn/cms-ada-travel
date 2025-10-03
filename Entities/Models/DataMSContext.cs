@@ -29,7 +29,7 @@ namespace Entities.Models
         public virtual DbSet<AllotmentFund> AllotmentFund { get; set; }
         public virtual DbSet<AllotmentHistory> AllotmentHistory { get; set; }
         public virtual DbSet<AllotmentUse> AllotmentUse { get; set; }
-        public virtual DbSet<Article> Article { get; set; }
+        public virtual DbSet<Article> Article { get; set; }      
         public virtual DbSet<FanpageArticleImage> FanpageArticleImages { get; set; }
 
         public virtual DbSet<ArticleCategory> ArticleCategory { get; set; }
@@ -154,6 +154,9 @@ namespace Entities.Models
         public virtual DbSet<Ward> Ward { get; set; }
         public virtual DbSet<HotelPosition> HotelPosition { get; set; }
         public virtual DbSet<TourPosition> TourPosition { get; set; }
+        public virtual DbSet<Recruitment> Recruitments { get; set; }
+        public virtual DbSet<RecruitmentCategory> RecruitmentCategories { get; set; }
+       
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -2969,7 +2972,38 @@ namespace Entities.Models
 
                 entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
             });
+            modelBuilder.Entity<Recruitment>(entity =>
+            {
+                entity.Property(e => e.Body)
+                    .IsRequired()
+                    .HasColumnType("ntext");
 
+                entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+
+                entity.Property(e => e.DownTime).HasColumnType("datetime");
+
+                entity.Property(e => e.Image11).HasMaxLength(350);
+
+                entity.Property(e => e.Image169)
+                    .IsRequired()
+                    .HasMaxLength(350);
+
+                entity.Property(e => e.Image43).HasMaxLength(350);
+
+                entity.Property(e => e.Lead)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PublishDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.UpTime).HasColumnType("datetime");
+            });
 
             OnModelCreatingPartial(modelBuilder);
         }
