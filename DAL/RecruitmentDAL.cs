@@ -168,6 +168,8 @@ namespace DAL
                     entity.CampaignName = model.CampaignName;
                     entity.AiContent = model.AiContent;
                     entity.IsPostedToFanpage = model.IsPostedToFanpage;
+                    entity.Minamount = model.Minamount;
+                    entity.Maxamount = model.Maxamount;
                     await UpdateAsync(entity);
                 }
                 else
@@ -193,7 +195,9 @@ namespace DAL
                         AimodelType = model.AimodelType,
                         CampaignName = model.CampaignName,
                         AiContent = model.AiContent,
-                        IsPostedToFanpage = model.IsPostedToFanpage
+                        IsPostedToFanpage = model.IsPostedToFanpage,
+                        Minamount = model.Minamount,
+                        Maxamount = model.Maxamount,
                     };
                     articleId = await CreateAsync(entity);
                 }
@@ -236,7 +240,9 @@ namespace DAL
                                 AimodelType = article.AimodelType,
                                 CampaignName = article.CampaignName,
                                 AiContent = article.AiContent,
-                                IsPostedToFanpage = article.IsPostedToFanpage
+                                IsPostedToFanpage = article.IsPostedToFanpage,
+                                Minamount = (double)article.Minamount,
+                                Maxamount = (double)article.Maxamount,
 
                             };
 

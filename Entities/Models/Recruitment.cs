@@ -27,5 +27,7 @@ namespace Entities.Models
         public string CampaignName { get; set; }
         public string AiContent { get; set; }
         public byte? IsPostedToFanpage { get; set; }
+        public double? Maxamount { get; set; }
+        public double? Minamount { get; set; }
     }
 }

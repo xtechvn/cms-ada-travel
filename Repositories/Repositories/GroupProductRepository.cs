@@ -18,6 +18,7 @@ namespace Repositories.Repositories
     public class GroupProductRepository : IGroupProductRepository
     {
         private const int NEWS_CATEGORY_ID = 39;
+        private const int Recruitment_CATEGORY_ID = 64;
         private readonly GroupProductDAL _GroupProductDAL;
         private readonly AllCodeDAL _AllCodeDAL;
 
@@ -280,7 +281,7 @@ namespace Repositories.Repositories
                         _strHtml.Append(@"<a class=""cur-pointer btn-toggle-cate plus""></a>");
                 }
 
-                if (parentId != NEWS_CATEGORY_ID /*true*/)
+                if (parentId != NEWS_CATEGORY_ID  && parentId != Recruitment_CATEGORY_ID/*true*/)
                 {
                     _strHtml.Append(@"<label class=""check-list mb10 mr25"">");
                     var strChecked = string.Empty;

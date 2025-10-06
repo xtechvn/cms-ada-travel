@@ -62,18 +62,7 @@ namespace Repositories.Repositories
             try
             {
                 var model = await _RecruitmentDAL.GetArticleDetail(Id);
-                /*
-                if (model != null)
-                {
-                    if (!string.IsNullOrEmpty(model.Image11))
-                        model.Image11 = _UrlStaticImage + model.Image11;
-
-                    if (!string.IsNullOrEmpty(model.Image169))
-                        model.Image169 = _UrlStaticImage + model.Image169;
-
-                    if (!string.IsNullOrEmpty(model.Image43))
-                        model.Image43 = _UrlStaticImage + model.Image43;
-                }*/
+                
                 return model;
             }
             catch (Exception ex)

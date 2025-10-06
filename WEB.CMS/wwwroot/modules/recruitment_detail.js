@@ -527,7 +527,9 @@ var _newsDetail = {
                 Position: {
                     min: 0,
                     max: max_pos
-                }
+                },
+                Minamount: { required: !isFanpage, },
+                Maxamount: { required: !isFanpage, },
             },
             messages: {
                 Title:
@@ -542,7 +544,9 @@ var _newsDetail = {
                 Position: {
                     min: "Vị trí phải trong khoảng 0 đến " + max_pos,
                     max: "Vị trí phải trong khoảng 0 đến " + max_pos
-                }
+                },
+                Minamount: { required: "Vui lòng nhập khoảng lương", },
+                Maxamount: { required: "Vui lòng nhập khoảng lương", },
             }
         });
 
@@ -586,7 +590,9 @@ var _newsDetail = {
                 CampaignName: campaignNameVal,
                 AiContent: aiContentVal,
                 AimodelType: aimodelTypeVal,
-                IsPostedToFanpage: parseInt($('#IsPostedToFanpage').val())
+                IsPostedToFanpage: parseInt($('#IsPostedToFanpage').val()),
+                Minamount: $('#Minamount').val().replaceAll(',', ''),
+                Maxamount: $('#Maxamount').val().replaceAll(',', ''),
             };
 
             // ✅ Nếu là bài video, dùng link video

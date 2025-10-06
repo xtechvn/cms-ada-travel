@@ -99,9 +99,7 @@
 
             @if (Model.Id > 0 && Model.Status == ArticleStatus.REMOVE)
             {
-                <button type="button" class="btn btn-default mr-2" style="margin-bottom:10px;" onclick="_news.ShowAddOrUpdateFromAI()">
-                    <i class="fa fa-pencil"></i> Sửa bài viết AI
-                </button>
+           
             }
 
 
@@ -169,10 +167,7 @@
                                     <input onclick="_newsDetail.Onchen('0')" type="radio" asp-for="@Model.ArticleType" value="0">
                                     Bài thường
                                 </label>
-                                <label class="radio-inline">
-                                    <input onclick="_newsDetail.Onchen('1')" type="radio" asp-for="@Model.ArticleType" value="1">
-                                    Bài video
-                                </label>
+                       
                             </div>
                         }
 
@@ -418,40 +413,49 @@
 
                     @if (isWebsiteAI || isWebsiteManual)
                     {
-                        <div class="mb20 form-default2">
-                            <div class="form-group none-flex" style="border: 1px solid #CCCCCC;padding:15px">
-                                <label class="mb10"><strong>Giờ lên bài</strong></label>
-                                <div class="datepicker-wrap">
-                                    <input id="PublishDate" name="single_pick_date"
-                                           class="datepicker-input form-control"
-                                           type="text"
-                                           value="@(Model.PublishDate != DateTime.MinValue ? Model.PublishDate.ToString("dd/MM/yyyy HH:mm") : DateTime.Now.ToString("dd/MM/yyyy HH:mm"))"
-                                           placeholder="Ngày đăng">
-                                </div>
-                                <label class="mb10" style="padding-top:10px; display: none !important"><strong>Giờ hạ bài</strong></label>
-                                <div class="datepicker-wrap" style="display: none !important">
-                                    <input id="DowntimeDate" name="single_pick_date"
-                                           class="datepicker-input form-control"
-                                           type="text"
-                                           value="@(Model.DownTime != DateTime.MinValue ? Model.DownTime.ToString("dd/MM/yyyy HH:mm") :string.Empty)"
-                                           placeholder="Ngày hạ bài">
-                                </div>
-                                <label class="mb10" style="padding-top:10px;"><strong>Vị trí ghim bài</strong></label>
-                                <input type="number" class="form-control" asp-for="@Model.Position" min="0" max="@(Model.ArticleType==0?"7":"8")" placeholder="Vị trí">
-                            </div>
-                            <div class="mb20">
-                                <div style="border: 1px solid #CCCCCC;padding:15px">
-                                    <label class="mb10"><strong>Cấu hình chuyên mục</strong></label>
-                                    <div class="user-hierarchy-tag" style="border: 1px solid #CCCCCC;border-radius: 3px;padding:15px;margin:0">
-                                        <div class="scrollbar-inner">
-                                            <ul class="user-hierarchy-ul mb0" id="detail-cate-panel">
-                                                @Html.Raw(_StrTreeViewCate)
-                                            </ul>
-                                        </div>
-                                    </div>
+                <div class="mb20 form-default2">
+                    <div class="form-group none-flex" style="border: 1px solid #CCCCCC;padding:15px">
+                        <label class="mb10"><strong>Giờ lên bài</strong></label>
+                        <div class="datepicker-wrap">
+                            <input id="PublishDate" name="single_pick_date"
+                                   class="datepicker-input form-control"
+                                   type="text"
+                                   value="@(Model.PublishDate != DateTime.MinValue ? Model.PublishDate.ToString("dd/MM/yyyy HH:mm") : DateTime.Now.ToString("dd/MM/yyyy HH:mm"))"
+                                   placeholder="Ngày đăng">
+                        </div>
+                        <label class="mb10" style="padding-top:10px; display: none !important"><strong>Giờ hạ bài</strong></label>
+                        <div class="datepicker-wrap" style="display: none !important">
+                            <input id="DowntimeDate" name="single_pick_date"
+                                   class="datepicker-input form-control"
+                                   type="text"
+                                   value="@(Model.DownTime != DateTime.MinValue ? Model.DownTime.ToString("dd/MM/yyyy HH:mm") :string.Empty)"
+                                   placeholder="Ngày hạ bài">
+                        </div>
+                        <label class="mb10" style="padding-top:10px;"><strong>Vị trí ghim bài</strong></label>
+                        <input type="number" class="form-control" asp-for="@Model.Position" min="0" max="@(Model.ArticleType==0?"7":"8")" placeholder="Vị trí">
+                    </div>
+                    <div class="form-group none-flex" style="border: 1px solid #CCCCCC;padding:15px">
+                        <label class="mb10"><strong>Khoảng lương</strong></label>
+                        <div class="datepicker-wrap">
+                            <input type="text" asp-for="@Model.Minamount" class="form-control currency"min="0" value="@Model.Minamount.ToString("#,##")" placeholder="Từ"/>
+                            <input type="text" asp-for="@Model.Maxamount" class="form-control currency"min="0" value="@Model.Maxamount.ToString("#,##")" placeholder="Đến"/>
+                        </div>
+                      
+                       
+                    </div>
+                    <div class="mb20">
+                        <div style="border: 1px solid #CCCCCC;padding:15px">
+                            <label class="mb10"><strong>Cấu hình chuyên mục</strong></label>
+                            <div class="user-hierarchy-tag" style="border: 1px solid #CCCCCC;border-radius: 3px;padding:15px;margin:0">
+                                <div class="scrollbar-inner">
+                                    <ul class="user-hierarchy-ul mb0" id="detail-cate-panel">
+                                        @Html.Raw(_StrTreeViewCate)
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
                     }
 
                 </div>
