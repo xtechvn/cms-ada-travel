@@ -1,4 +1,5 @@
 ﻿using APP_CHECKOUT.RabitMQ;
+using Caching.RedisWorker;
 using Entities.ConfigModels;
 using Entities.Models;
 using Entities.ViewModels;
@@ -40,7 +41,7 @@ namespace WEB.CMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly WorkQueueClient workQueueClient;
         private readonly string _UrlStaticImage;
-
+        private readonly RedisConn _redisService;
         public RecruitmentController(IConfiguration configuration, IRecruitmentRepository recruitmentRepository, IUserRepository userRepository, ICommonRepository commonRepository, IWebHostEnvironment hostEnvironment,
             IGroupProductRepository groupProductRepository, IOptions<DomainConfig> domainConfig)
         {
@@ -52,7 +53,8 @@ namespace WEB.CMS.Controllers
             _GroupProductRepository = groupProductRepository;
             _UrlStaticImage = domainConfig.Value.ImageStatic;
             workQueueClient = new WorkQueueClient(configuration);
-
+            _redisService = new RedisConn(configuration);
+            _redisService.Connect();
 
         }
 
@@ -377,8 +379,9 @@ namespace WEB.CMS.Controllers
                 {
                     //  clear cache article
                     var Categories = await _RecruitmentRepository.GetArticleCategoryIdList(Id);
-                    await ClearCacheArticle(Id, string.Join(",", Categories));
-
+                
+                    int db_index = Convert.ToInt32(_configuration["Redis:Database:db_core"]);
+                    _redisService.DeleteCacheByKeyword("Recruitment_CATEGORY", db_index);
                     return new JsonResult(new
                     {
                         isSuccess = true,
@@ -416,8 +419,9 @@ namespace WEB.CMS.Controllers
                 if (rs > 0)
                 {
                     //  clear cache article
-                    await ClearCacheArticle(Id, string.Join(",", Categories));
-
+                
+                    int db_index = Convert.ToInt32(_configuration["Redis:Database:db_core"]);
+                    _redisService.DeleteCacheByKeyword("Recruitment_CATEGORY", db_index);
                     return new JsonResult(new
                     {
                         isSuccess = true,
