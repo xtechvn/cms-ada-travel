@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "Quản lý yêu cầu tuyển dụng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section style=" overflow-x: hidden;">
+    <div class="row-main container">
+        <h2 class="txt_18 bold mb20">Quản lý yêu cầu tuyển dụng</h2>
+        <div class="flex fillter-donhang mb10">
+
+            <div class="form-group mb10 mr-2">
+                <div class="datepicker-wrap" style="width:100%">
+                    <div class="datepicker-wrap" style="width:100%">
+                        <input class="form-control date text-left filter_date_daterangepicker" id="date_time" type="text"
+                               name="datetimeApprove" style="min-width: 180px !important" />
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mb10 mr-2">
+          
+                <button type="button" class="btn btn-default bg-main" onclick="_yc_recruitment.Search()">
+                    <svg class="icon-svg" style="vertical-align: sub;">
+                        <use xlink:href="/images/icons/icon.svg#search"></use>
+                    </svg>
+                    Tìm kiếm
+                </button>
+            </div>
+        </div>
+       
+        <div id="grid-data">
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script asp-append-version="true" type="text/javascript" src="/modules/yc_recruitment.js"></script>
+    <script type="text/javascript" src="~/js/zebra_datepicker.min.js"></script>
+
+    <script>
+        $('#date_time').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+        $('#date_time').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            isPickerApproveRecruitment = false;
+        });
+        $('#date_time').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD /MM/YYYY') + ' - ' + picker.endDate.format('DD /MM/YYYY'));
+            isPickerApproveRecruitment = true;
+        });
+    </script>
+}

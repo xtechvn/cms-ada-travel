@@ -4,6 +4,7 @@ using Entities.ConfigModels;
 using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.News;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
+using WEB.CMS.Service;
 using WEB.CMS.Service.News;
 
 namespace WEB.CMS.Controllers
@@ -42,6 +44,7 @@ namespace WEB.CMS.Controllers
         private readonly WorkQueueClient workQueueClient;
         private readonly string _UrlStaticImage;
         private readonly RedisConn _redisService;
+        private CommentClientMongoService _commentClientMongoService;
         public RecruitmentController(IConfiguration configuration, IRecruitmentRepository recruitmentRepository, IUserRepository userRepository, ICommonRepository commonRepository, IWebHostEnvironment hostEnvironment,
             IGroupProductRepository groupProductRepository, IOptions<DomainConfig> domainConfig)
         {
@@ -55,7 +58,7 @@ namespace WEB.CMS.Controllers
             workQueueClient = new WorkQueueClient(configuration);
             _redisService = new RedisConn(configuration);
             _redisService.Connect();
-
+            _commentClientMongoService = new CommentClientMongoService(_configuration);
         }
 
         public async Task<IActionResult> Index()
@@ -485,6 +488,23 @@ namespace WEB.CMS.Controllers
             }
             return null;        
         }
-        
+        public async Task<IActionResult> YCRecruitment()
+        {
+          
+            return View();
+        }
+        public async Task<IActionResult> GetListRecruitment(RecruitmentSearchModel searchModel)
+        {
+            try
+            {
+                var data = _commentClientMongoService.GetListRecruitment(searchModel);
+                return PartialView(data);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListRecruitment - " + ex.ToString() );
+            }
+            return PartialView();
+        }
     }
 }

@@ -1,6 +1,9 @@
-﻿using Entities.ViewModels.Mongo;
+﻿using Entities.ViewModels;
+using Entities.ViewModels.Mongo;
+using Entities.ViewModels.TransferSms;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Nest;
 using Newtonsoft.Json;
 using Utilities;
 using Utilities.Contants;
@@ -120,6 +123,36 @@ namespace WEB.CMS.Service
                 LogHelper.InsertLogTelegram("GetListLogActions - CommentClientMongoService. " + JsonConvert.SerializeObject(ex));
             }
             return list_comment;
+        }
+        public List<SystemLogMongDBRecruitmentModel> GetListRecruitment(RecruitmentSearchModel searchModel)
+        {
+            var list_Recruitment = new List<SystemLogMongDBRecruitmentModel>();
+            try
+            {
+                var db = MongodbService.GetDatabase();
+
+                var collection = db.GetCollection<SystemLogMongDBRecruitmentModel>(configuration["DataBaseConfig:MongoServer:Recruitment_Log"]);
+                var filter = Builders<SystemLogMongDBRecruitmentModel>.Filter.Empty;
+                filter &= Builders<SystemLogMongDBRecruitmentModel>.Filter.Eq(n => n.location, searchModel.location);
+                filter &= Builders<SystemLogMongDBRecruitmentModel>.Filter.Eq(n => n.area, searchModel.area);
+                if (!string.IsNullOrEmpty(searchModel.FromDateStr))
+                {
+                    filter &= Builders<SystemLogMongDBRecruitmentModel>.Filter.Gte("CreatedTime", searchModel.FromDate);
+                }
+                if (!string.IsNullOrEmpty(searchModel.ToDateStr))
+                {
+                    filter &= Builders<SystemLogMongDBRecruitmentModel>.Filter.Lte("CreatedTime", searchModel.ToDate);
+                }
+                var S = Builders<SystemLogMongDBRecruitmentModel>.Sort.Descending("CreatedTime");
+
+                list_Recruitment = collection.Find(filter).Sort(S).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListLogActions - CommentClientMongoService. " + JsonConvert.SerializeObject(ex));
+            }
+            return list_Recruitment;
         }
     }
 }
