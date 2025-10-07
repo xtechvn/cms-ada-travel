@@ -528,8 +528,8 @@ var _newsDetail = {
                     min: 0,
                     max: max_pos
                 },
-                Minamount: { required: !isFanpage, },
-                Maxamount: { required: !isFanpage, },
+                Minamount: { required: true, },
+                Maxamount: { required: true, },
             },
             messages: {
                 Title:
