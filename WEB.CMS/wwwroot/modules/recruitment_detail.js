@@ -528,8 +528,7 @@ var _newsDetail = {
                     min: 0,
                     max: max_pos
                 },
-                Minamount: { required: true, },
-                Maxamount: { required: true, },
+              
             },
             messages: {
                 Title:
@@ -545,8 +544,7 @@ var _newsDetail = {
                     min: "Vị trí phải trong khoảng 0 đến " + max_pos,
                     max: "Vị trí phải trong khoảng 0 đến " + max_pos
                 },
-                Minamount: { required: "Vui lòng nhập khoảng lương", },
-                Maxamount: { required: "Vui lòng nhập khoảng lương", },
+                
             }
         });
 
