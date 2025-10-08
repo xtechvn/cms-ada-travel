@@ -330,6 +330,7 @@ namespace WEB.CMS.Controllers
                         strCategories = string.Join(",", model.Categories);
 
                     await ClearCacheArticle(articleId, strCategories);
+                    _redisService.DeleteCacheByKeyword("Recruitment_CATEGORY", db_index);
                     workQueueClient.SyncES(articleId, _configuration["DataBaseConfig:Elastic:SP:sp_GetArticle"], _configuration["DataBaseConfig:Elastic:Index:Article"], ProjectType.ADAVIGO_CMS);
 
                     return new JsonResult(new
