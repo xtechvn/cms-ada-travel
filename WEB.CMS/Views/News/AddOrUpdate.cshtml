@@ -10,29 +10,25 @@
         <div class="grid-item col-md-12">
             <div class="form-default3 pd10">
                 <div class="row row_min">
-                    <div class="form-group col-12">
-                        <label class="lbl">Tên Chủ Đề <sup class="red">*</sup></label>
-                        <div class="wrap_input">
-                            <input type="hidden" asp-for="@Model.Id" />
-                            <input type="hidden" asp-for="@Model.AimodelType" value="1" />
-
-                          
-                            <input type="text" class="form-control" id="modal-CampaignName" asp-for="@Model.CampaignName" />
-                        </div>
-                    </div>
+                    
                   
                     <div class="form-group col-12">
                         <label class="lbl">Bạn muốn đăng nội dung này lên nền tảng nào?</label>
                         <div class="wrap_input">
                             <label class="radio">
-                                <input type="radio" name="PlatForm" asp-for="@Model.PlatForm" value="0" />
+                                <input type="radio" name="PlatForm" id="PlatForm_Web" asp-for="@Model.PlatForm" value="0" />
                                 <span class="checkmark"></span>
                                 Website
                             </label>
-                            <label class="radio" style="margin-left:20px;">
-                                <input type="radio" name="PlatForm" asp-for="@Model.PlatForm" value="1" />
+                            <label class="radio" style="margin: 0px 20px;">
+                                <input type="radio" name="PlatForm" id="PlatForm_FB" asp-for="@Model.PlatForm" value="1" />
                                 <span class="checkmark"></span>
                                 Facebook
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="PlatForm" id="PlatForm_Web2" asp-for="@Model.PlatForm" value="0" />
+                                <span class="checkmark"></span>
+                                Website2
                             </label>
                         </div>
                     </div>
@@ -40,6 +36,16 @@
                         <label class="lbl">Content</label>
                         <div class="wrap_input">
                             <input type="text" class="form-control" id="modal-AiContent" asp-for="@Model.AiContent" />
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label class="lbl">Keyword <sup class="red">*</sup></label>
+                        <div class="wrap_input">
+                            <input type="hidden" asp-for="@Model.Id" />
+                            <input type="hidden" asp-for="@Model.AimodelType" value="1" />
+
+
+                            <input type="text" class="form-control" id="modal-CampaignName" asp-for="@Model.CampaignName" />
                         </div>
                     </div>
                 </div>

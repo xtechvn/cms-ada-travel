@@ -25,14 +25,19 @@
                         <label class="lbl">Bạn muốn đăng nội dung này lên nền tảng nào?</label>
                         <div class="wrap_input">
                             <label class="radio">
-                                <input type="radio" name="PlatForm" asp-for="@Model.PlatForm" value="0" />
+                                <input type="radio" name="PlatForm" id="PlatForm_Web" asp-for="@Model.PlatForm" value="0" />
                                 <span class="checkmark"></span>
                                 Website
                             </label>
-                            <label class="radio" style="margin-left:20px;">
-                                <input type="radio" name="PlatForm" asp-for="@Model.PlatForm" value="1" />
+                            <label class="radio" style="margin: 0px 20px;">
+                                <input type="radio" name="PlatForm" id="PlatForm_FB" asp-for="@Model.PlatForm" value="1" />
                                 <span class="checkmark"></span>
                                 Facebook
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="PlatForm" id="PlatForm_Web2" asp-for="@Model.PlatForm" value="2" />
+                                <span class="checkmark"></span>
+                                Website2
                             </label>
                         </div>
                     </div>
