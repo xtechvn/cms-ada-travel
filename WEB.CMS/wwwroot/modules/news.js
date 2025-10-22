@@ -91,7 +91,6 @@ var _news = {
     },
 
     OnSave: function () {
-       
 
         // 🧩 Thu thập dữ liệu từ form
         const data = {
@@ -120,7 +119,42 @@ var _news = {
         if (data.PlatForm === 2) platformText = "web2";
         // 🧠 Tạo system_message (gộp keyword hoặc cấu hình riêng của hệ thống)
         // Ví dụ: "Viết bài cho lĩnh vực du lịch, keyword: tour Hà Nội"
-        const system_message = ` Bài viết bao gồm Keyword : ${data.CampaignName}`;
+        const system_message = `
+        Bạn là chuyên gia SEO và Content Marketing trong lĩnh vực du lịch.
+        Hãy viết một bài blog chuẩn SEO cho website Adavigo.com với các thông tin sau:
+        - Từ khóa chính: ${data.CampaignName}
+        - Từ khóa phụ (LSI): [liệt kê 3–5 keyword phụ liên quan]
+        - Độ dài: khoảng 1000–1800 từ
+        - Mục tiêu SEO: Informational
+        - Đối tượng khách hàng: khách du lịch tự túc, nhóm bạn, gia đình
+        - Giọng văn: thân thiện, truyền cảm hứng
+        - Ngôn ngữ: tiếng Việt
+
+        Cấu trúc bài viết:
+        - Title (chuẩn SEO, dưới 60 ký tự, có từ khóa chính)
+        - Meta description (140–160 ký tự, có keyword, có CTA)
+        - Mở bài (intro)
+        - Thân bài (gồm H2 – H3 logic, chia đoạn, có bullet)
+        - Kết bài (CTA, tổng kết, nhấn mạnh thương hiệu Adavigo)
+        - FAQ (3–5 câu hỏi, trả lời ngắn gọn, thân thiện, schema-friendly)
+
+        Yêu cầu SEO kỹ thuật:
+        - Chèn keyword chính 3–5 lần tự nhiên.
+        - Không đoạn nào dài quá 120 từ.
+        - Heading theo chuẩn H1 – H2 – H3.
+        - Có yếu tố “E-E-A-T” (kinh nghiệm, chuyên môn, độ tin cậy).
+
+       Bạn luôn tuân thủ format output là JSON với cấu trúc:
+        {
+          "title": "string",
+          
+          "lead": "string",
+          "content": "HTML content hoặc markdown",
+          "keywords": ["keyword1", "keyword2"],
+          "img_lst": ["url1", "url2"]
+        }
+        `;
+
         // 🧠 Ghép nội dung yêu cầu + keyword thành prompt hoàn chỉnh
         const fullPrompt = `${data.AiContent.trim()}. Keyword trong bài: ${data.CampaignName}`;
 
@@ -144,7 +178,7 @@ var _news = {
             contentType: "application/json",
             data: JSON.stringify(payload),
             success: function (res) {
-                debugger
+               
                 $('#loadingOverlay').hide();
 
                 console.log("✅ Phản hồi từ N8n:", res);
