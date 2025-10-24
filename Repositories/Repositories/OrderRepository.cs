@@ -267,7 +267,9 @@ namespace Repositories.Repositories
                                      Amount = !row["Amount"].Equals(DBNull.Value) ? Convert.ToDouble(row["Amount"].ToString()) : 0,
                                      IsFinishPayment = Convert.ToInt32(row["IsFinishPayment"].ToString()),
                                      StatusCode = Convert.ToInt32(row["StatusCode"].ToString()),
+                                     IsLock = row["IsLock"].Equals(DBNull.Value) ? null:Convert.ToInt32(row["IsLock"].ToString()),
                                  }).ToList();
+                    listOrder = listOrder.Where(n => n.IsLock != 1).ToList();
                     var listContractPayDetail = contractPayDAL.GetByContractDataIds(listOrder.Select(n => Convert.ToInt64(n.OrderId)).ToList());
                     foreach (var item in listOrder)
                     {

@@ -55,6 +55,7 @@ namespace Entities.ViewModels
         public string InvoiceRequestStatusName { get; set; }
         public int InvoiceRequestStatus { get; set; }
         public string CutOffDate { get; set; }
+        public int? IsLock { get; set; }
 
 
     }
