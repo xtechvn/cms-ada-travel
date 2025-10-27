@@ -335,6 +335,8 @@ namespace Repositories.Repositories
                     if (field.NguoiTao) { listfieldtext.Add("Người tạo"); listfield.Add(11); }
                     if (field.Status) { listfieldtext.Add("Trạng thái"); listfield.Add(12); }
                     listfieldtext.Add("Nguồn khách hàng"); listfield.Add(13);
+                    listfieldtext.Add("Ngày tạo đơn cuối"); listfield.Add(14);
+                    listfieldtext.Add("Số cách Ngày tạo đơn cuối"); listfield.Add(15);
                     cell.SetColumnWidth(0, 8);
                     for (int i = 1; i <= listfield.Count; i++)
                     {
@@ -482,6 +484,20 @@ namespace Repositories.Repositories
                                 {
 
                                     ws.Cells[Cell[I] + RowIndex].PutValue(item.UtmSourceName);
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                } 
+                                if (listfield2[f] == 14)
+                                {
+
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.LastOrderDate != DateTime.MinValue ? item.LastOrderDate.ToString("dd/MM/yyyy") : "");
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                }
+                                if (listfield2[f] == 15)
+                                {
+
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.LastOrderDate != DateTime.MinValue ? (DateTime.Now - item.LastOrderDate).TotalDays:0);
                                     listfield2.Remove(listfield2[f]); f--; break;
 
                                 }

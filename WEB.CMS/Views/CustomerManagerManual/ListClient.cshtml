@@ -42,6 +42,7 @@ else
                         <th style="width: 100px;">Nguồn</th>
                         <th>Nhu cầu</th>
                         <th>Phản hồi gần nhất</th>
+                        <th>Ngày tạo đơn cuối</th>
 
                         @*<th class="mfp-hide" style="width: 100px;">Trạng thái tài khoản</th>*@
                     </tr>
@@ -123,23 +124,17 @@ else
                                         @if (item.ListComment != null)
                                         {
                                             @item.ListComment.Note
-                                        }                                        
+                                        }
                                     </div>
                                 </td>
-                                @*<td class="mfp-hide">
-                                        <div class="on-off-btn">
-                                            @if (item.ACStatus == 0)
-                                            {
-                                                <i id="Status_0_@item.Id" class="fa fa-check status-green" aria-hidden="true" onclick="_customer_manager.OnResetStatus(@item.Id,'0')"></i>
-                                                <i id="Status_1_@item.Id" class="fa fa-power-off status-grey" onclick="_customer_manager.OnResetStatus(@item.Id,'1')"></i>
-                                            }
-                                            else
-                                            {
-                                                <i id="Status_0_@item.Id" class="fa fa-check status-grey" onclick="_customer_manager.OnResetStatus(@item.Id,'0')"></i>
-                                                <i id="Status_1_@item.Id" class="fa fa-power-off status-red" aria-hidden="true" onclick="_customer_manager.OnResetStatus(@item.Id,'1')"></i>
-                                            }
-                                        </div>
-                                    </td>*@
+                                <td class="">
+                                    <div>
+
+                                        @(item.LastOrderDate!= DateTime.MinValue ? item.LastOrderDate.ToString("dd/MM/yyyy"):"")
+
+                                    </div>
+                                </td>
+
 
                             </tr>
                         }

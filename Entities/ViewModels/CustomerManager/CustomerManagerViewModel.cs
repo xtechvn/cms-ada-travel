@@ -47,6 +47,7 @@ namespace Entities.ViewModels.CustomerManager
         public string UtmSourceName { get; set; }
         public CommentClientMongoModel ListComment { get; set; }
         public CommentClientMongoModel ListCommentNhuCau { get; set; }
+        public DateTime LastOrderDate { get; set; }
     }
     public class CustomerManagerViewSearchModel
     {
