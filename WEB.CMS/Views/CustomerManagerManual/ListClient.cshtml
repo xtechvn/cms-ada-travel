@@ -43,6 +43,7 @@ else
                         <th>Nhu cầu</th>
                         <th>Phản hồi gần nhất</th>
                         <th>Ngày tạo đơn cuối</th>
+                        <th>Số Ngày tạo đơn cuối</th>
 
                         @*<th class="mfp-hide" style="width: 100px;">Trạng thái tài khoản</th>*@
                     </tr>
@@ -134,7 +135,9 @@ else
 
                                     </div>
                                 </td>
-
+                                <td>
+                                    @(item.LastOrderDate != DateTime.MinValue ? (DateTime.Now - item.LastOrderDate).TotalDays : 0)
+                                </td>
 
                             </tr>
                         }
