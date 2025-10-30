@@ -136,24 +136,24 @@ else
                                     </div>
                                 </td>
                                 <td>
-                                    @(item.LastOrderDate != DateTime.MinValue ? (DateTime.Now - item.LastOrderDate).TotalDays : 0)
+                                    @(item.LastOrderDate != DateTime.MinValue ? Math.Round((DateTime.Now - item.LastOrderDate).TotalDays) : 0)
                                 </td>
 
                             </tr>
                         }
 
-                    }
+                        }
                 </tbody>
             </table>
         </div>
         <style>
             .status-grey {
-                font-size: 12px;
-                background: #40424452;
+                            font-size: 12px;
+                            background: #40424452;
                 color: #fff;
                 padding: 2px 10px;
-                border-radius: 5px;
-            }
+                            border-radius: 5px;
+                        }
         </style>
         @*@await Component.InvokeAsync("Paging", new
             {

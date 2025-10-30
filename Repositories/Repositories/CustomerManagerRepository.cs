@@ -497,7 +497,7 @@ namespace Repositories.Repositories
                                 if (listfield2[f] == 15)
                                 {
 
-                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.LastOrderDate != DateTime.MinValue ? (DateTime.Now - item.LastOrderDate).TotalDays:0);
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.LastOrderDate != DateTime.MinValue ? Math.Round((DateTime.Now - item.LastOrderDate).TotalDays) : 0);
                                     listfield2.Remove(listfield2[f]); f--; break;
 
                                 }

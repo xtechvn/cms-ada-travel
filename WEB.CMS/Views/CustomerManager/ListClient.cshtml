@@ -93,7 +93,7 @@ else
                                 @(item.LastOrderDate!= DateTime.MinValue ? item.LastOrderDate.ToString("dd/MM/yyyy"):"")
                             </td>
                             <td>
-                                @(item.LastOrderDate != DateTime.MinValue ? (DateTime.Now - item.LastOrderDate).TotalDays : 0)
+                                @(item.LastOrderDate != DateTime.MinValue ? Math.Round((DateTime.Now - item.LastOrderDate).TotalDays) : 0)
                             </td>
                         </tr>
                     }
