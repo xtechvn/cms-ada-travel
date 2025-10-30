@@ -237,11 +237,25 @@ namespace WEB.CMS.Controllers.Order
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
+                var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
+                if (status == (int)DebtGuaranteeStatus.TU_CHOI)
+                {
+                    var Update = await _debtGuaranteeRepository.UpdateDebtGuarantee(id, status, _UserId);
+                    var user = await _userRepository.GetById(_UserId);
+
+                    string link = "/Order/" + detail.OrderId;
+                    apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.TU_CHOI_DON_CONG_NO).ToString(), detail.OrderNo, link, current_user.Role, detail.OrderNo);
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        smg = "Từ chối thành công"
+                    });
+                }
                 var userDetail = await _userRepository.GetDetailUser(current_user.Id);
                 var DebtLimit = ((double)userDetail.Entity.DebtLimit);
                 var UserUnderList = current_user.UserUnderList + "," + current_user.Id;
                 var AmountTotal = await _orderRepository.AmountTotalBySalerId(current_user.Id.ToString(), UserUnderList);
-                var detail = await _debtGuaranteeRepository.GetDetailDebtGuarantee(id);
+                
                 var order = await _orderRepository.GetOrderByID(detail.OrderId);
                 if ((order.Amount + AmountTotal) < DebtLimit) {
                     var Update = await _debtGuaranteeRepository.UpdateDebtGuarantee(id, status, _UserId);
@@ -354,6 +368,7 @@ namespace WEB.CMS.Controllers.Order
                          
                             string link = "/Order/" + detail.OrderId;
                             apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.CONG_NO_DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.TU_CHOI_DON_CONG_NO).ToString(), detail.OrderNo, link, current_user.Role, detail.OrderNo);
+                        
                         }
                     }
                 }
