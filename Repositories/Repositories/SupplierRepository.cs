@@ -195,6 +195,24 @@ namespace Repositories.Repositories
                 return new List<SupplierViewModel>();
             }
         }
+        public List<SupplierTicketViewModel> GetSuppliersForTickets(SupplierSearchModel searchModel)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(searchModel.FullName))
+                {
+                    searchModel.FullName = searchModel.FullName.ToLower();
+                }
+
+                var listSuppliers = supplierDAL.GetPagingListTicket(searchModel);
+                return listSuppliers.ToList<SupplierTicketViewModel>();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetSuppliers - SupplierRepository: " + ex);
+                return new List<SupplierTicketViewModel>();
+            }
+        }
 
         public int Add(SupplierConfigUpsertModel model)
         {

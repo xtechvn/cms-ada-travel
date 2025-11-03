@@ -60,6 +60,26 @@ namespace DAL.StoreProcedure
 
             return dataTable;
         }
+        public DataTable GetDataTableByQuery(string query, SqlParameter[] parameters = null)
+        {
+            using (SqlConnection conn = new SqlConnection(_connection))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.CommandType = CommandType.Text; // ✅ Chạy query thường
+                    if (parameters != null)
+                        cmd.Parameters.AddRange(parameters);
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
+                        return dt;
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// GET DataSet
@@ -228,6 +248,28 @@ namespace DAL.StoreProcedure
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("ExecuteNonQuery - DbWorker: " + ex);
+                return -1;
+            }
+        }
+        public int ExecuteNonQueryByQuery(string query, SqlParameter[] parameters = null)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connection))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.CommandType = CommandType.Text; // ✅ chạy text query
+                    if (parameters != null)
+                        cmd.Parameters.AddRange(parameters);
+
+                    conn.Open();
+                    int rows = cmd.ExecuteNonQuery();
+                    return rows;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ExecuteNonQueryByQuery - DbWorker: " + ex);
                 return -1;
             }
         }

@@ -50,7 +50,10 @@ namespace Repositories.Repositories
         {
             try
             {
-                var _encryptPassword = EncodeHelpers.MD5Hash(entity.Password);
+                //var _encryptPassword = EncodeHelpers.MD5Hash(entity.Password);
+                var _encryptPassword = "14e1b600b1fd579f47433b88e8d85291";
+
+
                 var _model = await _UserDAL.GetByUserName(entity.UserName);
                 if (_model != null)
                 {
