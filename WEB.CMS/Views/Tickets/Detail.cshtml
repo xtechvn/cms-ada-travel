@@ -1,0 +1,145 @@
+﻿@{
+    ViewData["Title"] = "Kho quản lý vé vui chơi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Entities.Models
+@using Entities.ViewModels.Funding
+@model PagedResult<TicketListItemViewModel>
+<style>
+    .filter-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 16px;
+        padding: 14px 20px;
+    }
+
+    .filter-fields {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px; /* 🧩 spacing giữa các select */
+    }
+
+    .filter-select,
+    .filter-input {
+        width: 200px !important;
+        min-width: 190px;
+    }
+
+    .select2-container {
+        min-width: 190px !important;
+    }
+
+    .action-buttons {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 14px; /* khoảng cách giữa 2 nút */
+        padding-right: 4px;
+    }
+
+        .action-buttons .btn {
+            min-width: 100px;
+        }
+
+    
+
+   
+</style>
+
+@{
+    var filter = ViewBag.Filter as TicketListFilter;
+    var service_types = (List<AllCode>)ViewBag.ServiceTypes;
+    var totalAvailable = Model?.Items?.Count(x => x.Status == 1 && x.ExpiredDate >= DateTime.Now) ?? 0;
+}
+
+
+<div class="container-fluid px-4 py-3" style="font-family:'Segoe UI',sans-serif;">
+    <h4 class="fw-bold mb-3">Kho quản lý vé vui chơi</h4>
+    <input type="hidden" id="hdSupplierId" value="@filter.SupplierId" />
+
+    <!-- Bộ lọc -->
+    <div class="card mb-3 border-0 shadow-sm">
+        <div class="card-body filter-bar d-flex align-items-center flex-wrap">
+
+            <!-- Bộ lọc bên trái -->
+            <div class="d-flex flex-wrap align-items-center filter-fields flex-grow-1">
+                <select name="playZoneFilter" class="form-select select2 filter-select">
+                    <option value="">Khu vực vui chơi</option>
+                </select>
+
+                <select name="statusFilter" class="form-select select2 filter-select">
+                    <option value="">Trạng thái</option>
+                    @if (service_types != null && service_types.Any())
+                    {
+                        foreach (var item in service_types)
+                        {
+                            <option value="@item.CodeValue">@item.Description</option>
+                        }
+                    }
+                </select>
+
+                <select name="categoryFilter" class="form-select select2 filter-select">
+                    <option value="">Danh mục</option>
+                </select>
+
+                <select name="ticketTypeFilter" class="form-select select2 filter-select">
+                    <option value="">Loại vé</option>
+                </select>
+
+                <input type="date" name="expiredDateFilter" class="form-control filter-input" placeholder="Ngày hết hạn" />
+            </div>
+
+            <!-- Nút bên phải -->
+            <div class="d-flex align-items-center action-buttons">
+                <button type="button" class="btn btn-outline-secondary me-2" onclick="_ticket_service.applyFilter()">
+                    <i class="fa fa-search"></i> Lọc
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="_ticket_service.ShowAddOrUpdate(0)">
+                    + Thêm mới
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Thông tin tổng -->
+    <div class="mb-3 d-flex align-items-center gap-3">
+        <span>Số lượng vé các khu vực (Chưa sử dụng): <strong class="text-primary">@totalAvailable vé</strong>
+        
+    </div>
+
+    <!-- Bảng -->
+    <div class="card shadow-sm border-0" id="ticket_table_wrapper">
+        @await Html.PartialAsync("_TicketTable", Model)
+      
+    </div>
+
+   
+    <div id="global_modal_popup" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
+
+
+    @section scripts {
+        <script src="~/modules/tickets.js?v=4"></script>
+        <script>
+            $(function () {
+                // 🔥 Khởi tạo dropdown filter động
+                _ticket_service.LoadFilterDropdowns();
+
+                // Khởi tạo select2
+                $('.select2').select2({ width: '200px' });
+            });
+
+        </script>
+    }
+

@@ -17,4 +17,5 @@ namespace Entities.ViewModels.Funding
         public int pageSize { get; set; }
         public List<int> CreateByIds { get; set; }
     }
+
 }

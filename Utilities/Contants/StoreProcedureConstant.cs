@@ -351,6 +351,8 @@ namespace Utilities.Contants
         public static string SP_UpdateSupplier = "SP_UpdateSupplier";
         public static string SP_GetSupplierById = "SP_GetSupplierById";
         public static string SP_GetListSupplier = "SP_GetListSupplier";
+        public static string SP_GetListSupplierForTickets = "SP_GetListSupplierForTickets";
+
 
         public static string SP_GetDetailSupplierContact = "SP_GetDetailSupplierContact";
         public static string SP_GetDetailSupplierContactBySupplierId = "SP_GetDetailSupplierContactBySupplierId";
