@@ -23,7 +23,7 @@ namespace DAL
         {
             _DbWorker = new DbWorker(connection);
         }
-
+       
         public async Task<List<Role>> GetUserActiveRoleList(int user_id)
         {
             try
@@ -112,6 +112,88 @@ namespace DAL
                 return 0;
             }
         }
+      
 
+
+        public async Task<List<int>> GetUserRoleId(int userId)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    return await _DbContext.UserRole.Where(x => x.UserId == userId).Select(s => s.RoleId).ToListAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetUserRoleId - UserRoleDAL: " + ex);
+                return new List<int>();
+            }
+        }
+       
+        public List<User> GetListUserByRole(int role_id)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var user_role = _DbContext.UserRole.Where(s => s.RoleId == role_id).ToList();
+                    var userRoleIds = user_role.Select(n => n.UserId).ToList();
+                    if (userRoleIds.Count > 0)
+                    {
+                        return _DbContext.User.Where(s => userRoleIds.Contains(s.Id) && s.Status == 0).ToList();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListUserByRole - UserRoleDAL: " + ex);
+            }
+            return new List<User>();
+        }
+        public int UpsertUserRole(UserRole role)
+        {
+            try
+            {
+
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserID", role.UserId),
+                    new SqlParameter("@UserRole", role.RoleId)
+                };
+                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.UpsertUserRole, parameters);
+                role.Id = id;
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpsertUserRole - UserDAL: " + ex);
+                return -1;
+            }
+        }
+        public int DeleteUserRole(int user_id, int[] roles)
+        {
+            try
+            {
+                string role_string = "";
+                if(roles != null && roles.Count() > 0)
+                {
+                    role_string = string.Join(",", roles);
+                }
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserID", user_id),
+                    new SqlParameter("@UserRole",role_string)
+                };
+                var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.DeleteUserRole, parameters);
+                
+                return id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpsertUserRole - UserDAL: " + ex);
+                return -1;
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using Entities.ConfigModels;
 using Entities.ViewModels;
 using Entities.ViewModels.Report;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -104,13 +105,13 @@ namespace Repositories.Repositories
                             break;
                     }
                 }
-                if(searchModel.DepartmentIdSearch!=null && searchModel.DepartmentIdSearch.Split(",").Count() > 0)
+                if (searchModel.DepartmentIdSearch != null && searchModel.DepartmentIdSearch.Split(",").Count() > 0)
                 {
                     var department_str = searchModel.DepartmentIdSearch.Split(",");
                     List<int> department_all = new List<int>();
                     try
                     {
-                        foreach(var s in department_str)
+                        foreach (var s in department_str)
                         {
                             department_all.AddRange(await departmentDAL.GetAllDepartmentByParentDepartmentId(Convert.ToInt32(s)));
                         }
@@ -145,9 +146,9 @@ namespace Repositories.Repositories
         {
             try
             {
-                
+
                 var data_table = operatorReportDAL.GetSumOperatorReport(searchModel);
-                if (data_table!=null && data_table.Rows != null && data_table.Rows.Count > 0)
+                if (data_table != null && data_table.Rows != null && data_table.Rows.Count > 0)
                 {
                     var data = data_table.ToList<SumOperatorReportViewModel>();
                     return data[0];
@@ -162,11 +163,11 @@ namespace Repositories.Repositories
         }
         public async Task<string> ExportOperatorExcel(GenericViewModel<OperatorReportViewModel> model, string file_path)
         {
-          
+
             try
             {
                 string full_path = Directory.GetCurrentDirectory() + file_path;
-               
+
                 try
                 {
                     File.Delete(full_path);
@@ -247,7 +248,7 @@ namespace Repositories.Repositories
                     ws.Cells["C2"].PutValue("Chi nhánh");
                     ws.Cells["D2"].PutValue("Nhãn đơn hàng");
                     ws.Cells["E2"].PutValue("Mã khách hàng");
-                   
+
                     ws.Cells["F2"].PutValue("Tên khách hàng");
 
                     ws.Cells["G2"].PutValue("Mã đơn hàng");
@@ -264,7 +265,8 @@ namespace Repositories.Repositories
                     ws.Cells["X2"].PutValue("Người phụ trách chính");
                     ws.Cells["Y2"].PutValue("Điều hành");
                     ws.Cells["Z2"].PutValue("Ngân hàng nhận tiền");
-                    
+                    ws.Cells["AA2"].PutValue("Quỹ chăm sóc khách hàng");
+
                     cell.Merge(0, 0, 2, 1);
                     cell.Merge(0, 1, 2, 1);
                     cell.Merge(0, 2, 2, 1);
@@ -275,7 +277,7 @@ namespace Repositories.Repositories
                     cell.Merge(0, 7, 2, 1);
                     cell.Merge(0, 8, 2, 1);
                     cell.Merge(0, 9, 2, 1);
-                    
+
 
                     cell.Merge(0, 17, 2, 1);
                     cell.Merge(0, 18, 2, 1);
@@ -359,15 +361,15 @@ namespace Repositories.Repositories
                         ws.Cells["J" + RowIndex].PutValue(item.EndDate.ToString("dd/MM/yyyy HH:mm"));
 
                         ws.Cells["K" + RowIndex].PutValue(item.Amount);
-                       
+
                         ws.Cells["L" + RowIndex].PutValue(item.AmountPay == null ? 0 : ((double)item.AmountPay));
-                       
+
                         ws.Cells["M" + RowIndex].PutValue(item.AmountRemain == null ? item.Amount : ((double)item.AmountRemain));
-                       
+
                         ws.Cells["N" + RowIndex].PutValue(item.Price == null ? 0 : ((double)item.Price));
-             
+
                         ws.Cells["O" + RowIndex].PutValue(item.PricePay == null ? 0 : ((double)item.PricePay));
-               
+
                         double item_price_remain = 0;
                         if (item.PriceRemain == null)
                         {
@@ -393,7 +395,8 @@ namespace Repositories.Repositories
                         ws.Cells["X" + RowIndex].PutValue(item.FullName != null ? item.FullName : "");
                         ws.Cells["Y" + RowIndex].PutValue(item.OperatorName != null ? item.OperatorName : "");
                         ws.Cells["Z" + RowIndex].PutValue(item.BankId != null ? item.BankId.Replace(",", " ") + " - " + item.AccountNumber : "");
-                    
+                        ws.Cells["AA" + RowIndex].PutValue((item.TotalFundCustomerCare == null ? 0 : (double)item.TotalFundCustomerCare).ToString("N0"));
+
 
                         ws.Cells["K" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["L" + RowIndex].SetStyle(numberStyle);
@@ -405,7 +408,7 @@ namespace Repositories.Repositories
                         ws.Cells["R" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["S" + RowIndex].SetStyle(numberStyle);
                     }
-                   
+
                     #endregion
                     wb.Save(full_path);
                 }
@@ -418,14 +421,14 @@ namespace Repositories.Repositories
         }
         public async Task<GenericViewModel<ReportClientDebtViewModel>> GetTotalDebtRevenueByClient(ReportClientDebtSearchModel searchModel)
         {
-          
+
             try
             {
                 if (searchModel == null) searchModel = new ReportClientDebtSearchModel();
 
-                if (searchModel.PageIndex==null || searchModel.PageIndex <= 0) searchModel.PageIndex = 1;
+                if (searchModel.PageIndex == null || searchModel.PageIndex <= 0) searchModel.PageIndex = 1;
                 if (searchModel.PageSize == null || searchModel.PageSize <= 0) searchModel.PageSize = 20;
-                
+
                 var model = new GenericViewModel<ReportClientDebtViewModel>();
                 var data_table = operatorReportDAL.GetTotalDebtRevenueByClient(searchModel);
                 if (data_table != null && data_table.Rows != null && data_table.Rows.Count > 0)
@@ -533,7 +536,7 @@ namespace Repositories.Repositories
                     cell.Merge(0, 0, 2, 1);
                     cell.Merge(0, 1, 2, 1);
                     cell.Merge(0, 2, 2, 1);
-      
+
                     #endregion
 
                     #region Body
@@ -604,7 +607,7 @@ namespace Repositories.Repositories
                         ws.Cells["G" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["H" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["I" + RowIndex].SetStyle(numberStyle);
-                       
+
 
                     }
                     #endregion
@@ -624,8 +627,8 @@ namespace Repositories.Repositories
             {
                 if (searchModel == null) searchModel = new ReportDetailClientDebtSearchModel();
 
-                if ( searchModel.PageIndex <= 0) searchModel.PageIndex = 1;
-                if ( searchModel.PageSize <= 0) searchModel.PageSize = 20;
+                if (searchModel.PageIndex <= 0) searchModel.PageIndex = 1;
+                if (searchModel.PageSize <= 0) searchModel.PageSize = 20;
 
                 var model = new GenericViewModel<ReportDetailClientDebtViewModel>();
                 var data_table = operatorReportDAL.GetDetailDebtRevenueByClient(searchModel);
@@ -652,7 +655,7 @@ namespace Repositories.Repositories
 
             try
             {
-                
+
                 string full_path = Directory.GetCurrentDirectory() + file_path;
                 if (!file_path.Contains("wwwroot"))
                 {
@@ -731,6 +734,7 @@ namespace Repositories.Repositories
 
                     ws.Cells["K2"].PutValue("Nợ");
                     ws.Cells["L2"].PutValue("Có");
+                    ws.Cells["M2"].PutValue("Ngày thu hồi");
 
 
                     cell.Merge(0, 0, 2, 1);
@@ -811,22 +815,216 @@ namespace Repositories.Repositories
                         ws.Cells["K" + RowIndex].PutValue(opening_credit.ToString("N0"));
                         ws.Cells["K" + RowIndex].SetStyle(alignCenterStyle);
                         ws.Cells["L" + RowIndex].PutValue("");
-
+                        ws.Cells["M" + RowIndex].PutValue(item.CutOffDate==null?"": ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy"));
 
                         ws.Cells["I" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["J" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["K" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["L" + RowIndex].SetStyle(numberStyle);
 
+                        if(item.Refund > 0)
+                        {
+                            RowIndex++;
+                            ws.Cells["A" + RowIndex].PutValue(RowIndex - 2);
+                            ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle);
+
+                            ws.Cells["B" + RowIndex].PutValue(item.CreatedDate.ToString("dd/MM/yyyy HH:mm"));
+                            ws.Cells["B" + RowIndex].SetStyle(alignCenterStyle);
+
+                            ws.Cells["C" + RowIndex].PutValue(item.CreatedDate.ToString("dd/MM/yyyy HH:mm"));
+                            ws.Cells["C" + RowIndex].SetStyle(alignCenterStyle);
+
+
+                            ws.Cells["D" + RowIndex].PutValue(item.LicenceNo);
+                            ws.Cells["E" + RowIndex].PutValue(item.BillNo);
+
+                            ws.Cells["F" + RowIndex].PutValue(item.Description);
+                            ws.Cells["G" + RowIndex].PutValue(item.DebtAccount);
+                            ws.Cells["H" + RowIndex].PutValue(item.CorrespondingAccount);
+
+                            opening_credit = opening_credit + (item.Refund != null ? (double)item.Refund : 0) - (item.AmountCredit != null ? (double)item.AmountCredit : 0);
+
+                            ws.Cells["I" + RowIndex].PutValue((item.Refund != null ? (double)item.Refund : 0));
+                            ws.Cells["I" + RowIndex].SetStyle(alignCenterStyle);
+                            ws.Cells["J" + RowIndex].PutValue((item.AmountCredit != null ? (double)item.AmountCredit : 0));
+                            ws.Cells["J" + RowIndex].SetStyle(alignCenterStyle);
+                            ws.Cells["K" + RowIndex].PutValue(opening_credit.ToString("N0"));
+                            ws.Cells["K" + RowIndex].SetStyle(alignCenterStyle);
+                            ws.Cells["L" + RowIndex].PutValue("");
+                            ws.Cells["M" + RowIndex].PutValue(item.CutOffDate == null ? "" : ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy"));
+
+                            ws.Cells["I" + RowIndex].SetStyle(numberStyle);
+                            ws.Cells["J" + RowIndex].SetStyle(numberStyle);
+                            ws.Cells["K" + RowIndex].SetStyle(numberStyle);
+                            ws.Cells["L" + RowIndex].SetStyle(numberStyle);
+                        }
                     }
                     #endregion
                     wb.Save(full_path);
                 }
-                
+
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("ExportDetailDebtRevenueByClient - ReportRepository: " + ex);
+            }
+            return file_path;
+        }
+        public async Task<string> ExportReportOrder(List<ReportOrderViewModel> model, string file_path)
+        {
+
+            try
+            {
+                string full_path = Directory.GetCurrentDirectory() + file_path;
+                if (!file_path.Contains("wwwroot"))
+                {
+                    full_path = Directory.GetCurrentDirectory() + @"\wwwroot" + file_path;
+                }
+                try
+                {
+                    File.Delete(full_path);
+                }
+                catch { }
+                if (model != null && model.Count > 0)
+                {
+                    Workbook wb = new Workbook();
+                    Worksheet ws = wb.Worksheets[0];
+                    ws.Name = "danh sách";
+                    Cells cell = ws.Cells;
+
+                    var range = ws.Cells.CreateRange(0, 0, 1, 1);
+                    StyleFlag st = new StyleFlag();
+                    st.All = true;
+                    Style style = ws.Cells["A1"].GetStyle();
+
+                    #region Header
+                    range = cell.CreateRange(0, 0, 2, 9);
+                    style = ws.Cells["A1"].GetStyle();
+                    style.Font.IsBold = true;
+                    style.IsTextWrapped = true;
+                    //style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                    //style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                    style.Pattern = BackgroundType.Solid;
+                    //style.Font.Color = Color.White;
+                    style.VerticalAlignment = TextAlignmentType.Center;
+                    style.HorizontalAlignment = TextAlignmentType.Center;
+                    style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                    style.Borders[BorderType.TopBorder].Color = Color.Black;
+                    style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                    style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                    style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                    style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                    style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                    style.Borders[BorderType.RightBorder].Color = Color.Black;
+                    range.ApplyStyle(style, st);
+
+                    // Set column width
+                    cell.SetColumnWidth(0, 8);
+                    cell.SetColumnWidth(1, 20);
+                    cell.SetColumnWidth(2, 40);
+                    cell.SetColumnWidth(3, 20);
+                    cell.SetColumnWidth(4, 20);
+                    cell.SetColumnWidth(5, 30);
+                    cell.SetColumnWidth(6, 30);
+                    cell.SetColumnWidth(7, 25);
+                    cell.SetColumnWidth(8, 25);
+
+
+                    // Set header value
+                    ws.Cells["A1"].PutValue("STT");
+                    ws.Cells["B1"].PutValue("Mã đơn hàng");
+                    ws.Cells["C1"].PutValue("Dịch vụ");
+                    ws.Cells["D1"].PutValue("Mã dịch vụ");
+                    ws.Cells["E1"].PutValue("Mã yêu cầu chi");
+
+                    ws.Cells["F1"].PutValue("Số tiền");
+
+                    #endregion
+
+                    #region Body
+
+                    range = cell.CreateRange(1, 0, model.Count + 20, 9);
+                    style = ws.Cells["A2"].GetStyle();
+                    style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                    style.Borders[BorderType.TopBorder].Color = Color.Black;
+                    style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                    style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                    style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                    style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                    style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                    style.Borders[BorderType.RightBorder].Color = Color.Black;
+                    style.VerticalAlignment = TextAlignmentType.Center;
+                    range.ApplyStyle(style, st);
+
+                    Style numberStyle = ws.Cells["A2"].GetStyle();
+                    numberStyle.Number = 3;
+                    numberStyle.HorizontalAlignment = TextAlignmentType.Right;
+                    numberStyle.VerticalAlignment = TextAlignmentType.Center;
+
+                    int RowIndex = 2;
+                    int STT = 2;
+
+                    foreach (var item in model)
+                    {
+
+                        //RowIndex++;
+                        STT++;
+                        ws.Cells["A" + RowIndex].PutValue(STT - 2);
+                        ws.Cells["B" + RowIndex].PutValue(item.OrderNo);
+
+                        if (item.ListService != null && item.ListService.Count > 0)
+                        {
+                            var rowSpan = item.ListService.Count;
+                            var rowSpanPaymentRequest = 0;
+                            foreach (var Service in item.ListService)
+                            {
+
+                                rowSpanPaymentRequest +=  Service.ListPaymentRequest.Count;
+                            }
+                            rowSpan = rowSpan > rowSpanPaymentRequest ? rowSpan : rowSpanPaymentRequest;
+                            if (rowSpan > 1)
+                            {
+                                ws.Cells.Merge(RowIndex - 1, 0, rowSpan, 1);// A
+                                ws.Cells.Merge(RowIndex - 1, 1, rowSpan, 1);// B
+                            }    
+                            foreach (var Service in item.ListService)
+                            {
+                                var dem = 0;
+                                var count = 1;
+                                ws.Cells["C" + RowIndex].PutValue(Service.Type);
+                                ws.Cells["D" + RowIndex].PutValue(Service.ServiceCode);
+                                count = Service.ListPaymentRequest.Count > 0 ? Service.ListPaymentRequest.Count : count;
+                                if (count > 1)
+                                {
+                                    ws.Cells.Merge(RowIndex - 1, 2, count, 1);// C
+                                    ws.Cells.Merge(RowIndex - 1, 3, count, 1);// D
+                                }
+
+                                if (Service.ListPaymentRequest != null && Service.ListPaymentRequest.Count > 0)
+                                {
+                                    foreach (var PaymentRequest in Service.ListPaymentRequest)
+                                    {
+                                        ws.Cells["E" + RowIndex].PutValue(PaymentRequest.PaymentCode);
+                                        ws.Cells["F" + RowIndex].PutValue(PaymentRequest.Amount == null ? "0" : ((double)PaymentRequest.Amount).ToString("N0"));
+                                        ws.Cells["F" + RowIndex].SetStyle(numberStyle);
+                                        RowIndex++;
+                                        dem++;
+                                    }
+                                }
+                                if (dem <= 0)
+                                    RowIndex = RowIndex + count;
+                            }
+
+                        }
+                        #endregion
+
+                    }
+                    wb.Save(full_path);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ExportTotalDebtRevenueByClient - ReportRepository: " + ex);
             }
             return file_path;
         }

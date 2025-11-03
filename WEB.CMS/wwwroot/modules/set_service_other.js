@@ -91,7 +91,7 @@ var _set_service_other = {
             success: function (result) {
                 $('#search_data_grid').html(result);
                 _common_function_other.OrderNoSuggesstion($('.set-service-other-search-orderno'))
-                //_common_function_other.ServiceCodeSuggesstion($('.set-service-other-search-servicecode'))
+                _common_function_other.ServiceCodeSuggesstion($('.set-service-other-search-servicecode'))
                 _common_function_other.Select2BookingCode($("#BookingCode"))
             }
         });

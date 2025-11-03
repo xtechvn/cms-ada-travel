@@ -103,11 +103,7 @@
                                 <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Ghi chú:</td>
                                 <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{GhiChu}}</td>
                             </tr>
-                            <tr>
-                                <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">{{DoanhTITLE}}:</td>
-                                <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{DoanhT}} VNĐ</td>
 
-                            </tr>
                             <!--<tr>
         <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Bằng chữ:</td>
         <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{BChuDT}}</td>
@@ -116,6 +112,11 @@
                             <tr>
                                 <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Tổng tiền khách đã thanh toán:</td>
                                 <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{TTKhachTT}} VNĐ</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">{{DoanhTITLE}}:</td>
+                                <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{DoanhT}} VNĐ</td>
+
                             </tr>
                             <tr style="{{style}}">
                                 <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Lợi nhuận dự kiến:</td>
@@ -167,7 +168,18 @@
                                 <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Hạn thanh toán:</td>
                                 <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{HanTT}}</td>
                             </tr>
-
+                            <tr style="{{DHstyle}}">
+                                <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Điều hành ghi chú:</td>
+                                <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{DHNote}}</td>
+                            </tr>
+                            <tr style="{{KTstyle}}">
+                                <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Kế toán ghi chú:</td>
+                                <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{KTNote}}</td>
+                            </tr>
+                            <tr >
+                                <td style="border: 1px solid #999; padding: 5px;font-weight: bold;">Số lần in:</td>
+                                <td colspan="3" style="border: 1px solid #999; padding: 5px;">{{SLIN}}</td>
+                            </tr>
 
                         </tbody>
                     </table>
@@ -192,8 +204,10 @@
 
                 </div>
             </td>
+
         </tr>
     </table>
+
 </body>
 
 </html>

@@ -2,11 +2,13 @@
 using Entities.ViewModels;
 using Entities.ViewModels.Funding;
 using Entities.ViewModels.Invoice;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -15,8 +17,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
+using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
@@ -33,10 +37,11 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private ManagementUser _ManagementUser;
-
+        private APIService apiService;
+        private readonly IConfiguration _configuration;
         public InvoiceRequestController(IAllCodeRepository allCodeRepository, IInvoiceRequestRepository invoiceRequestRepository,
             IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser, IUserRepository userRepository,
-            IClientRepository clientRepository, IOrderRepositor orderRepository)
+            IClientRepository clientRepository, IOrderRepositor orderRepository, IConfiguration configuration)
         {
             _allCodeRepository = allCodeRepository;
             _invoiceRequestRepository = invoiceRequestRepository;
@@ -45,6 +50,7 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _orderRepository = orderRepository;
+            apiService = new APIService(configuration, userRepository);
         }
 
         public IActionResult Index()
@@ -67,8 +73,48 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
                 if (!string.IsNullOrEmpty(searchModel.InvoiceCode)) searchModel.InvoiceCode = searchModel.InvoiceCode.Trim();
                 if (!string.IsNullOrEmpty(searchModel.Note)) searchModel.Note = searchModel.Note.Trim();
                 var current_user = _ManagementUser.GetCurrentUser();
-                if (!string.IsNullOrEmpty(current_user.UserUnderList) && (searchModel.CreateByIds == null || searchModel.CreateByIds.Count == 0))
-                    searchModel.CreateByIds = current_user.UserUnderList.Split(',').Select(n => int.Parse(n)).ToList();
+                //if (!string.IsNullOrEmpty(current_user.UserUnderList) && (searchModel.CreateByIds == null || searchModel.CreateByIds.Count == 0))
+                //searchModel.CreateByIds = current_user.UserUnderList.Split(',').Select(n => int.Parse(n)).ToList();
+                if (current_user != null)
+                {
+                    if (current_user.Role != "")
+                    {
+                        var list = current_user.Role.Split(',');
+                        foreach (var item in list)
+                        {
+                            bool is_admin = false;
+                            switch (Convert.ToInt32(item))
+                            {
+                                case (int)RoleType.SaleOnl:
+                                case (int)RoleType.SaleKd:
+                                case (int)RoleType.SaleTour:
+                                case (int)RoleType.TPDHKS:
+                                case (int)RoleType.TPDHVe:
+                                case (int)RoleType.TPDHTour:
+                                case (int)RoleType.TPKS:
+                                case (int)RoleType.TPTour:
+                                case (int)RoleType.TPVe:
+                                    {
+                                        searchModel.CreateByIds = current_user.UserUnderList.Split(',').Select(n => int.Parse(n)).ToList();
+                                    }
+                                    break;
+                                case (int)RoleType.Admin:
+                                case (int)RoleType.KT:
+                                case (int)RoleType.GD:
+                                case (int)RoleType.KeToanTruong:
+                                case (int)RoleType.PhoTPKeToan:
+                                    {
+                                        searchModel.CreateByIds= null;
+                                       
+                                        is_admin = true;
+                                    }
+                                    break;
+                            }
+                            if (is_admin) break;
+                        }
+                    }
+
+                }
                 var listInvoiceRequest = _invoiceRequestRepository.GetInvoiceRequests(searchModel, out long total, currentPage, pageSize);
                 if (searchModel.Status != -1)
                 {
@@ -133,13 +179,21 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
             ViewBag.KTT_DUYET_YEU_CAU_XUAT_HOA_DON = 0;
             ViewBag.KTV_DUYET_YEU_CAU_XUAT_HOA_DON = 0;
             ViewBag.isAdmin = false;
+            ViewBag.isCreatedBy = false;
             if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
             {
+                if(detail.CreatedBy == current_user.Id)
+                {
+                    ViewBag.isCreatedBy = true;
+                }
                 bool isAdmin = _userRepository.IsAdmin(current_user.Id);
                 ViewBag.isAdmin = isAdmin;
 
                 bool isHeadOfAccountant = _userRepository.IsHeadOfAccountant(current_user.Id);
                 if (isHeadOfAccountant)
+                    ViewBag.KTT_DUYET_YEU_CAU_XUAT_HOA_DON = 1;
+                bool IsHeadOfAccountantPhoTPKeToan = _userRepository.IsHeadOfAccountantPhoTPKeToan(current_user.Id);
+                if (IsHeadOfAccountantPhoTPKeToan)
                     ViewBag.KTT_DUYET_YEU_CAU_XUAT_HOA_DON = 1;
 
                 bool IsAccountant = _userRepository.IsAccountant(current_user.Id);
@@ -187,7 +241,7 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
 
         public IActionResult Add(long orderId)
         {
-            ViewBag.orderId = 0;
+            ViewBag.orderId = orderId;
             ViewBag.ClientId = 0;
             ViewBag.ClientName = string.Empty;
             ViewBag.TaxNo = string.Empty;
@@ -323,6 +377,17 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
                         isSuccess = false,
                         message = "Cập nhật yêu cầu xuất hóa đơn thất bại"
                     });
+                var detail = _invoiceRequestRepository.GetById((int)model.Id);
+                var link = "/Order/" + detail.OrderId;
+                if (model.isSend == (int)INVOICE_REQUEST_STATUS.DA_XUAT_NHAP)
+                {
+                    apiService.SendMessage(detail.CreatedBy.ToString(), ((int)ModuleType.YEU_CAU_XUAT_HD).ToString(), ((int)ActionType.YEU_CAU_XUAT_HD).ToString(), detail.OrderNo, link, "1", detail.OrderNo);
+                }
+                if (model.isSend == (int)INVOICE_REQUEST_STATUS.HOAN_THANH)
+                {
+                    apiService.SendMessage(detail.CreatedBy.ToString(), ((int)ModuleType.YEU_CAU_XUAT_HD).ToString(), ((int)ActionType.YEU_CAU_XUAT_HD).ToString(), detail.OrderNo, link, "1", detail.OrderNo);
+
+                }
                 return Ok(new
                 {
                     isSuccess = true,
@@ -537,7 +602,7 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
         {
             try
             {
-                var listOrder = _invoiceRequestRepository.GetByClientId(clientId, invoiceRequestId, (int)OrderStatus.WAITING_FOR_OPERATOR);
+                var listOrder = _invoiceRequestRepository.GetByClientId(clientId, invoiceRequestId, (int)OrderStatus.CREATED_ORDER);
                 var clientInfo = _clientRepository.GetClientDetailByClientId(clientId).Result;
                 return Ok(new
                 {

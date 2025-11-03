@@ -5,10 +5,12 @@ using Entities.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Repositories.IRepositories;
 using Repositories.Repositories.BaseRepos;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -28,6 +30,7 @@ namespace Repositories.Repositories
         private readonly IHttpContextAccessor _HttpContext;
         private readonly UserRoleDAL _userRoleDAL;
         private readonly UserDepartDAL _userDepart;
+        private readonly DepartmentDAL _departmentDAL;
 
         public UserRepository(IHttpContextAccessor context, IOptions<DataBaseConfig> dataBaseConfig,
             IOptions<MailConfig> mailConfig, ILogger<UserRepository> logger)
@@ -40,6 +43,7 @@ namespace Repositories.Repositories
             _userPositionDAL = new UserPositionDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _userRoleDAL = new UserRoleDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _userDepart = new UserDepartDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
+            _departmentDAL = new DepartmentDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
         }
 
         public async Task<UserDetailViewModel> CheckExistAccount(AccountModel entity)
@@ -115,7 +119,7 @@ namespace Repositories.Repositories
 
 
 
-        public async Task<IEnumerable<RolePermission>> GetUserPermissionById(int Id)
+        public async Task<List<RolePermission>> GetUserPermissionById(int Id)
         {
             try
             {
@@ -133,7 +137,7 @@ namespace Repositories.Repositories
             try
             {
                 model.Entity = await _UserDAL.FindAsync(Id);
-                model.RoleIdList = await _UserDAL.GetUserRoleId(Id);
+                model.RoleIdList = await _userRoleDAL.GetUserRoleId(Id);
             }
             catch (Exception ex)
             {
@@ -148,8 +152,15 @@ namespace Repositories.Repositories
             var model = new UserDataViewModel();
             try
             {
-                model = await _UserDAL.GetUserInfoById(Id);
-                model.RoleIdList = await _UserDAL.GetUserRoleId(Id);
+                var user= await _UserDAL.GetById(Id);
+                if (user == null || user.Id <= 0) return model;
+                model = JsonConvert.DeserializeObject<UserDataViewModel>(JsonConvert.SerializeObject(user));
+                if(model.DepartmentId!=null && model.DepartmentId > 0)
+                {
+                    var depart = await _departmentDAL.GetById((int)model.DepartmentId);
+                    if (depart != null && depart.Id > 0) model.DepartmentName = depart.DepartmentName;
+                }
+                model.RoleIdList = await _userRoleDAL.GetUserRoleId(Id);
             }
             catch (Exception ex)
             {
@@ -159,16 +170,26 @@ namespace Repositories.Repositories
             return model;
         }
 
-        public GenericViewModel<UserGridModel> GetPagingList(string userName, string strRoleId, int status, int currentPage, int pageSize)
+        public GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize)
         {
-            var model = new GenericViewModel<UserGridModel>();
+            var model = new GenericViewModel<UserGridModel>()
+            {
+                PageSize=0,
+                TotalRecord=0,
+                TotalPage=0
+            };
             try
             {
-                model.ListData = _UserDAL.GetUserPagingList(userName, strRoleId, status, currentPage, pageSize, out int totalRecord);
-                model.PageSize = pageSize;
-                model.CurrentPage = currentPage;
-                model.TotalRecord = totalRecord;
-                model.TotalPage = (int)Math.Ceiling((double)totalRecord / pageSize);
+                
+                model.ListData = _UserDAL.GetUserPagingList(userName,  status, currentPage, pageSize);
+                if(model.ListData!=null && model.ListData.Count > 0)
+                {
+                    model.PageSize = pageSize;
+                    model.CurrentPage = currentPage;
+                    model.TotalRecord = model.ListData[0].TotalRow;
+                    model.TotalPage = (int)Math.Ceiling((double)model.ListData[0].TotalRow / pageSize);
+                }
+               
             }
             catch (Exception ex)
             {
@@ -216,21 +237,34 @@ namespace Repositories.Repositories
                 };
 
                 // Check exist User Name or Email
-                var userList = await _UserDAL.GetAllAsync();
-                var exmodel = userList.Where(s => s.Status == 0 && (s.UserName == model.UserName/* || s.Email == model.Email*/));
-                if (exmodel != null && exmodel.Count() > 0)
+                var exmodel = await _UserDAL.GetByUserName(model.UserName);
+               
+                if (exmodel != null && exmodel.Id > 0)
                 {
                     return -1;
                 }
 
-                var userId = (int)await _UserDAL.CreateAsync(entity);
+                var userId = await  _UserDAL.CreateAsync(entity);
 
                 if (!string.IsNullOrEmpty(model.RoleId))
                 {
                     var role_list = model.RoleId.Split(',').Select(s => int.Parse(s)).ToArray();
-                    await _UserDAL.UpdateUserRole(userId, role_list, 0);
+                    foreach (var role in role_list) {
+                         _userRoleDAL.UpsertUserRole(new UserRole()
+                        {
+                            UserId = entity.Id,
+                            RoleId = role
+                        });
+                    
+                    }
+                    var exists_roles = await _userRoleDAL.GetUserRoleId(entity.Id);
+                    if (exists_roles.Any())
+                    {
+                        var non_keep = exists_roles.Where(x => !role_list.Contains(x)).ToArray();
+                        _userRoleDAL.DeleteUserRole(entity.Id, non_keep);
+                    }
                 }
-                return userId;
+                return Convert.ToInt32(userId);
             }
             catch (Exception ex)
             {
@@ -241,11 +275,38 @@ namespace Repositories.Repositories
             return 0;
         }
 
-        public async Task<int> UpdateUserRole(int userId, int[] arrayRole, int type)
+        public async Task<int> DeleteUserRole(int userId, int[] arrayRole)
         {
             try
             {
-                await _UserDAL.UpdateUserRole(userId, arrayRole, type);
+
+                _userRoleDAL.DeleteUserRole(userId, arrayRole);
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("DeleteUserRole - UserRepository: " + ex);
+                _logger.LogError(ex.Message);
+            }
+            return 0;
+        }
+        public async Task<int> UpdateUserRole(int userId, int[] arrayRole)
+        {
+            try
+            {
+
+                if (arrayRole != null && arrayRole.Count() > 0)
+                {
+                    foreach (var role in arrayRole)
+                    {
+                        _userRoleDAL.UpsertUserRole(new UserRole()
+                        {
+                            UserId = userId,
+                            RoleId = role
+                        });
+
+                    }
+                }
                 return 1;
             }
             catch (Exception ex)
@@ -255,7 +316,6 @@ namespace Repositories.Repositories
             }
             return 0;
         }
-
         public async Task<int> ChangeUserStatus(int userId)
         {
             try
@@ -302,14 +362,18 @@ namespace Repositories.Repositories
                 var entity = await _UserDAL.FindAsync(model.Id);
 
                 // Check exist User Name or Email
-                var userList = await _UserDAL.GetAllAsync();
+                // var userList = await _UserDAL.GetAllAsync();
 
-                var exmodel = userList.Where(s => s.Id != entity.Id && s.Status == 0 && (s.UserName == entity.UserName /*|| s.Email == entity.Email*/)).ToList();
-                if (exmodel != null && exmodel.Count > 0)
-                {
-                    return -1;
-                }
-
+                //var exmodel = userList.Where(s => s.Id != entity.Id /*&& s.Status == 0 && (s.UserName == entity.UserName || s.Email == entity.Email)*/).FirstOrDefault();
+                //if (exmodel != null && exmodel.Count > 0)
+                //{
+                //    return -1;
+                //}
+                //var exists_other_user = await _UserDAL.CheckIfExists(model.UserName, model.Id);
+                //if(exists_other_user!=null && exists_other_user.Id > 0)
+                //{
+                //    return -1;
+                //}
                 if (entity.DepartmentId.HasValue && entity.DepartmentId.Value > 0
                     && model.DepartmentId.HasValue && model.DepartmentId.Value > 0
                     && entity.DepartmentId.Value != model.DepartmentId.Value)
@@ -343,11 +407,24 @@ namespace Repositories.Repositories
                 entity.DebtLimit = model.DebtLimit;
 
 
-                await _UserDAL.UpdateAsync(entity);
+               await  _UserDAL.UpdateAsync(entity);
                 if (!string.IsNullOrEmpty(model.RoleId))
                 {
                     var role_list = model.RoleId.Split(',').Select(s => int.Parse(s)).ToArray();
-                    await _UserDAL.UpdateUserRole(entity.Id, role_list, 0);
+                    foreach (var role in role_list)
+                    {
+                        _userRoleDAL.UpsertUserRole(new UserRole()
+                        {
+                            UserId = entity.Id,
+                            RoleId = role
+                        });
+
+                    }
+                    var exists_roles = await  _userRoleDAL.GetUserRoleId(entity.Id);   
+                    if (exists_roles.Any()) {
+                        var non_keep = exists_roles.Where(x => !role_list.Contains(x)).ToArray();
+                        _userRoleDAL.DeleteUserRole(entity.Id, non_keep);
+                    }
                 }
                 return model.Id;
             }
@@ -683,7 +760,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                return _UserDAL.GetListUserByRole((int)RoleType.Admin);
+                return _userRoleDAL.GetListUserByRole((int)RoleType.Admin);
             }
             catch (Exception ex)
             {
@@ -696,12 +773,12 @@ namespace Repositories.Repositories
         {
             try
             {
-                return _UserDAL.GetListUserByRole((int)RoleType.KeToanTruong);
+                return _userRoleDAL.GetListUserByRole((int)RoleType.KeToanTruong);
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetHeadOfAccountantUser - UserRepository: " + ex);
-            }
+            }       
             return new List<User>();
         }
 
@@ -709,7 +786,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var listUserAdmin = _UserDAL.GetListUserByRole((int)RoleType.Admin);
+                var listUserAdmin = _userRoleDAL.GetListUserByRole((int)RoleType.Admin);
                 return listUserAdmin.FirstOrDefault(n => n.Id == userId) != null;
             }
             catch (Exception ex)
@@ -723,7 +800,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var listHeadOfAccountant = _UserDAL.GetListUserByRole((int)RoleType.KeToanTruong);
+                var listHeadOfAccountant = _userRoleDAL.GetListUserByRole((int)RoleType.KeToanTruong);
                 return listHeadOfAccountant.FirstOrDefault(n => n.Id == userId) != null;
             }
             catch (Exception ex)
@@ -737,7 +814,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var listIsAccountant = _UserDAL.GetListUserByRole((int)RoleType.KT);
+                var listIsAccountant = _userRoleDAL.GetListUserByRole((int)RoleType.KT);
                 return listIsAccountant.FirstOrDefault(n => n.Id == userId) != null;
             }
             catch (Exception ex)
@@ -750,7 +827,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                return _UserDAL.GetListUserByRole((int)RoleType.TPKS);
+                return _userRoleDAL.GetListUserByRole((int)RoleType.TPKS);
             }
             catch (Exception ex)
             {
@@ -790,7 +867,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var listIsAccountant = _UserDAL.GetListUserByRole((int)RoleType.TPTour);
+                var listIsAccountant = _userRoleDAL.GetListUserByRole((int)RoleType.TPTour);
                 return listIsAccountant.FirstOrDefault(n => n.Id == userId) != null;
             }
             catch (Exception ex)
@@ -803,7 +880,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var listHeadOfAccountant = _UserDAL.GetListUserByRole((int)RoleType.PhoTPKeToan);
+                var listHeadOfAccountant = _userRoleDAL.GetListUserByRole((int)RoleType.PhoTPKeToan);
                 return listHeadOfAccountant.FirstOrDefault(n => n.Id == userId) != null;
             }
             catch (Exception ex)
@@ -811,6 +888,20 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("isHeadOfAccountant - UserRepository: " + ex);
             }
             return false;
+        }
+        public  List<UserProfitReportViewModel> GetListUserProfitReport(UserProfitReportModel model)
+        {
+            try
+            {
+                var data =  _UserDAL.GetListUserProfitReport(model);
+                return data;
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetDetail - ClientDAL: " + ex);
+                return null;
+            }
         }
     }
 }

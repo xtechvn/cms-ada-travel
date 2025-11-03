@@ -7,5 +7,6 @@ namespace Entities.ViewModels.UserAgent
    public class UserAgentViewModel: Entities.Models.UserAgent
     {
         public string UserId_Name { get; set; }
+        public string Avata { get; set; }
     }
 }

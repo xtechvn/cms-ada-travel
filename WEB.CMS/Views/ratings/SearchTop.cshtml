@@ -1,0 +1,70 @@
+﻿@using Entities.ViewModels;
+@model List<UserProfitReportViewModel>
+@{
+    Layout = null;
+}
+
+<div class="bg-white pd15 radius-10 mb30">
+
+    <h5>Danh hiệu Vàng – Lợi nhuận đỉnh cao</h5>
+    <div class="box-vinhdanh">
+        @if (Model != null)
+        {
+            <!-- Silver -->
+            @if (Model.Count >= 2)
+            {
+                <div class="item n2nd">
+                    <div class="image-avt">
+                        <div class="avt">
+                            <img src="@(Model[1].Avata ==null ||Model[1].Avata ==""? "/images/graphics/user.jpeg" :Model[1].Avata)" alt="" />
+                        </div>
+                        <img class="tag" src="/images/graphics/2nd.png" alt="" />
+                    </div>
+                    <div class="info">
+                        <h4 class="name">@Model[1].FullName</h4>
+                        <p class="price">@Model[1].TotalProfit.ToString("N0") vnđ</p>
+                    </div>
+                </div>
+            }
+
+
+            <!-- Gold -->
+            @if (Model.Count >= 1)
+            {
+                <div class="item n1st">
+                    <div class="image-avt">
+                        <div class="avt">
+                            <img src="@(Model[0].Avata ==null ||Model[0].Avata ==""? "/images/graphics/user.jpeg" :Model[0].Avata)" alt="" />
+                        </div>
+                        <img class="tag" src="/images/graphics/1st.png" alt="" />
+                    </div>
+                    <div class="info">
+                        <h4 class="name">@Model[0].FullName</h4>
+                        <p class="price">@Model[0].TotalProfit.ToString("N0") vnđ</p>
+                    </div>
+                </div>
+
+            }
+
+
+            <!-- Bronze -->
+            @if (Model.Count >= 3)
+            {
+                <div class="item n3rd">
+                    <div class="image-avt">
+                        <div class="avt">
+                            <img src="@(Model[2].Avata ==null ||Model[2].Avata ==""? "/images/graphics/user.jpeg" :Model[2].Avata)" alt="" />
+                        </div>
+                        <img class="tag" src="/images/graphics/3rd.png" alt="" />
+                    </div>
+                    <div class="info">
+                        <h4 class="name">@Model[2].FullName</h4>
+                        <p class="price">@Model[2].TotalProfit.ToString("N0") vnđ</p>
+                    </div>
+                </div>
+            }
+        }
+
+
+    </div>
+</div>

@@ -3,6 +3,7 @@ using Entities.ViewModels;
 using Entities.ViewModels.OrderManual;
 
 using Entities.ViewModels.SetServices;
+using Entities.ViewModels.Tour;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -31,7 +32,9 @@ namespace Repositories.IRepositories
         Task<long> UpdateServiceStatus(int status, long booking_id, int user_id);
         Task<List<OtherBooking>> ServiceCodeSuggesstion(string txt_search = "");
         Task<List<OtherBooking>> getListOtherBookingByOrderId(long OrderId);
+        Task<GenericViewModel<OtherBookingPackagesOptionalModel>> GetListOtherBookingPackagesOptionalBySupplierId(OptionalSearshModel Searsh);
 
-      
+
+
     }
 }

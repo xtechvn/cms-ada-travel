@@ -5,8 +5,10 @@ using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.SetServices;
+using Entities.ViewModels.Tour;
 using Entities.ViewModels.VinWonder;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -16,6 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Contants;
 
 namespace Repositories.Repositories
 {
@@ -26,6 +29,7 @@ namespace Repositories.Repositories
         private readonly VinWonderBookingTicketCustomerDAL _vinWonderBookingTicketCustomerDAL;
         private readonly OrderDAL _orderDAL;
         private readonly ClientDAL _clientDAL;
+        private readonly TourDAL _tourDAL;
         public VinWonderBookingRepository(IOptions<DataBaseConfig> dataBaseConfig)
         {
             var _StrConnection = dataBaseConfig.Value.SqlServer.ConnectionString;
@@ -34,6 +38,7 @@ namespace Repositories.Repositories
             _vinWonderBookingTicketCustomerDAL = new VinWonderBookingTicketCustomerDAL(_StrConnection);
             _orderDAL = new OrderDAL(_StrConnection);
             _clientDAL = new ClientDAL(_StrConnection);
+            _tourDAL = new TourDAL(_StrConnection);
         }
         public VinWonderBooking GetVinWonderBookingById(long booking_id)
         {
@@ -44,14 +49,14 @@ namespace Repositories.Repositories
         {
             return await _vinWonderBookingTicketDAL.GetVinWonderTicketByBookingId(booking_id);
         }
-        public async Task<List<VinWonderBookingTicket>> GetVinWonderTicketByBookingIdSP(long booking_id)
+        public async Task<List<VinWonderBookingTicketViewModel>> GetVinWonderTicketByBookingIdSP(long booking_id)
         {
             try
             {
                 DataTable dt = await _vinWonderBookingTicketDAL.GetVinWonderTicketByBookingIdSP(booking_id);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    var data = dt.ToList<VinWonderBookingTicket>();
+                    var data = dt.ToList<VinWonderBookingTicketViewModel>();
                     return data;
                 }
                 return null;
@@ -494,6 +499,29 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("GetVinWonderBookingTicketByBookingID - VinWonderBookingRepository: " + ex);
                 return null;
             }
+        }
+        public async Task<GenericViewModel<VinWonderOptionalViewModel>> GetListVinWonderOptionalBySupplierId(OptionalSearshModel Searsh)
+        {
+            var model = new GenericViewModel<VinWonderOptionalViewModel>();
+            try
+            {
+                DataTable dt = await _tourDAL.GetListOptionalBySupplierId(Searsh, StoreProcedureConstant.SP_GetAllListVinWonderOptionalBySupplierId);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    model.ListData = dt.ToList<VinWonderOptionalViewModel>();
+                    model.CurrentPage = Searsh.PageIndex;
+                    model.PageSize = Searsh.PageSize;
+                    model.TotalRecord = Convert.ToInt32(dt.Rows[0]["TotalRow"]);
+                    model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / model.PageSize);
+                    return model;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListVinWonderOptionalBySupplierId - OtherBookingRepository: " + ex);
+            }
+            return model;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Nest;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Entities.Models
@@ -8,12 +7,10 @@ namespace Entities.Models
     {
         public Order()
         {
-            Passenger = new HashSet<Passenger>();
+            Passengers = new HashSet<Passenger>();
         }
-        [PropertyName("id")]
 
         public long OrderId { get; set; }
-        [PropertyName("orderno")]
         public string OrderNo { get; set; }
         public byte? ServiceType { get; set; }
         public DateTime? CreateTime { get; set; }
@@ -32,9 +29,18 @@ namespace Entities.Models
         public double? Discount { get; set; }
         public double? Profit { get; set; }
         public DateTime? ExpriryDate { get; set; }
+        /// <summary>
+        /// ngay bat dau khoi tao dich vu
+        /// </summary>
         public DateTime? StartDate { get; set; }
+        /// <summary>
+        /// Ngay ket thuc dich vu
+        /// </summary>
         public DateTime? EndDate { get; set; }
         public string ProductService { get; set; }
+        /// <summary>
+        /// Chính là label so với wiframe
+        /// </summary>
         public string Note { get; set; }
         public string UtmSource { get; set; }
         public DateTime? UpdateLast { get; set; }
@@ -66,10 +72,12 @@ namespace Entities.Models
         public double? AmountFinalize { get; set; }
         public DateTime? FinalizeDate { get; set; }
         public bool? IsLock { get; set; }
+        public DateTime? ClosingEndDate { get; set; }
         public bool? IsSalerDebtLimit { get; set; }
+        public DateTime? CutOffDate { get; set; }
 
         public virtual ContactClient ContactClient { get; set; }
         public virtual Contract Contract { get; set; }
-        public virtual ICollection<Passenger> Passenger { get; set; }
+        public virtual ICollection<Passenger> Passengers { get; set; }
     }
 }

@@ -10,8 +10,8 @@ namespace Entities.Models
         public long? ProgramId { get; set; }
         public int? ProgramPackageId { get; set; }
         public int? HotelId { get; set; }
-        public int? RoomId { get; set; }
         public string AllotmentsId { get; set; }
         public string PackageCode { get; set; }
+        public int? RoomId { get; set; }
     }
 }

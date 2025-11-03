@@ -79,7 +79,7 @@
 
                 <div class="form-group align-right mt20 block pin-btn-bottom ">
                     <b class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</b>
-                    @if (ViewBag.sale == 1 && ViewBag.ServiceStatus == 1 )
+                    @if (ViewBag.sale == 1 && ViewBag.ServiceStatus == 1 && ViewBag.CN == 1)
                     {
                         <button type="button" class="btn btn-default ml-1" onclick="_orderDetail.SaleUpdateOrderFinishPayment(@ViewBag.OrderId,@ViewBag.ServiceStatus2,@ViewBag.SalerId,@ViewBag.Amount);">Bảo lãnh công nợ</button>
 
@@ -158,7 +158,11 @@
 <div class="mask-content"></div>
 
 @section scripts {
-
+    <script>
+        console.log("sale: "+@ViewBag.sale+" " );
+        console.log("ServiceStatus: "+@ViewBag.ServiceStatus+" "  );
+        console.log("CN: "+@ViewBag.CN+" " );
+    </script>
     <script type="text/javascript" src="~/modules/add_invoice_request.js" asp-append-version="true"></script>
     @*<script type="text/javascript" src="~/modules/invoice_request.js" asp-append-version="true"></script>*@
     <script type="text/javascript" src="~/js/zebra_datepicker.min.js" asp-append-version="true"></script>

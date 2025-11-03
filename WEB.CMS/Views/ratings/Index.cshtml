@@ -1,0 +1,83 @@
+﻿@{ ViewData["Title"] = "Quản lý khách hàng"; }
+@using Entities.Models
+
+<div class="row-main container bg-white rounded p-3">
+    <div class="flex gap10 mb10 align-items-center justify-content-between">
+
+        <div class="right-button flex gap10 ">
+            <div class="form-group mb10 mr-2" style="min-width: 220px;">
+                <div class="datepicker-wrap add-lbl " style="width:100%;">
+                    <div style="width: 100%;">
+                        <input class="form-control date text-left " id="filter_date_daterangepicker_DateFrom" type="text" name="datetimeApprove" placeholder="Từ ngày" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mb10 mr-2" style="min-width: 220px;">
+                <div class="datepicker-wrap add-lbl " style="width:100%;">
+                    <div style="width: 100%;">
+                        <input class="form-control date text-left " id="filter_date_daterangepicker_DateTo" type="text" name="datetimeApprove" placeholder="Đến ngày" />
+                    </div>
+                </div>
+            </div> <div class="form-group mb10 mr-2">
+                <button type="button" class="btn btn-default bg-main" onclick="_ratings.getListData()">
+                    <svg class="icon-svg" style="vertical-align: sub;">
+                        <use xlink:href="/images/icons/icon.svg#search"></use>
+                    </svg>
+                    Tìm kiếm
+                </button>
+            </div>
+
+
+        </div>
+        <div class="blue number-new text-center">
+
+            <a class="blue" href="/ReportDepartment/ReportDepartmentBysalerIndex"> Xem tất cả</a>
+        </div>
+    </div>
+
+    <div class="wrap_bg wrap_bg_no-padding mb20">
+
+        <div id="grid_data_Top">
+
+        </div>
+    </div>
+    <div class="wrap_bg wrap_bg_no-padding mb20 main-user-chua-dat">
+        <h5>Adavigo đang chờ bạn bứt phá!</h5>
+        <div>
+            <div class="wrap_bg wrap_bg_no-padding mb20">
+                <div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding">
+                    <table class="table table-nowrap">
+                        <thead>
+                            <tr>
+                                <th class="text-center">STT</th>
+
+                                <th class="text-center">Họ tên</th>
+                                <th class="text-center">Lợi nhuận</th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody id="grid_data">
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts {
+
+    <script type="text/javascript" src="/modules/ratings.js" asp-append-version="true"></script>
+
+    <script type="text/javascript" src="~/js/zebra_datepicker.min.js"></script>
+    <link href="~/css/scss/_element.scss" media="all" rel="stylesheet" />
+
+}
+
+
+
+

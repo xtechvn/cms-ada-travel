@@ -67,6 +67,7 @@
                     <th>Nội dung</th>
                     <th class="text-right">Số tiền</th>
                     <th>Trạng thái</th>
+                    <th>Số lần in</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -126,6 +127,7 @@
                                     <span class="status-draft">@item.PaymentRequestStatus</span>
                                 }
                             </td>
+                            <td>@item.Count</td>
                             <td>
                                 @*@if (item.Status != (int)(PAYMENT_REQUEST_STATUS.LUU_NHAP) && item.Status != (int)(PAYMENT_REQUEST_STATUS.TU_CHOI) && item.Status != (int)(PAYMENT_REQUEST_STATUS.CHO_TBP_DUYET))
                                     {

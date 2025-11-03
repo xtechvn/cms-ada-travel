@@ -277,13 +277,14 @@ var _SetService = {
         _SetService.Search(objSearch); 
     },
     Search: function (input) {
-        
+        _global_function.AddLoading();
         window.scrollTo(0, 0);
         $.ajax({
             url: "/SetService/Search",
             type: "Post",
             data: input,
             success: function (result) {
+                _global_function.RemoveLoading();
                 $('#imgLoading_Search').hide();
                 $('#grid_data_Search').html(result);
                 $('.checkbox-tb-column').each(function () {

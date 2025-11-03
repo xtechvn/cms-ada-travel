@@ -1,7 +1,7 @@
 ﻿@{
     Layout = null;
     Entities.Models.VinWonderBooking? booking = (Entities.Models.VinWonderBooking?)ViewBag.Booking;
-    List<Entities.Models.VinWonderBookingTicket> list = (List<Entities.Models.VinWonderBookingTicket>)ViewBag.Packages;
+    List<Entities.ViewModels.SetServices.VinWonderBookingTicketViewModel> list = (List<Entities.ViewModels.SetServices.VinWonderBookingTicketViewModel>)ViewBag.Packages;
     List<Entities.Models.VinWonderBookingTicketCustomer> guest = (List<Entities.Models.VinWonderBookingTicketCustomer>)ViewBag.Guests;
     double profit = list != null && list.Count > 0 ? list.Sum(x => (double)x.Profit) : 0;
     double amount = list != null && list.Count > 0 ? list.Sum(x => (double)x.Amount) : 0;

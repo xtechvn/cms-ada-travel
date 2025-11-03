@@ -27,66 +27,38 @@ namespace DAL.StoreProcedure
         /// <returns></returns>
         public DataTable GetDataTable(string procedureName, SqlParameter[] parameters = null)
         {
-            DataTable _dataTable = new DataTable();
+            DataTable dataTable = new DataTable();
+
             try
             {
-                using (SqlConnection oConnection = new SqlConnection(_connection))
+                using (SqlConnection connection = new SqlConnection(_connection))
+                using (SqlCommand command = new SqlCommand(procedureName, connection))
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                 {
-                    SqlCommand oCommand = new SqlCommand(procedureName, oConnection);
-                    oCommand.CommandType = CommandType.StoredProcedure;
+                    command.CommandType = CommandType.StoredProcedure;
 
                     if (parameters != null)
-                    {
-                        oCommand.Parameters.AddRange(parameters);
-                    }
+                        command.Parameters.AddRange(parameters);
 
-                    SqlDataAdapter oAdapter = new SqlDataAdapter();
-                    oAdapter.SelectCommand = oCommand;
-                    oConnection.Open();
-
-                    using (SqlTransaction oTransaction = oConnection.BeginTransaction())
-                    {
-                        try
-                        {
-                            oAdapter.SelectCommand.Transaction = oTransaction;
-                            oAdapter.Fill(_dataTable);
-                            oTransaction.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            string data_log = "";
-                            if(parameters!=null && parameters.Length > 0)
-                            {
-                                data_log = string.Join(",", parameters.Select(x => x.ParameterName)) + ":" + string.Join(",", parameters.Select(x => x.Value == null ? "NULL" : x.Value.ToString())) ;
-                              
-                            }
-                            LogHelper.InsertLogTelegram("SP Name: " + procedureName + "\n" + "Params: " + data_log + "\nGetDataTable - Transaction Rollback - DbWorker: " + ex);
-                            oTransaction.Rollback();
-                            throw;
-                        }
-                        finally
-                        {
-                            if (oConnection.State == ConnectionState.Open)
-                            {
-                                oConnection.Close();
-                            }
-                            oConnection.Dispose();
-                            oAdapter.Dispose();
-                        }
-                    }
+                    connection.Open();
+                    adapter.Fill(dataTable);
                 }
             }
             catch (Exception ex)
             {
-                string data_log = "";
+                string dataLog = "";
+
                 if (parameters != null && parameters.Length > 0)
                 {
-                    data_log = string.Join(",", parameters.Select(x => x.ParameterName)) + ":" + string.Join(",", parameters.Select(x => x.Value == null ? "NULL" : x.Value.ToString()));
-
+                    var names = string.Join(",", parameters.Select(p => p.ParameterName));
+                    var values = string.Join(",", parameters.Select(p => p.Value?.ToString() ?? "NULL"));
+                    dataLog = $"{names}:{values}";
                 }
-                LogHelper.InsertLogTelegram("SP Name: " + procedureName + "\n" + "Params: " + data_log +"Error" + ex);
+
+                LogHelper.InsertLogTelegram($"SP Name: {procedureName}\nParams: {dataLog}\nError: {ex}");
             }
-            return _dataTable;
+
+            return dataTable;
         }
 
         /// <summary>

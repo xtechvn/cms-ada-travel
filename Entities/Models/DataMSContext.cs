@@ -29,7 +29,9 @@ namespace Entities.Models
         public virtual DbSet<AllotmentFund> AllotmentFund { get; set; }
         public virtual DbSet<AllotmentHistory> AllotmentHistory { get; set; }
         public virtual DbSet<AllotmentUse> AllotmentUse { get; set; }
-        public virtual DbSet<Article> Article { get; set; }
+        public virtual DbSet<Article> Article { get; set; }      
+        public virtual DbSet<FanpageArticleImage> FanpageArticleImages { get; set; }
+
         public virtual DbSet<ArticleCategory> ArticleCategory { get; set; }
         public virtual DbSet<ArticleRelated> ArticleRelated { get; set; }
         public virtual DbSet<ArticleTag> ArticleTag { get; set; }
@@ -152,6 +154,9 @@ namespace Entities.Models
         public virtual DbSet<Ward> Ward { get; set; }
         public virtual DbSet<HotelPosition> HotelPosition { get; set; }
         public virtual DbSet<TourPosition> TourPosition { get; set; }
+        public virtual DbSet<Recruitment> Recruitment { get; set; }
+        public virtual DbSet<RecruitmentCategory> RecruitmentCategory { get; set; }
+       
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -371,7 +376,7 @@ namespace Entities.Models
             modelBuilder.Entity<ArticleRelated>(entity =>
             {
                 entity.HasOne(d => d.Article)
-                    .WithMany(p => p.ArticleRelated)
+                    .WithMany(p => p.ArticleRelateds)
                     .HasForeignKey(d => d.ArticleId)
                     .HasConstraintName("FK_ArticleRelated_Article");
             });
@@ -379,12 +384,12 @@ namespace Entities.Models
             modelBuilder.Entity<ArticleTag>(entity =>
             {
                 entity.HasOne(d => d.Article)
-                    .WithMany(p => p.ArticleTag)
+                    .WithMany(p => p.ArticleTags)
                     .HasForeignKey(d => d.ArticleId)
                     .HasConstraintName("FK_ArticleTags_Article");
 
                 entity.HasOne(d => d.Tag)
-                    .WithMany(p => p.ArticleTag)
+                    .WithMany(p => p.ArticleTags)
                     .HasForeignKey(d => d.TagId)
                     .HasConstraintName("FK_ArticleTags_Tags");
             });
@@ -1840,7 +1845,7 @@ namespace Entities.Models
                     .HasMaxLength(100);
 
                 entity.HasOne(d => d.Order)
-                    .WithMany(p => p.Passenger)
+                    .WithMany(p => p.Passengers)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Passenger_Order");
@@ -2275,7 +2280,7 @@ namespace Entities.Models
                 entity.Property(e => e.UpdateLast).HasColumnType("datetime");
 
                 entity.HasOne(d => d.RoomFun)
-                    .WithMany(p => p.RoomPackage)
+                    .WithMany(p => p.RoomPackages)
                     .HasForeignKey(d => d.RoomFunId)
                     .HasConstraintName("FK_RoomPackage_RoomFun1");
             });
@@ -2322,7 +2327,7 @@ namespace Entities.Models
                 entity.Property(e => e.UpdateLast).HasColumnType("datetime");
 
                 entity.HasOne(d => d.RoomPackage)
-                    .WithMany(p => p.ServicePiceRoom)
+                    .WithMany(p => p.ServicePiceRooms)
                     .HasForeignKey(d => d.RoomPackageId)
                     .HasConstraintName("FK_ServicePiceRoom_RoomPackage");
             });
@@ -2967,7 +2972,38 @@ namespace Entities.Models
 
                 entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
             });
+            modelBuilder.Entity<Recruitment>(entity =>
+            {
+                entity.Property(e => e.Body)
+                    .IsRequired()
+                    .HasColumnType("ntext");
 
+                entity.Property(e => e.CreatedOn).HasColumnType("datetime");
+
+                entity.Property(e => e.DownTime).HasColumnType("datetime");
+
+                entity.Property(e => e.Image11).HasMaxLength(350);
+
+                entity.Property(e => e.Image169)
+                    .IsRequired()
+                    .HasMaxLength(350);
+
+                entity.Property(e => e.Image43).HasMaxLength(350);
+
+                entity.Property(e => e.Lead)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PublishDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.UpTime).HasColumnType("datetime");
+            });
 
             OnModelCreatingPartial(modelBuilder);
         }

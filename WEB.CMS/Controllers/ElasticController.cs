@@ -31,7 +31,7 @@ namespace WEB.CMS.Controllers
                     { "store_name", request.StoreName },
                     { "index_es", "adavigo_" + request.StoreName.ToLower() },
                     { "project_type", Convert.ToInt16(ProjectType.ADAVIGO_CMS) },
-                    { "id", request.Id }
+                    { "id", -1 }
                 };
 
                 var _data_push = JsonConvert.SerializeObject(j_param);

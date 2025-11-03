@@ -10,11 +10,9 @@ namespace Entities.Models
         public string RoomId { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
-        public string Avatar { get; set; }
         public int? NumberOfBedRoom { get; set; }
         public string Description { get; set; }
         public string TypeOfRoom { get; set; }
-        public string RoomAvatar { get; set; }
         public string Thumbnails { get; set; }
         public string Extends { get; set; }
         public int? BedRoomType { get; set; }
@@ -28,5 +26,7 @@ namespace Entities.Models
         public DateTime? CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public string RoomAvatar { get; set; }
+        public string Avatar { get; set; }
     }
 }

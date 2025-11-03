@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Aspose.Cells;
+using Entities.Models;
 using Entities.ViewModels.Attachment;
 using Entities.ViewModels.Funding;
 using Entities.ViewModels.HotelBookingCode;
@@ -11,6 +12,7 @@ using Repositories.IRepositories;
 using Repositories.Repositories;
 using SharpCompress.Common;
 using System.Buffers.Text;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
@@ -19,6 +21,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service.ServiceInterface;
 using WEB.CMS.Models;
+using WEB.CMS.Service;
 
 namespace WEB.Adavigo.CMS.Service
 {
@@ -50,10 +53,12 @@ namespace WEB.Adavigo.CMS.Service
         private readonly IBankingAccountRepository _bankingAccountRepository;
         private readonly APIService _APIService;
         private readonly IPaymentVoucherRepository _paymentVoucherRepository;
+        private INoteRepository _noteRepository;
+        private readonly CountYCCMongoService _countYCCMongoService;
         public EmailService(IConfiguration configuration, IHotelBookingCodeRepository hotelBookingCodeRepository, IHotelBookingRepositories hotelBookingRepositories, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository, IHotelBookingRoomRatesRepository hotelBookingRoomRatesRepository,
         IFlyBookingDetailRepository flyBookingDetailRepository, IBagageRepository bagageRepository, IPassengerRepository passengerRepository, IOrderRepository orderRepository, IContactClientRepository contactClientRepository, IHotelBookingRoomRepository hotelBookingRoomRepository, IOtherBookingRepository otherBookingRepository,
              IUserRepository userRepository, IClientRepository clientRepository, ITourRepository tourRepository, IFlightSegmentRepository flightSegmentRepository, IAirlinesRepository airlinesRepository, ISupplierRepository supplierRepository, IPaymentRequestRepository paymentRequestRepository,
-             IVinWonderBookingRepository vinWonderBookingRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, IBankingAccountRepository bankingAccountRepository, IPaymentVoucherRepository paymentVoucherRepository)
+             IVinWonderBookingRepository vinWonderBookingRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, IBankingAccountRepository bankingAccountRepository, IPaymentVoucherRepository paymentVoucherRepository, INoteRepository noteRepository)
         {
 
             _configuration = configuration;
@@ -81,6 +86,8 @@ namespace WEB.Adavigo.CMS.Service
             _contractPayRepository = contractPayRepository;
             _APIService = new APIService(configuration, userRepository);
             _paymentVoucherRepository = paymentVoucherRepository;
+            _noteRepository = noteRepository;
+            _countYCCMongoService = new CountYCCMongoService(configuration);
         }
         public async Task<bool> SendEmail(SendEmailViewModel model, List<AttachfileViewModel> attach_file)
         {
@@ -208,13 +215,33 @@ namespace WEB.Adavigo.CMS.Service
                                         var saler = await _userRepository.GetById((long)item.Flight.SalerId);
 
                                         message.To.Add(saler.Email);
+                                    }
+                                    if (item.Type.Equals("Dịch vụ khác"))
+                                    {
+                                        item.OtherBooking = await _otherBookingRepository.GetDetailOtherBookingById(Convert.ToInt32(item.ServiceId));
+                                        var saler = await _userRepository.GetById((long)item.OtherBooking[0].OperatorId);
 
+                                        message.To.Add(saler.Email);
+                                    }
+                                    if (item.Type.Equals("Vinwonder"))
+                                    {
+                                        item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
+                                        var saler = await _userRepository.GetById((long)item.VinWonderBooking[0].SalerId);
 
+                                        message.To.Add(saler.Email);
                                     }
 
 
                                 }
-                            message.To.Add(model.Email);
+                            if (model.Email != null && model.Email.Trim() != "")
+                            {
+                                var Email_split = model.Email.Split(",");
+                                foreach (var email in Email_split)
+                                {
+                                    message.CC.Add(email);
+                                }
+                            }
+                            //message.To.Add(model.Email);
 
                             message.To.Add(Email_KIEMSOAT);
                             message.To.Add(Email_KETOAN);
@@ -505,31 +532,33 @@ namespace WEB.Adavigo.CMS.Service
 
                                     }
                                 if (extra_package != null && extra_package.Count > 0)
-                                    foreach (var item in extra_package)
+                                    extra_package = extra_package.Where(s => s.SupplierId == SupplierId).ToList();
+                                foreach (var item in extra_package)
+                                {
+                                    double operator_price = 0;
+                                    if (item.UnitPrice == null)
                                     {
-                                        double operator_price = 0;
-                                        if (item.UnitPrice == null)
-                                        {
-                                            AmountDVK += (double)(item.Amount - item.Profit);
-                                        }
-                                        else
-                                        {
-                                            AmountDVK += (double)item.UnitPrice;
-                                        };
-
-                                        if (item.UnitPrice != null) operator_price = Math.Round(((double)item.UnitPrice / (double)item.Nights / (double)item.Quantity), 0);
-                                        if (operator_price <= 0) operator_price = item.OperatorPrice != null ? (double)item.OperatorPrice : 0;
-                                        chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.PackageCode + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.PackageId + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.StartDate == null ? "" : ((DateTime)item.StartDate).ToString("dd/MM/yyyy")) + " - " + (item.EndDate == null ? "" : ((DateTime)item.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operator_price.ToString("N0") + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.Nights != null ? ((double)item.Nights).ToString("N0") : "1") + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.Quantity != null ? ((double)item.Quantity).ToString("N0") : "1") + "</td>" +
-                                                                          "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice == null ? ((double)item.Amount - (double)item.Profit).ToString("N0") : ((double)item.UnitPrice).ToString("N0")) + "</td>" +
-                                                                          "</tr>";
-
-
+                                        AmountDVK += (double)(item.Amount - item.Profit);
                                     }
+                                    else
+                                    {
+                                        AmountDVK += (double)item.UnitPrice;
+                                    }
+                                    ;
+
+                                    if (item.UnitPrice != null) operator_price = Math.Round(((double)item.UnitPrice / (double)item.Nights / (double)item.Quantity), 0);
+                                    if (operator_price <= 0) operator_price = item.OperatorPrice != null ? (double)item.OperatorPrice : 0;
+                                    chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.PackageCode + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.PackageId + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.StartDate == null ? "" : ((DateTime)item.StartDate).ToString("dd/MM/yyyy")) + " - " + (item.EndDate == null ? "" : ((DateTime)item.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operator_price.ToString("N0") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.Nights != null ? ((double)item.Nights).ToString("N0") : "1") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.Quantity != null ? ((double)item.Quantity).ToString("N0") : "1") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice == null ? ((double)item.Amount - (double)item.Profit).ToString("N0") : ((double)item.UnitPrice).ToString("N0")) + "</td>" +
+                                                                      "</tr>";
+
+
+                                }
 
                                 var code = await _hotelBookingCodeRepository.GetListlBookingCodeByHotelBookingId(id, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
                                 string passenger2 = "";
@@ -597,7 +626,7 @@ namespace WEB.Adavigo.CMS.Service
                                     body = body.Replace("{{datatabledv}}", datatabledv);
                                 }
 
-                                if (hotel.SupplierId == (int)SupplierId)
+                                if (datatabledvkhac != "")
                                 {
                                     body = body.Replace("{{datatabledvkhac}}", datatabledvkhac);
                                 }
@@ -741,6 +770,112 @@ namespace WEB.Adavigo.CMS.Service
 
                                 body = body.Replace("{{totalAmount}}", "<input type =\"text\" class=\"currency\" id=\"totalAmount\" value=\"" + (model[0].OthersAmount != null ? (double)model[0].OthersAmount : 0).ToString("N0") + "\" />");
                                 body = body.Replace("{{OrderAmount}}", "<input type =\"text\" class=\"currency\" id=\"OrderAmount\" value=\"" + (model[0].Price != null ? (double)model[0].Price : 0).ToString("N0") + "\" />");
+
+                                body = body.Replace("{{totalToday}}", "<input type=\"text\" id=\"totalToday\" value=\"" + 1 + "\" />");
+
+
+                                body = body.Replace("{{Note}}", "<textarea id=\"order_note\" style=\"height: 100px !important;\">" + order_note + "</textarea>");
+                                body = body.Replace("{{payment_notification}}", "<textarea id=\"payment_notification\" style=\"height: 200px !important;\">" + payment_notification + "</textarea>");
+                                return body;
+
+                            }
+                            break;
+                        case (int)ServicesType.VinWonder:
+                            {
+                                string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                                var template = workingDirectory + @"\EmailTemplate\OtherSupplierTemplate.html";
+
+                                string body = File.ReadAllText(template);
+                                var model = _vinWonderBookingRepository.GetVinWonderBookingById(id);
+                                var extra_package = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(Convert.ToInt32(id));
+
+                                if (model == null) return null;
+                                double TotalUnitPrice = 0;
+                                var order = await _orderRepository.GetOrderByID((long)model.OrderId);
+                                var Dh = await _userRepository.GetById((long)model.SalerId);
+                                if (extra_package != null && extra_package.Count() > 0)
+                                {
+                                    extra_package = extra_package.Where(s => s.SupplierId == SupplierId).ToList();
+                                    foreach (var item in extra_package)
+                                    {
+
+                                        chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Name + "</td>" +
+
+                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice != null ? ((double)item.UnitPrice / (double)item.Quantity) : 0).ToString("N0") + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Quantity + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item.UnitPrice).ToString("N0") + "</td>"
+                                                                    + "</tr>";
+                                    }
+                                    TotalUnitPrice = (double)extra_package.Sum(s => s.UnitPrice);
+                                }
+
+
+                                if (chitietdichvu != string.Empty)
+                                {
+                                    datatabledv = "<table style='border-collapse: collapse;width:100%;'>" +
+                                                                "<thead>" +
+                                                                    "<tr>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Loại dịch vụ</th>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá nhập</th>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số lượng</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                    "</tr> " +
+                                                                "</thead>" +
+                                                                "<tbody>" +
+                                                                    chitietdichvu +
+                                                               "</tbody>" +
+                                                           "</table>";
+                                }
+                                else
+                                {
+                                    datatabledv = "";
+                                }
+                                if (datatabledv == "")
+                                {
+
+                                    body = body.Replace("{{styledv}}", "style=\"display:none;\"");
+                                    body = body.Replace("{{datatabledv}}", datatabledv);
+                                }
+                                else
+                                {
+                                    body = body.Replace("{{datatabledv}}", datatabledv);
+                                }
+                                if (extra_package != null && extra_package.Count() > 0)
+                                {
+                                    var Supplier = _supplierRepository.GetDetailById((int)extra_package[0].SupplierId);
+                                    body = body.Replace("{{HotelName}}", "<input type =\"text\" id=\"TileEmail\"style=\"text-align: center;font-weight: bold;\" value=\"PHIẾU XÁC NHẬN DỊCH VỤ: " + Supplier.FullName + "\"/>");
+
+                                }
+                                else
+                                {
+                                    body = body.Replace("{{HotelName}}", "<input type =\"text\" id=\"TileEmail\"style=\"text-align: center;font-weight: bold;\" value=\"PHIẾU XÁC NHẬN DỊCH VỤ: \"/>");
+
+                                }
+                                body = body.Replace("{{styledvkhac}}", "style =\"display:none;\"");
+                                body = body.Replace("{{datatable}}", "<textarea id=\"datatable\" style=\"height: 200px !important;\">" + model.Note + "</textarea>");
+                                body = body.Replace("{{datatableCode}}", "<textarea id=\"datatableCode\" style=\"height: 200px !important;\">" + model.ServiceCode + "</textarea>");
+                                body = body.Replace("{{userName}}", "<input type =\"text\" id=\"user_Name\" value=\"\" />");
+
+                                body = body.Replace("{{userPhone}}", "<input type =\"text\" id=\"user_Phone\" value=\"\" />");
+                                body = body.Replace("{{userEmail}}", "<input type =\"text\" id=\"user_Email\" value=\"\" />");
+                                body = body.Replace("{{orderNo}}", "<input type =\"text\" id=\"orderNo\" value=\"" + order.OrderNo + "\" />");
+                                body = body.Replace("{{ArrivalDate}}", "<input type =\"text\"style=\"min-width: 100px;\" id=\"go_startdate\" value=\"" + ((DateTime)order.StartDate).ToString("dd/MM/yyyy") + "\" />");
+                                body = body.Replace("{{DepartureDate}}", "<input type =\"text\" id=\"go_enddate\" value=\"" + ((DateTime)order.EndDate).ToString("dd/MM/yyyy") + "\" />");
+
+                                body = body.Replace("{{salerName}}", "<input type =\"text\" id=\"saler_Name\" value=\"" + Dh.FullName + "\" />");
+                                body = body.Replace("{{salerPhone}}", "<input type =\"text\" id=\"saler_Phone\" value=\"" + Dh.Phone + "\" />");
+                                body = body.Replace("{{salerEmail}}", "<input type =\"text\" id=\"saler_Email\" value=\"" + Dh.Email + "\" />");
+
+                                //body = body.Replace("{{NumberOfRoom}}", "<input type =\"text\" id=\"NumberOfRoom\" value=\"" + NumberOfRoom.ToString() + "\" />");
+                                //body = body.Replace("{{numberOfAdult}}", "<input style=\"width:30% !important;\" type =\"text\" id=\"go_numberOfAdult\" value=\"" + NumberOfAdult.ToString() + "\" />");
+                                //body = body.Replace("{{numberOfChild}}", "<input style=\"width:30% !important;\" type =\"text\" id=\"go_numberOfChild\" value=\"" + NumberOfChild.ToString() + "\" />");
+                                //body = body.Replace("{{numberOfInfant}}", "<input style=\"width:30% !important;\" type =\"text\" id=\"go_numberOfInfant\" value=\"" + NumberOfInfant.ToString() + "\" />");
+
+                                body = body.Replace("{{totalAmount}}", "<input type =\"text\" class=\"currency\" id=\"totalAmount\" value=\"" + (model.OthersAmount != null ? (double)model.OthersAmount : 0).ToString("N0") + "\" />");
+                                body = body.Replace("{{OrderAmount}}", "<input type =\"text\" class=\"currency\" id=\"OrderAmount\" value=\"" + TotalUnitPrice.ToString("N0") + "\" />");
 
                                 body = body.Replace("{{totalToday}}", "<input type=\"text\" id=\"totalToday\" value=\"" + 1 + "\" />");
 
@@ -920,6 +1055,8 @@ namespace WEB.Adavigo.CMS.Service
 
                                     }
                                 if (extra_package != null && extra_package.Count > 0)
+                                {
+                                    extra_package = extra_package.Where(s => s.SupplierId == SupplierId).ToList();
                                     foreach (var item in extra_package)
                                     {
                                         double operator_price = 0;
@@ -936,6 +1073,8 @@ namespace WEB.Adavigo.CMS.Service
 
 
                                     }
+                                }
+
 
                                 datatabledv = "<table style='border-collapse: collapse;width:100%;'>" +
                                                               "<thead>" +
@@ -991,7 +1130,7 @@ namespace WEB.Adavigo.CMS.Service
                                     body = body.Replace("{{datatabledv}}", datatabledv);
                                 }
                                 var hotel = await _hotelBookingRepositories.GetHotelBookingByID(modelEmail.ServiceId);
-                                if (hotel.SupplierId == (int)modelEmail.SupplierId)
+                                if (datatabledvkhac != "")
                                 {
                                     body = body.Replace("{{datatabledvkhac}}", datatabledvkhac);
                                 }
@@ -1056,6 +1195,102 @@ namespace WEB.Adavigo.CMS.Service
                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.BasePrice != null ? (double)item.BasePrice : 0).ToString("N0") + "</td>" +
                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Quantity + "</td>" +
                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Amount.ToString("N0") + "</td>"
+                                                                    + "</tr>";
+                                    }
+
+                                }
+
+
+                                if (chitietdichvu != string.Empty)
+                                {
+                                    datatabledv = "<table style='border-collapse: collapse;width:100%;'>" +
+                                                                "<thead>" +
+                                                                    "<tr>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Loại dịch vụ</th>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá nhập</th>" +
+
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số lượng</th>" +
+                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                    "</tr> " +
+                                                                "</thead>" +
+                                                                "<tbody>" +
+                                                                    chitietdichvu +
+                                                               "</tbody>" +
+                                                           "</table>";
+                                }
+                                else
+                                {
+                                    datatabledv = "";
+                                }
+                                if (datatabledv == "")
+                                {
+
+                                    body = body.Replace("{{styledv}}", "style=\"display:none;\"");
+                                    body = body.Replace("{{datatabledv}}", datatabledv);
+                                }
+                                else
+                                {
+                                    body = body.Replace("{{datatabledv}}", datatabledv);
+                                }
+
+
+
+                                body = body.Replace("{{datatable}}", modelEmail.datatable);
+                                body = body.Replace("{{userName}}", modelEmail.user_Name);
+                                body = body.Replace("{{HotelName}}", modelEmail.TileEmail);
+                                body = body.Replace("{{userPhone}}", modelEmail.user_Phone);
+                                body = body.Replace("{{userEmail}}", modelEmail.user_Email);
+                                body = body.Replace("{{orderNo}}", modelEmail.OrderNo);
+                                body = body.Replace("{{ArrivalDate}}", modelEmail.go_startdate);
+                                body = body.Replace("{{DepartureDate}}", modelEmail.go_enddate);
+                                body = body.Replace("{{NumberOfRoom}}", modelEmail.NumberOfRoom);
+                                body = body.Replace("{{numberOfAdult}}", modelEmail.go_numberOfAdult);
+                                body = body.Replace("{{numberOfChild}}", modelEmail.go_numberOfChild);
+                                body = body.Replace("{{numberOfInfant}}", modelEmail.go_numberOfInfant);
+                                body = body.Replace("{{totalAmount}}", modelEmail.totalAmount.ToString("N0"));
+                                body = body.Replace("{{OrderAmount}}", modelEmail.OrderAmount.ToString("N0"));
+
+                                body = body.Replace("{{salerName}}", modelEmail.saler_Name);
+                                body = body.Replace("{{salerPhone}}", modelEmail.saler_Phone);
+                                body = body.Replace("{{salerEmail}}", modelEmail.saler_Email);
+                                body = body.Replace("{{totalToday}}", modelEmail.totalToday);
+
+                                body = body.Replace("{{Note}}", modelEmail.OrderNote);
+                                body = body.Replace("{{payment_notification}}", modelEmail.PaymentNotification);
+
+                                return body;
+                            }
+                            break;
+                        case (int)ServicesType.VinWonder:
+                            {
+                                string datatabledv = String.Empty;
+                                string datatabledvkhac = String.Empty;
+                                string chitietdichvu = String.Empty;
+                                var template = workingDirectory + @"\EmailTemplate\OtherSupplierTemplate.html";
+
+                                string body = File.ReadAllText(template);
+
+
+                                var model = _vinWonderBookingRepository.GetVinWonderBookingById(modelEmail.ServiceId);
+                                var extra_package = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(modelEmail.ServiceId);
+
+                                if (model == null) return null;
+
+                                var order = await _orderRepository.GetOrderByID((long)model.OrderId);
+                                var Dh = await _userRepository.GetById((long)model.SalerId);
+                                if (extra_package != null && extra_package.Count() > 0)
+                                {
+                                    extra_package = extra_package.Where(s => s.SupplierId == SupplierId).ToList();
+                                    foreach (var item in extra_package)
+                                    {
+
+                                        chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Name + "</td>" +
+
+                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item.UnitPrice != null ? ((double)item.UnitPrice / (double)item.Quantity) : 0).ToString("N0") + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item.Quantity + "</td>" +
+                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item.UnitPrice).ToString("N0") + "</td>"
                                                                     + "</tr>";
                                     }
 
@@ -1890,6 +2125,13 @@ namespace WEB.Adavigo.CMS.Service
                                     if (note != null)
                                         item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
                                 }
+                                if (item.Type.Equals("Vinwonder"))
+                                {
+                                    item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
+                                    var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.Other);
+                                    if (note != null)
+                                        item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
+                                }
                             }
                         if (data != null && data.Count > 1)
                         {
@@ -2017,12 +2259,267 @@ namespace WEB.Adavigo.CMS.Service
                             }
                             if (item.Type.Equals("Khách sạn"))
                             {
+                                //if (item.Hotel != null)
+                                //{
+                                //    string note = string.Empty;
+                                //    var hotedetail = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.ServiceId));
+
+
+                                //    note += "<tr>" +
+                                //        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày nhận phòng:</td>" +
+                                //        "<td style='border: 1px solid #999; padding: 5px;' ><input id='hotelArrivalDate'type='text' value=" + item.Hotel[0].ArrivalDate.ToString("dd/MM/yyyy") + " ></td> " +
+                                //       "<td style= 'border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày trả phòng:</td>" +
+                                //       " <td style= 'border: 1px solid #999; padding: 5px;'><input id='hotelDepartureDate' type='text' value=" + item.Hotel[0].DepartureDate.ToString("dd/MM/yyyy") + "></td>" +
+                                //    "</tr>" +
+                                //    "<tr>" +
+                                //        "<td style= 'border: 1px solid #999; padding: 5px; font-weight: bold;' > Số lượng phòng:</td>" +
+                                //       " <td style= 'border: 1px solid #999; padding: 5px;' ><input id='hotelNumberOfRoom'type='text'value=" + item.Hotel[0].TotalRooms + "></td>" +
+                                //        "<td rowspan='2' style= 'border: 1px solid #999; padding: 5px; font-weight: bold;' > Số lượng khách (NL/TE/EB):</td>" +
+                                //        "<td rowspan='2' style= 'border: 1px solid #999; padding: 5px;' ><input id='hotelNumberOfAdult'type='text'style='width:30%;' value=" + item.Hotel[0].NumberOfAdult + ">/<input id='hotelNumberOfChild' type='text'style='width:30%;' value=" + item.Hotel[0].NumberOfChild + ">/<input id='hotelNumberOfInfant' type='text'style='width:30%;' value=" + item.Hotel[0].NumberOfInfant + "></td>" +
+                                //    "</tr>" +
+                                //    "<tr>" +
+                                //        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Số đêm</td>" +
+                                //        "<td style='border: 1px solid #999; padding: 5px;'><input id='hotelTotalDays'type='text'value=" + item.Hotel[0].TotalDays + "></td>" +
+                                //    "</tr>" +
+
+                                //    "<tr>" +
+                                //        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
+                                //        "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' ><input id='hotelAmount' class='currency'type='text' value=" + item.Hotel[0].TotalAmount.ToString("N0") + "></td>" +
+                                //   "</tr>";
+
+
+
+                                //    Packagesdetail = "<table class='Hotel-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'><tr>" +
+                                //        "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > <input id='HotelName'style = 'font-weight: bold;text-align: center;' type='text'value=\"Dịch vụ khách sạn : " + hotedetail[0].HotelName + "\"></ td ></tr> " +
+                                //                    "" + note + "</table>";
+
+                                //}
                                 if (item.Hotel != null)
                                 {
                                     string note = string.Empty;
+                                    string passenger = String.Empty;
+                                    string datatabledv = String.Empty;
+                                    string datatabledvkhac = String.Empty;
+                                    string chitietdichvu = String.Empty;
+                                    string chitietdichvukhac = String.Empty;
+
+
+                                    //var model = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.ServiceId));
+                                    var hotel = await _hotelBookingRepositories.GetHotelBookingByID(Convert.ToInt32(item.ServiceId));
+                                    var datahotelbookingroomextrapackage = await _hotelBookingRoomExtraPackageRepository.Gethotelbookingroomextrapackagebyhotelbookingid(Convert.ToInt32(item.ServiceId));
+
+
+                                    foreach (var item2 in datahotelbookingroomextrapackage)
+                                    {
+                                        passenger += "" + item2.PackageCode + "&#10 ";
+
+                                    }
+                                    var rooms = await _hotelBookingRepositories.GetHotelBookingOptionalListByHotelBookingId(Convert.ToInt32(item.ServiceId));
+                                    var packages = await _hotelBookingRoomRepository.GetHotelBookingRoomRatesOptionalByBookingId(Convert.ToInt32(item.ServiceId));
+                                    var extra_package = await _hotelBookingRoomExtraPackageRepository.GetByBookingID(Convert.ToInt32(item.ServiceId));
+                                    List<HotelBookingRoomRatesOptionalViewModel> package_daterange = new List<HotelBookingRoomRatesOptionalViewModel>();
+
+                                    var NumberOfAdult = rooms.Sum(x => x.NumberOfAdult);
+                                    var NumberOfChild = rooms.Sum(x => x.NumberOfChild);
+                                    var NumberOfInfant = rooms.Sum(x => x.NumberOfInfant);
+                                    var NumberOfRoom = rooms.Sum(x => x.NumberOfRooms);
+                                    var sumtoday = 0;
+                                    var Amount = rooms.Sum(x => x.TotalAmount);
+                                    double AmountDVK = 0;
+                                    double number_of_people = (double)rooms.Sum(x => x.NumberOfAdult) + (double)rooms.Sum(x => x.NumberOfChild) + (double)rooms.Sum(x => x.NumberOfInfant);
+                                    if (packages != null && packages.Count > 0)
+                                    {
+                                        foreach (var p in packages)
+                                        {
+                                            if (p.StartDate == null && p.EndDate == null)
+                                            {
+                                                if (packages.Count < 1 || !package_daterange.Any(x => x.HotelBookingRoomId == p.HotelBookingRoomId && x.RatePlanId == p.RatePlanId))
+                                                {
+                                                    var add_value = p;
+                                                    add_value.StartDate = add_value.StayDate;
+                                                    add_value.EndDate = add_value.StayDate.AddDays(1);
+                                                    p.StayDate = (DateTime)add_value.StartDate;
+                                                    p.SalePrice = p.TotalAmount;
+                                                    p.OperatorPrice = p.Price;
+                                                    package_daterange.Add(add_value);
+                                                }
+                                                else
+                                                {
+                                                    var p_d = package_daterange.FirstOrDefault(x => x.HotelBookingRoomId == p.HotelBookingRoomId && x.RatePlanId == p.RatePlanId && ((DateTime)x.EndDate).Date == p.StayDate.Date);
+                                                    if (p_d != null)
+                                                    {
+
+                                                        if (p_d.StartDate == null || p_d.StartDate > p.StayDate)
+                                                            p_d.StartDate = p.StayDate;
+                                                        p_d.EndDate = p.StayDate.AddDays(1);
+                                                    }
+                                                    else
+                                                    {
+                                                        var add_value = p;
+                                                        add_value.StartDate = add_value.StayDate;
+                                                        add_value.EndDate = add_value.StayDate.AddDays(1);
+                                                        p.StayDate = (DateTime)add_value.StartDate;
+                                                        p.SalePrice = p.TotalAmount;
+                                                        p.OperatorPrice = p.Price;
+                                                        package_daterange.Add(add_value);
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                package_daterange.Add(p);
+                                            }
+                                        }
+                                    }
+                                    if (rooms != null && rooms.Count > 0)
+                                        foreach (var item2 in rooms)
+                                        {
+                                            string RatePlanCode = String.Empty;
+                                            string date_time = String.Empty;
+                                            double Nights = 0;
+                                            string TotalAmount = String.Empty;
+                                            string operatorprice = String.Empty;
+                                            string Goi = String.Empty;
+                                            string TgSD = String.Empty;
+                                            string GiaN = String.Empty;
+                                            string SDem = String.Empty;
+                                            string SP = String.Empty;
+                                            string TTien = String.Empty;
+                                            double NumberOfRooms = 0;
+                                            var package_by_room_id = packages.Where(x => x.HotelBookingRoomOptionalId == item2.Id);
+                                            if (package_by_room_id != null && package_by_room_id.Count() > 0)
+                                            {
+                                                sumtoday += (int)package_by_room_id.Sum(s => s.Nights);
+                                                var row = 1;
+                                                foreach (var p in package_by_room_id)
+                                                {
+                                                    row++;
+                                                    var style_row = "";
+                                                    if (row > 2)
+                                                    {
+                                                        style_row = "display: none;";
+                                                    }
+                                                    double operator_price = 0;
+                                                    if (p.Price != null) operator_price = Math.Round(((double)p.SaleTotalAmount / (double)p.Nights / (double)item2.NumberOfRooms), 0);
+                                                    if (operator_price <= 0) operator_price = p.SalePrice != null ? (double)p.SalePrice : 0;
+
+                                                    RatePlanCode = p.RatePlanCode;
+                                                    date_time = (p.StartDate == null ? "" : ((DateTime)p.StartDate).ToString("dd/MM/yyyy")) + " - " + (p.EndDate == null ? "" : ((DateTime)p.EndDate).ToString("dd/MM/yyyy"));
+                                                    operatorprice = operator_price.ToString("N0");
+                                                    Nights = (double)p.Nights;
+                                                    TotalAmount = ((double)p.SaleTotalAmount).ToString("N0");
+                                                    NumberOfRooms = item2.NumberOfRooms == null ? 1 : (double)item2.NumberOfRooms;
+                                                    //Goi += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</div>";
+                                                    //TgSD += "<div style='border: 1px solid #999; padding:2px; text-align: center;'>" + date_time + "</div>";
+                                                    //GiaN += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</div>";
+                                                    //SDem += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</div>";
+                                                    //SP = "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</div>";
+                                                    //TTien += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</div>";
+
+                                                    Goi = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</td>";
+                                                    TgSD = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + date_time + "</td>";
+                                                    GiaN = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</td>";
+                                                    SDem = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</td>";
+                                                    SP = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</td>";
+                                                    TTien = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</td>";
+
+                                                    chitietdichvu += "<tr><td rowspan='" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style='border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + item2.RoomTypeName + "</td>" +
+                                                                      Goi +
+                                                                      TgSD +
+                                                                      GiaN +
+                                                                      SDem +
+                                                                      "<td rowspan = '" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style = 'border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + NumberOfRooms + " </td> " +
+                                                                      TTien
+                                                                       + "</tr>";
+                                                }
+
+                                            }
+                                            //chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.RoomTypeName + "</td>" +
+                                            //                            "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Goi + "</td>" +
+                                            //                              "<td style='border: 1px solid #999; padding:2px; text-align: center;'>" + TgSD + "</td>" +
+                                            //                             "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + GiaN + "</td>" +
+                                            //                             "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SDem + "</td>" +
+                                            //                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SP + "</td>" +
+                                            //                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TTien + "</td>"
+                                            //                              + "</tr>";
+
+                                        }
+                                    if (extra_package != null && extra_package.Count > 0)
+                                        foreach (var item2 in extra_package)
+                                        {
+                                            double operator_price = 0;
+                                            if (item2.UnitPrice == null)
+                                            {
+                                                AmountDVK += (double)(item2.Amount - item2.Profit);
+                                            }
+                                            else
+                                            {
+                                                AmountDVK += (double)item2.UnitPrice;
+                                            }
+                                            ;
+
+                                            if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.Amount / (double)item2.Nights / (double)item2.Quantity), 0);
+                                            if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
+                                            chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageCode + "</td>" +
+                                                                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageId + "</td>" +
+                                                                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.StartDate == null ? "" : ((DateTime)item2.StartDate).ToString("dd/MM/yyyy")) + " - " + (item2.EndDate == null ? "" : ((DateTime)item2.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
+                                                                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operator_price.ToString("N0") + "</td>" +
+                                                                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.Nights != null ? ((double)item2.Nights).ToString("N0") : "1") + "</td>" +
+                                                                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.Quantity != null ? ((double)item2.Quantity).ToString("N0") : "1") + "</td>" +
+                                                                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item2.Amount).ToString("N0") + "</td>" +
+                                                                              "</tr>";
+
+
+                                        }
+
+
+                                    if (chitietdichvu != string.Empty)
+                                    {
+                                        datatabledv = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'><table style='border-collapse: collapse;width:100%;'>" +
+                                                                    "<thead>" +
+                                                                        "<tr style='background: #D6E1EB;text-align: center;color: #00264D;height: 35px;'>" +
+                                                                            "<th style='padding:2px 5px;font-weight: bold;'>Hạng phòng</th>" +
+                                                                            "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
+                                                                            "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
+                                                                            "<th style='padding:2px 5px;font-weight: bold;'>Giá bán</th>" +
+                                                                            "<th style='padding:2px 5px;font-weight: bold;'>Số đêm</th>" +
+                                                                            "<th style='padding:2px 5px;font-weight: bold;'>Số phòng</th>" +
+                                                                            "<th style='padding:2px 5px;font-weight: bold;'>Thành tiền</th>" +
+                                                                        "</tr> " +
+                                                                    "</thead>" +
+                                                                    "<tbody>" +
+                                                                        chitietdichvu +
+                                                                   "</tbody>" +
+                                                               "</table></td></tr>";
+                                    }
+                                    else
+                                    {
+                                        datatabledv = "";
+                                    }
+                                    if (extra_package != null && extra_package.Count > 0)
+                                    {
+                                        datatabledvkhac = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'> <table style='border-collapse: collapse;width:100%;'>" +
+                                                                "<thead>" +
+                                                                    "<tr style='background: #D6E1EB;text-align: center;color: #00264D;height: 35px;'>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Tên dịch vụ</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Giá bán</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Số ngày	</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Số lượng</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Thành tiền</th>" +
+                                                                    "</tr> " +
+                                                                "</thead>" +
+                                                                "<tbody>" +
+                                                                    chitietdichvukhac +
+                                                               "</tbody>" +
+                                                           "</table></td></tr>";
+                                    }
+                                    else
+                                    {
+                                        datatabledvkhac = "";
+                                    }
                                     var hotedetail = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.ServiceId));
-
-
                                     note += "<tr>" +
                                         "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày nhận phòng:</td>" +
                                         "<td style='border: 1px solid #999; padding: 5px;' ><input id='hotelArrivalDate'type='text' value=" + item.Hotel[0].ArrivalDate.ToString("dd/MM/yyyy") + " ></td> " +
@@ -2038,18 +2535,21 @@ namespace WEB.Adavigo.CMS.Service
                                     "<tr>" +
                                         "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Số đêm</td>" +
                                         "<td style='border: 1px solid #999; padding: 5px;'><input id='hotelTotalDays'type='text'value=" + item.Hotel[0].TotalDays + "></td>" +
-                                    "</tr>" +
-
+                                    "</tr>"
+                                    + datatabledv
+                                    + datatabledvkhac +
                                     "<tr>" +
                                         "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
                                         "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' ><input id='hotelAmount' class='currency'type='text' value=" + item.Hotel[0].TotalAmount.ToString("N0") + "></td>" +
                                    "</tr>";
 
+                                    Packagesdetail = "<table class='Hotel-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'>" +
+                                        "<tr><td colspan='4' style = 'padding: 5px; font-weight: bold;text-align: center;background:#a8c7fa;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "" +
+                                        "<input id='HotelName'type='text'style='display:none' value='Dịch vụ khách sạn " + hotedetail[0].HotelName + "'>" +
+                                        "<input id='HotelId'type='text'style='display:none' value=" + item.ServiceId + "></td></tr> " +
 
-
-                                    Packagesdetail = "<table class='Hotel-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'><tr>" +
-                                        "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > <input id='HotelName'style = 'font-weight: bold;text-align: center;' type='text'value=\"Dịch vụ khách sạn : " + hotedetail[0].HotelName + "\"></ td ></tr> " +
-                                                    "" + note + "</table>";
+                                                    "" + note + "" +
+                                                          "</table>";
 
                                 }
                             }
@@ -2217,6 +2717,30 @@ namespace WEB.Adavigo.CMS.Service
 
                                 }
                             }
+                            if (item.Type.Equals("Vinwonder"))
+                            {
+                                if (item.VinWonderBooking != null)
+                                {
+                                    string note = string.Empty;
+
+                                    note += "<tr>" +
+                                        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
+                                        "<td style='border: 1px solid #999; padding: 5px;' ><input id='VinWonderStartDate'type='text' value=" + item.StartDate.ToString("dd/MM/yyyy") + " ></td> " +
+
+                                    "</tr>" +
+                                    "<tr>" +
+                                        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +
+                                        "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' ><input id='VinWonderAmount' class='currency'type='text' value=" + ((double)item.VinWonderBooking[0].Amount).ToString("N0") + "></td>" +
+                                   "</tr>";
+
+
+
+                                    Packagesdetail = "<table class='Vinwonder-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'><tr>" +
+                                        "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > <input id='VinWonderName' disabled style=\"font-weight: bold; text-align: center;background:#a8c7fa; \"type='text'value=\"Dịch vụ : " + item.VinWonderBooking[0].SiteName + "\"</ td ></tr> " +
+                                                    "" + note + "</table>";
+
+                                }
+                            }
                             Packagesdata += Packagesdetail;
                         }
                     }
@@ -2270,10 +2794,10 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{NDChuyenKhoan}}", "<input type=\"text\" id=\"NDChuyenKhoan\" value=\"" + order.OrderNo + " CHUYEN KHOAN\" />");
 
                     var data_VietQRBankList = await _APIService.GetVietQRBankList();
-                    var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
-                    string bank_code = "Techcombank";
+                    var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("VPbank".Trim().ToLower())) : null;
+                    string bank_code = "VPbank";
                     if (selected_bank != null) bank_code = selected_bank.bin;
-                    var result = await _APIService.GetVietQRCode("19131835226016", bank_code, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var result = await _APIService.GetVietQRCode("9698888", bank_code, order.OrderNo, Convert.ToDouble(order.Amount));
                     var jsonData = JObject.Parse(result);
                     var status = int.Parse(jsonData["code"].ToString());
                     if (status == (int)ResponseType.SUCCESS)
@@ -2281,10 +2805,10 @@ namespace WEB.Adavigo.CMS.Service
                         body = body.Replace("{{LinkQRTCB}}", jsonData["data"]["qrDataURL"].ToString());
                     }
 
-                    var selected_bank2 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("HDBANK".Trim().ToLower())) : null;
-                    string bank_code2 = "HDBANK";
+                    var selected_bank2 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
+                    string bank_code2 = "Techcombank";
                     if (selected_bank2 != null) bank_code2 = selected_bank2.bin;
-                    var result2 = await _APIService.GetVietQRCode("371704070000023", bank_code2, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var result2 = await _APIService.GetVietQRCode("19131835226016", bank_code2, order.OrderNo, Convert.ToDouble(order.Amount));
                     var jsonData2 = JObject.Parse(result2);
                     var status2 = int.Parse(jsonData2["code"].ToString());
                     if (status2 == (int)ResponseType.SUCCESS)
@@ -2301,6 +2825,16 @@ namespace WEB.Adavigo.CMS.Service
                     if (status3 == (int)ResponseType.SUCCESS)
                     {
                         body = body.Replace("{{LinkQRVTB}}", jsonData3["data"]["qrDataURL"].ToString());
+                    }
+                    var selected_bank4 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("MSB ".Trim().ToLower())) : null;
+                    string bank_code4 = "MSB";
+                    if (selected_bank4 != null) bank_code4 = selected_bank4.bin;
+                    var result4 = await _APIService.GetVietQRCode("3066010006688", bank_code4, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var jsonData4 = JObject.Parse(result4);
+                    var status4 = int.Parse(jsonData4["code"].ToString());
+                    if (status4 == (int)ResponseType.SUCCESS)
+                    {
+                        body = body.Replace("{{LinkQRMSB}}", jsonData4["data"]["qrDataURL"].ToString());
                     }
 
 
@@ -2393,6 +2927,216 @@ namespace WEB.Adavigo.CMS.Service
                         foreach (var item in model.HotelEmail)
                         {
                             string note = string.Empty;
+                            string passenger = String.Empty;
+                            string datatabledv = String.Empty;
+                            string datatabledvkhac = String.Empty;
+                            string chitietdichvu = String.Empty;
+                            string chitietdichvukhac = String.Empty;
+
+
+                            //var model = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.ServiceId));
+                            var hotel = await _hotelBookingRepositories.GetHotelBookingByID(Convert.ToInt32(item.HotelId));
+                            var datahotelbookingroomextrapackage = await _hotelBookingRoomExtraPackageRepository.Gethotelbookingroomextrapackagebyhotelbookingid(Convert.ToInt32(item.HotelId));
+
+
+                            foreach (var item2 in datahotelbookingroomextrapackage)
+                            {
+                                passenger += "" + item2.PackageCode + "&#10 ";
+
+                            }
+                            var rooms = await _hotelBookingRepositories.GetHotelBookingOptionalListByHotelBookingId(Convert.ToInt32(item.HotelId));
+                            var packages = await _hotelBookingRoomRepository.GetHotelBookingRoomRatesOptionalByBookingId(Convert.ToInt32(item.HotelId));
+                            var extra_package = await _hotelBookingRoomExtraPackageRepository.GetByBookingID(Convert.ToInt32(item.HotelId));
+                            List<HotelBookingRoomRatesOptionalViewModel> package_daterange = new List<HotelBookingRoomRatesOptionalViewModel>();
+
+                            var NumberOfAdult = rooms.Sum(x => x.NumberOfAdult);
+                            var NumberOfChild = rooms.Sum(x => x.NumberOfChild);
+                            var NumberOfInfant = rooms.Sum(x => x.NumberOfInfant);
+                            var NumberOfRoom = rooms.Sum(x => x.NumberOfRooms);
+                            var sumtoday = 0;
+                            var Amount = rooms.Sum(x => x.TotalAmount);
+                            double AmountDVK = 0;
+                            double number_of_people = (double)rooms.Sum(x => x.NumberOfAdult) + (double)rooms.Sum(x => x.NumberOfChild) + (double)rooms.Sum(x => x.NumberOfInfant);
+                            if (packages != null && packages.Count > 0)
+                            {
+                                foreach (var p in packages)
+                                {
+                                    if (p.StartDate == null && p.EndDate == null)
+                                    {
+                                        if (packages.Count < 1 || !package_daterange.Any(x => x.HotelBookingRoomId == p.HotelBookingRoomId && x.RatePlanId == p.RatePlanId))
+                                        {
+                                            var add_value = p;
+                                            add_value.StartDate = add_value.StayDate;
+                                            add_value.EndDate = add_value.StayDate.AddDays(1);
+                                            p.StayDate = (DateTime)add_value.StartDate;
+                                            p.SalePrice = p.TotalAmount;
+                                            p.OperatorPrice = p.Price;
+                                            package_daterange.Add(add_value);
+                                        }
+                                        else
+                                        {
+                                            var p_d = package_daterange.FirstOrDefault(x => x.HotelBookingRoomId == p.HotelBookingRoomId && x.RatePlanId == p.RatePlanId && ((DateTime)x.EndDate).Date == p.StayDate.Date);
+                                            if (p_d != null)
+                                            {
+
+                                                if (p_d.StartDate == null || p_d.StartDate > p.StayDate)
+                                                    p_d.StartDate = p.StayDate;
+                                                p_d.EndDate = p.StayDate.AddDays(1);
+                                            }
+                                            else
+                                            {
+                                                var add_value = p;
+                                                add_value.StartDate = add_value.StayDate;
+                                                add_value.EndDate = add_value.StayDate.AddDays(1);
+                                                p.StayDate = (DateTime)add_value.StartDate;
+                                                p.SalePrice = p.TotalAmount;
+                                                p.OperatorPrice = p.Price;
+                                                package_daterange.Add(add_value);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        package_daterange.Add(p);
+                                    }
+                                }
+                            }
+                            if (rooms != null && rooms.Count > 0)
+                                foreach (var item2 in rooms)
+                                {
+                                    string RatePlanCode = String.Empty;
+                                    string date_time = String.Empty;
+                                    double Nights = 0;
+                                    string TotalAmount = String.Empty;
+                                    string operatorprice = String.Empty;
+                                    string Goi = String.Empty;
+                                    string TgSD = String.Empty;
+                                    string GiaN = String.Empty;
+                                    string SDem = String.Empty;
+                                    string SP = String.Empty;
+                                    string TTien = String.Empty;
+                                    double NumberOfRooms = 0;
+                                    var package_by_room_id = packages.Where(x => x.HotelBookingRoomOptionalId == item2.Id);
+                                    if (package_by_room_id != null && package_by_room_id.Count() > 0)
+                                    {
+                                        sumtoday += (int)package_by_room_id.Sum(s => s.Nights);
+                                        var row = 1;
+                                        foreach (var p in package_by_room_id)
+                                        {
+                                            row++;
+                                            var style_row = "";
+                                            if (row > 2)
+                                            {
+                                                style_row = "display: none;";
+                                            }
+                                            double operator_price = 0;
+                                            if (p.Price != null) operator_price = Math.Round(((double)p.SaleTotalAmount / (double)p.Nights / (double)item2.NumberOfRooms), 0);
+                                            if (operator_price <= 0) operator_price = p.SalePrice != null ? (double)p.SalePrice : 0;
+
+                                            RatePlanCode = p.RatePlanCode;
+                                            date_time = (p.StartDate == null ? "" : ((DateTime)p.StartDate).ToString("dd/MM/yyyy")) + " - " + (p.EndDate == null ? "" : ((DateTime)p.EndDate).ToString("dd/MM/yyyy"));
+                                            operatorprice = operator_price.ToString("N0");
+                                            Nights = (double)p.Nights;
+                                            TotalAmount = ((double)p.SaleTotalAmount).ToString("N0");
+                                            NumberOfRooms = item2.NumberOfRooms == null ? 1 : (double)item2.NumberOfRooms;
+
+                                            Goi = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</td>";
+                                            TgSD = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + date_time + "</td>";
+                                            GiaN = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</td>";
+                                            SDem = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</td>";
+                                            SP = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</td>";
+                                            TTien = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</td>";
+
+                                            chitietdichvu += "<tr><td rowspan='" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style='border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + item2.RoomTypeName + "</td>" +
+                                                              Goi +
+                                                              TgSD +
+                                                              GiaN +
+                                                              SDem +
+                                                              "<td rowspan = '" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style = 'border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + NumberOfRooms + " </td> " +
+                                                              TTien
+                                                               + "</tr>";
+                                        }
+
+                                    }
+
+                                }
+                            if (extra_package != null && extra_package.Count > 0)
+                                foreach (var item2 in extra_package)
+                                {
+                                    double operator_price = 0;
+                                    if (item2.UnitPrice == null)
+                                    {
+                                        AmountDVK += (double)(item2.Amount - item2.Profit);
+                                    }
+                                    else
+                                    {
+                                        AmountDVK += (double)item2.UnitPrice;
+                                    }
+                                    ;
+
+                                    if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.Amount / (double)item2.Nights / (double)item2.Quantity), 0);
+                                    if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
+                                    chitietdichvukhac += "<tr><td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageCode + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.PackageId + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.StartDate == null ? "" : ((DateTime)item2.StartDate).ToString("dd/MM/yyyy")) + " - " + (item2.EndDate == null ? "" : ((DateTime)item2.EndDate).ToString("dd/MM/yyyy")) + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operator_price.ToString("N0") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.Nights != null ? ((double)item2.Nights).ToString("N0") : "1") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + (item2.Quantity != null ? ((double)item2.Quantity).ToString("N0") : "1") + "</td>" +
+                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + ((double)item2.Amount).ToString("N0") + "</td>" +
+                                                                      "</tr>";
+
+
+                                }
+
+
+                            if (chitietdichvu != string.Empty)
+                            {
+                                datatabledv = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'><table style='border-collapse: collapse;width:100%;'>" +
+                                                            "<thead>" +
+                                                                "<tr style='background: #D6E1EB;text-align: center;color: #00264D;height: 35px;'>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Hạng phòng</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Giá bán</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Số đêm</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Số phòng</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Thành tiền</th>" +
+                                                                "</tr> " +
+                                                            "</thead>" +
+                                                            "<tbody>" +
+                                                                chitietdichvu +
+                                                           "</tbody>" +
+                                                       "</table></td></tr>";
+                            }
+                            else
+                            {
+                                datatabledv = "";
+                            }
+                            if (extra_package != null && extra_package.Count > 0)
+                            {
+                                datatabledvkhac = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'> <table style='border-collapse: collapse;width:100%;'>" +
+                                                        "<thead>" +
+                                                            "<tr style='background: #D6E1EB;text-align: center;color: #00264D;height: 35px;'>" +
+                                                                "<th style='padding:2px 5px;font-weight: bold;'>Tên dịch vụ</th>" +
+                                                                "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
+                                                                "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
+                                                                "<th style='padding:2px 5px;font-weight: bold;'>Giá bán</th>" +
+                                                                "<th style='padding:2px 5px;font-weight: bold;'>Số ngày	</th>" +
+                                                                "<th style='padding:2px 5px;font-weight: bold;'>Số lượng</th>" +
+                                                                "<th style='padding:2px 5px;font-weight: bold;'>Thành tiền</th>" +
+                                                            "</tr> " +
+                                                        "</thead>" +
+                                                        "<tbody>" +
+                                                            chitietdichvukhac +
+                                                       "</tbody>" +
+                                                   "</table></td></tr>";
+                            }
+                            else
+                            {
+                                datatabledvkhac = "";
+                            }
+                            var hotedetail = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.HotelId));
+
                             note += "<tr>" +
                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày nhận phòng:</td>" +
                                 "<td style='border: 1px solid #999; padding: 5px;' >" + item.hotelArrivalDate + " </td> " +
@@ -2409,7 +3153,8 @@ namespace WEB.Adavigo.CMS.Service
                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Số đêm</td>" +
                                 "<td style='border: 1px solid #999; padding: 5px;'>" + item.hotelTotalDays + "</td>" +
                             "</tr>" +
-
+                             datatabledv
+                            + datatabledvkhac +
                             "<tr>" +
                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
                                 "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + item.hotelAmount + "</td>" +
@@ -2417,7 +3162,7 @@ namespace WEB.Adavigo.CMS.Service
 
 
 
-                            Packagesdetail = "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' >" + item.HotelName + "</ td > " +
+                            Packagesdetail = "<tr><td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' >" + item.HotelName + "</td></tr> " +
                                             "" + note + "";
                             Packagesdata += "<table role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'>" +
                                Packagesdetail + "</table>";
@@ -2552,30 +3297,61 @@ namespace WEB.Adavigo.CMS.Service
 
 
                     }
+                    if (model.VinWonderEmail != null && model.VinWonderEmail.Count > 0)
+                    {
+
+                        foreach (var item in model.VinWonderEmail)
+                        {
+                            string note = string.Empty;
+
+
+
+                            note += "<tr>" +
+                                "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
+                                "<td style='border: 1px solid #999; padding: 5px;' >" + item.VinWonderStartDate + " </td> " +
+
+                            "</tr>" +
+                            "<tr>" +
+                                "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +
+                                "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + item.VinWonderAmount + "</td>" +
+                           "</tr>";
+
+
+
+                            Packagesdetail = "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > " + item.VinWonderName + "</ td > " +
+                                            "" + note + "";
+                            Packagesdata += "<table role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'>" +
+                                Packagesdetail + "</table>";
+                        }
+
+
+
+                    }
                     var data_VietQRBankList = await _APIService.GetVietQRBankList();
-                    var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
-                    string bank_code = "Techcombank";
+                    var selected_bank = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("VPbank".Trim().ToLower())) : null;
+                    string bank_code = "VPbank";
                     if (selected_bank != null) bank_code = selected_bank.bin;
-                    var result = await _APIService.GetVietQRCode("19131835226016", bank_code, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var result = await _APIService.GetVietQRCode("9698888", bank_code, order.OrderNo, Convert.ToDouble(order.Amount));
                     var jsonData = JObject.Parse(result);
                     var status = int.Parse(jsonData["code"].ToString());
                     if (status == (int)ResponseType.SUCCESS)
                     {
-                        var url_path = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData["data"]["qrDataURL"].ToString(), "19131835226016");
+                        var url_path = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData["data"]["qrDataURL"].ToString(), "9698888");
 
                         body = body.Replace("{{LinkQRTCB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path);
                     }
 
-                    var selected_bank2 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("HDBANK".Trim().ToLower())) : null;
-                    string bank_code2 = "HDBANK";
+                    var selected_bank2 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("Techcombank".Trim().ToLower())) : null;
+                    string bank_code2 = "Techcombank";
                     if (selected_bank2 != null) bank_code2 = selected_bank2.bin;
-                    var result2 = await _APIService.GetVietQRCode("371704070000023", bank_code2, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var result2 = await _APIService.GetVietQRCode("19131835226016", bank_code2, order.OrderNo, Convert.ToDouble(order.Amount));
                     var jsonData2 = JObject.Parse(result2);
                     var status2 = int.Parse(jsonData2["code"].ToString());
                     if (status2 == (int)ResponseType.SUCCESS)
                     {
-                        var url_path2 = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData2["data"]["qrDataURL"].ToString(), "371704070000023");
-                        body = body.Replace("{{LinkQRHDB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path2);
+                        var url_path = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData2["data"]["qrDataURL"].ToString(), "19131835226016");
+
+                        body = body.Replace("{{LinkQRHDB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path);
                     }
 
                     var selected_bank3 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("VietinBank".Trim().ToLower())) : null;
@@ -2586,9 +3362,21 @@ namespace WEB.Adavigo.CMS.Service
                     var status3 = int.Parse(jsonData3["code"].ToString());
                     if (status3 == (int)ResponseType.SUCCESS)
                     {
-                        var url_path3 = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData3["data"]["qrDataURL"].ToString(), "113600558866");
+                        var url_path = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData3["data"]["qrDataURL"].ToString(), "113600558866");
 
-                        body = body.Replace("{{LinkQRVTB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path3);
+                        body = body.Replace("{{LinkQRVTB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path);
+                    }
+                    var selected_bank4 = data_VietQRBankList.Count > 0 ? data_VietQRBankList.FirstOrDefault(x => x.shortName.Trim().ToLower().Contains("MSB ".Trim().ToLower())) : null;
+                    string bank_code4 = "MSB";
+                    if (selected_bank4 != null) bank_code4 = selected_bank4.bin;
+                    var result4 = await _APIService.GetVietQRCode("3066010006688", bank_code4, order.OrderNo, Convert.ToDouble(order.Amount));
+                    var jsonData4 = JObject.Parse(result4);
+                    var status4 = int.Parse(jsonData4["code"].ToString());
+                    if (status4 == (int)ResponseType.SUCCESS)
+                    {
+                        var url_path = await _APIService.UploadImageQRBase64(order.OrderNo, Convert.ToDouble(order.Amount).ToString(), jsonData4["data"]["qrDataURL"].ToString(), "3066010006688");
+
+                        body = body.Replace("{{LinkQRMSB}}", ReadFile.LoadConfig().IMAGE_DOMAIN + url_path);
                     }
                     //string TTChuyenKhoan = string.Empty;
                     //if (model.TTChuyenKhoan != null)
@@ -2870,6 +3658,13 @@ namespace WEB.Adavigo.CMS.Service
                                 if (note != null)
                                     item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
                             }
+                            if (item.Type.Equals("Vinwonder"))
+                            {
+                                item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
+                                var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.VinWonder);
+                                if (note != null)
+                                    item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
+                            }
                         }
                     if (data != null && data.Count > 1)
                     {
@@ -2992,7 +3787,7 @@ namespace WEB.Adavigo.CMS.Service
                                                 "" + note + "" +
                                                 "<tr>" +
                                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
-                                                "<td colspan='3' style='border: 1px solid #999; padding: 5px;'>" + item.Note + "</td></tr>";
+                                                "<td colspan='3' style='border: 1px solid #999; padding: 5px;'>" + item.tour.Note + "</td></tr>";
 
                             }
                         }
@@ -3022,7 +3817,7 @@ namespace WEB.Adavigo.CMS.Service
                                 var packages = await _hotelBookingRoomRepository.GetHotelBookingRoomRatesOptionalByBookingId(Convert.ToInt32(item.ServiceId));
                                 var extra_package = await _hotelBookingRoomExtraPackageRepository.GetByBookingID(Convert.ToInt32(item.ServiceId));
                                 List<HotelBookingRoomRatesOptionalViewModel> package_daterange = new List<HotelBookingRoomRatesOptionalViewModel>();
-                                
+
                                 var NumberOfAdult = rooms.Sum(x => x.NumberOfAdult);
                                 var NumberOfChild = rooms.Sum(x => x.NumberOfChild);
                                 var NumberOfInfant = rooms.Sum(x => x.NumberOfInfant);
@@ -3094,8 +3889,15 @@ namespace WEB.Adavigo.CMS.Service
                                         if (package_by_room_id != null && package_by_room_id.Count() > 0)
                                         {
                                             sumtoday += (int)package_by_room_id.Sum(s => s.Nights);
+                                            var row = 1;
                                             foreach (var p in package_by_room_id)
                                             {
+                                                row++;
+                                                var style_row = "";
+                                                if (row > 2)
+                                                {
+                                                    style_row = "display: none;";
+                                                }
                                                 double operator_price = 0;
                                                 if (p.Price != null) operator_price = Math.Round(((double)p.SaleTotalAmount / (double)p.Nights / (double)item2.NumberOfRooms), 0);
                                                 if (operator_price <= 0) operator_price = p.SalePrice != null ? (double)p.SalePrice : 0;
@@ -3106,23 +3908,39 @@ namespace WEB.Adavigo.CMS.Service
                                                 Nights = (double)p.Nights;
                                                 TotalAmount = ((double)p.SaleTotalAmount).ToString("N0");
                                                 NumberOfRooms = item2.NumberOfRooms == null ? 1 : (double)item2.NumberOfRooms;
-                                                Goi += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</div>";
-                                                TgSD += "<div style='border: 1px solid #999; padding:2px; text-align: center;'>" + date_time + "</div>";
-                                                GiaN += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</div>";
-                                                SDem += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</div>";
-                                                SP = "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</div>";
-                                                TTien += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</div>";
+                                                //Goi += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</div>";
+                                                //TgSD += "<div style='border: 1px solid #999; padding:2px; text-align: center;'>" + date_time + "</div>";
+                                                //GiaN += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</div>";
+                                                //SDem += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</div>";
+                                                //SP = "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</div>";
+                                                //TTien += "<div style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</div>";
+
+                                                Goi = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + RatePlanCode + "</td>";
+                                                TgSD = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + date_time + "</td>";
+                                                GiaN = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + operatorprice + "</td>";
+                                                SDem = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Nights + "</td>";
+                                                SP = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + NumberOfRooms + "</td>";
+                                                TTien = "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TotalAmount + "</td>";
+
+                                                chitietdichvu += "<tr><td rowspan='" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style='border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + item2.RoomTypeName + "</td>" +
+                                                                  Goi +
+                                                                  TgSD +
+                                                                  GiaN +
+                                                                  SDem +
+                                                                  "<td rowspan = '" + (row > 2 ? 0 : package_by_room_id.Count()) + "' style = 'border: 1px solid #999; padding: 2px; text-align: center;" + style_row + "'>" + NumberOfRooms + " </td> " +
+                                                                  TTien
+                                                                   + "</tr>";
                                             }
 
                                         }
-                                        chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.RoomTypeName + "</td>" +
-                                                                    "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Goi + "</td>" +
-                                                                      "<td style='border: 1px solid #999; padding:2px; text-align: center;'>" + TgSD + "</td>" +
-                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + GiaN + "</td>" +
-                                                                     "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SDem + "</td>" +
-                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SP + "</td>" +
-                                                                      "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TTien + "</td>"
-                                                                      + "</tr>";
+                                        //chitietdichvu += "<tr><td  style='border: 1px solid #999; padding: 2px; text-align: center;'>" + item2.RoomTypeName + "</td>" +
+                                        //                            "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + Goi + "</td>" +
+                                        //                              "<td style='border: 1px solid #999; padding:2px; text-align: center;'>" + TgSD + "</td>" +
+                                        //                             "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + GiaN + "</td>" +
+                                        //                             "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SDem + "</td>" +
+                                        //                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + SP + "</td>" +
+                                        //                              "<td style='border: 1px solid #999; padding: 2px; text-align: center;'>" + TTien + "</td>"
+                                        //                              + "</tr>";
 
                                     }
                                 if (extra_package != null && extra_package.Count > 0)
@@ -3136,7 +3954,8 @@ namespace WEB.Adavigo.CMS.Service
                                         else
                                         {
                                             AmountDVK += (double)item2.UnitPrice;
-                                        };
+                                        }
+                                        ;
 
                                         if (item2.UnitPrice != null) operator_price = Math.Round(((double)item2.UnitPrice / (double)item2.Nights / (double)item2.Quantity), 0);
                                         if (operator_price <= 0) operator_price = item2.SalePrice != null ? (double)item2.SalePrice : 0;
@@ -3155,16 +3974,16 @@ namespace WEB.Adavigo.CMS.Service
 
                                 if (chitietdichvu != string.Empty)
                                 {
-                                    datatabledv = "<tr><td colspan='4'><table style='border-collapse: collapse;width:100%;'>" +
+                                    datatabledv = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'><table style='border-collapse: collapse;width:100%;'>" +
                                                                 "<thead>" +
-                                                                    "<tr>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Hạng phòng</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Gói</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thời gian sử dụng</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá bán</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số đêm</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số phòng</th>" +
-                                                                        "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                    "<tr style='background: #D6E1EB;text-align: center;color: #00264D;height: 35px;'>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Hạng phòng</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Giá bán</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Số đêm</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Số phòng</th>" +
+                                                                        "<th style='padding:2px 5px;font-weight: bold;'>Thành tiền</th>" +
                                                                     "</tr> " +
                                                                 "</thead>" +
                                                                 "<tbody>" +
@@ -3178,16 +3997,16 @@ namespace WEB.Adavigo.CMS.Service
                                 }
                                 if (extra_package != null && extra_package.Count > 0)
                                 {
-                                    datatabledvkhac = "<tr><td colspan='4'> <table style='border-collapse: collapse;width:100%;'>" +
+                                    datatabledvkhac = "<tr><td colspan='4' style='padding: 6px 0px 6px 0px;'> <table style='border-collapse: collapse;width:100%;'>" +
                                                             "<thead>" +
-                                                                "<tr>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Tên dịch vụ</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Gói</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thời gian sử dụng</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Giá bán</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số ngày	</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Số lượng</th>" +
-                                                                    "<th style='border: 1px solid #999; padding: 2px; text-align: center;'>Thành tiền</th>" +
+                                                                "<tr style='background: #D6E1EB;text-align: center;color: #00264D;height: 35px;'>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Tên dịch vụ</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Gói</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Thời gian sử dụng</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Giá bán</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Số ngày	</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Số lượng</th>" +
+                                                                    "<th style='padding:2px 5px;font-weight: bold;'>Thành tiền</th>" +
                                                                 "</tr> " +
                                                             "</thead>" +
                                                             "<tbody>" +
@@ -3218,18 +4037,18 @@ namespace WEB.Adavigo.CMS.Service
                                     "<td style='border: 1px solid #999; padding: 5px;'>" + item.Hotel[0].TotalDays + "</td>" +
                                 "</tr>" + datatabledv
                                 + datatabledvkhac +
-                                "<tr>" +
-                                    "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
-                                    "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + item.Hotel[0].TotalAmount.ToString("N0") + "</td>" +
+                                "<tr style='color: #00264D;background: #F5F7FB;font-weight: bold;padding: 4px;height: 35px;'>" +
+                                    "<td >Tổng tiền phòng:</td>" +
+                                    "<td colspan='3' style ='text-align: right;padding: 4px;' >" + item.Hotel[0].TotalAmount.ToString("N0") + "</td>" +
                                "</tr>";
 
 
 
-                                Packagesdetail = "<tr><td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "</ td ></tr> " +
+                                Packagesdetail = "<tr><td colspan='4' style = 'padding: 5px; font-weight: bold;text-align: center;background:#a8c7fa;' > Dịch vụ khách sạn " + hotedetail[0].HotelName + "</ td ></tr> " +
                                                 "" + note + "" +
                                                       "<tr>" +
                                                       "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
-                                                      "<td colspan='3' style='border: 1px solid #999; padding: 5px;'>" + item.Note + "</td></tr>";
+                                                      "<td colspan='3' style='border: 1px solid #999; padding: 5px;'><textarea type='text' style='min-height: 120px;width: 100%;'disabled value=" + hotel.Note + ">" + hotel.Note + "</textarea></td></tr>";
 
                             }
                         }
@@ -3422,6 +4241,34 @@ namespace WEB.Adavigo.CMS.Service
 
                             }
                         }
+                        if (item.Type.Equals("Vinwonder"))
+                        {
+                            if (item.VinWonderBooking != null)
+                            {
+                                string note = string.Empty;
+
+                                note += "<tr>" +
+                                    "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày bắt đầu:</td>" +
+                                    "<td style='border: 1px solid #999; padding: 5px;' >" + item.StartDate.ToString("dd/MM/yyyy") + " </td> " +
+
+                                "</tr>" +
+                                "<tr>" +
+                                    "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền dịch vụ:</td>" +
+                                    "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + ((double)item.VinWonderBooking[0].Amount).ToString("N0") + "</td>" +
+                               "</tr>";
+
+
+
+                                Packagesdetail = "<table class='Other-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'><tr>" +
+                                    "<td colspan='4' style = 'border: 1px solid #999; padding: 5px; font-weight: bold;text-align: center;' > Dịch vụ : " + item.VinWonderBooking[0].SiteName + "</td></tr> " +
+                                                "" + note + "" +
+                                                      "<tr>" +
+                                                      "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ghi chú:</td>" +
+                                                      "<td colspan='3' style='border: 1px solid #999; padding: 5px;'>" + item.Note + "</td></tr>";
+
+                            }
+                        }
+
                         Packagesdata += "<table class='Tour-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'>" +
                             Packagesdetail +
                             "</table>";
@@ -3434,7 +4281,7 @@ namespace WEB.Adavigo.CMS.Service
                 string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
 
-                var template = workingDirectory + @"\EmailTemplate\OrderTemplate.html";
+                var template = workingDirectory + @"\EmailTemplate\OrderTemplateDH.html";
                 string body = File.ReadAllText(template);
                 if (order.ClientId != null && order.ClientId != 0)
                 {
@@ -3537,7 +4384,9 @@ namespace WEB.Adavigo.CMS.Service
             {
                 if (Emailmodel == null)
                 {
+                    var Count = _countYCCMongoService.GetCountYCC(id);
                     var model = _paymentRequestRepository.GetById((int)id);
+                    var list_note = await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
                     string ngay = "Ngày " + model.CreatedDate.Value.Day.ToString();
                     string thang = "Tháng " + model.CreatedDate.Value.Month.ToString();
@@ -3573,6 +4422,31 @@ namespace WEB.Adavigo.CMS.Service
                     {
                         body = body.Replace("{{CongNo}}", "Không công nợ với NCC");
                     }
+                    if (model.Description != null && model.Description != "")
+                    {
+                        body = body.Replace("{{DHNote}}", model.Description);
+                    }
+                    else
+                    {
+                        body = body.Replace("{{DHstyle}}", "display: none");
+
+                    }
+                    if (list_note != null && list_note.Count > 0)
+                    {
+                        var ktnote = "";
+
+                        foreach (var item in list_note)
+                        {
+
+                            ktnote += "<div" + "<span>" + item.FullName + " :" + item.Comment + "</span></div>";
+                        }
+                        body = body.Replace("{{KTNote}}", ktnote);
+                    }
+                    else
+                    {
+                        body = body.Replace("{{KTstyle}}", "display: none");
+
+                    }
 
 
                     body = body.Replace("{{NguoiDn}}", model.UserCreateFullName);
@@ -3601,7 +4475,7 @@ namespace WEB.Adavigo.CMS.Service
                         if (model.BankingAccountId != null && model.BankingAccountId != 0)
                         {
                             var BankingAccount = _bankingAccountRepository.GetById((int)model.BankingAccountId);
-                            body = body.Replace("{{SoTK}}", BankingAccount.BankId + '(' + BankingAccount.AccountName + ')');
+                            body = body.Replace("{{SoTK}}", BankingAccount.AccountNumber + '(' + BankingAccount.AccountName + ')');
                             body = body.Replace("{{NganHang}}", BankingAccount.BankId);
                             body = body.Replace("{{ChuTK}}", BankingAccount.AccountName);
                         }
@@ -3617,13 +4491,15 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{MaDV}}", model.ServiceCode);
                     body = body.Replace("{{NDTT}}", model.Note);
                     body = body.Replace("{{HanTT}}", model.PaymentDate.Value.ToString("dd/MM/yyyy HH:mm"));
+                    body = body.Replace("{{SLIN}}", (Count + 1).ToString());
                     return body;
                 }
                 else
                 {
+                    var Count = _countYCCMongoService.GetCountYCC(id);
                     var model = _paymentRequestRepository.GetById((int)id);
                     //var text = XTL.Utils.NumberToText(model.RelateData.Sum(n => n.Amount));
-
+                    var list_note = await _noteRepository.GetListByType(id, (int)AttachmentType.YCC_Comment);
                     string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
                     var template = workingDirectory + @"EmailTemplate\TemplatePaymentRequest.html";
                     string ngay = "Ngày " + model.CreatedDate.Value.Day.ToString();
@@ -3637,6 +4513,31 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{DoanhT}}", model.RelateData.Sum(n => n.Amount).ToString("N0"));
                     body = body.Replace("{{GhiChu}}", Emailmodel.GhiChu);
                     body = body.Replace("{{BChuDT}}", NumberToString.So_chu((double)model.RelateData.Sum(n => n.Amount)));
+                    if (model.Description != null && model.Description != "")
+                    {
+                        body = body.Replace("{{DHNote}}", model.Description);
+                    }
+                    else
+                    {
+                        body = body.Replace("{{DHstyle}}", "display: none");
+
+                    }
+                    if (list_note != null && list_note.Count > 0)
+                    {
+                        var ktnote = "";
+
+                        foreach (var item in list_note)
+                        {
+
+                            ktnote += "<div" + "<span>" + item.FullName + " :" + item.Comment + "</span></div>";
+
+                        }
+                        body = body.Replace("{{KTNote}}", ktnote);
+                    }
+                    else
+                    {
+                        body = body.Replace("{{KTstyle}}", "display: none");
+                    }
                     if (type != 1)
                     {
                         body = body.Replace("{{DoanhTITLE}}", "Doanh thu");
@@ -3680,7 +4581,7 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{HanTT}}", model.PaymentDate.Value.ToString("dd/MM/yyyy HH:mm"));
                     body = body.Replace("{{MaDH}}", model.OrderNo);
                     body = body.Replace("{{MaDV}}", model.ServiceCode);
-
+                    body = body.Replace("{{SLIN}}", (Count == 0 ? 1 : Count).ToString());
                     return body;
                 }
             }

@@ -51,6 +51,9 @@ namespace Repositories.IRepositories
         Task<long> CountOrderInYear();
         Task<double> CheckAmountRemainBySalerId(long SalerId);
         Task<int> UpdateOrderIsSalerDebtLimit(long OrderId, long IsSalerDebtLimit, long UpdatedBy, long UserVerify);
-        Task<double> AmountTotalBySalerId(long SalerId);
+        Task<double> AmountTotalBySalerId(string SalerId, string SalerPermission);
+        Task<GenericViewModel<ReportOrderViewModel>> GetlistReportOrder(SearchReportOrderModels searchModel);
+        Task<List<ReportOrderServiceViewModel>> GetReportOrderAllServiceByOrderId(long OrderId);
+        Task<long> UpdateOrderCutOffDate(long order_id, int user_commit, string CutOffDate);
     }
 }

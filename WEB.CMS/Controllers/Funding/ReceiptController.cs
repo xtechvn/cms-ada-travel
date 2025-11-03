@@ -46,11 +46,13 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly IPaymentRequestRepository _paymentRequestRepository;
         private readonly ISupplierRepository _supplierRepository;
+        private readonly IDebtGuaranteeRepository _debtGuaranteeRepository;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
 
         public ReceiptController(IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IWebHostEnvironment hostEnvironment, IHotelBookingRepositories hotelBookingRepositories, ITourRepository tourRepository,
             IClientRepository clientRepository, IDepositHistoryRepository depositHistoryRepository, IOrderRepository orderRepository, ManagementUser ManagementUser,
-             IUserRepository userRepository,  IPaymentRequestRepository paymentRequestRepository,
-             IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService)
+             IUserRepository userRepository, IPaymentRequestRepository paymentRequestRepository,
+             IConfiguration configuration, ISupplierRepository supplierRepository, IEmailService emailService, IDebtGuaranteeRepository debtGuaranteeRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
             _supplierRepository = supplierRepository;
             _WebHostEnvironment = hostEnvironment;
@@ -68,6 +70,8 @@ namespace WEB.Adavigo.CMS.Controllers
             _emailService = emailService;
             _configuration = configuration;
             config = ReadFile.LoadConfig();
+            _debtGuaranteeRepository = debtGuaranteeRepository;
+            _identifierServiceRepository = identifierServiceRepository;
         }
 
         public IActionResult Index()
@@ -245,25 +249,25 @@ namespace WEB.Adavigo.CMS.Controllers
                     }
                     model.AttatchmentFile = "/" + _UploadFolder + "/" + _FileName;
                 }
-                //model.BillNo = await identifierServiceRepository.buildContractPay();
-                var client = new HttpClient();
-                var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
-                var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
-                HttpClient httpClient = new HttpClient();
-                JObject jsonObject = new JObject(
-                   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_THU).ToString())
-                );
-                var j_param = new Dictionary<string, object>
-                 {
-                     { "key",jsonObject}
-                 };
-                var data_product = JsonConvert.SerializeObject(j_param);
-                var token = CommonHelper.Encode(data_product, key_token_api);
-                var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
-                var response = await httpClient.PostAsync(apiPrefix, content);
-                var resultAPI = await response.Content.ReadAsStringAsync();
-                var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
-                model.BillNo = output.code;
+                model.BillNo = await _identifierServiceRepository.buildContractPay();
+                //var client = new HttpClient();
+                //var apiPrefix = ReadFile.LoadConfig().API_URL + ReadFile.LoadConfig().API_GET_BILL_NO;
+                //var key_token_api = ReadFile.LoadConfig().KEY_TOKEN_API_MANUAL;
+                //HttpClient httpClient = new HttpClient();
+                //JObject jsonObject = new JObject(
+                //   new JProperty("code_type", ((int)GET_CODE_MODULE.PHIEU_THU).ToString())
+                //);
+                //var j_param = new Dictionary<string, object>
+                // {
+                //     { "key",jsonObject}
+                // };
+                //var data_product = JsonConvert.SerializeObject(j_param);
+                //var token = CommonHelper.Encode(data_product, key_token_api);
+                //var content = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("token", token) });
+                //var response = await httpClient.PostAsync(apiPrefix, content);
+                //var resultAPI = await response.Content.ReadAsStringAsync();
+                //var output = JsonConvert.DeserializeObject<OutputAPI>(resultAPI);
+                //model.BillNo = output.code;
                 var contractPayId = _contractPayRepository.CreateContractPay(model);
                 if (contractPayId == -2)
                     return Ok(new
@@ -285,6 +289,9 @@ namespace WEB.Adavigo.CMS.Controllers
                 var current_user = _ManagementUser.GetCurrentUser();
                 foreach (var item in model.ContractPayDetails)
                 {
+                    var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(item.OrderId);
+                 
+
                     string link = "/Receipt/Detail?contractPayId=" + contractPayId;
                     apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.PHIEU_THU).ToString(),
                        ((int)ActionType.TAO_MOI_PHIEU_THU).ToString(), item.OrderCode, link, current_user == null ? "0" : current_user.Role);
@@ -312,9 +319,24 @@ namespace WEB.Adavigo.CMS.Controllers
                     var ContractPayByOrderId = await _contractPayRepository.GetContractPayByOrderId(item.OrderId);
                     modelEmail.ServiceType = (int)EmailType.SaleDH;
                     var order = await _orderRepository.GetOrderByID(item.OrderId);
-                    if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && order.OrderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR)
+                   
+                    if (model.Type == ContractType.TT_DON_HANG)
                     {
-                        _emailService.SendEmail(modelEmail, attach_file);
+                        if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && (item.StatusCode == (int)OrderStatus.CREATED_ORDER || item.StatusCode == (int)OrderStatus.CONFIRMED_SALE) && (DetailDebtGuarantee == null || DetailDebtGuarantee.Status != (int)DebtGuaranteeStatus.TN_DUYET || DetailDebtGuarantee.Status != (int)DebtGuaranteeStatus.TP_DUYET))
+                        {
+                            _emailService.SendEmail(modelEmail, attach_file);
+                        }
+                    }
+                    else
+                    {
+                        if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1 && order.OrderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR && (DetailDebtGuarantee == null || DetailDebtGuarantee.Status!= (int)DebtGuaranteeStatus.TN_DUYET || DetailDebtGuarantee.Status != (int)DebtGuaranteeStatus.TP_DUYET))
+                        {
+                            _emailService.SendEmail(modelEmail, attach_file);
+                        }
+                    }
+                    if (DetailDebtGuarantee != null)
+                    {
+                        _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)_UserId);
                     }
                 }
                 return Ok(new
@@ -402,6 +424,11 @@ namespace WEB.Adavigo.CMS.Controllers
                     if (ContractPayByOrderId != null && ContractPayByOrderId.Count <= 1)
                     {
                         _emailService.SendEmail(modelEmail, attach_file);
+                    }
+                    var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(item.OrderId);
+                    if (DetailDebtGuarantee != null)
+                    {
+                        _debtGuaranteeRepository.UpdateDebtGuarantee((int)DetailDebtGuarantee.Id, (int)DebtGuaranteeStatus.HOAN_THANH, (int)userLogin);
                     }
                 }
 

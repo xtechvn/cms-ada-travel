@@ -33,6 +33,16 @@ namespace Entities.ViewModels
         public int AuthorId { get; set; }
         public DateTime DownTime { get; set; }
         public int Position { get; set; }
+        public byte? PlatForm { get; set; }
+        public byte? AimodelType { get; set; }
+        public string? CampaignName { get; set; }
+        public string? AiContent { get; set; }
+        public byte? IsPostedToFanpage { get; set; }
+        public double Minamount { get; set; }
+        public double Maxamount { get; set; }
+        // ✅ Thêm danh sách ảnh Fanpage
+        public List<string> FanpageImages { get; set; } = new List<string>();
+
     }
 
     public class ArticleSearchModel

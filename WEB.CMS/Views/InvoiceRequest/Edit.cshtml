@@ -50,6 +50,7 @@
     <input type="text" name="CompanyName" id="CompanyName" value="@Model.CompanyName" style="display: none" />
     <input type="text" name="OrderNo" id="OrderNo" value="@Model.OrderNo" style="display: none" />
     <input type="text" name="OrderId" id="OrderId" value="@Model.OrderId" style="display: none" />
+    <input type="text" name="OrderId" id="orderId" value="@Model.OrderId" style="display: none" />
     <div class="grid-item border">
 
         <div class="row row_min">
@@ -167,12 +168,22 @@
     <div class="text-right border-top pt-3">
         <button type="button" class="btn btn-default btn btn-default cancel" onclick="$.magnificPopup.close();">Bỏ qua</button>
         <button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(0)">Lưu nháp</button>
-        <button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(1)">Gửi đi</button>
+        @*<button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(1)">Gửi đi</button>*@
+        @if (Model.Status == (int)(INVOICE_REQUEST_STATUS.HOA_DON_NHAP))
+        {
+            <button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(8)">Xuất nháp</button>
+        }
+        else
+        {
+            <button type="button" class="btn btn-default background-button" background-button onclick="_add_invoice_request.EditInvoiceRequest(7)">Xuất hóa đơn nháp</button>
+        }
+
     </div>
 
 </div>
 
 <script type="text/javascript" src="/modules/add_invoice_request.js"></script>
+
 <script>
     $('.datepicker-payment').Zebra_DatePicker({
         format: 'd/m/Y'

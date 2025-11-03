@@ -6,6 +6,7 @@ using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Mongo;
 using Entities.ViewModels.OrderManual;
+using Entities.ViewModels.SetServices;
 using ENTITIES.ViewModels.Articles;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -374,6 +375,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                       case (int)ServiceType.PRODUCT_FLY_TICKET:
                             {
                                 deparments.Add(ReadFile.LoadConfig().Department_Operator_Fly);
+                                deparments.Add(ReadFile.LoadConfig().Department_Operator_Fly_SG);
 
                             }
                             break;
@@ -388,6 +390,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                             {
                                 deparments.Add(ReadFile.LoadConfig().Department_Operator_Hotel);
                                 deparments.Add(ReadFile.LoadConfig().Department_Operator_Fly);
+                                deparments.Add(ReadFile.LoadConfig().Department_Operator_Fly_SG);
                                 deparments.Add(ReadFile.LoadConfig().Department_Operator_Tour);
                             }
                             break;
@@ -672,6 +675,8 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 if (order_id > 0)
                 {
                     var fly_detail = await _flyBookingDetailRepository.GetListByGroupFlyID(order_id, group_fly);
+                    if(fly_detail!=null && fly_detail.Count > 0)
+                    fly_detail = fly_detail.OrderBy(s => s.StartDate).ToList();
                     int fly_status = (int)ServiceStatus.OnExcution;
                     if (fly_detail != null && fly_detail.Count > 0)
                     {
@@ -2235,7 +2240,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         {
             try
             {
-                ViewBag.ExtraList = new List<VinWonderBookingTicket>();
+                ViewBag.ExtraList = new List<VinWonderBookingTicketViewModel>();
                 if (booking_id > 0)
                 {
                     var list = await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(booking_id);

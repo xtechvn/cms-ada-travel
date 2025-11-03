@@ -1,0 +1,115 @@
+﻿@using Entities.ViewModels
+@using Entities.ViewModels.DebtGuarantee
+@using Utilities
+@using Utilities.Contants
+@{
+    ViewData["Title"] = "Chi tiết bảo lãnh công nợ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model DebtGuaranteeViewModel
+<section class="main-container">
+    <input value="@Model.Id" id="Id"  style="display:none;"/>
+    <div class="row-main container">
+        <div class="table-responsive table-white">
+            <table class="table table-nowrap">
+                <tbody>
+                    <tr>
+                        <td colspan="3">
+                            <strong>Mã bảo lãnh : @Model.Code</strong>
+
+                            @switch (Model.Status)
+                            {
+                                case (int)(DebtGuaranteeStatus.CHO_TN_DUYET):
+                                case (int)(DebtGuaranteeStatus.CHO_TP_DUYET):
+                                    {
+                                        <span class="status-oranger">@Model.StatusName</span>
+                                    }
+                                    break;
+                                case (int)(DebtGuaranteeStatus.TN_DUYET):
+                                case (int)(DebtGuaranteeStatus.TP_DUYET):
+                                case (int)(DebtGuaranteeStatus.HOAN_THANH):
+                                    {
+                                        <span class="status-green">@Model.StatusName</span>
+                                    }
+                                    break;
+                                case (int)(DebtGuaranteeStatus.TU_CHOI):
+                                    {
+                                        <span class="status-red">@Model.StatusName</span>
+                                    }
+                                    break;
+
+                            }
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 45%;">
+                            <div class="row">
+
+                                <div class="col-5 mb10">Mã đơn hàng</div>
+                                <div class="col-7 mb10">:<a class="blue" href="/Order/@Model.OrderId">@Model.OrderNo</a> </div>
+                                <div class="col-5 mb10">Giá trị đơn hàng</div>
+                                <div class="col-7 mb10">: @(Model.Amount == 0 ? "0" : Model.Amount.ToString("#,##"))</div> 
+                                <div class="col-5 mb10">Lợi nhuận</div>
+                                <div class="col-7 mb10">: @Model.Profit.ToString("#,##")</div> 
+                                <div class="col-5 mb10">Ngày bắt đầu - kết thúc</div>
+                                <div class="col-7 mb10">: @Model.StartDate.ToString("dd/MM/yyyy") - @Model.EndDate.ToString("dd/MM/yyyy")</div>
+                                
+                            </div>
+                        </td>
+                        <td>
+                            <div >
+                                <div class="col-6 row">
+                                    <div class="col-5 mb10">Sale phụ trách</div>
+                                    <div class="col-7 mb10">: @Model.UserCreateName</div>
+
+                                    <div class="col-5 mb10">Ngày tạo</div>
+                                    <div class="col-7 mb10">
+                                        : @Model.CreatedDate.ToString("dd/MM/yyyy")
+                                    </div>
+                                    <div class="col-5 mb10">Ngày duyệt</div>
+                                    <div class="col-7 mb10">
+                                        : @Model.UpdatedDate.ToString("dd/MM/yyyy")
+                                    </div>
+                                    <div class="col-5 mb10">khách hàng</div>
+                                    <div class="col-7 mb10">
+                                        : @Model.ClientName - @Model.ClientPhone - @Model.ClienEmail
+                                    </div>
+                                    <div class="col-5 mb10">Nhãn đơn</div>
+                                    <div class="col-7 mb10">
+                                        : @Model.Label
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex flex-end">
+            @*<button type="submit" class="btn btn-default cancel ml-1" onclick="_payment_request_service.BackToList()">Quay lại</button>*@
+            <button class="btn btn-default cancel ml-1">Quay lại</button>
+            @if (ViewBag.tn == 1)
+            {
+                <button class="btn btn-default ml-1 tn-duyet">Duyệt</button>
+                <button class="btn btn-default ml-1 tn-tuchoi-duyet red">Từ chối</button>
+            }
+            @if (ViewBag.tp == 1)
+            {
+                <button class="btn btn-default ml-1 tp-duyet">Duyệt</button>
+                <button class="btn btn-default ml-1 tp-tuchoi-duyet red">Từ chối</button>
+            }
+            @*<button class="btn btn-default ml-1 tn-duyet">Duyệt</button>
+            <button class="btn btn-default ml-1 tp-duyet">Duyệt</button>
+            <button class="btn btn-default ml-1 tn-tuchoi-duyet">Từ chối</button>
+            <button class="btn btn-default ml-1 tp-tuchoi-duyet">Từ chối</button>*@
+
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script type="text/javascript" src="~/modules/debt_guarantee_detail.js"></script>
+}

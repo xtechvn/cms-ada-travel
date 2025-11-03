@@ -2,7 +2,7 @@
     ServiceType: 1,
     Initialization: function (hotel_booking_id) {
         $('#AddHotelService').addClass('show')
-        _order_detail_common.UserSuggesstion($('#main-hotel-staff'), 1);
+        _order_detail_common.UserSuggesstion($('#main-hotel-staff'), 0);
         _order_detail_hotel.HotelServiceRoomPopup(hotel_booking_id);
         _order_detail_hotel.HotelServiceRoomPackagesPopup(hotel_booking_id);
 
@@ -189,7 +189,13 @@
             })
         });
         $("body").on('click', ".servicemanual-hotel-add-new-room", function () {
-            _order_detail_hotel.AddNewHotelRoom();
+            var Orderid_request = $('#Orderid_request').val();
+            if (Orderid_request == 0) {
+                _order_detail_hotel.AddNewHotelRoom_request();
+            } else {
+                _order_detail_hotel.AddNewHotelRoom();
+            }
+           
             _order_detail_hotel.FillHotelGuestSelectRoomOption()
             _order_detail_hotel.OnAddNewRoomRates();
 
@@ -795,7 +801,6 @@
     },
     AddNewHotelRoom: function () {
         var room_max_value = $('#servicemanual-hotel-numberOfRooms').val();
-        var Orderid_request = $('#Orderid_request').val();
         if (room_max_value == undefined || parseInt(room_max_value) == undefined || parseInt(room_max_value) <= 0) {
             _msgalert.error('Vui nhập vào số phòng tại thông tin khách sạn');
             return;
@@ -811,13 +816,10 @@
         var min_time = _global_function.GetDayTextDateRangePicker(min_range);
         var max_time = _global_function.GetDayTextDateRangePicker(max_range);
         var html_append = ''
-        if (Orderid_request != 0) {
+   
             html_append = _order_detail_html.html_service_hotel_newroom.replaceAll('{{new_room_id}}', '0').replaceAll('{{room_order}}', '' + (lastest_order + 1)).replaceAll('{{new_rate_id}}', '0').replaceAll('{date_range}', min_time + ' - ' + max_time)
 
-        } else {
-            html_append = _order_detail_html.html_service_hotel_newroom.replaceAll('{{new_room_id}}', '0').replaceAll('{{room_order}}', '' + (lastest_order + 1)).replaceAll('{{new_rate_id}}', '0').replaceAll('{date_range}', min_time + ' - ' + max_time).replaceAll('{available}', 'display:none;')
-
-        }
+      
         $('.servicemanual-hotel-room-total-summary').before(html_append)
         _order_detail_hotel.ReIndexRoomOrder()
         $('.servicemanual-hotel-room-tr').each(function (index, item) {
@@ -1637,7 +1639,35 @@
         });
 
     },
+    AddNewHotelRoom_request: function () {
+        var room_max_value = $('#servicemanual-hotel-numberOfRooms').val();
+        var Orderid_request = $('#Orderid_request').val();
+        if (room_max_value == undefined || parseInt(room_max_value) == undefined || parseInt(room_max_value) <= 0) {
+            _msgalert.error('Vui nhập vào số phòng tại thông tin khách sạn');
+            return;
+        }
+        var room_exists = $('#servicemanual-hotel-rooms').find('.servicemanual-hotel-room-tr').length;
+        if (room_exists >= parseInt(room_max_value)) {
+            _msgalert.error('Số phòng tại mục [Bảng kê dịch vụ phòng] không được vượt quá số phòng đã nhập bên trên');
+            return;
+        }
+        var lastest_order = _order_detail_hotel.GetLastestHotelRoomOrder()
+        var min_range = _order_detail_common.GetDateFromNoUpdateDateRangeElement($('#servicemanual_hotel_checkin'))
+        var max_range = _order_detail_common.GetDateFromNoUpdateDateRangeElement($('#servicemanual_hotel_checkout'))
+        var min_time = _global_function.GetDayTextDateRangePicker(min_range);
+        var max_time = _global_function.GetDayTextDateRangePicker(max_range);
+        var html_append = ''
+        html_append = _order_detail_html.html_service_hotel_newroom_request.replaceAll('{{new_room_id}}', '0').replaceAll('{{room_order}}', '' + (lastest_order + 1)).replaceAll('{{new_rate_id}}', '0').replaceAll('{date_range}', min_time + ' - ' + max_time)
 
+        $('.servicemanual-hotel-room-total-summary').before(html_append)
+        _order_detail_hotel.ReIndexRoomOrder()
+        $('.servicemanual-hotel-room-tr').each(function (index, item) {
+            var element = $(item);
+            _order_detail_hotel.CheckIfOnlyRateInRoom(element)
+        });
+
+
+    },
 }
 
 

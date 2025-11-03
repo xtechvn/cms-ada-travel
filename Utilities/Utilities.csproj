@@ -37,6 +37,9 @@
     <None Update="EmailTemplate\FlyBookingServiceCodeTemplate.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="EmailTemplate\OrderTemplateDH.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="EmailTemplate\OtherSupplierTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

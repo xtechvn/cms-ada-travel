@@ -14,6 +14,8 @@ namespace Utilities.Contants
         PHIEU_THU = 4,
         DICH_VU = 5,
         BANG_KE = 6,
+        CONG_NO_DON_HANG = 7,
+        YEU_CAU_XUAT_HD = 8,
     }
     public enum ActionType
     {
@@ -36,6 +38,11 @@ namespace Utilities.Contants
         TU_CHOI_DUYET_YEU_CAU_CHI = 16,
         DUYET_bANG_KE= 17,
         TU_CHOI_DUYET_BANG_KE = 18,
+        DA_DUYET_CONG_NO = 19,
+        TU_CHOI_DON_CONG_NO = 20,
+        DUYET_CONG_NO = 21,
+        KHACH_HANG = 22,
+        YEU_CAU_XUAT_HD = 23,
 
     }
 

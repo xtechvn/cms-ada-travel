@@ -7,8 +7,14 @@ namespace Entities.Models
     {
         public long Id { get; set; }
         public string PaymentCode { get; set; }
+        /// <summary>
+        /// 1: Thanh toán dịch vụ , 2: Thanh toán khác
+        /// </summary>
         public int Type { get; set; }
         public int PaymentType { get; set; }
+        /// <summary>
+        /// Id Phiếu yêu cầu chi
+        /// </summary>
         public string RequestId { get; set; }
         public long SupplierId { get; set; }
         public decimal Amount { get; set; }

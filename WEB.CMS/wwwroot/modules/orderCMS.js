@@ -37,6 +37,7 @@ let listServiceType = [];
 let listService = [];
 let listStatus = [];
 let listHINHTHUCTT = [];
+let listInvoiceRequestStatus = [];
 let tabActive = 99;
 let PageIndex = 1;
 
@@ -256,6 +257,9 @@ $(document).ready(function () {
     const selectBtnStatus = document.querySelector(".select-btn-status");
     const itemsStatus = document.querySelectorAll(".item-status");
 
+    const selectBtnInvoiceRequestStatus = document.querySelector(".select-btn-InvoiceRequestStatus");
+    const itemsInvoiceRequestStatus = document.querySelectorAll(".item-InvoiceRequestStatus");
+
     const selectBtnHINHTHUCTT = document.querySelector(".select-btn-HINHTHUCTT");
     const itemsHINHTHUCTT = document.querySelectorAll(".item-HINHTHUCTT");
 
@@ -289,6 +293,15 @@ $(document).ready(function () {
             }
 
         }
+        if (!$target.closest('#InvoiceRequestStatus').length) {
+            if ($('#list-item-InvoiceRequestStatus').is(":visible") && !$target[0].id.includes('InvoiceRequestStatus_data') && !$target[0].id.includes('checkbox_InvoiceRequestStatus')
+                && !$target[0].id.includes('list-item-InvoiceRequestStatus') && !$target[0].id.includes('InvoiceRequestStatus_text')) {
+                selectBtnInvoiceRequestStatus.classList.toggle("open");
+            }
+            //if ($('#list-item-status').is(":visible") && !$target.id.includes('status_data')) {
+            //    selectBtnStatus.classList.toggle("open");
+            //}
+        }
 
     });
     //selectBtnServiceType.addEventListener("click", (e) => {
@@ -306,6 +319,10 @@ $(document).ready(function () {
     selectBtnHINHTHUCTT.addEventListener("click", (e) => {
         e.preventDefault();
         selectBtnHINHTHUCTT.classList.toggle("open");
+    });
+    selectBtnInvoiceRequestStatus.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectBtnInvoiceRequestStatus.classList.toggle("open");
     });
     //itemsServiceType.forEach(item => {
     //    item.addEventListener("click", () => {
@@ -401,6 +418,28 @@ $(document).ready(function () {
             }
         })
     })
+    itemsInvoiceRequestStatus.forEach(item => {
+        item.addEventListener("click", () => {
+            item.classList.toggle("checked");
+
+            let checked = document.querySelectorAll("#list-item-InvoiceRequestStatus .checked"),
+                btnText = document.querySelector(".btn-text-InvoiceRequestStatus");
+            let checked_list = []
+            listInvoiceRequestStatus = []
+            for (var i = 0; i < checked.length; i++) {
+                id = checked[i].getAttribute('id')
+                if (id.includes('InvoiceRequestStatus_data_')) {
+                    checked_list.push(checked[i]);
+                }
+                listInvoiceRequestStatus.push(parseInt(id.replace('InvoiceRequestStatus_data_', '')))
+            }
+            if (listInvoiceRequestStatus && listInvoiceRequestStatus.length > 0) {
+                btnText.innerText = `${listInvoiceRequestStatus.length} Selected`;
+            } else {
+                btnText.innerText = "Tất cả trạng thái yêu cầu hóa đơn";
+            }
+        })
+    })
 });
 
 var _ordersCMS = {
@@ -448,6 +487,7 @@ var _ordersCMS = {
             UtmSource: listServiceType,
             ServiceType: listService,
             Status: listStatus,
+            InvoiceRequestStatus: listInvoiceRequestStatus,
             CreateTime: null,
             CreateName: null,
             HINHTHUCTT: listHINHTHUCTT,
@@ -629,6 +669,7 @@ var _ordersCMS = {
         objSearch.searchModel.UtmSource = listServiceType;
         objSearch.searchModel.ServiceType = listService;
         objSearch.searchModel.Status = listStatus;
+        objSearch.searchModel.InvoiceRequestStatus= listInvoiceRequestStatus,
         objSearch.searchModel.CreateName = null;
         //objSearch.searchModel.Sale = $('#Sale').val().trim();
         objSearch.searchModel.StatusTab = tabActive;
@@ -730,6 +771,7 @@ var _ordersCMS = {
         listService = objSearch.searchModel.ServiceType;
         listStatus = objSearch.searchModel.Status;
         listHINHTHUCTT = objSearch.searchModel.HINHTHUCTT;
+        listInvoiceRequestStatus = objSearch.searchModel.InvoiceRequestStatus ,
         $('#Status').val(objSearch.searchModel.Status ?? -1).change();
         $('#CreateName').val(objSearch.searchModel.CreateName);
         $('#Sale').val(objSearch.searchModel.Sale);

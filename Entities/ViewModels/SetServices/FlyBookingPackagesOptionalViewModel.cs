@@ -13,6 +13,7 @@ namespace Entities.ViewModels.SetServices
         public string Email { get; set; }
         public string Phone { get; set; }
         public int SupplierId { get; set; }
+        public double TotalContractPay { get; set; }
 
     }
 }

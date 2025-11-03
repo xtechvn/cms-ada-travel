@@ -8,18 +8,22 @@ using Entities.ViewModels;
 using Entities.ViewModels.Funding;
 using Entities.ViewModels.Hotel;
 using Entities.ViewModels.SupplierConfig;
+using Entities.ViewModels.Tour;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Repositories.IRepositories;
 using Repositories.Repositories.BaseRepos;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Contants;
 
 namespace Repositories.Repositories
 {
@@ -28,6 +32,7 @@ namespace Repositories.Repositories
         private readonly BankingAccountDAL bankingAccountDAL;
         private readonly SupplierDAL supplierDAL;
         private readonly AllCodeDAL allCodeDAL;
+        private readonly TourDAL _tourDAL;
 
         private readonly string _UrlStaticImage;
 
@@ -37,6 +42,7 @@ namespace Repositories.Repositories
             supplierDAL = new SupplierDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             allCodeDAL = new AllCodeDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             bankingAccountDAL = new BankingAccountDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
+            _tourDAL = new TourDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _UrlStaticImage = domainConfig.Value.ImageStatic;
         }
 
@@ -701,7 +707,575 @@ namespace Repositories.Repositories
                 throw;
             }
         }
+        public async Task<string> ExportSuppliersOrder(OptionalSearshModel searchModel, string FilePath,int type)
+        {
+            var pathResult = string.Empty;
+            try
+            {
+                searchModel.PageIndex = -1;
+                switch (type)
+                {
+                    case 0:
+                        {
+                            var ListData = new List<FlyBookingPackagesOptionalModel>();
+                            DataTable dt = await _tourDAL.GetListOptionalBySupplierId(searchModel, StoreProcedureConstant.SP_GetAllListFlyBookingPackagesOptionalBySupplierId);
+                            if (dt != null && dt.Rows.Count > 0)
+                            {
+                                 ListData = dt.ToList<FlyBookingPackagesOptionalModel>();
+                             
+                            }
 
+                            if (ListData != null && ListData.Count > 0)
+                            {
+                                Workbook wb = new Workbook();
+                                Worksheet ws = wb.Worksheets[0];
+                                ws.Name = "Danh sách đơn hàng";
+                                Cells cell = ws.Cells;
+
+                                var range = ws.Cells.CreateRange(0, 0, 1, 1);
+                                StyleFlag st = new StyleFlag();
+                                st.All = true;
+                                Style style = ws.Cells["A1"].GetStyle();
+
+                                #region Header
+                                range = cell.CreateRange(0, 0, 1, 12);
+                                style = ws.Cells["A1"].GetStyle();
+                                style.Font.IsBold = true;
+                                style.IsTextWrapped = true;
+                                style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                style.Pattern = BackgroundType.Solid;
+                                style.Font.Color = Color.White;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                range.ApplyStyle(style, st);
+
+                                // Set column width
+                                cell.SetColumnWidth(0, 8);
+                                cell.SetColumnWidth(1, 20);
+                                cell.SetColumnWidth(2, 50);
+                                cell.SetColumnWidth(3, 50);
+                                cell.SetColumnWidth(4, 50);
+                                cell.SetColumnWidth(5, 30);
+                                cell.SetColumnWidth(6, 40);
+                                cell.SetColumnWidth(7, 25);
+                                cell.SetColumnWidth(8, 25);
+
+
+                                // Set header value
+                                ws.Cells["A1"].PutValue("STT");
+                                ws.Cells["B1"].PutValue("Mã dịch vụ ");
+                                ws.Cells["C1"].PutValue("Hành trình");
+                                ws.Cells["D1"].PutValue("Điểm đi");
+                                ws.Cells["E1"].PutValue("Điểm đến");
+                                ws.Cells["F1"].PutValue("Trạng thái");
+                                ws.Cells["G1"].PutValue("Thành tiền");
+                                ws.Cells["H1"].PutValue("Ngày tạo");
+
+                                #endregion
+
+                                #region Body
+
+                                range = cell.CreateRange(1, 0, ListData.Count, 12);
+                                style = ws.Cells["A2"].GetStyle();
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                range.ApplyStyle(style, st);
+
+                                Style alignCenterStyle = ws.Cells["A2"].GetStyle();
+                                alignCenterStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+                                Style numberStyle = ws.Cells["J2"].GetStyle();
+                                numberStyle.Number = 3;
+                                numberStyle.HorizontalAlignment = TextAlignmentType.Right;
+                                numberStyle.VerticalAlignment = TextAlignmentType.Center;
+
+                                int RowIndex = 1;
+
+                                foreach (var item in ListData)
+                                {
+                                    RowIndex++;
+                                    ws.Cells["A" + RowIndex].PutValue(RowIndex - 1);
+                                    ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle);
+                                    ws.Cells["B" + RowIndex].PutValue(item.PackageName);
+                                    ws.Cells["C" + RowIndex].PutValue(item.leg == 1? "Một chiều": "Khứ hồi");
+                                    ws.Cells["D" + RowIndex].PutValue(item.StartPoint );
+                                    ws.Cells["E" + RowIndex].PutValue(item.EndPoint);
+                                    ws.Cells["F" + RowIndex].PutValue(item.Status == 1? "Hủy" : "Sử dụng");
+                                    ws.Cells["G" + RowIndex].PutValue(item.Amount.ToString("N0"));
+                                    ws.Cells["H" + RowIndex].PutValue(item.CreatedDate.HasValue && item.CreatedDate != DateTime.MinValue ? item.CreatedDate.Value.ToString("dd-MM-yyyy HH:mm") : string.Empty);
+                                }
+
+                                #endregion
+                                wb.Save(FilePath);
+                                pathResult = FilePath;
+                            }
+                        }
+                        break;
+                    case 1:
+                        {
+                            var ListData = new List<HotelBookingRoomsOptionalModel>();
+                            DataTable dt = await _tourDAL.GetListOptionalBySupplierId(searchModel, StoreProcedureConstant.SP_GetAllListHotelBookingRoomsOptionalBySupplierId);
+                            if (dt != null && dt.Rows.Count > 0)
+                            {
+                                ListData = dt.ToList<HotelBookingRoomsOptionalModel>();
+
+                            }
+
+                            if (ListData != null && ListData.Count > 0)
+                            {
+                                Workbook wb = new Workbook();
+                                Worksheet ws = wb.Worksheets[0];
+                                ws.Name = "Danh sách đơn hàng";
+                                Cells cell = ws.Cells;
+
+                                var range = ws.Cells.CreateRange(0, 0, 1, 1);
+                                StyleFlag st = new StyleFlag();
+                                st.All = true;
+                                Style style = ws.Cells["A1"].GetStyle();
+
+                                #region Header
+                                range = cell.CreateRange(0, 0, 1, 12);
+                                style = ws.Cells["A1"].GetStyle();
+                                style.Font.IsBold = true;
+                                style.IsTextWrapped = true;
+                                style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                style.Pattern = BackgroundType.Solid;
+                                style.Font.Color = Color.White;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                range.ApplyStyle(style, st);
+
+                                // Set column width
+                                cell.SetColumnWidth(0, 8);
+                                cell.SetColumnWidth(1, 20);
+                                cell.SetColumnWidth(2, 50);
+                                cell.SetColumnWidth(3, 50);
+                                cell.SetColumnWidth(4, 50);
+                                cell.SetColumnWidth(5, 30);
+                                cell.SetColumnWidth(6, 40);
+                                cell.SetColumnWidth(7, 25);
+                                cell.SetColumnWidth(8, 25);
+
+
+                                // Set header value
+                                ws.Cells["A1"].PutValue("STT");
+                                ws.Cells["B1"].PutValue("Mã dịch vụ ");
+                                ws.Cells["C1"].PutValue("Ngày bắt đầu");
+                                ws.Cells["D1"].PutValue("Ngày kết thúc");
+                                ws.Cells["E1"].PutValue("Số đêm");
+                                ws.Cells["F1"].PutValue("Số lượng phòng");
+                                ws.Cells["G1"].PutValue("Trạng thái");
+                                ws.Cells["H1"].PutValue("Thành tiền");
+                                ws.Cells["I1"].PutValue("Ngày tạo");
+
+                                #endregion
+
+                                #region Body
+
+                                range = cell.CreateRange(1, 0, ListData.Count, 12);
+                                style = ws.Cells["A2"].GetStyle();
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                range.ApplyStyle(style, st);
+
+                                Style alignCenterStyle = ws.Cells["A2"].GetStyle();
+                                alignCenterStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+                                Style numberStyle = ws.Cells["J2"].GetStyle();
+                                numberStyle.Number = 3;
+                                numberStyle.HorizontalAlignment = TextAlignmentType.Right;
+                                numberStyle.VerticalAlignment = TextAlignmentType.Center;
+
+                                int RowIndex = 1;
+
+                                foreach (var item in ListData)
+                                {
+                                    RowIndex++;
+                                    ws.Cells["A" + RowIndex].PutValue(RowIndex - 1);
+                                    ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle);
+                                    ws.Cells["B" + RowIndex].PutValue(item.PackageName);
+                                    ws.Cells["C" + RowIndex].PutValue(((DateTime)item.StartDate).ToString("dd/MM/yyyy"));
+                                    ws.Cells["D" + RowIndex].PutValue(((DateTime)item.EndDate).ToString("dd/MM/yyyy"));
+                                    ws.Cells["E" + RowIndex].PutValue(item.Night);
+                                    ws.Cells["F" + RowIndex].PutValue(item.NumberOfRooms);
+                                    ws.Cells["G" + RowIndex].PutValue(item.Status == 1 ? "Hủy" : "Sử dụng");
+                                    ws.Cells["H" + RowIndex].PutValue(item.Amount.ToString("N0"));
+                                    ws.Cells["I" + RowIndex].PutValue(item.CreatedDate.HasValue && item.CreatedDate != DateTime.MinValue ? item.CreatedDate.Value.ToString("dd-MM-yyyy HH:mm") : string.Empty);
+                                }
+
+                                #endregion
+                                wb.Save(FilePath);
+                                pathResult = FilePath;
+                            }
+                        }
+                        break;
+                    case 2:
+                        {
+                            var ListData = new List<TourPackagesOptionalModel>();
+                            DataTable dt = await _tourDAL.GetListOptionalBySupplierId(searchModel, StoreProcedureConstant.SP_GetAllListTourPackagesOptionalBySupplierId);
+                            if (dt != null && dt.Rows.Count > 0)
+                            {
+                                ListData = dt.ToList<TourPackagesOptionalModel>();
+
+                            }
+
+                            if (ListData != null && ListData.Count > 0)
+                            {
+                                Workbook wb = new Workbook();
+                                Worksheet ws = wb.Worksheets[0];
+                                ws.Name = "Danh sách đơn hàng";
+                                Cells cell = ws.Cells;
+
+                                var range = ws.Cells.CreateRange(0, 0, 1, 1);
+                                StyleFlag st = new StyleFlag();
+                                st.All = true;
+                                Style style = ws.Cells["A1"].GetStyle();
+
+                                #region Header
+                                range = cell.CreateRange(0, 0, 1, 12);
+                                style = ws.Cells["A1"].GetStyle();
+                                style.Font.IsBold = true;
+                                style.IsTextWrapped = true;
+                                style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                style.Pattern = BackgroundType.Solid;
+                                style.Font.Color = Color.White;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                range.ApplyStyle(style, st);
+
+                                // Set column width
+                                cell.SetColumnWidth(0, 8);
+                                cell.SetColumnWidth(1, 20);
+                                cell.SetColumnWidth(2, 50);
+                                cell.SetColumnWidth(3, 50);
+                                cell.SetColumnWidth(4, 50);
+                                cell.SetColumnWidth(5, 30);
+                                cell.SetColumnWidth(6, 40);
+                                cell.SetColumnWidth(7, 25);
+                                cell.SetColumnWidth(8, 25);
+
+
+                                // Set header value
+                                ws.Cells["A1"].PutValue("STT");
+                                ws.Cells["B1"].PutValue("Mã dịch vụ ");
+                                ws.Cells["C1"].PutValue("Số lượng");
+                                ws.Cells["D1"].PutValue("Số lần");
+                                ws.Cells["E1"].PutValue("Trạng thái");
+                                ws.Cells["F1"].PutValue("Thành tiền");
+                                ws.Cells["G1"].PutValue("Ngày tạo");
+                           
+
+                                #endregion
+
+                                #region Body
+
+                                range = cell.CreateRange(1, 0, ListData.Count, 12);
+                                style = ws.Cells["A2"].GetStyle();
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                range.ApplyStyle(style, st);
+
+                                Style alignCenterStyle = ws.Cells["A2"].GetStyle();
+                                alignCenterStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+                                Style numberStyle = ws.Cells["J2"].GetStyle();
+                                numberStyle.Number = 3;
+                                numberStyle.HorizontalAlignment = TextAlignmentType.Right;
+                                numberStyle.VerticalAlignment = TextAlignmentType.Center;
+
+                                int RowIndex = 1;
+
+                                foreach (var item in ListData)
+                                {
+                                    RowIndex++;
+                                    ws.Cells["A" + RowIndex].PutValue(RowIndex - 1);
+                                    ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle);
+                                    ws.Cells["B" + RowIndex].PutValue(item.PackageName);
+                                    ws.Cells["C" + RowIndex].PutValue(item.Quantity);
+                                    ws.Cells["D" + RowIndex].PutValue(item.EndDate);
+                                    ws.Cells["E" + RowIndex].PutValue(item.Times);
+                                    ws.Cells["F" + RowIndex].PutValue(item.Status == 1 ? "Hủy" : "Sử dụng");
+                                    ws.Cells["G" + RowIndex].PutValue(item.Amount.ToString("N0"));
+                                    ws.Cells["H" + RowIndex].PutValue(item.CreatedDate.HasValue && item.CreatedDate != DateTime.MinValue ? item.CreatedDate.Value.ToString("dd-MM-yyyy HH:mm") : string.Empty);
+                                }
+
+                                #endregion
+                                wb.Save(FilePath);
+                                pathResult = FilePath;
+                            }
+                        }
+                        break;
+                    case 3:
+                        {
+                            var ListData = new List<OtherBookingPackagesOptionalModel>();
+                            DataTable dt = await _tourDAL.GetListOptionalBySupplierId(searchModel, StoreProcedureConstant.SP_GetAllListOtherBookingPackagesOptionallBySupplierId);
+                            if (dt != null && dt.Rows.Count > 0)
+                            {
+                                ListData = dt.ToList<OtherBookingPackagesOptionalModel>();
+
+                            }
+
+                            if (ListData != null && ListData.Count > 0)
+                            {
+                                Workbook wb = new Workbook();
+                                Worksheet ws = wb.Worksheets[0];
+                                ws.Name = "Danh sách đơn hàng";
+                                Cells cell = ws.Cells;
+
+                                var range = ws.Cells.CreateRange(0, 0, 1, 1);
+                                StyleFlag st = new StyleFlag();
+                                st.All = true;
+                                Style style = ws.Cells["A1"].GetStyle();
+
+                                #region Header
+                                range = cell.CreateRange(0, 0, 1, 12);
+                                style = ws.Cells["A1"].GetStyle();
+                                style.Font.IsBold = true;
+                                style.IsTextWrapped = true;
+                                style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                style.Pattern = BackgroundType.Solid;
+                                style.Font.Color = Color.White;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                range.ApplyStyle(style, st);
+
+                                // Set column width
+                                cell.SetColumnWidth(0, 8);
+                                cell.SetColumnWidth(1, 20);
+                                cell.SetColumnWidth(2, 50);
+                                cell.SetColumnWidth(3, 50);
+                                cell.SetColumnWidth(4, 50);
+                                cell.SetColumnWidth(5, 30);
+                                cell.SetColumnWidth(6, 40);
+                                cell.SetColumnWidth(7, 25);
+                                cell.SetColumnWidth(8, 25);
+
+
+                                // Set header value
+                                ws.Cells["A1"].PutValue("STT");
+                                ws.Cells["B1"].PutValue("Mã dịch vụ ");
+                                ws.Cells["C1"].PutValue("Trạng thái");
+                                ws.Cells["D1"].PutValue("Số lượng");
+                                ws.Cells["E1"].PutValue("Tổng tiền");
+                                ws.Cells["F1"].PutValue("Ngày tạo");
+
+
+                                #endregion
+
+                                #region Body
+
+                                range = cell.CreateRange(1, 0, ListData.Count, 12);
+                                style = ws.Cells["A2"].GetStyle();
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                range.ApplyStyle(style, st);
+
+                                Style alignCenterStyle = ws.Cells["A2"].GetStyle();
+                                alignCenterStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+                                Style numberStyle = ws.Cells["J2"].GetStyle();
+                                numberStyle.Number = 3;
+                                numberStyle.HorizontalAlignment = TextAlignmentType.Right;
+                                numberStyle.VerticalAlignment = TextAlignmentType.Center;
+
+                                int RowIndex = 1;
+
+                                foreach (var item in ListData)
+                                {
+                                    RowIndex++;
+                                    ws.Cells["A" + RowIndex].PutValue(RowIndex - 1);
+                                    ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle);
+                                    ws.Cells["B" + RowIndex].PutValue(item.PackageName);
+                                    ws.Cells["C" + RowIndex].PutValue(item.Status == 1 ? "Hủy" : "Sử dụng");
+                                    ws.Cells["D" + RowIndex].PutValue(item.Quantity);
+                                    ws.Cells["E" + RowIndex].PutValue(item.Amount.ToString("N0"));
+                                    ws.Cells["F" + RowIndex].PutValue(item.CreatedDate.HasValue && item.CreatedDate != DateTime.MinValue ? item.CreatedDate.Value.ToString("dd-MM-yyyy HH:mm") : string.Empty);
+                                }
+
+                                #endregion
+                                wb.Save(FilePath);
+                                pathResult = FilePath;
+                            }
+
+                        }
+                        break;
+                    case 4:
+                        {
+                            var ListData = new List<VinWonderOptionalViewModel>();
+                            DataTable dt = await _tourDAL.GetListOptionalBySupplierId(searchModel, StoreProcedureConstant.SP_GetAllListVinWonderOptionalBySupplierId);
+                            if (dt != null && dt.Rows.Count > 0)
+                            {
+                                ListData = dt.ToList<VinWonderOptionalViewModel>();
+
+                            }
+
+                            if (ListData != null && ListData.Count > 0)
+                            {
+                                Workbook wb = new Workbook();
+                                Worksheet ws = wb.Worksheets[0];
+                                ws.Name = "Danh sách đơn hàng";
+                                Cells cell = ws.Cells;
+
+                                var range = ws.Cells.CreateRange(0, 0, 1, 1);
+                                StyleFlag st = new StyleFlag();
+                                st.All = true;
+                                Style style = ws.Cells["A1"].GetStyle();
+
+                                #region Header
+                                range = cell.CreateRange(0, 0, 1, 12);
+                                style = ws.Cells["A1"].GetStyle();
+                                style.Font.IsBold = true;
+                                style.IsTextWrapped = true;
+                                style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                style.Pattern = BackgroundType.Solid;
+                                style.Font.Color = Color.White;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                range.ApplyStyle(style, st);
+
+                                // Set column width
+                                cell.SetColumnWidth(0, 8);
+                                cell.SetColumnWidth(1, 20);
+                                cell.SetColumnWidth(2, 50);
+                                cell.SetColumnWidth(3, 50);
+                                cell.SetColumnWidth(4, 50);
+                                cell.SetColumnWidth(5, 30);
+                                cell.SetColumnWidth(6, 40);
+                                cell.SetColumnWidth(7, 25);
+                                cell.SetColumnWidth(8, 25);
+
+
+                                // Set header value
+                                ws.Cells["A1"].PutValue("STT");
+                                ws.Cells["B1"].PutValue("Mã dịch vụ ");
+                                ws.Cells["C1"].PutValue("Thời gian sử dụng");
+                                ws.Cells["D1"].PutValue("Số lượng");
+                                ws.Cells["E1"].PutValue("Tổng tiền");
+                                ws.Cells["F1"].PutValue("Ngày tạo");
+
+
+                                #endregion
+
+                                #region Body
+
+                                range = cell.CreateRange(1, 0, ListData.Count, 12);
+                                style = ws.Cells["A2"].GetStyle();
+                                style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                style.VerticalAlignment = TextAlignmentType.Center;
+                                range.ApplyStyle(style, st);
+
+                                Style alignCenterStyle = ws.Cells["A2"].GetStyle();
+                                alignCenterStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+                                Style numberStyle = ws.Cells["J2"].GetStyle();
+                                numberStyle.Number = 3;
+                                numberStyle.HorizontalAlignment = TextAlignmentType.Right;
+                                numberStyle.VerticalAlignment = TextAlignmentType.Center;
+
+                                int RowIndex = 1;
+
+                                foreach (var item in ListData)
+                                {
+                                    RowIndex++;
+                                    ws.Cells["A" + RowIndex].PutValue(RowIndex - 1);
+                                    ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle);
+                                    ws.Cells["B" + RowIndex].PutValue(item.PackageName);
+                                    ws.Cells["C" + RowIndex].PutValue(((DateTime)item.DateUsed).ToString("dd/MM/yyyy"));
+                                    ws.Cells["D" + RowIndex].PutValue(item.Quantity);
+                                    ws.Cells["E" + RowIndex].PutValue(item.Amount.ToString("N0"));
+                                    ws.Cells["F" + RowIndex].PutValue(item.CreatedDate.HasValue && item.CreatedDate != DateTime.MinValue ? item.CreatedDate.Value.ToString("dd-MM-yyyy HH:mm") : string.Empty);
+                                }
+
+                                #endregion
+                                wb.Save(FilePath);
+                                pathResult = FilePath;
+                            }
+                        }
+                        break;
+                }
+              
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ExportPaymentRequest - SupplierRepository: " + ex);
+            }
+            return pathResult;
+        }
         #endregion
 
         #region program

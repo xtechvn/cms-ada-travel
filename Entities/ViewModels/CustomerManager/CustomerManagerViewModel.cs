@@ -1,4 +1,5 @@
 ﻿using Entities.Models;
+using Entities.ViewModels.Mongo;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -41,6 +42,12 @@ namespace Entities.ViewModels.CustomerManager
         public long TotalProfit { get; set; }
         public long TotalFundCustomerCare { get; set; }
         public long AmountContractPay { get; set; }
+
+        public string StatusName { get; set; }
+        public string UtmSourceName { get; set; }
+        public CommentClientMongoModel ListComment { get; set; }
+        public CommentClientMongoModel ListCommentNhuCau { get; set; }
+        public DateTime LastOrderDate { get; set; }
     }
     public class CustomerManagerViewSearchModel
     {
@@ -52,6 +59,7 @@ namespace Entities.ViewModels.CustomerManager
         public string Phone { get; set; }
         public int AgencyType { get; set; } = -1;
         public int ClientType { get; set; } = -1;
+        public int ClientStatus { get; set; } = -1;
         public int PermissionType { get; set; } = -1;
         public int PageIndex { get; set; }
         public int PageSize { get; set; }
@@ -60,6 +68,10 @@ namespace Entities.ViewModels.CustomerManager
         public double MinAmount { get; set; } = -1;
         public double MaxAmount { get; set; } = -1;
         public string SalerPermission { get; set; }
+        public string CacheName { get; set; }
+        public string _id { get; set; }
+        public int UtmSource { get; set; } = -1;
+
     }
 
     public class CustomerManagerView
@@ -86,6 +98,7 @@ namespace Entities.ViewModels.CustomerManager
         public string Note { get; set; }
         public string ClientCode { get; set; }
         public DateTime JoinDate { get; set; }
+        public int UtmSource { get; set; } = 0;
 
     }
     public class AmountRemainView
@@ -110,5 +123,11 @@ namespace Entities.ViewModels.CustomerManager
         public bool NguoiTao { get; set; }
         public bool Status { get; set; }
 
+    }
+    public class SumContractPayByUtmSource:AllCode
+    {
+        public int UtmSource { get; set; }
+        public double TotalAmount { get; set; }
+        
     }
 }

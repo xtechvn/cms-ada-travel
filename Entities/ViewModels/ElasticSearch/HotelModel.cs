@@ -24,26 +24,31 @@ namespace ENTITIES.ViewModels.ElasticSearch
 
     public class HotelModel
     {
-        public string hotel_id { get; set; }
+        public string hotelid { get; set; }
         public string name { get; set; }
         public string email { get; set; }
-        public string image_thumb { get; set; }
-        public Int16 number_of_roooms { get; set; }
-        
-        public double star { get; set; }
-        public long review_count { get; set; }
+        public string imagethumb { get; set; }
+        public int? numberofroooms { get; set; }
+
+        public double? star { get; set; }
+        public int? reviewcount { get; set; }
         public string city { get; set; }
 
-        public string review_rate { get; set; }
+        public double? reviewrate { get; set; }
         public string country { get; set; }
         public string street { get; set; }
         public string state { get; set; }
-        public string hotel_type { get; set; }
-        public List<string> type_of_room { get; set; }
-        public double min_price { get; set; }
-        public bool is_refundable { get; set; }
-        public bool is_instantly_confirmed { get; set; }
-        public int confirmed_time { get; set; }
+        public string hoteltype { get; set; }
+        public string typeofroom { get; set; }
+        public string groupname { get; set; } = null;
+        public string index_search { get; set; }
+        public string keyword { get; set; }
+        public bool? isrefundable { get; set; }
+        public bool? isinstantlyconfirmed { get; set; }
+        public bool? isdisplaywebsite { get; set; }
+        public bool? isvinhotel { get; set; }
+        public bool? iscommitfund { get; set; }
+        public int? position { get; set; }
     }
 
     public class thumbnails

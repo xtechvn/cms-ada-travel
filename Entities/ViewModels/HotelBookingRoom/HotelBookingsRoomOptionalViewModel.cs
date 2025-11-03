@@ -8,6 +8,7 @@ namespace Entities.ViewModels.HotelBookingRoom
     public class HotelBookingsRoomOptionalViewModel : HotelBookingRoomsOptional
     {
         public decimal TotalAmountPay { get; set; }
+        public double TotalContractPay { get; set; }
         public long SupplierId { get; set; }
         public string SupplierName { get; set; }
         public string Email { get; set; }

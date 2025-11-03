@@ -1,5 +1,6 @@
 ﻿using DAL;
 using Entities.ConfigModels;
+using Entities.Models;
 using Entities.ViewModels;
 using Microsoft.Extensions.Options;
 using Repositories.IRepositories;
@@ -107,7 +108,12 @@ namespace Repositories.Repositories
                                           AuthorId = Convert.ToInt32(!row["AuthorId"].Equals(DBNull.Value) ? row["AuthorId"] : 0),
                                           AuthorName = row["AuthorName"].ToString(),
                                           ArticleStatusName = row["ArticleStatusName"].ToString(),
-                                          ArticleCategoryName = row["ArticleCategoryName"].ToString()
+                                          ArticleCategoryName = row["ArticleCategoryName"].ToString(),
+                                          // ✅ Bổ sung 4 trường mới
+                                          //PlatForm = Convert.ToByte(!row["PlatForm"].Equals(DBNull.Value) ? row["PlatForm"] : 0),
+                                          //AimodelType = Convert.ToByte(!row["AimodelType"].Equals(DBNull.Value) ? row["AimodelType"] : 0),
+                                          //CampaignName = row["CampaignName"].ToString(),
+                                          //AiContent = row["AiContent"].ToString()
 
                                       }).ToList();
 
@@ -127,6 +133,34 @@ namespace Repositories.Repositories
         public Task<List<string>> GetSuggestionTag(string name)
         {
             return _TagDAL.GetSuggestionTag(name);
+        }
+
+        public async Task SaveFanpageImagesAsync(long articleId, List<string> images)
+        {
+           
+            var processedImages = new List<string>();
+
+            foreach (var image in images)
+            {
+                var url = await UpLoadHelper.UploadBase64Src(image, _UrlStaticImage);
+                // ✅ Nếu URL trả về KHÔNG chứa static domain thì gắn vào
+                if (!string.IsNullOrEmpty(url) && !url.Contains(_UrlStaticImage))
+                {
+                    url = _UrlStaticImage + url;
+                }
+                if (!string.IsNullOrEmpty(url))
+                {
+                    processedImages.Add(url);
+                }
+            }
+
+            await _ArticleDAL.SaveFanpageImagesAsync(articleId, processedImages);
+        }
+
+
+        public async Task<List<string>> GetFanpageImagesAsync(long articleId)
+        {
+            return await _ArticleDAL.GetFanpageImagesAsync(articleId);
         }
 
         public async Task<long> SaveArticle(ArticleModel model)

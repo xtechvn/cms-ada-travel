@@ -9,5 +9,6 @@ namespace Entities.ViewModels.BankingAccount
         public double Amount { get; set; }
         public double SumAmount { get; set; }
         public double SumAmountTR { get; set; }
+        public double TransactionSMs_Amount { get; set; }
     }
 }

@@ -6,7 +6,7 @@
         _order_detail_common.Select2WithFixedOptionAndSearch($('.add-service-other-select-service'))
         _order_detail_common.SingleDateTimePicker($('.service-other-from-date'))
         _order_detail_common.SingleDateTimePicker($('.service-other-to-date'))
-        _order_detail_common.UserSuggesstion($('.add-service-other-main-staff'),9)
+        _order_detail_common.UserSuggesstion($('.add-service-other-main-staff'),0)
         _order_detail_common.FileAttachment(booking_id, _order_detail_other.ServiceType)
         _order_detail_other.DynamicBind()
     },

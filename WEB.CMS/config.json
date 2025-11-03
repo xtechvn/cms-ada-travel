@@ -64,6 +64,7 @@
   "upload_QR_payment_order": "/images/upload-payment-order",
   "Department_Operator_Hotel": 26,
   "Department_Operator_Fly": 12,
+  "Department_Operator_Fly_SG": 119,
   "Department_Operator_Tour": 27,
   "Department_Operator_WaterSport": 44,
   "GET_COMMENT_LISTING": "/api/comment/get-list.json",

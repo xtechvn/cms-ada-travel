@@ -9,7 +9,7 @@
     <div class="flex space-between row-main-head pd10">
         <div class="bold">Yêu cầu xuất hóa đơn</div>
         <div>
-            @if (totalRequest == 0 && orderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR)
+            @if (totalRequest == 0 &&( orderStatus == (int)OrderStatus.WAITING_FOR_OPERATOR || orderStatus == (int)OrderStatus.OPERATOR_DECLINE || orderStatus == (int)OrderStatus.WAITING_FOR_ACCOUNTANT || orderStatus == (int)OrderStatus.ACCOUNTANT_DECLINE || orderStatus == (int)OrderStatus.FINISHED))
             {
                 <button onclick="_orderDetail.AddInvoiceRequest();" type="button" class="btn btn-default bg-main ">
                     <i class="fa fa-plus"></i>Thêm
@@ -47,7 +47,7 @@
                                 <td>@item.Note</td>
                                 <td class="text-right">@item.TotalPriceVAT.ToString("N0")</td>
                                 <td>
-                                    @if (item.Status == (int)(INVOICE_REQUEST_STATUS.CHO_TBP_DUYET) || item.Status == (int)(INVOICE_REQUEST_STATUS.CHO_KTT_DUYET))
+                                    @if (item.Status == (int)(INVOICE_REQUEST_STATUS.CHO_TBP_DUYET) || item.Status == (int)(INVOICE_REQUEST_STATUS.CHO_KTT_DUYET) || item.Status == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP) || item.Status == (int)(INVOICE_REQUEST_STATUS.HOA_DON_NHAP))
                                     {
                                         <span class="status-wait">@item.InvoiceRequestStatus</span>
                                     }
@@ -62,7 +62,7 @@
                                     @if (item.Status == (int)(INVOICE_REQUEST_STATUS.LUU_NHAP))
                                     {
                                         <span class="status-draft">@item.InvoiceRequestStatus</span>
-                                    }
+                                    }                                   
                                 </td>
                                 <td>@item.CreatedDate.Value.ToString("dd/MM/yyyy")</td>
                                 <td class="text-center">

@@ -1,6 +1,6 @@
 ﻿@{
     Layout = null;
-    List<Entities.Models.VinWonderBookingTicket> list = (List<Entities.Models.VinWonderBookingTicket>)ViewBag.ExtraList;
+    List<Entities.ViewModels.SetServices.VinWonderBookingTicketViewModel> list = (List<Entities.ViewModels.SetServices.VinWonderBookingTicketViewModel>)ViewBag.ExtraList;
     double profit = list != null && list.Count > 0 ? list.Sum(x => (double)x.Profit) : 0;
     double amount = list != null && list.Count > 0 ? list.Sum(x => (double)x.Amount) : 0;
     int index = 0;

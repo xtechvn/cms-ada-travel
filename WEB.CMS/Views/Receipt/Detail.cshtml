@@ -34,7 +34,7 @@
                                 <div class="col-5 mb10">Hình thức</div>
                                 <div class="col-7 mb10">: @Model.PayTypeStr</div>
                                 @if (Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_DON_HANG
-                              || Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_KY_QUY)
+                             || Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_KY_QUY)
                                 {
                                     <div class="col-5 mb10">Khách hàng</div>
                                     <div class="col-7 mb10">
@@ -46,7 +46,7 @@
                                     </div>
                                 }
                                 @if (Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_HOA_HONG_NCC
-                              || Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_NCC_HOAN_TRA)
+                             || Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_NCC_HOAN_TRA)
                                 {
                                     <div class="col-5 mb10">Nhà cung cấp</div>
                                     <div class="col-7 mb10">
@@ -84,26 +84,26 @@
                                         @if (Model.AmountPayDetail >= Model.ContractPayDetail.Sum(n => n.AmountOrder))
                                         {
                                             <div>
-                                                : <span class=" green">  @Model.AmountPayDetail.ToString("N0")</span>
-                                                /@Model.ContractPayDetail.Sum(n => n.AmountOrder).ToString("N0")
+                                                : <span class=" green"> @Model.ContractPayDetail.Sum(n => n.AmountPayDetail).ToString("N0")</span>
+                                                /@Model.Amount.ToString("N0")
                                             </div>
                                         }
                                         else
                                         {
                                             <div class=" ">
-                                                :  <span class=" red">  @Model.AmountPayDetail.ToString("N0")</span>
-                                                / @Model.ContractPayDetail.Sum(n => n.AmountOrder).ToString("N0")
+                                                :  <span class=" red"> @Model.ContractPayDetail.Sum(n => n.AmountPayDetail).ToString("N0")</span>
+                                                / @Model.Amount.ToString("N0")
                                             </div>
                                         }
                                     </div>
                                 }
                                 @if (Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_KY_QUY ||
-                              Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_KHAC)
+                             Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_KHAC)
                                 {
                                     <div class="col-7 mb10">:@Model.Amount.ToString("N0")</div>
                                 }
                                 @if (Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_HOA_HONG_NCC
-                              || Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_NCC_HOAN_TRA)
+                             || Model.Type == (int)DepositHistoryConstant.CONTRACT_PAY_TYPE.THU_TIEN_NCC_HOAN_TRA)
                                 {
                                     <div class="col-7 mb10">: @Model.Amount.ToString("N0")</div>
 

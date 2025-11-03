@@ -14,6 +14,7 @@ using Nest;
 using Newtonsoft.Json;
 using PdfSharp;
 using Repositories.IRepositories;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -21,6 +22,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 using Utilities;
 using Utilities.Contants;
 
@@ -55,7 +57,7 @@ namespace Repositories.Repositories
             var model = new GenericViewModel<OrderViewModel>();
             try
             {
-                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GET_TOTALCOUNT_ORDER);
+                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GET_TOTALCOUNT_ORDER);
                 if (dt != null && dt.Rows.Count > 0)
                 {
 
@@ -65,6 +67,9 @@ namespace Repositories.Repositories
                     model.TotalRecord3 = dt.Rows[0]["TotalStatusTab3"].Equals(DBNull.Value) ? 0 : Convert.ToInt32(dt.Rows[0]["TotalStatusTab3"]);
                     model.TotalrecordErr = dt.Rows[0]["TotalStatusTab4"].Equals(DBNull.Value) ? 0 : Convert.ToInt32(dt.Rows[0]["TotalStatusTab4"]);
                     model.TotalRecord4 = dt.Rows[0]["TotalStatusTab5"].Equals(DBNull.Value) ? 0 : Convert.ToInt32(dt.Rows[0]["TotalStatusTab5"]);
+                    model.Profit = dt.Rows[0]["Profit"].Equals(DBNull.Value) ? 0 : Convert.ToDouble(dt.Rows[0]["Profit"]);
+                    model.Amount = dt.Rows[0]["Amount"].Equals(DBNull.Value) ? 0 : Convert.ToDouble(dt.Rows[0]["Amount"]);
+                    model.Price = dt.Rows[0]["Price"].Equals(DBNull.Value) ? 0 : Convert.ToDouble(dt.Rows[0]["Price"]);
                 }
             }
             catch (Exception ex)
@@ -78,7 +83,7 @@ namespace Repositories.Repositories
             var model = new GenericViewModel<OrderViewModel>();
             try
             {
-                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GETALLORDER_SEARCH);
+                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETALLORDER_SEARCH);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     model.ListData = (from row in dt.AsEnumerable()
@@ -113,6 +118,8 @@ namespace Repositories.Repositories
                                           SalerUserName = row["SalerUserName"].ToString(),
                                           SalerEmail = row["SalerEmail"].ToString(),
                                           UtmMedium = row["UtmMedium"].ToString(),
+                                          InvoiceRequestStatus = !row["InvoiceRequestStatus"].Equals(DBNull.Value) ? Convert.ToInt32(row["InvoiceRequestStatus"].ToString()) : 999,
+                                          InvoiceRequestStatusName = row["InvoiceRequestStatusName"].ToString(),
 
 
                                       }).ToList();
@@ -173,6 +180,8 @@ namespace Repositories.Repositories
                                           SalerEmail = md1.SalerEmail,
                                           SalerUserName = md1.SalerUserName,
                                           UtmMedium = md1.UtmMedium,
+                                          InvoiceRequestStatusName = md1.InvoiceRequestStatusName,
+                                          InvoiceRequestStatus = md1.InvoiceRequestStatus,
                                       }
                                                     ).ToList();
                 }
@@ -189,7 +198,10 @@ namespace Repositories.Repositories
                 model.TotalRecord2 = model3.TotalRecord2;
                 model.TotalRecord3 = model3.TotalRecord3;
                 model.TotalRecord4 = model3.TotalRecord4;
-                model.TotalrecordErr = model3.TotalrecordErr;
+                model.Amount = model3.Amount;
+                model.Price = model3.Price;
+                model.Profit = model3.Profit;
+         
             }
             catch (Exception ex)
             {
@@ -198,7 +210,7 @@ namespace Repositories.Repositories
             return model;
         }
 
-        public async Task<Order> CreateOrder(Order order)
+        public async Task<Entities.Models.Order> CreateOrder(Entities.Models.Order order)
         {
             try
             {
@@ -217,7 +229,7 @@ namespace Repositories.Repositories
             return null;
         }
 
-        public async Task<Order> GetOrderByID(long id)
+        public async Task<Entities.Models.Order> GetOrderByID(long id)
         {
             try
             {
@@ -238,7 +250,7 @@ namespace Repositories.Repositories
             {
                 var listOrder = new List<OrderViewModel>();
                 var listOrderOutput = new List<OrderViewModel>();
-                var dt = _OrderDal.GetListOrderByClientId(clientId, ProcedureConstants.SP_GetDetailOrderByClientId, status);
+                var dt = _OrderDal.GetListOrderByClientId(clientId, StoreProcedureConstant.SP_GetDetailOrderByClientId, status);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     listOrder = (from row in dt.AsEnumerable()
@@ -254,7 +266,10 @@ namespace Repositories.Repositories
                                      CreateDate = row["CreateTime"].Equals(DBNull.Value) ? "" : Convert.ToDateTime(row["CreateTime"]).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
                                      Amount = !row["Amount"].Equals(DBNull.Value) ? Convert.ToDouble(row["Amount"].ToString()) : 0,
                                      IsFinishPayment = Convert.ToInt32(row["IsFinishPayment"].ToString()),
+                                     StatusCode = Convert.ToInt32(row["StatusCode"].ToString()),
+                                     IsLock = row["IsLock"].Equals(DBNull.Value) ? null:Convert.ToInt32(row["IsLock"].ToString()),
                                  }).ToList();
+                    listOrder = listOrder.Where(n => n.IsLock != 1).ToList();
                     var listContractPayDetail = contractPayDAL.GetByContractDataIds(listOrder.Select(n => Convert.ToInt64(n.OrderId)).ToList());
                     foreach (var item in listOrder)
                     {
@@ -337,7 +352,7 @@ namespace Repositories.Repositories
             return new List<OrderViewModel>();
         }
 
-        public async Task<Order> GetOrderByOrderNo(string orderNo)
+        public async Task<Entities.Models.Order> GetOrderByOrderNo(string orderNo)
         {
             try
             {
@@ -459,7 +474,7 @@ namespace Repositories.Repositories
             {
                 var listOrder = new List<OrderViewModel>();
                 var listOrderOutput = new List<OrderViewModel>();
-                var dt = _OrderDal.GetListOrderByClientId(clientId, ProcedureConstants.SP_GetDetailOrderByClientId);
+                var dt = _OrderDal.GetListOrderByClientId(clientId, StoreProcedureConstant.SP_GetDetailOrderByClientId);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     listOrder = (from row in dt.AsEnumerable()
@@ -548,7 +563,7 @@ namespace Repositories.Repositories
             }
             return new List<OrderViewModel>();
         }
-        public int UpdateOrder(Order model)
+        public int UpdateOrder(Entities.Models.Order model)
         {
             return _OrderDal.UpdateOrder(model);
         }
@@ -557,7 +572,7 @@ namespace Repositories.Repositories
             try
             {
                 var client = await _clientDAL.GetClientDetail(client_id);
-                if (client != null && client.ClientType == (int)ClientType.kl)
+                if (client != null && client.ClientType == (int)Utilities.Contants.ClientType.kl)
                 {
                     return (int)DebtType.DEBT_ACCEPTED;
                 }
@@ -641,7 +656,7 @@ namespace Repositories.Repositories
             {
                 currentPage = -1;
                 var data = new List<OrderViewModel>();
-                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GETALLORDER_SEARCH);
+                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETALLORDER_SEARCH);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     data = (from row in dt.AsEnumerable()
@@ -675,6 +690,8 @@ namespace Repositories.Repositories
                                 SalerUserName = row["SalerUserName"].ToString(),
                                 SalerEmail = row["SalerEmail"].ToString(),
                                 UtmMedium = row["UtmMedium"].ToString(),
+                                CutOffDate = row["CutOffDate"].Equals(DBNull.Value) ? "" : Convert.ToDateTime(row["CutOffDate"]).ToString("dd/MM/yyyy ", CultureInfo.InvariantCulture),
+
                             }).ToList();
                 }
                 else
@@ -734,6 +751,7 @@ namespace Repositories.Repositories
                     if (field.HINHTHUCTT) { listfieldtext.Add("Hình thức thanh toán"); listfield.Add(18); }
 
                     listfieldtext.Add("Mã code dịch vụ"); listfield.Add(19);
+                    listfieldtext.Add("Ngày thu hồi"); listfield.Add(20);
 
                     cell.SetColumnWidth(0, 8);
                     for (int i = 1; i <= listfieldtext.Count; i++)
@@ -1006,13 +1024,18 @@ namespace Repositories.Repositories
                                     {
                                         var ListHotelBookingCode = dt_HotelBookingCode.ToList<HotelBookingCodeModel>();
                                         ws.Cells[Cell[I] + RowIndex].PutValue(string.Join(",", ListHotelBookingCode.Select(x => x.BookingCode)));
-                                        listfield2.Remove(listfield2[f]);
-                                        f--;
-
                                     }
-
+                                    listfield2.Remove(listfield2[f]);
+                                    f--;
                                     break;
 
+                                }
+                                if (listfield2[f] == 20)
+                                {
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.CutOffDate);
+                                    listfield2.Remove(listfield2[f]);
+                                    f--;
+                                    break;
                                 }
                             }
 
@@ -1023,7 +1046,7 @@ namespace Repositories.Repositories
 
                     }
                     #endregion
-                    wb.Save(FilePath);
+                     wb.Save(FilePath);
                     pathResult = FilePath;
                 }
             }
@@ -1037,7 +1060,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                var data = contractPayDAL.GetByOrderId(OrderId, ProcedureConstants.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
+                var data = contractPayDAL.GetByOrderId(OrderId, StoreProcedureConstant.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
                 var order = _OrderDal.GetByOrderId(OrderId);
 
                 if (order != null && order.OrderId > 0 && order.Amount > 0 && data != null && data.Count > 0 && order.Amount <= data.Sum(x => x.AmountPayDetail))
@@ -1065,7 +1088,7 @@ namespace Repositories.Repositories
                 var order = _OrderDal.GetByOrderId(order_id);
                 if (order.OrderStatus == (int)OrderStatus.CANCEL)
                 {
-                    var list_contract_pay = _contractPayDAL.GetByOrderId(order_id, ProcedureConstants.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
+                    var list_contract_pay = _contractPayDAL.GetByOrderId(order_id, StoreProcedureConstant.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
                     if (list_contract_pay != null && list_contract_pay.Count > 0)
                     {
                         //_contractPayDAL.UpdateContractPayDetail(string.Join(",", list_contract_pay.Select(x => x.PayId)), order_id, (order.Amount == null ? 0 : (double)order.Amount), user_summit);
@@ -1090,7 +1113,7 @@ namespace Repositories.Repositories
             var model = new TotalCountSumOrder();
             try
             {
-                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GET_TOTALCOUNT_ORDER);
+                DataTable dt = await _OrderDal.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GET_TOTALCOUNT_ORDER);
                 if (dt != null && dt.Rows.Count > 0)
                 {
 
@@ -1194,7 +1217,7 @@ namespace Repositories.Repositories
         {
             try
             {
-                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId);
+                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId.ToString(), SalerId.ToString());
                 if (dt != null && dt.Rows.Count > 0)
                 {
 
@@ -1221,11 +1244,11 @@ namespace Repositories.Repositories
                 return 0;
             }
         }
-        public async Task<double> AmountTotalBySalerId(long SalerId)
+        public async Task<double> AmountTotalBySalerId(string SalerId, string SalerPermission)
         {
             try
             {
-                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId);
+                DataTable dt = await _OrderDal.CheckAmountRemainBySalerId(SalerId, SalerPermission);
                 if (dt != null && dt.Rows.Count > 0)
                 {
 
@@ -1237,6 +1260,59 @@ namespace Repositories.Repositories
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("AmountTotalBySalerId - OrderRepository: " + ex);
+            }
+            return -1;
+        }
+        public async Task<GenericViewModel<ReportOrderViewModel>> GetlistReportOrder(SearchReportOrderModels searchModel)
+        {
+            var model = new GenericViewModel<ReportOrderViewModel>();
+            try
+            {
+                DataTable dt = await _OrderDal.GetListOrder(searchModel);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<ReportOrderViewModel>();
+                    model.ListData = data;
+                    model.CurrentPage = searchModel.PageIndex;
+                    model.PageSize = searchModel.pageSize;
+                    model.TotalRecord = Convert.ToInt32(dt.Rows[0]["TotalRow"]);
+                    model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / model.PageSize);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetlistReportOrder in OrderRepository: " + ex);
+            }
+            return model;
+        }
+        public async Task<List<ReportOrderServiceViewModel>> GetReportOrderAllServiceByOrderId(long OrderId)
+        {
+            //var data = new List<OrderServiceViewModel>();
+            try
+            {
+                DataTable dt = await _OrderDal.GetAllServiceByOrderId(OrderId);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var listData = dt.ToList<ReportOrderServiceViewModel>();
+                    return listData;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetReportOrderAllServiceByOrderId - OrderRepository: " + ex);
+            }
+            return null;
+        }
+        public async Task<long> UpdateOrderCutOffDate(long order_id, int user_commit, string CutOffDate)
+        {
+            //var data = new List<OrderServiceViewModel>();
+            try
+            {
+                return await _OrderDal.UpdateOrderCutOffDate(order_id, user_commit, CutOffDate);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetReportOrderAllServiceByOrderId - OrderRepository: " + ex);
             }
             return -1;
         }

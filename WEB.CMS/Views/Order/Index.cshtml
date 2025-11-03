@@ -14,6 +14,7 @@
     var Status = (List<AllCode>)ViewBag.FilterOrder.Status;
     var PAYMENT_STATUS = (List<AllCode>)ViewBag.PAYMENT_STATUS;
     var PERMISION_TYPE = (List<AllCode>)ViewBag.PERMISION_TYPE;
+    var INVOICE_REQUEST_STATUS = (List<AllCode>)ViewBag.INVOICE_REQUEST_STATUS;
     var SuggestOrder = (string[])ViewBag.FilterOrder.SuggestOrder;
 }
 <style>
@@ -196,12 +197,34 @@
                 </select>
 
             </div>
-            <div class="form-group mb10 mr-2" >
+            <div class="form-group mb10 mr-2">
                 <select class="select2" name="IsSalerDebtLimit" id="IsSalerDebtLimit" style="width: 150px;">
                     <option value="">Tất cả</option>
                     <option value="0">Không được bảo lãnh</option>
                     <option value="1">Bảo lãnh công nợ</option>
                 </select>
+            </div>
+            <div class="form-group mb10 mr-2">
+                <div class="multiple-select form-group mb10 mr-2" style="width: 250px; margin-top: 10px;">
+                    <div class="select-btn select-btn-InvoiceRequestStatus" id="InvoiceRequestStatus">
+                        <span class="btn-text-InvoiceRequestStatus">Tất cả trạng thái yêu cầu hóa đơn</span>
+                        <span class="arrow-dwn">
+                            <i class="fa fa-angle-down"></i>
+                        </span>
+                    </div>
+
+                    <ul class="list-items list-item-InvoiceRequestStatus" id="list-item-InvoiceRequestStatus">
+                        @foreach (var item in INVOICE_REQUEST_STATUS)
+                        {
+                            <li class="item item-InvoiceRequestStatus" id="InvoiceRequestStatus_data_@item.CodeValue">
+                                <span class="checkbox" id="checkbox_InvoiceRequestStatus_@item.CodeValue">
+                                    <i class="fa fa-check"></i>
+                                </span>
+                                <span class="item-text" id="InvoiceRequestStatus_text_@item.CodeValue">@item.Description</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
             </div>
             <div class="form-group mb10 mr-2">
                 <input type="text" style="display:none" class="form-control" id="" placeholder="Nhân viên phụ">

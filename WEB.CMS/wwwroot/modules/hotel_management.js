@@ -102,17 +102,23 @@
         let formData = hotel_management.GetFormData(Form);
         var b2c = $('#PositionB2C :checked').text();
         var b2B = $('#PositionB2B :checked').text();
+        var BanChay = $('#PositionBanChay :checked').text();
         if (parseFloat(formData.PositionB2B) != 0 && parseFloat(formData.PositionB2B) != parseFloat(b2B)) {
             formData.PositionB2B = b2B
         }
         if (parseFloat(formData.PositionB2C) != 0 && parseFloat(formData.PositionB2C) != parseFloat(b2c)) {
             formData.PositionB2C = b2c
         }
+        if (parseFloat(formData.PositionBanChay) != 0 && parseFloat(formData.PositionBanChay) != parseFloat(BanChay)) {
+            formData.PositionBanChay = BanChay
+        }
         
         let avatar = $('#avatar_image').attr('src');
         formData.ImageThumb = (avatar != null && avatar != "") ? avatar : "";
-        formData.HotelId = null;
+        formData.HotelId = $('#HotelId').val();
         formData.IsCommitFund = $('#IsCommitFund').is(":checked")
+        formData.ProvinceId = $('#ProvinceId').val();
+        formData.State = $('#ProvinceId option:selected').text().trim();
 
 
         if ((formData.ImageThumb == null || formData.ImageThumb == "") && status == 0) {
@@ -208,8 +214,8 @@
             return false;
         }
 
-        if (file.size > (5 * 1024 * 1024)) {
-            _msgalert.error("Ảnh tải lên phải có dung lượng bé hơn hoặc bằng 5MB.");
+        if (file.size > (2.5 * 1024 * 1024)) {
+            _msgalert.error("Ảnh tải lên phải có dung lượng bé hơn hoặc bằng 2.5MB.");
             return false;
         }
 

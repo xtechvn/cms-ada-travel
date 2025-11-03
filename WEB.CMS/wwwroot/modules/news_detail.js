@@ -250,6 +250,232 @@ $('#btn-cancel-crop').click(function () {
     // $('.btn-dynamic-enable').prop('disabled', false);
 });
 
+function convertTinyMCEToPlainText(htmlContent) {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = htmlContent;
+
+    // Convert <br> → \n
+    tempDiv.querySelectorAll("br").forEach(br => br.replaceWith("\n"));
+
+    // Convert <p> → \n (mỗi đoạn 2 dòng cách nhau)
+    tempDiv.querySelectorAll("p").forEach(p => {
+        const newline = document.createTextNode("\n\n");
+        p.parentNode.insertBefore(newline, p.nextSibling);
+    });
+
+    // Lấy plain text
+    let plainText = tempDiv.textContent || tempDiv.innerText || "";
+
+    // Làm sạch text
+    return plainText
+        .replace(/\n{3,}/g, "\n\n") // tránh quá nhiều dòng trống
+        .trim();
+}
+
+
+var _news = {
+    modal_element: $('.modal'),
+    ShowAddOrUpdate: function (id, parent_id = 0) {
+        debugger
+        let title = `${id > 0 ? "Cập nhật" : "Thêm mới"} menu`;
+        let url = '/news/AddOrUpdate';
+        _news.modal_element.find('.modal-title').html(title);
+        _news.modal_element.find('.modal-dialog').css('max-width', '680px');
+        _ajax_caller.get(url, { id: id, parent_id: parent_id }, function (result) {
+            _news.modal_element.find('.modal-body').html(result);
+            _news.modal_element.modal('show');
+        });
+    },
+
+
+    ShowAddOrUpdateFromAI: function () {
+        debugger;
+
+        const aiArticles = JSON.parse(localStorage.getItem('aiArticles') || '[]');
+        const lastAI = aiArticles.length > 0 ? aiArticles[aiArticles.length - 1] : null;
+        const currentId = parseInt($('#Id').val()) || 0;
+
+        // Ưu tiên sửa bài đang mở (đã lưu DB), fallback dùng bài AI trong local
+        const openId = currentId > 0 ? currentId : (lastAI?.Id ? parseInt(lastAI.Id) : 0);
+
+        if (openId <= 0) {
+            _msgalert.error("Không tìm thấy bài viết nào để sửa.");
+            return;
+        }
+
+        _news.modal_element.find('.modal-title').html("Sửa bài viết");
+        _news.modal_element.find('.modal-dialog').css('max-width', '680px');
+
+        _ajax_caller.get('/news/AddOrUpdate', { id: openId }, function (result) {
+            _news.modal_element.find('.modal-body').html(result);
+
+            // ✅ Nếu có AI tương ứng bài đang sửa → gán dữ liệu AI
+            if (lastAI && parseInt(lastAI.Id) === openId) {
+                setTimeout(() => {
+                    $('#CampaignName').val(lastAI.CampaignName || "");
+                    $('#AiContent').val(lastAI.AiContent || "");
+                    $(`input[name="PlatForm"][value="${lastAI.PlatForm}"]`).prop("checked", true);
+                }, 300);
+            }
+
+            _news.modal_element.modal('show');
+        });
+    },
+
+
+    // Cập nhật Ai
+    OnSave: function () {
+        debugger;
+
+        const data = {
+            Id: parseInt($('#Id').val()) || 0, // vẫn lấy Id từ view chính
+            CampaignName: $('#modal-CampaignName').val(),
+            PlatForm: parseInt($('input[name="PlatForm"]:checked', _news.modal_element).val()),
+            AiContent: $('#modal-AiContent').val(),
+            AimodelType: 1
+        };
+
+        // ⚠️ Nếu chọn web → reset flag IsPostedToFanpage
+        if (data.PlatForm !== 1) {
+            $('#IsPostedToFanpage').val(0);
+        }
+
+        if (!data.AiContent) {
+            _msgalert.error("Bạn cần nhập nội dung để gửi lên AI.");
+            return;
+        }
+
+
+        const platformText = data.PlatForm === 1 ? "facebook" : "web";
+        const payload = {
+            chatInput: data.AiContent,
+            platform: platformText
+        };
+
+        $('#loadingOverlay').show();
+        localStorage.removeItem('aiArticles');
+
+        $.ajax({
+            url: "https://n8n.adavigo.com/webhook/send-message",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(payload),
+            success: function (res) {
+                debugger
+                $('#loadingOverlay').hide();
+
+                // ✅ Gán kết quả AI trả về
+                data.AiResult = res.content;
+                data.Title = res.title || "";
+                data.Lead = res.lead || "";
+                data.Images = (res.img_lst || []).slice(0, 10);
+                data.Keywords = res.keyword || [];
+
+                // ✅ Lưu lại vào localStorage
+                let aiArticles = JSON.parse(localStorage.getItem('aiArticles') || '[]');
+
+                // Xoá nếu trùng Id (đã lưu)
+                aiArticles = aiArticles.filter(item => parseInt(item.Id) !== data.Id);
+
+                // Ghi lại bài mới
+                aiArticles.push(data);
+                localStorage.setItem('aiArticles', JSON.stringify(aiArticles));
+
+
+                // ✅ Redirect tới trang chi tiết bài viết, gắn lại các tham số
+                const redirectUrl = `/news/detail/${data.Id || 0}?fromAI=true&platform=${data.PlatForm}&AimodelType=1`;
+                window.location.href = redirectUrl;
+            },
+            error: function (xhr, status, err) {
+                $('#loadingOverlay').hide();
+                console.error("❌ Gửi thất bại:", err);
+                _msgalert.error("❌ Lỗi khi gửi lên AI.");
+            }
+        });
+    },
+
+
+    postToFanpage: async function (articleId) {
+        const defaultImage = "https://static-image.adavigo.com/uploads/images/2025/1/23/9ac274a4-56ab-47fe-bbba-5a94daa84510.png";
+
+        // ✅ Hiện loading
+        $('#loadingPostFanpage').addClass('show');
+
+        let images = JSON.parse($('#selectedImagesForFanpage').val() || '[]');
+
+        if (images.length === 0) {
+            $('#fanpage-db-wrapper .fanpage-img-option').each(function () {
+                const url = $(this).attr('src');
+                if (url) images.push(url);
+            });
+        }
+
+        if (images.length === 0) {
+            images = [defaultImage];
+        }
+
+        const imagesNeedConvert = images.filter(x => !x.includes("static-image.adavigo.com"));
+
+        if (imagesNeedConvert.length > 0) {
+            try {
+                const res = await $.ajax({
+                    url: '/news/ConvertImagesBeforePost',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(imagesNeedConvert)
+                });
+
+                const staticImages = images.filter(x => x.includes("static-image.adavigo.com"));
+                images = [...staticImages, ...res];
+            } catch (err) {
+                $('#loadingPostFanpage').removeClass('show');
+                _msgalert.error("❌ Lỗi chuẩn hóa ảnh: " + err.message);
+                return;
+            }
+        }
+
+        $('#IsPostedToFanpage').val(1);
+
+        _newsDetail.OnSave(0, function (savedId) {
+            if (!savedId) {
+                $('#loadingPostFanpage').removeClass('show');
+                _msgalert.error("❌ Không thể lưu bài viết trước khi đăng.");
+                return;
+            }
+
+            const rawContent = tinymce.activeEditor.getContent();
+            const plainText = convertTinyMCEToPlainText(rawContent);
+            const payload = {
+                content: plainText,
+                image_list: images
+            };
+
+            $.ajax({
+                url: "https://n8n.adavigo.com/webhook/post-facebook",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    $('#loadingPostFanpage').removeClass('show');
+
+                    if (res.post_supports_client_mutation_id) {
+                        _msgalert.success("✅ Đăng bài lên Fanpage thành công!");
+                        $('#btn-post-fanpage').replaceWith('<button class="btn btn-success" disabled>Đã đăng lên Fanpage</button>');
+                        window.location.href = "/news/detail/" + savedId;
+                    } else {
+                        _msgalert.error("❌ Đăng lên Fanpage thất bại.");
+                    }
+                },
+                error: function () {
+                    $('#loadingPostFanpage').removeClass('show');
+                    _msgalert.error("❌ Lỗi khi kết nối tới N8n.");
+                }
+            });
+        });
+    }
+
+
+};
 
 var _newsDetail = {
 
@@ -263,18 +489,41 @@ var _newsDetail = {
         _wrapperImage.data('lightGallery').destroy(true);
         _wrapperImage.lightGallery();
     },
-
-    OnSave: function (articleStatus) {
+    //Lưu Bài Viết
+    OnSave: function (articleStatus, callback = null) {
+        debugger
         let formvalid = $('#form-news');
+
+        // ✅ Kiểm tra xem bài viết là Facebook (PlatForm = 1) hay không
+        const aiArticles = JSON.parse(localStorage.getItem('aiArticles') || '[]');
+        const lastAI = aiArticles.length > 0 ? aiArticles[aiArticles.length - 1] : {};
+
+        // 👇 Ưu tiên lấy từ DB (input hidden), nếu không có thì lấy từ localStorage
+        const platformVal = parseInt($('#PlatForm').val() || lastAI?.PlatForm || 0);
+        const aimodelTypeVal = parseInt($('#AimodelType').val() || lastAI?.AimodelType || 0);
+        const campaignNameVal = $('#CampaignName').val() || lastAI?.CampaignName || "";
+        const aiContentVal = $('#AiContent').val() || lastAI?.AiContent || "";
+        const articleId = $('#Id').val() || lastAI?.Id || 0;
+        const isPostedToFanpage = parseInt($('#IsPostedToFanpage').val() || 0);
+
+        const isFanpage = platformVal === 1 && aimodelTypeVal === 1;
+        const isWebsiteAI = platformVal === 0 && aimodelTypeVal === 1;
+        const isManual = aimodelTypeVal === 0;
+        // 👇 Thêm dòng này ngay sau xác định isFanpage
+        if (!isFanpage) {
+            $('#IsPostedToFanpage').val(0); // Nếu không còn là fanpage → reset lại
+        }
+
         var max_pos = $('#ArticleType:checked').val() == "0" ? 7 : 8;
+
         formvalid.validate({
             rules: {
                 Title: {
-                    required: true,
+                    required: !isFanpage, // ⚠️ Nếu không phải fanpage thì bắt buộc
                     maxlength: 300
                 },
                 Lead: {
-                    required: true,
+                    required: !isFanpage,
                     maxlength: 400
                 },
                 Position: {
@@ -286,66 +535,68 @@ var _newsDetail = {
                 Title:
                 {
                     required: "Vui lòng nhập tiêu đề cho bài viết",
-                    maxlength: "Tiêu đề cho bài viết không được vượt quá 300 ký tự"
+                    maxlength: "Tiêu đề không được vượt quá 300 ký tự"
                 },
                 Lead: {
                     required: "Vui lòng nhập mô tả ngắn cho bài viết",
-                    maxlength: "Tiêu đề cho bài viết không được vượt quá 400 ký tự"
+                    maxlength: "Mô tả không được vượt quá 400 ký tự"
                 },
                 Position: {
-                    min: "Vị trí bài viết phải trong khoảng 0 đến " + max_pos,
-                    max: "Vị trí bài viết phải trong khoảng 0 đến " + max_pos
+                    min: "Vị trí phải trong khoảng 0 đến " + max_pos,
+                    max: "Vị trí phải trong khoảng 0 đến " + max_pos
                 }
             }
         });
 
-        if (formvalid.valid()) {
+        if (formvalid.valid() || isFanpage) {
             var _body = tinymce.activeEditor.getContent();
-            var _tags = $('#news-tag').tagsinput('items');
+            var _tags = $('#news-tag').tagsinput?.('items') || [];
             var _categories = [];
             var _articleIdList = [];
 
-            if ($('.ckb-news-cate:checked').length > 0) {
-                $('.ckb-news-cate:checked').each(function () {
-                    _categories.push($(this).val());
-                });
-            }
-
-            if ($('.item-related-article').length > 0) {
-                $('.item-related-article').each(function () {
-                    _articleIdList.push(parseFloat($(this).data('id')));
-                });
-            }
-
-            if (_categories.length <= 0) {
+            // ✅ Nếu KHÔNG PHẢI fanpage thì bắt buộc chọn chuyên mục
+            if (!isFanpage && $('.ckb-news-cate:checked').length <= 0) {
                 _msgalert.error('Bạn phải chọn chuyên mục cho bài viết');
                 return false;
             }
-            if ($('#Lead').val().length >= 400) {
-                _msgalert.error('Tiêu đề cho bài viết không được vượt quá 400 ký tự');
-                return false;
-            }
+
+            $('.ckb-news-cate:checked').each(function () {
+                _categories.push($(this).val());
+            });
+
+            $('.item-related-article').each(function () {
+                _articleIdList.push(parseFloat($(this).data('id')));
+            });
+
             var _model = {
-                Id: $('#Id').val(),
-                Title: $('#Title').val(),
-                Lead: $('#Lead').val(),
+                Id: articleId,
+                Title: $('#Title').val() || lastAI?.Title || "",
+                Lead: $('#Lead').val() || lastAI?.Lead || "",
                 Body: _body,
                 Status: articleStatus,
                 ArticleType: $('#ArticleType:checked').val(),
-                Image169: $('#img_16x9').attr('src') == undefined ? "" : $('#img_16x9').attr('src'),
-                Image43: $('#img_4x3').attr('src') == undefined ? "" : $('#img_4x3').attr('src'),
-                Image11: $('#img_1x1').attr('src') == undefined ? "" : $('#img_1x1').attr('src'),
+                Image169: $('#img_16x9').attr('src') || "",
+                Image43: $('#img_4x3').attr('src') || "",
+                Image11: $('#img_1x1').attr('src') || "",
                 Tags: _tags,
                 Categories: _categories,
                 RelatedArticleIds: _articleIdList,
                 PublishDate: ConvertToJSONDateTime($('#PublishDate').val()),
                 DownTime: ConvertToJSONDateTime($('#DowntimeDate').val()),
-                Position: $('#Position').val()
-            }
+                Position: $('#Position').val(),
+                PlatForm: platformVal,
+                CampaignName: campaignNameVal,
+                AiContent: aiContentVal,
+                AimodelType: aimodelTypeVal,
+                IsPostedToFanpage: parseInt($('#IsPostedToFanpage').val())
+            };
+
+            // ✅ Nếu là bài video, dùng link video
             if (_model.ArticleType == 1) {
-                _model.Body = $('#link-video').attr('src') == undefined ? "" : $('#link-video').attr('src');
+                _model.Body = $('#link-video').attr('src') || "";
             }
 
+            // ✅ Fanpage yêu cầu có ảnh (ít nhất 1 ảnh); không cần tiêu đề, mô tả
             if (_model.Image169 == "" && _model.Image43 == "" && _model.Image11 == "") {
                 _msgalert.error('Bạn phải upload ít nhất một ảnh đại diện cho tin bài');
                 return false;
@@ -358,25 +609,57 @@ var _newsDetail = {
                 dataType: 'JSON',
                 contentType: "application/json",
                 traditional: true,
-                // data: { model: _model },
                 success: function (result) {
+                    debugger
                     if (result.isSuccess) {
                         _msgalert.success(result.message);
-                        setTimeout(function () {
-                            window.location.href = "/news/detail/" + result.dataId;
-                        }, 300);
+                        const savedId = result.dataId;
+                        // ✅ Lưu danh sách ảnh Fanpage nếu có
+                        if (isFanpage) {
+                            const selectedImages = JSON.parse($('#selectedImagesForFanpage').val() || '[]');
+                            if (selectedImages.length > 0) {
+                                $.ajax({
+                                    url: "/news/SaveFanpageImages",
+                                    type: "POST",
+                                    contentType: "application/json",
+                                    data: JSON.stringify({
+                                        articleId: savedId,
+                                        images: selectedImages
+                                    }),
+                                    success: function () {
+                                        debugger
+                                        console.log("✅ Đã lưu ảnh Fanpage vào DB");
+                                    },
+                                    error: function () {
+                                        _msgalert.warn("⚠️ Không thể lưu ảnh Fanpage.");
+                                    }
+                                });
+                            }
+                        }
+                        //localStorage.removeItem('aiArticles');
+
+                        // ✅ callback nhận Id nếu có
+                        if (typeof callback === "function") {
+                            callback(result.dataId);
+                        } else {
+                            setTimeout(function () {
+                                window.location.href = "/news/detail/" + result.dataId;
+                            }, 300);
+                        }
+
                     } else {
                         _msgalert.error(result.message);
                     }
                 },
-                error: function (jqXHR) {
-
+                error: function () {
+                    _msgalert.error('Đã xảy ra lỗi khi lưu bài viết.');
                 }
             });
         } else {
             _msgalert.error('Bạn phải nhập thông tin đầy đủ và chính xác cho bài viết');
         }
     },
+
 
     OnChangeArticleStatus: function (id, status) {
         let actionName = '';

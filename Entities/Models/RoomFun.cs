@@ -7,7 +7,7 @@ namespace Entities.Models
     {
         public RoomFun()
         {
-            RoomPackage = new HashSet<RoomPackage>();
+            RoomPackages = new HashSet<RoomPackage>();
         }
 
         public int Id { get; set; }
@@ -20,6 +20,6 @@ namespace Entities.Models
         public int? ContractType { get; set; }
         public string HotelName { get; set; }
 
-        public virtual ICollection<RoomPackage> RoomPackage { get; set; }
+        public virtual ICollection<RoomPackage> RoomPackages { get; set; }
     }
 }

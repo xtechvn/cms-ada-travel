@@ -179,9 +179,9 @@ namespace Repositories.Repositories
         {
             total = 0;
             //var listContractPays = _contractPayDAL.GetContractPays(searchModel, out total, currentPage, pageSize);
-            //var dt = _contractPayDAL.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.SP_GetListContractPay);
+            //var dt = _contractPayDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.SP_GetListContractPay);
             var listContractPays = _contractPayDAL.GetPagingList(searchModel, currentPage, pageSize,
-                ProcedureConstants.SP_GetListContractPay).ToList<ContractPayViewModel>();
+                StoreProcedureConstant.SP_GetListContractPay).ToList<ContractPayViewModel>();
             if (listContractPays.Count > 0)
                 total = listContractPays.FirstOrDefault().TotalRow;
             var listContractPayView = new List<ContractPayViewModel>();
@@ -454,7 +454,7 @@ namespace Repositories.Repositories
             try
             {
                 data = _contractPayDAL.GetAllOrderDebt(searchModel, currentPage, pageSize,
-                 ProcedureConstants.SP_GetAllOrder_Debt).ToList<OrderDebtViewModel>();
+                 StoreProcedureConstant.SP_GetAllOrder_Debt).ToList<OrderDebtViewModel>();
                 if (data.Count > 0)
                     total = data.FirstOrDefault().TotalRow;
                 foreach (var item in data)
@@ -492,7 +492,7 @@ namespace Repositories.Repositories
             try
             {
                 data = _contractPayDAL.GetLisContractPayDebt(searchModel, currentPage, pageSize,
-                 ProcedureConstants.SP_GetListContractPayDebt).ToList<ContractPayDebtViewModel>();
+                 StoreProcedureConstant.SP_GetListContractPayDebt).ToList<ContractPayDebtViewModel>();
                 if (data.Count > 0)
                     total = data.FirstOrDefault().TotalRow;
                 foreach (var item in data)
@@ -528,7 +528,7 @@ namespace Repositories.Repositories
             try
             {
                 data = _contractPayDAL.GetByClientId(clientId,
-                      ProcedureConstants.SP_GetListContractPayByClientId).ToList<ContractPayViewModel>();
+                      StoreProcedureConstant.SP_GetListContractPayByClientId).ToList<ContractPayViewModel>();
                 data = data.Where(n => n.AmountRemain > 0).ToList();
                 foreach (var item in data)
                 {
@@ -792,7 +792,7 @@ namespace Repositories.Repositories
             try
             {
                 data = _contractPayDAL.GetByClientId(clientId,
-                      ProcedureConstants.sp_GetListOrderDebtByClientId).ToList<OrderDebtViewModel>();
+                      StoreProcedureConstant.sp_GetListOrderDebtByClientId).ToList<OrderDebtViewModel>();
                 data = data.Where(n => n.AmountRemain > 0).ToList();
                 foreach (var item in data)
                 {
@@ -812,7 +812,7 @@ namespace Repositories.Repositories
             List<ContractPayViewModel> data;
             try
             {
-                data = _contractPayDAL.GetByOrderId(orderId, ProcedureConstants.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
+                data = _contractPayDAL.GetByOrderId(orderId, StoreProcedureConstant.SP_GetListContractPayByOrderId).ToList<ContractPayViewModel>();
                 //foreach (var item in data)
                 //{
                 //    item.TotalNeedPayment = item.AmountRemain;
@@ -832,7 +832,7 @@ namespace Repositories.Repositories
             try
             {
                 data = _contractPayDAL.GetByPayId(contractPayId,
-                      ProcedureConstants.sp_GetListOrderByPayId).ToList<ContractPayViewModel>();
+                      StoreProcedureConstant.sp_GetListOrderByPayId).ToList<ContractPayViewModel>();
             }
             catch (Exception ex)
             {
@@ -888,7 +888,7 @@ namespace Repositories.Repositories
             try
             {
                 data = _contractPayDAL.GetByClientId(payId,
-                      ProcedureConstants.sp_GetDetailContractPay).ToList<ContractPayViewModel>().FirstOrDefault();
+                      StoreProcedureConstant.sp_GetDetailContractPay).ToList<ContractPayViewModel>().FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -920,9 +920,9 @@ namespace Repositories.Repositories
                 var listService = new List<PaymentRequestViewModel>();
                 if (supplierId == 0) return listService;
                 //var listServiceOutput = _contractPayDAL.GetContractPayServiceListBySupplierId(supplierId,
-                //    ProcedureConstants.SP_GetAllServiceBySupplierIdForReturn).ToList<PaymentRequestViewModel>();
+                //    StoreProcedureConstant.SP_GetAllServiceBySupplierIdForReturn).ToList<PaymentRequestViewModel>();
                 var listServiceOutput = _contractPayDAL.GetContractPayServiceListBySupplierId(supplierId,
-                   ProcedureConstants.SP_GetAllSubServiceBySupplierIdForReturn).ToList<PaymentRequestViewModel>();
+                   StoreProcedureConstant.SP_GetAllSubServiceBySupplierIdForReturn).ToList<PaymentRequestViewModel>();
                 //foreach (var item in listSubServiceOutput)
                 //{
                 //    listServiceOutput.Add(item);
@@ -987,7 +987,7 @@ namespace Repositories.Repositories
             try
             {
                 var listServiceOutput = _contractPayDAL.GetServiceDetail(serviceCode,
-                    ProcedureConstants.SP_GetAllServiceByServiceCode).ToList<PaymentRequestViewModel>();
+                    StoreProcedureConstant.SP_GetAllServiceByServiceCode).ToList<PaymentRequestViewModel>();
                 return listServiceOutput.FirstOrDefault();
             }
             catch (Exception ex)
@@ -1002,7 +1002,7 @@ namespace Repositories.Repositories
             try
             {
                 var listServiceOutput = _contractPayDAL.GetContractPayBySupplierId(orderId, serviceId, serviceType,
-                    ProcedureConstants.SP_GetListContractPayByServiceId).ToList<ContractPayViewModel>();
+                    StoreProcedureConstant.SP_GetListContractPayByServiceId).ToList<ContractPayViewModel>();
                 return listServiceOutput.ToList();
             }
             catch (Exception ex)

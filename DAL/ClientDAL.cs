@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -234,8 +235,8 @@ namespace DAL
                                     VerifyStatus_name = g.Description,
                                     TaxNo = b.TaxNo,
                                     Create_name = k.FullName,
-                                    Update_Name=i.FullName
-                                    
+                                    Update_Name = i.FullName
+
                                 }).FirstOrDefault();
 
                     if (deta != null)
@@ -260,7 +261,7 @@ namespace DAL
                     if (model.Id == 0)
                     {
                         var check = _DbContext.Client.Where(s => s.ClientCode == model.ClientCode).ToList();
-                        if(check!=null && check.Count > 0)
+                        if (check != null && check.Count > 0)
                         {
                             return 2;
                         }
@@ -269,22 +270,22 @@ namespace DAL
                             var deta = _DbContext.Client.Add(model);
                             _DbContext.SaveChanges();
                         }
-                       
+
                     }
                     else
                     {
                         var data2 = _DbContext.Client.Where(s => s.Email.Equals(model.Email) && s.Id != model.Id).ToList();
-                      
 
-                        if (data2.Count == 0 && data2 != null  )
+
+                        if (data2.Count == 0 && data2 != null)
                         {
-                           
-                           
-                                var deta = _DbContext.Client.Update(model);
-                                _DbContext.SaveChanges();
-                                return 1;
-                            
-                            
+
+
+                            var deta = _DbContext.Client.Update(model);
+                            _DbContext.SaveChanges();
+                            return 1;
+
+
                         }
                         else
                         {
@@ -341,7 +342,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[16];
+                SqlParameter[] objParam = new SqlParameter[18];
                 objParam[0] = new SqlParameter("@MaKH", searchModel.MaKH);
                 objParam[1] = new SqlParameter("@TenKH", searchModel.TenKH);
                 objParam[2] = new SqlParameter("@Email", searchModel.Email);
@@ -357,8 +358,12 @@ namespace DAL
                 objParam[12] = new SqlParameter("@MinAmount", searchModel.MinAmount);
                 objParam[13] = new SqlParameter("@MaxAmount", searchModel.MaxAmount);
                 objParam[14] = new SqlParameter("@CreatedBy", searchModel.CreatedBy);
-                objParam[15] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
-                return _DbWorker.GetDataTable(proc, objParam);
+                objParam[15] = new SqlParameter("@UtmSource", searchModel.UtmSource);
+                objParam[16] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
+                objParam[17] = new SqlParameter("@ClientStatus", searchModel.ClientStatus);
+      
+                var data =_DbWorker.GetDataTable(proc, objParam);
+                return data;
             }
             catch (Exception ex)
             {
@@ -411,8 +416,8 @@ namespace DAL
 
                 SqlParameter[] objParam = new SqlParameter[1];
                 objParam[0] = new SqlParameter("@ClientID", Client);
-                
-                return  _DbWorker.GetDataTable(StoreProcedureConstant.GetClientByID, objParam);
+
+                return _DbWorker.GetDataTable(StoreProcedureConstant.GetClientByID, objParam);
             }
             catch (Exception ex)
             {
@@ -457,18 +462,95 @@ namespace DAL
             {
 
                 SqlParameter[] objParam = new SqlParameter[4];
-               
+
                 objParam[0] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
                 objParam[1] = new SqlParameter("@ClientId", searchModel.MaKH);
                 objParam[2] = new SqlParameter("@PageIndex", searchModel.PageIndex);
                 objParam[3] = new SqlParameter("@PageSize", searchModel.PageSize);
-          
-   
+
+
                 return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListClientCustomerCareFund, objParam);
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("GetPagingList - ClientDAL: " + ex);
+            }
+            return null;
+        }
+        public async Task<int> UpdateStatusClient(int status, int id)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var model = _DbContext.Client.FirstOrDefault(s => s.Id == id);
+                    model.Status = status;
+                    var Update = _DbContext.Client.Update(model);
+                    _DbContext.SaveChanges();
+                    return 1;
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SetUpClient - ClientDAL: " + ex.ToString());
+                return 0;
+            }
+            return 0;
+        }
+        public async Task<List<Client>> GetClientByphone(string Phone)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    return await _DbContext.Client.AsNoTracking().Where(x => x.Phone == Phone).ToListAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SetUpClient - ClientDAL: " + ex.ToString());
+                return null;
+            }
+        }
+        public async Task<int> CreateClient(Client model)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var check = _DbContext.Client.Where(s => s.ClientCode == model.ClientCode).ToList();
+                    if (check != null && check.Count > 0)
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        var deta = _DbContext.Client.Add(model);
+                        _DbContext.SaveChanges();
+                    }
+                }
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SetUpClient - ClientDAL: " + ex.ToString());
+                return 0;
+            }
+        }
+        public async Task<DataTable> GetSumContractPayByUtmSource()
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[0];
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetSumContractPayByUtmSource, objParam);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("getClientid - ClientDal: " + ex);
             }
             return null;
         }

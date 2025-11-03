@@ -4,10 +4,12 @@ using Entities.ViewModels.BankingAccount;
 using Entities.ViewModels.Funding;
 using Entities.ViewModels.Hotel;
 using Entities.ViewModels.SupplierConfig;
+using Entities.ViewModels.Tour;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Repositories.IRepositories;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Utilities;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
@@ -25,9 +27,14 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private readonly ISupplierRepository _supplierRepository;
         private readonly IBrandRepository _brandRepository;
         private readonly WEB.CMS.Models.AppSettings config;
+        private readonly IHotelBookingRoomRepository _hotelBookingRoomRepository;
+        private readonly IOtherBookingRepository _otherBookingRepository;
+        private readonly IFlyBookingDetailRepository _flyBookingDetailRepository;
+        private readonly ITourPackagesOptionalRepository _tourPackagesOptionalRepository;
+        private readonly IVinWonderBookingRepository _vinWonderBookingRepository;
 
         public SupplierController(IAllCodeRepository allCodeRepository, ISupplierRepository supplierRepository,
-            IBrandRepository brandRepository, ICommonRepository commonRepository, IConfiguration _configuration, IWebHostEnvironment webHostEnvironment)
+            IBrandRepository brandRepository, ICommonRepository commonRepository, IConfiguration _configuration, IWebHostEnvironment webHostEnvironment, IHotelBookingRoomRepository hotelBookingRoomRepository, IOtherBookingRepository otherBookingRepository, IFlyBookingDetailRepository flyBookingDetailRepository, ITourPackagesOptionalRepository tourPackagesOptionalRepository, IVinWonderBookingRepository vinWonderBookingRepository)
         {
             _allCodeRepository = allCodeRepository;
             _supplierRepository = supplierRepository;
@@ -36,6 +43,11 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             config = ReadFile.LoadConfig();
             configuration = _configuration;
             _WebHostEnvironment = webHostEnvironment;
+            _hotelBookingRoomRepository = hotelBookingRoomRepository;
+            _otherBookingRepository = otherBookingRepository;
+            _flyBookingDetailRepository = flyBookingDetailRepository;
+            _tourPackagesOptionalRepository = tourPackagesOptionalRepository;
+            _vinWonderBookingRepository = vinWonderBookingRepository;
         }
 
         #region supplier
@@ -342,7 +354,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         }
 
         [HttpPost]
-        public IActionResult PaymentDelete(int id)
+        public async Task<IActionResult> PaymentDelete(int id)
         {
             try
             {
@@ -350,6 +362,19 @@ namespace WEB.Adavigo.CMS.Controllers.Order
 
                 if (result > 0)
                 {
+                    string url = "mongodb://" + configuration["DataBaseConfig:MongoServer:user"] + ":" + configuration["DataBaseConfig:MongoServer:pwd"] + "@" + configuration["DataBaseConfig:MongoServer:Host"] + ":" + configuration["DataBaseConfig:MongoServer:Port"] + "/" + configuration["DataBaseConfig:MongoServer:catalog_log"];
+                    var client = new MongoClient(url);
+
+                    IMongoDatabase db = client.GetDatabase(configuration["DataBaseConfig:MongoServer:catalog_log"]);
+                    IMongoCollection<BankingAccountViewModel> affCollection = db.GetCollection<BankingAccountViewModel>(configuration["DataBaseConfig:MongoServer:BankingAccount_collection"]);
+
+                    var filter = Builders<BankingAccountViewModel>.Filter.Where(x => x.Id == id);
+                    var result_document = affCollection.Find(filter).ToList();
+                    if (result_document != null && result_document.Count > 0)
+                    {
+                        await affCollection.DeleteOneAsync(filter);
+                    }
+                   
                     return new JsonResult(new
                     {
                         isSuccess = true,
@@ -491,8 +516,113 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         [HttpPost]
         public IActionResult OrderListing(SupplierOrderSearchModel model)
         {
-            var data = _supplierRepository.GetSupplierOrderList(model);
+            
+            return PartialView();
+        }
+        public async Task<IActionResult> FlyListing(OptionalSearshModel model)
+        {
+            var data =await _flyBookingDetailRepository.GetListFlyBookingPackagesBySupplierId(model);
             return PartialView(data);
+        }
+        public async Task<IActionResult> HotelListing(OptionalSearshModel model)
+        {
+            var data =await _hotelBookingRoomRepository.GetListHotelBookingRoomsOptionalBySupplierId(model);
+            return PartialView(data);
+        }
+        public async Task<IActionResult> OtherListing(OptionalSearshModel model)
+        {
+            var data =await _otherBookingRepository.GetListOtherBookingPackagesOptionalBySupplierId(model);
+            return PartialView(data);
+        }
+        public async Task<IActionResult> TourListing(OptionalSearshModel model)
+        {
+            var data =await _tourPackagesOptionalRepository.GetListTourPackagesOptionalBySupplierId(model);
+            return PartialView(data);
+        }
+        public async Task<IActionResult> VinWonderListing(OptionalSearshModel model)
+        {
+            var data =await _vinWonderBookingRepository.GetListVinWonderOptionalBySupplierId(model);
+            return PartialView(data);
+        }
+        public async Task<IActionResult> ExportExcelOrder(OptionalSearshModel searchModel,int type)
+        {
+
+            int _UserId = 0;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            }
+            string _FileName = StringHelpers.GenFileName("Danh sách đặt hàng vé máy bay", _UserId, "xlsx");
+            switch (type)
+            {
+                case 0:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng vé máy bay", _UserId, "xlsx");
+                    }
+                    break;
+                case 1:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng khách", _UserId, "xlsx");
+                    }
+                    break;
+                case 2:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng tour", _UserId, "xlsx");
+                    }
+                    break;
+                case 3:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng dịch vụ khác", _UserId, "xlsx");
+
+                    }
+                    break;
+                case 4:
+                    {
+                        _FileName = StringHelpers.GenFileName("Danh sách đặt hàng VinWonder", _UserId, "xlsx");
+                    }
+                    break;
+            }
+           
+            string _UploadFolder = @"Template\Export";
+            string _UploadDirectory = Path.Combine(_WebHostEnvironment.WebRootPath, _UploadFolder);
+
+            if (!Directory.Exists(_UploadDirectory))
+            {
+                Directory.CreateDirectory(_UploadDirectory);
+            }
+            //delete all file in folder before export
+            try
+            {
+                System.IO.DirectoryInfo di = new DirectoryInfo(_UploadDirectory);
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+            catch
+            {
+            }
+            string FilePath = Path.Combine(_UploadDirectory, _FileName);
+
+            var rsPath = await _supplierRepository.ExportSuppliersOrder(searchModel, FilePath,type);
+
+            if (!string.IsNullOrEmpty(rsPath))
+            {
+                return new JsonResult(new
+                {
+                    isSuccess = true,
+                    message = "Xuất dữ liệu thành công",
+                    path = "/" + _UploadFolder + "/" + _FileName
+                });
+            }
+            else
+            {
+                return new JsonResult(new
+                {
+                    isSuccess = false,
+                    message = "Xuất dữ liệu thất bại"
+                });
+            }
         }
         #endregion
 

@@ -137,7 +137,7 @@ namespace DAL.Funding
                     new SqlParameter("@PageSize", searchModel.pageSize)
                 };
 
-                return _DbWorker.GetDataTable(ProcedureConstants.SP_GetListSupplier, objParam);
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListSupplier, objParam);
             }
             catch (Exception ex)
             {

@@ -97,6 +97,7 @@ var _supplier_service = {
         $('#icon-export').addClass('fa-spinner fa-pulse');
         var objSearch = this.GetParam()
         objSearch.currentPage = 1;
+        objSearch.pageSize = 100000000;
         this.SearchParam = objSearch
         $.ajax({
             url: "/Supplier/ExportExcel",

@@ -5,32 +5,18 @@ $(document).ready(function () {
 });
 var Saler_Dbt_Limit = {
     Init: function () {
-        let _searchModel = {
-            OrderNo: null,
-            StartDateFrom: null,
-            StartDateTo: null,
-            EndDateFrom: null,
-            EndDateTo: null,
-            Note: null,
-            UtmSource: [],
-            ServiceType: [],
-            Status: [2,3,4,5,6],
+        var _searchModel = {
+            Code: $('#Code').val(),
+            Status: [2, 3].toString(),
+            OrderId: $('#OrderId').select2("val"),
+            ClientId: $('#ClientId').select2("val"),
+            DepartmentId: $('#DepartmentId').val(),
             CreateTime: null,
-            CreateName: null,
-            HINHTHUCTT: ['_0'],
-            Sale: null,
-            BoongKingCode: null,
-            IsSalerDebtLimit: 1,
-            sysTemType: -1,
-            StatusTab: 99,
-        };
-
-        let objSearch = {
-            searchModel: _searchModel,
-            currentPage: 1,
-            pageSize: 20
-        };
-        Saler_Dbt_Limit.Search(objSearch);
+            ToDateTime: null,
+            PageIndex: 1,
+            PageSize: 20,
+        }
+        Saler_Dbt_Limit.Search(_searchModel);
     },
     Search: function (input) {
         $('#imgLoading').show();
@@ -70,40 +56,30 @@ var Saler_Dbt_Limit = {
 
     },
     onSelectPageSize: function () {
-        this.SearchData();
+        this.SearchData(1);
     },
     OnPaging: function (value) {
         pageSize = 1;
         if (value > 0) {
             PageIndex = value;
-            this.SearchData();
+            this.SearchData(value);
         }
     },
-    SearchData: function () {
-        let _searchModel = {
-            OrderNo: null,
-            StartDateFrom: null,
-            StartDateTo: null,
-            EndDateFrom: null,
-            EndDateTo: null,
-            Note: null,
-            UtmSource: [],
-            ServiceType: [],
-            Status: [2, 3, 4, 5, 6],
+    SearchData: function (value) {
+        var _searchModel = {
+            Code: $('#Code').val(),
+            Status: [2,3].toString(),
+            OrderId: $('#OrderId').select2("val"),
+            ClientId: $('#ClientId').select2("val"),
+            DepartmentId: $('#DepartmentId').val(),
             CreateTime: null,
-            CreateName: null,
-            HINHTHUCTT: ['_0'],
-            Sale: null,
-            BoongKingCode: null,
-            IsSalerDebtLimit: 1,
-            sysTemType: -1,
-            StatusTab: 99,
-        };
+            ToDateTime: null,
+            PageIndex: value,
+            PageSize: $("#selectPaggingOptions").find(':selected').val(),
+        }
 
         let objSearch = {
             searchModel: _searchModel,
-            currentPage: PageIndex,
-            pageSize: $("#selectPaggingOptions").find(':selected').val()
         };
         this.Search(objSearch);
         this.changeSetting(15);

@@ -455,6 +455,7 @@ var _add_payment_voucher = {
         $("#body_payment_requests").empty();
         $('#bankName').val("")
         $("#bankingAccount").empty();
+       /* debugger*/
         if (payment_request_type !== null && payment_request_type !== '' && parseInt(payment_request_type) != 3) { // thanh toán dịch vụ và khác
             $('#lblSupplier').show()
             $('#divSupplier').show()
@@ -615,7 +616,7 @@ var _add_payment_voucher = {
     },
     OnChoosePaymentType: function () {
         var pay_type = $('#payment-voucher-pay-type').val()
-        debugger
+        /*debugger*/
         if (parseInt(pay_type) != 2) { //thanh toán tiền mặt
             $('#bankingAccount').attr('disabled', true)
             $('#bankingAccount').addClass('background-disabled')
@@ -818,5 +819,215 @@ var _add_payment_voucher = {
     },
     FileAttachment: function (data_id, type, readonly = false) {
         _global_function.RenderFileAttachment($('.attachment_file'), data_id, type, false, true)
+    },
+
+    OnChooseTypeEditPaymentRequest: function (client_id, supplier_id, bankAccountId) {
+        bankingAccountId = bankAccountId
+        isEditView = true
+ 
+        if ((client_id == undefined || client_id == null || client_id == 0 || client_id == '')
+            && (supplier_id == undefined || supplier_id == null || supplier_id == 0 || supplier_id == '')) {
+            return
+        }
+        amountEdit = parseFloat($('#amount').val().replaceAll('.', '').replaceAll(',', ''))
+        isEdit = true
+        if (client_id !== undefined && client_id !== null && client_id !== 0 && client_id !== '') {
+            _add_payment_voucher.GetListBankAccountByClientID(client_id);
+            setTimeout(function () {
+                var newOption = new Option($('#client_name_hide').val(), client_id, true, true);
+                $('#client-select').append(newOption).trigger('change');
+            }, 500)
+        }
+        if (supplier_id !== undefined && supplier_id !== null && supplier_id !== 0 && supplier_id !== '') {
+            _add_payment_voucher.GetListBankAccountBySupplierID(supplier_id);
+            setTimeout(function () {
+                var newOption = new Option($('#supplier_name_hide').val(), supplier_id, true, true);
+                $('#supplier-select').append(newOption).trigger('change');
+            }, 500)
+        }
+
+        var payment_request_type = $('#payment-voucher-type').val()
+        if (payment_request_type !== null && payment_request_type !== '' && parseInt(payment_request_type) == 1) { // thanh toán dịch vụ
+            $('#amount').attr('disabled', true)
+            $('#amount').addClass('background-disabled')
+        }
+        if (payment_request_type !== null && payment_request_type !== '' && parseInt(payment_request_type) == 3) {//hoàn trả khách hàng
+            $('#amount').attr('disabled', true)
+            $('#amount').addClass('background-disabled')
+        }
+        if (payment_request_type !== null && payment_request_type !== '' && parseInt(payment_request_type) == 5) {//Quỹ chăm sóc khách hàng
+            $('#amount').attr('disabled', true)
+            $('#amount').addClass('background-disabled')
+        }
+        if (client_id !== null && client_id !== undefined && client_id !== '' && client_id !== 0) {
+            this.GetDataByClientOrSupplierPaymentrequest(client_id, 0, true)
+        }
+        if (supplier_id !== null && supplier_id !== undefined && supplier_id !== '' && supplier_id !== 0) {
+            this.GetDataByClientOrSupplierPaymentrequest(0, supplier_id, true)
+        }
+        var payment_request_type = $('#payment-voucher-type').val()
+        if (payment_request_type !== null && payment_request_type !== '' && parseInt(payment_request_type) != 3) { // thanh toán dịch vụ và khác
+            $('#lblSupplier').show()
+            $('#divSupplier').show()
+            $('#lblCustomer').hide()
+            $('#divCustomer').hide()
+        }
+        if (payment_request_type !== null && payment_request_type !== '' && parseInt(payment_request_type) == 3) {//hoàn trả khách hàng
+            $('#lblSupplier').hide()
+            $('#divSupplier').hide()
+            $('#lblCustomer').show()
+            $('#divCustomer').show()
+        }
+        if (payment_request_type !== null && payment_request_type !== '' && parseInt(payment_request_type) == 5) {//Quỹ chăm sóc khách hàng
+            $('#lblSupplier').hide()
+            $('#divSupplier').hide()
+            $('#lblCustomer').show()
+            $('#divCustomer').show()
+        }
+        _add_payment_voucher.OnChoosePaymentType()
+    },
+    GetDataByClientOrSupplierPaymentrequest: function (clientId, supplier_id, isEdit = false) {
+        let payment_request_type = $('#payment-voucher-type').val()
+        if (payment_request_type !== '3') {
+            this.GetRequestBySupplierId2(supplier_id, isEdit);
+        }
+        if (payment_request_type === '3') {
+            this.GetRequestByClientId2(clientId, 3);
+        }
+        if (payment_request_type === '5') {
+            this.GetRequestByClientId2(clientId, 5);
+        }
+    },
+    GetRequestBySupplierId2: function (supplierId, isEdit = false) {
+        var paymentRequestId = $('#paymentRequestId').val()
+        supplierIdSearch = supplierId
+        listPaymentRequest = []
+        _global_function.AddLoading()
+        $.ajax({
+            url: "/PaymentVoucher/GetRequestBySupplierId",
+            type: "Post",
+            data: { 'supplierId': supplierId, 'paymentVoucherId': $('#paymentVoucherId').val(), 'requestType': $('#payment-voucher-type').val() },
+            success: function (result) {
+                _global_function.RemoveLoading()
+                
+                var totalAmount = 0
+                $("#body_payment_requests").empty();
+                $("#paymentRequestCode").empty()
+                for (var i = 0; i < result.data.length; i++) {
+                    $('#request-relate-table').find('tbody').append(
+                        "<tr id='order_" + i + "'>" +
+                        "<td>" +
+                        "<label class='check-list number'>" +
+                        " <input type='checkbox'  id='order_ckb_" + result.data[i].paymentCode + "' name='order_ckb' onclick='_add_payment_voucher.OnCheckBox(" + i + ");_add_payment_voucher.AddToListDetail(" + i + ")'>" +
+                        " <span class='checkmark'></span>" + (i + 1) +
+                        "  </label>"
+                        + "</td>" +
+                        "<td>" +
+                        " <a class='blue' href='/PaymentRequest/Detail?paymentRequestId=" + result.data[i].id + "'> " + result.data[i].paymentCode + " </a>"
+                        + "</td>" +
+                        "<td>" + result.data[i].paymentDateViewStr
+                        + "</td>" +
+                        "<td>" + result.data[i].userName + "</td>" +
+                        "<td class='text-right'>" + _add_payment_voucher.FormatNumberStr(result.data[i].amount) + "</td>" +
+                        "</tr>"
+                    );
+                    totalAmount += result.data[i].amount
+                    if (paymentRequestId == result.data[i].id) {
+                        result.data[i].isChecked = true;
+                        _add_payment_voucher.OnCheckBox(i);
+                        _add_payment_voucher.AddToListDetail(i)
+                        let index = i
+                        let code = result.data[i].paymentCode
+                        setTimeout(function () {
+                            $('#order_ckb_' + code).prop('checked', true)
+                        }, 800)
+                    }
+                 
+                    
+                }
+                listPaymentRequest = result.data
+                $('#request-relate-table').find('tbody').append(
+                    "<tr style='font-weight:bold !important;'>" +
+                    "<td class='text-right' colspan='4'> Tổng </td>" +
+                    "<td>" + _add_payment_voucher.FormatNumberStr(totalAmount) + "</td>" +
+                    "</tr>"
+                );
+                setTimeout(function () {
+                    _add_payment_voucher.OnCheckBox();
+                }, 1000)
+                if (isEditView) {
+                    isRender = true
+                    setTimeout(function () {
+                        _add_payment_voucher.RenderItemChecked();
+                    }, 700)
+                }
+            }
+        });
+        _add_payment_voucher.GetListBankAccountBySupplierID(supplierId);
+    },
+    GetRequestByClientId2: function (clientId, type, isEdit = false) {
+        var paymentRequestId = $('#paymentRequestId').val()
+        clientIdSearch = clientId
+        listPaymentRequest = []
+        _global_function.AddLoading()
+        $.ajax({
+            url: "/PaymentVoucher/GetRequestByClientId",
+            type: "Post",
+            data: { 'clientId': clientId, 'paymentVoucherId': $('#paymentVoucherId').val(), 'Type': type },
+            success: function (result) {
+                _global_function.RemoveLoading()
+                $("#body_payment_requests").empty();
+                
+                var totalAmount = 0
+                $("#paymentRequestCode").empty()
+                for (var i = 0; i < result.data.length; i++) {
+                    $('#request-relate-table').find('tbody').append(
+                        "<tr id='order_" + i + "'>" +
+                        "<td>" +
+                        "<label class='check-list number'>" +
+                        " <input type='checkbox' id='order_ckb_" + result.data[i].paymentCode + "' name='order_ckb' onclick='_add_payment_voucher.OnCheckBox(" + i + ");_add_payment_voucher.AddToListDetail(" + i + ")'>" +
+                        " <span class='checkmark'></span>" + (i + 1) +
+                        "  </label>"
+                        + "</td>" +
+                        "<td>" +
+                        " <a class='blue' href='/PaymentRequest/Detail?paymentRequestId=" + result.data[i].id + "'> " + result.data[i].paymentCode + " </a>"
+                        + "</td>" +
+                        "<td>" + result.data[i].paymentDateViewStr + "</td>" +
+                        "<td>" + result.data[i].userName + "</td>" +
+                        "<td class='text-right'>" + _add_payment_voucher.FormatNumberStr(result.data[i].amount) + "</td>" +
+                        "</tr>"
+                    );
+                    totalAmount += result.data[i].amount
+                    if (paymentRequestId == result.data[i].id) {
+                        result.data[i].isChecked = true;
+                        let index = i
+                        _add_payment_voucher.OnCheckBox(i);
+                        _add_payment_voucher.AddToListDetail(i)
+                        let code = result.data[i].paymentCode
+                        setTimeout(function () {
+                            $('#order_ckb_' + code).prop('checked', true)
+                        }, 800)
+                    }
+                   
+                    
+                }
+                listPaymentRequest = result.data
+
+                $('#request-relate-table').find('tbody').append(
+                    "<tr style='font-weight:bold !important;'>" +
+                    "<td class='text-right' colspan='4'> Tổng </td>" +
+                    "<td>" + _add_payment_voucher.FormatNumberStr(totalAmount) + "</td>" +
+                    "</tr>"
+                );
+                setTimeout(function () {
+                    _add_payment_voucher.OnCheckBox();
+                }, 1000)
+                if (isEditView)
+                    setTimeout(function () {
+                        _add_payment_voucher.RenderItemChecked();
+                    }, 700)
+            }
+        });
+        _add_payment_voucher.GetListBankAccountByClientID(clientIdSearch);
     },
 }

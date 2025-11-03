@@ -9,7 +9,6 @@
         PageSize:30
     },
     Initialization: function () {
-        //_report_common.RenderDateRangePicker($('#report_date'))
         var today = new Date();
         var yyyy = today.getFullYear();
         var mm = today.getMonth() + 1; // Months start at 0!
@@ -19,23 +18,32 @@
         var min_range = '01/01/2020';
         var max_range = dd + '/' + mm + '/' + yyyy;
         var start_day_of_month = new Date(yyyy, mm - 1, 1);
+        $('input[name="report_date"]').daterangepicker({
+            autoApply: true,
+            autoUpdateInput: false,
+            minDate: min_range,
+            maxDate: max_range,
+            setStartDate: start_day_of_month,
+            setEndDate: today,
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
 
-        $('#report_date').each(function (index, item) {
-            var element = $(item)
-            element.daterangepicker({
-                autoApply: true,
-                autoUpdateInput: false,
-                showDropdowns: true,
-                drops: 'down',
-                minDate: min_range,
-                maxDate: max_range,
-                locale: {
-                    format: 'DD/MM/YYYY'
-                }
-            });
-            element.data('daterangepicker').setStartDate(start_day_of_month);
-            element.data('daterangepicker').setEndDate(max_range);
-        })
+        });
+        $('input[name="report_date"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+            isPickerApprove = false;
+        });
+        $('input[name="report_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+            isPickerApprove = true;
+        });
+        let picker = $('#report_date').data('daterangepicker');
+        picker.setStartDate(start_day_of_month);
+        picker.setEndDate(today);
+        $('#report_date').val(start_day_of_month.toLocaleDateString("en-GB") + ' - ' + today.toLocaleDateString("en-GB"))
+
+
         _report_client_debt.SearchData()
     },
     ExportExcel: function () {
@@ -77,11 +85,12 @@
             branch = branch_element.val()
         }
         var daterange_element = $('#report_date')
+        var daterange_element2 = $('#report_date').val()
         var min_date = null
         var max_date=null
-        if (daterange_element != undefined && daterange_element != null) {
-            min_date = _global_function.GetDayText(daterange_element.data('daterangepicker').startDate._d,true).split(' ')[0]
-            max_date = _global_function.GetDayText(daterange_element.data('daterangepicker').endDate._d, true).split(' ')[0]
+        if (daterange_element != undefined && daterange_element != null ) {
+            min_date = _global_function.GetDayText(daterange_element.data('daterangepicker').startDate._d, true)
+            max_date = _global_function.GetDayText(daterange_element.data('daterangepicker').endDate._d, true) 
         }
 
         var client_element = $('#report-clientdebt-filter-clientId')
@@ -233,9 +242,10 @@ var _report_client_debt_detail = {
         var daterange_element = $('#report_date')
         var min_date = null
         var max_date = null
+        var a = daterange_element.data('daterangepicker').startDate._d.toLocaleDateString("en-GB") 
         if (daterange_element != undefined && daterange_element != null) {
-            min_date = _global_function.GetDayText(daterange_element.data('daterangepicker').startDate._d, true).split(' ')[0]
-            max_date = _global_function.GetDayText(daterange_element.data('daterangepicker').endDate._d, true).split(' ')[0]
+            min_date = _global_function.GetDayText(daterange_element.data('daterangepicker').startDate._d, true) 
+            max_date = _global_function.GetDayText(daterange_element.data('daterangepicker').endDate._d, true) 
         }
         _report_client_debt_detail.searchModel.FromDate = min_date
         _report_client_debt_detail.searchModel.ToDate = max_date

@@ -1,0 +1,90 @@
+﻿@using Entities.Models
+@using Entities.ViewModels.OrderManual
+@{
+    Layout = null;
+    var _DepartmentList = (List<Department>)ViewBag.DepartmentList;
+
+    async Task ShowDepartment(Department item, int level = 0)
+    {
+        var childs = _DepartmentList.Where(s => s.ParentId == item.Id);
+        string str_level = string.Empty;
+        for (int i = 0; i < level; i++)
+        {
+            str_level += "---";
+        }
+
+        <option value="@item.Id">@str_level @item.DepartmentName</option>
+
+        @if (childs != null && childs.Any())
+        {
+            level++;
+            foreach (var child in childs)
+            {
+                await ShowDepartment(child, level);
+            }
+        }
+    }
+}
+<form id="_source_add_client" onsubmit="return false">
+    <input id="Client_Source" value="@ViewBag.type" style="display:none;" />
+    <div class="form-group">
+        <label class="lbl">Phòng ban</label>
+        <div class="wrap_input">
+            <select class="form-control DepartmentId" name="DepartmentId" onchange="_detail_source_client.loaduser()" id="DepartmentId" style="width:100%!important;">
+
+                @if (_DepartmentList != null && _DepartmentList.Any())
+                {
+                    var depParents = _DepartmentList.Where(s => s.ParentId == 0);
+                    foreach (var item in depParents)
+                    {
+                        await ShowDepartment(item);
+                    }
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Trưởng nhóm <sup class="red">*</sup></label>
+        <div class="wrap_input">
+            <select class="form-control Userid" name="Userid" id="Userid" style="width:100%!important;">
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Tên khách hàng <sup class="red">*</sup></label>
+        <div class="wrap_input">
+            <input class="form-control ClientName" name="ClientName" id="ClientName" style="width:100%!important;" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Email</label>
+        <div class="wrap_input">
+            <input class="form-control email" name="email" id="email" style="width:100%!important;" />
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Số điện thoại <sup class="red">*</sup></label>
+        <div class="wrap_input">
+            <input class="form-control phone" name="phone" id="phone" style="width:100%!important;" />
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Nhu cầu</label>
+        <div class="wrap_input">
+            <textarea class="form-control Note" name="Note" id="Note" style="width: 100% !important; height: 200px; border: 1px solid #ccc !important"></textarea>
+        </div>
+    </div>
+    <div class="form-default" bis_skin_checked="1">
+        <div class="form-group align-right mt20 block" bis_skin_checked="1">
+            <button type="button" id="confirm-ws-import" class="btn btn-default bg-main" onclick="_detail_source_client.AddClientNhanh()" style="">
+               Thêm mới
+            </button>
+            <button type="button" class="btn btn-default cancel" data-dismiss="modal" onclick="$.magnificPopup.close()"><i class="fa fa-minus-circle"></i>Đóng</button>
+        </div>
+    </div>
+</form>
+<script>
+    _detail_source_client.loaduser()
+</script>
