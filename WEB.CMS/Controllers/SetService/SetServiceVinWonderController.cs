@@ -133,6 +133,8 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
                                 case (int)RoleType.DHPQ:
                                 case (int)RoleType.DHTour:
                                 case (int)RoleType.DHVe:
+                                case (int)RoleType.SaleKd:
+                                case (int)RoleType.SaleTour:
                                     {
                                         searchModel.SalerPermission += current_user.UserUnderList;
                                     }

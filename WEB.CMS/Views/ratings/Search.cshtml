@@ -1,0 +1,25 @@
+﻿@using Entities.ViewModels;
+@model List<UserProfitReportViewModel>
+@{
+    Layout = null;
+    var PageIndex = (int)ViewBag.pageIndex;
+    var PageSize = (int)ViewBag.PageSize;
+    var STT = (PageIndex - 1) * PageSize;
+}
+@if (Model != null)
+{
+
+
+    @foreach (var item in Model)
+    {
+        STT++;
+        <tr class="list-row">
+            <td class="text-center">@STT</td>
+            <td class="text-center"><img src="/images/icons/SmileySad.svg"></img> @item.FullName</td>
+            <td class="text-center red">@item.TotalProfit.ToString("N0")</td>
+
+
+        </tr>
+    }
+
+}

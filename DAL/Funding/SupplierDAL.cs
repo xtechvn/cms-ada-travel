@@ -137,7 +137,26 @@ namespace DAL.Funding
                     new SqlParameter("@PageSize", searchModel.pageSize)
                 };
 
-                return _DbWorker.GetDataTable(ProcedureConstants.SP_GetListSupplier, objParam);
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListSupplier, objParam);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetPagingList - SupplierDAL: " + ex);
+            }
+            return null;
+        }
+        public DataTable GetPagingListTicket(SupplierSearchModel searchModel)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[]
+                {
+                     new SqlParameter("@Search", (object)searchModel.FullName ?? DBNull.Value),
+            new SqlParameter("@PageIndex", searchModel.currentPage),
+            new SqlParameter("@PageSize", searchModel.pageSize)
+                };
+
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListSupplierForTickets, objParam);
             }
             catch (Exception ex)
             {

@@ -106,7 +106,8 @@ namespace DAL
                     new SqlParameter("@Branch", model.Branch ?? (object)DBNull.Value),
                     new SqlParameter("@SupplierId",model.SupplierId==null? (object)DBNull.Value : model.SupplierId),
                     new SqlParameter("@ClientId",model.ClientId==null? (object)DBNull.Value: model.ClientId),
-                    new SqlParameter("@UpdatedBy", model.UpdatedBy)
+                    new SqlParameter("@UpdatedBy", model.UpdatedBy),
+                    new SqlParameter("@IsDisplayWebsite", DBNull.Value)
                 };
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdateBankingAccount, objParam_contractPay);
             }

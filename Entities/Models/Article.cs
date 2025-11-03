@@ -7,8 +7,8 @@ namespace Entities.Models
     {
         public Article()
         {
-            ArticleRelated = new HashSet<ArticleRelated>();
-            ArticleTag = new HashSet<ArticleTag>();
+            ArticleRelateds = new HashSet<ArticleRelated>();
+            ArticleTags = new HashSet<ArticleTag>();
         }
 
         public long Id { get; set; }
@@ -28,8 +28,15 @@ namespace Entities.Models
         public DateTime? DownTime { get; set; }
         public DateTime? UpTime { get; set; }
         public short? Position { get; set; }
+        // 🆕 Thêm các cột liên quan đến AI
+        public byte? PlatForm { get; set; }
+        public byte? AimodelType { get; set; }
+        public string? CampaignName { get; set; }
+        public string? AiContent { get; set; }
+        public byte? IsPostedToFanpage { get; set; }
 
-        public virtual ICollection<ArticleRelated> ArticleRelated { get; set; }
-        public virtual ICollection<ArticleTag> ArticleTag { get; set; }
+
+        public virtual ICollection<ArticleRelated> ArticleRelateds { get; set; }
+        public virtual ICollection<ArticleTag> ArticleTags { get; set; }
     }
 }

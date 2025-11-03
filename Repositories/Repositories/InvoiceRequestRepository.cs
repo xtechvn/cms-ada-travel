@@ -262,7 +262,7 @@ namespace Repositories.Repositories
             try
             {
                 var listInvoiceRequests = invoiceRequestDAL.GetPagingList(searchModel, currentPage, pageSize,
-                ProcedureConstants.SP_GetListInvoiceRequest).ToList<InvoiceRequestViewModel>();
+                StoreProcedureConstant.SP_GetListInvoiceRequest).ToList<InvoiceRequestViewModel>();
                 if (listInvoiceRequests.FirstOrDefault() != null)
                     total = listInvoiceRequests.FirstOrDefault().TotalRow;
                 foreach (var item in listInvoiceRequests)
@@ -306,7 +306,7 @@ namespace Repositories.Repositories
             try
             {
                 var listPaymentRequests = invoiceRequestDAL.GetCountStatus(searchModel,
-                ProcedureConstants.SP_CountInvoiceRequestStatus).ToList<CountStatus>();
+                StoreProcedureConstant.SP_CountInvoiceRequestStatus).ToList<CountStatus>();
                 return listPaymentRequests;
             }
             catch (Exception ex)
@@ -321,7 +321,7 @@ namespace Repositories.Repositories
             try
             {
                 var listOrderOutput = new List<OrderViewModel>();
-                var dt = orderDal.GetListOrderByClientId(clientId, ProcedureConstants.SP_GetDetailOrderByClientId, status);
+                var dt = orderDal.GetListOrderByClientId(clientId, StoreProcedureConstant.SP_GetDetailOrderByClientId, status);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var listOrder = (from row in dt.AsEnumerable()
@@ -449,7 +449,7 @@ namespace Repositories.Repositories
                 {
                     InvoiceRequestViewModel model = new InvoiceRequestViewModel();
                     //item.VATAmount = ((decimal)item.VAT / (decimal)100) * item.TotalPrice;
-                    //item.TotalPriceVAT = (decimal)(item.TotalPrice + item.VATAmount);
+                    item.TotalPriceVAT = (decimal)((double)item.TotalPrice + item.PriceExtraExport);
                     item.CopyProperties(model);
                     invoiceRequestViewModels.Add(model);
                 }

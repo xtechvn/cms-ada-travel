@@ -119,7 +119,10 @@ let _dashBoard = {
         $('#revenuLabelChart').hide();
 
         let toDate = new Date();
-        let fromDate = moment().startOf('month').toDate();
+        var newdate = new Date();
+        newdate.setDate(01);
+        let fromDate = newdate;
+        /*let fromDate = moment().startOf('month').toDate();*/
 
         _dashBoard.GetRevenueOrderGroupBySale({
             from_date: fromDate.toJSON(),

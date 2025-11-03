@@ -37,6 +37,7 @@ namespace Entities.ViewModels.Report
         public string ClientCode { get; set; }
         public string ClientName { get; set; }
         public string ServiceName { get; set; }
+        public double? TotalFundCustomerCare { get; set; }
 
     }
     public class SumOperatorReportViewModel
@@ -51,6 +52,7 @@ namespace Entities.ViewModels.Report
         public double? Comission { get; set; }
         public double? Profit { get; set; }
         public double? Refund { get; set; }
+        public double? TotalFundCustomerCare { get; set; }
 
     }
 }

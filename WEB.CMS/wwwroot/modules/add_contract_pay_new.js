@@ -222,6 +222,11 @@ var _contract_pay_create_new = {
                 _contract_pay_create_new.GetDataByClientId()
             })
         }
+        if (is_admin == true) {
+            $("#supplier-select").on('change', function () {
+                _contract_pay_create_new.GetServiceListBySupplierId()
+            })
+        }
     
     },
     FormatNumber: function () {
@@ -326,6 +331,12 @@ var _contract_pay_create_new = {
     GetServiceListBySupplierId: function (supplierId, isEdit = false, isCommission = false) {
         var contract_type = $('#contract-type').val()
         if (contract_type !== null && contract_type !== '' && parseInt(contract_type) == contractpay_type_other) return
+        if (supplierId == null || supplierId == undefined || supplierId == '') {
+            var supplierId = $('#supplier-select').val() != null ? $('#supplier-select').val()[0] : 0
+            //if (client !== null && client !== undefined && client !== '') {
+            //    clientId = client[0]
+            //}
+        }
         _global_function.AddLoading()
         $.ajax({
             url: "/Receipt/GetServiceListBySupplierId",
@@ -1086,6 +1097,11 @@ var _contract_pay_create_new = {
             _contract_pay_create_new.GetListBankAccountAdavigo()
         }
         if (contract_type !== null && contract_type !== '' && parseInt(contract_type) == contractpay_type_supplier_refund) {//thu tiền NCC hoàn trả
+            debugger
+            setTimeout(function () {
+                var newOption = new Option($('#supplier_name_hide').val(), supplierId, true, true);
+                $('#supplier-select').append(newOption).trigger('change');
+            }, 500)
             $('#divSupplier').show()
             $('#divCustomer').hide()
             $('#divEmployee').hide()
@@ -1100,16 +1116,14 @@ var _contract_pay_create_new = {
             $('#deposit-relate').hide()
             $('#supplier-refund-relate').show()
             $('#supplier-commision-relate').hide()
-            setTimeout(function () {
-                var newOption = new Option($('#supplier_name_hide').val(), supplierId, true, true);
-                $('#supplier-select').append(newOption).trigger('change');
-            }, 500)
+         
             _contract_pay_create_new.GetListBankAccountAdavigo(supplierId)
             if (supplierId !== null && supplierId !== undefined && supplierId !== '') {
                 _contract_pay_create_new.GetServiceListBySupplierId(supplierId, true)
             }
             $('#amount').attr('disabled', false)
             $('#amount').removeClass('background-disabled')
+         
         }
         if (contract_type !== null && contract_type !== '' && parseInt(contract_type) == contractpay_type_supplier_commision) {//thu tiền hoa hồng NCC
             $('#divSupplier').show()
@@ -1710,6 +1724,8 @@ var _contract_pay_create_new = {
     },
     GetListBankAccountAdavigo: function (supplierId) {
         _global_function.AddLoading()
+        bankingAccountId = $("#bankingAccount").val();
+      
         $.ajax({
             url: "/Receipt/GetListBankAccountAdavigo",
             type: "Post",
@@ -1723,11 +1739,6 @@ var _contract_pay_create_new = {
                     "<option value='0'>Chọn</option>"
                 );
                 listBankAccount = result.data
-                for (var i = 0; i < result.data.length; i++) {
-                    $('#bankingAccount').append(
-                        "<option value='" + result.data[i].id + "'> " + result.data[i].bankId + " - " + result.data[i].accountNumber + "</option>"
-                    );
-                }
                 if (bankingAccountId !== undefined && bankingAccountId !== null && bankingAccountId !== 0) {
                     $("#bankingAccount").val(bankingAccountId);
                     for (var i = 0; i < listBankAccount.length; i++) {
@@ -1735,6 +1746,19 @@ var _contract_pay_create_new = {
                             $('#bankName').val(listBankAccount[i].accountName)
                     }
                 }
+                for (var i = 0; i < result.data.length; i++) {
+                    if (result.data[i].id == bankingAccountId) {
+                        $('#bankingAccount').append(
+                            "<option selected value='" + result.data[i].id + "'> " + result.data[i].bankId + " - " + result.data[i].accountNumber + "</option>"
+                        );
+                    } else {
+                        $('#bankingAccount').append(
+                            "<option value='" + result.data[i].id + "'> " + result.data[i].bankId + " - " + result.data[i].accountNumber + "</option>"
+                        );
+                    }
+                   
+                }
+               
             }
         });
     },

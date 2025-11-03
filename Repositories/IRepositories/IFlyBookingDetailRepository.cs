@@ -2,6 +2,7 @@
 using Entities.ViewModels;
 using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.SetServices;
+using Entities.ViewModels.Tour;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,5 +34,6 @@ namespace Repositories.IRepositories
         Task<long> UpdateFlyBookingOptional(List<FlyBookingPackagesOptional> data,string group_booking_id,int user_summit);
         Task<FlyBookingDetail> GetFlyBookingById(long fly_booking_id);
         Task<string> ExportDeposit(SearchFlyBookingViewModel searchModel, string FilePath);
+        Task<GenericViewModel<FlyBookingPackagesOptionalModel>> GetListFlyBookingPackagesBySupplierId(OptionalSearshModel Searsh);
     }
 }

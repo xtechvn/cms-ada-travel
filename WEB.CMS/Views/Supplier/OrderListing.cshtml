@@ -4,99 +4,69 @@
 @using Entities.ViewModels
 @using Entities.ViewModels.SupplierConfig
 @using Utilities
-@model GenericViewModel<SupplierOrderGridViewModel>
+
 
 <div class="table-responsive table-default table-gray">
-    <table class="table table-nowrap">
-        <thead>
-            <tr>
-                <th style="min-width: 30px;">STT</th>
-                <th>Mã dịch vụ</th>
-                <th>Số tiền</th>
-                <th>Đã thanh toán</th>
-                <th>Chưa thanh toán</th>
-                <th>Mã đơn hàng</th>
-                <th>Ngày tạo</th>
-                <th>Nhân viên bán</th>
-                <th>Điều hành</th>
-                <th>Trạng thái</th>
-                <th>Công nợ với nhà cung cấp</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.ListData != null && Model.ListData.Count > 0)
-            {
-                var counter = (Model.CurrentPage - 1) * Model.PageSize;
-                foreach (var item in Model.ListData)
-                {
-                    counter++;
-                    <tr>
-                        <td>@counter</td>
-                        <td>@item.ServiceCode</td>
-                        <td>
-                            @(item.Amount.HasValue ? item.Amount.Value.ToString("N0") : string.Empty)
-                        </td>
-                        <td>
-                            @(item.AmountPay.HasValue ? item.AmountPay.Value.ToString("N0") : string.Empty)
-                        </td>
-                        <td>
-                            @if (item.AmountPay.HasValue)
-                            {
-                                <span>@(item.Amount.HasValue ? (item.Amount.Value -item.AmountPay.Value).ToString("N0") : string.Empty)</span>
-                            }
-                            else
-                            {
-                                <span>@(item.Amount.HasValue ? item.Amount.Value.ToString("N0") : string.Empty)</span>
-                            }
-                        </td>
-                        <td>
-                            @item.OrderNo
-                        </td>
-                        <td>
-                            @item.StartDate.ToString("dd/MM/yyyy HH:mm")
-                        </td>
-                        <td>
-                            @item.SalerName
-                        </td>
-                        <td>
-                            N/A
-                        </td>
-                        <td>
-                            N/A
-                        </td>
-                        <td>
-                            N/A
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="13" class="text-center">
-                        <div class="search-null center mt40 mb40">
-                            <div class="mb24">
-                                <img src="/images/graphics/icon-search.png" alt="">
+
+    <div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding mb20">
+        <div class="tab-default" style="border-bottom: 1px solid #CCCCCC;" bis_skin_checked="1">
+            <div class="row" style=" width: 100%; " bis_skin_checked="1">
+                <div class="tab-default col-md-9 mb0 mt10" bis_skin_checked="1" id="tab-order-supplier">
+                    <a href="javascript:;" class="supplier-detail-change-tab-button  supplier-button-fly active" data-tab-id="0">Vé máy bay</a>
+                    <a href="javascript:;" class="supplier-detail-change-tab-button  supplier-button-hotel" data-tab-id="1">Khách sạn</a>
+                    <a href="javascript:;" class="supplier-detail-change-tab-button  supplier-button-tour" data-tab-id="2">Tour</a>
+                    <a href="javascript:;" class="supplier-detail-change-tab-button  supplier-button-other" data-tab-id="3">Dịch vụ khác</a>
+                    <a href="javascript:;" class="supplier-detail-change-tab-button  supplier-button-vinWonder" data-tab-id="4">VinWonder</a>
+                </div>
+                <div class="row mt10 ">
+                    <div class="form-group mb10 mr-2">
+                        <div class="datepicker-wrap" style="width:100%">
+                            <div class="datepicker-wrap" style="width:100%">
+                                <input class="form-control date text-left filter_date_daterangepicker" id="createdate" type="text"
+                                       name="datetimeApprove" style="min-width: 180px !important" placeholder="Thời gian tạo" />
                             </div>
-                            <h2 class="title txt_24">Không tìm thấy kết quả</h2>
-                            <div class="gray">Chúng tôi không tìm thấy thông tin mà bạn cần, vui lòng thử lại</div>
+
                         </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </div>
+                    <button class="mb10 mr-2 btn-search btn-default " type="button" onclick="_supplier_order.Export()" id="btnExport">
+                        <i class="fa fa-file-excel-o" id="icon-export"></i>
+                    </button>
+                    <button type="button" class="btn btn-default bg-main" onclick="_supplier_order.SearchData()">
+                        <svg class="icon-svg" style="vertical-align: sub;">
+                            <use xlink:href="/images/icons/icon.svg#search"></use>
+                        </svg>
+                        Tìm kiếm
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <div class="table-responsive table-default table-gray">
+            <div id="gray-data">
+                <div class="form-group flex-end mt20 block text-center">
+                    <i class="fa fa-refresh fa-spin" style="color:#1E5846"></i>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-@await Component.InvokeAsync("Paging", new
-{
-    pageModel = new Paging()
-    {
-        TotalRecord = Model.TotalRecord,
-        TotalPage = Model.TotalPage,
-        CurrentPage = Model.CurrentPage,
-        PageSize = Model.PageSize,
-        RecordName = "kết quả lọc",
-        PageAction = "_supplier_detail.PagingRoom({0})"
-    }
-})
+
+<script>
+  
+    $('input[name="datetimeApprove"]').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+            cancelLabel: 'Clear'
+        }
+    });
+    $('input[name="datetimeApprove"]').on('cancel.daterangepicker', function (ev, picker) {
+        $(this).val('');
+        isPickerApprove = false;
+    });
+    $('input[name="datetimeApprove"]').on('apply.daterangepicker', function (ev, picker) {
+        $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+        isPickerApprove = true;
+    });
+</script>

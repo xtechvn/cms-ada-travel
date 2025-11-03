@@ -28,14 +28,16 @@ namespace WEB.Adavigo.CMS.Controllers.Report
         private readonly IHotelBookingRepositories _hotelBookingRepositories;
         private readonly IOtherBookingRepository _otherBookingRepository;
         private readonly IHotelBookingRoomExtraPackageRepository _hotelBookingRoomExtraPackageRepository;
+        private readonly IVinWonderBookingRepository _vinWonderBookingRepository;
 
         private readonly IReportRepository _reportRepository;
         private ManagementUser _ManagementUser;
         private readonly IAllCodeRepository _allCodeRepository;
+        private readonly ISupplierRepository _supplierRepository;
 
         public ReportDepartmentController(IOrderRepository orderRepository, IDepartmentRepository departmentRepository,
             IWebHostEnvironment WebHostEnvironment, IHotelBookingRepositories hotelBookingRepositories, IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository,
-             IReportRepository reportRepository, ManagementUser managementUser, IAllCodeRepository allcodeRepository, IOtherBookingRepository otherBookingRepository)
+             IReportRepository reportRepository, ManagementUser managementUser, IAllCodeRepository allcodeRepository, IOtherBookingRepository otherBookingRepository, ISupplierRepository supplierRepository, IVinWonderBookingRepository vinWonderBookingRepository)
         {
             _orderRepository = orderRepository;
             _DepartmentRepository = departmentRepository;
@@ -46,7 +48,9 @@ namespace WEB.Adavigo.CMS.Controllers.Report
             _ManagementUser = managementUser;
             _allCodeRepository = allcodeRepository;
             _otherBookingRepository = otherBookingRepository;
-           
+            _supplierRepository = supplierRepository;
+            _vinWonderBookingRepository = vinWonderBookingRepository;
+
 
         }
         public async Task<IActionResult> Index()
@@ -1208,6 +1212,21 @@ namespace WEB.Adavigo.CMS.Controllers.Report
 
                                 }).ToList();
                                 suggestionlist.AddRange(hotellist);
+                                var Supplier_list = new List<SupplierViewModel> ();
+                                foreach (var item in extra_package)
+                                {
+                                    var Supplier =new SupplierViewModel();
+                                    Supplier.id = (int)item.SupplierId;
+                                    var Supplier_Detail = _supplierRepository.GetDetailById((int)item.SupplierId);
+                                    Supplier.fullname = Supplier_Detail.FullName;
+                                    Supplier_list.Add(Supplier);
+                                   
+                                }
+                                if (Supplier_list!=null && Supplier_list.Count>0)
+                                {
+                                    suggestionlist.AddRange(Supplier_list);
+                                }
+                              
                             }
                             suggestionlist = suggestionlist.GroupBy(s => s.id).Select(s => s.First()).ToList();
                             return JsonConvert.SerializeObject(suggestionlist);
@@ -1221,6 +1240,22 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                             var suggestionlist = supplierList.Select(s => new SupplierViewModel
                             {
                                 id = (int)s.SuplierId,
+                                fullname = s.SupplierName,
+
+                            }).ToList();
+
+                            suggestionlist = suggestionlist.GroupBy(s => s.id).Select(s => s.First()).ToList();
+                            return JsonConvert.SerializeObject(suggestionlist);
+                        }
+                        break;
+                    case (int)ServicesType.VinWonder:
+                        {
+                            var supplierList =await _vinWonderBookingRepository.GetVinWonderTicketByBookingIdSP(id);
+
+
+                            var suggestionlist = supplierList.Select(s => new SupplierViewModel
+                            {
+                                id = (int)s.SupplierId,
                                 fullname = s.SupplierName,
 
                             }).ToList();
@@ -1305,7 +1340,7 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                         PricePay = model.ListData.Sum(x => x.PricePay != null ? (double)x.PricePay : 0),
                         PriceRemain = model.ListData.Sum(x => x.PriceRemain != null ? (double)x.PriceRemain : (x.Price != null ? (double)x.Price : 0)),
                         Profit = model.ListData.Sum(x => x.Profit != null ? (double)x.Profit : 0),
-                        Refund = model.ListData.Sum(x => x.Refund != null ? (double)x.Refund : 0),
+                        TotalFundCustomerCare = model.ListData.Sum(x => x.TotalFundCustomerCare != null ? (double)x.TotalFundCustomerCare : 0),
                     };
                 }
                 else
@@ -1760,6 +1795,42 @@ namespace WEB.Adavigo.CMS.Controllers.Report
                     message = ex.Message.ToString()
                 });
             }
+        }
+        public async Task<IActionResult> ReportDepartmentBysalerIndex()
+        {
+            var departments = await _DepartmentRepository.GetAll("");
+            var orderStatus = _allCodeRepository.GetListByType(AllCodeType.ORDER_STATUS);
+            var branchs = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
+            var serviceType = _allCodeRepository.GetListByType(AllCodeType.SERVICE_TYPE);
+            var PAYMENT_STATUS = _allCodeRepository.GetListByType(AllCodeType.PAYMENT_STATUS);
+            var PERMISION_TYPE = _allCodeRepository.GetListByType(AllCodeType.PERMISION_TYPE);
+
+            ViewBag.PAYMENT_STATUS = PAYMENT_STATUS;
+            ViewBag.PERMISION_TYPE = PERMISION_TYPE;
+            ViewBag.departments = departments;
+            ViewBag.orderStatus = orderStatus;
+            ViewBag.Role = 0;
+            ViewBag.Branch = branchs;
+            ViewBag.serviceType = serviceType;
+            var current_user = _ManagementUser.GetCurrentUser();
+            if (current_user.Role != "")
+            {
+                var list = current_user.Role.Split(',');
+                foreach (var item in list)
+                {
+                    switch (Convert.ToInt32(item))
+                    {
+                        case (int)RoleType.SaleOnl:
+                        case (int)RoleType.SaleTour:
+                        case (int)RoleType.SaleKd:
+                            {
+                                ViewBag.Role = 1;
+                            }
+                            break;
+                    }
+                }
+            }
+            return View();
         }
     }
 }

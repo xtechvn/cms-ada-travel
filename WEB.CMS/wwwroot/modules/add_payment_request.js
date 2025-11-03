@@ -129,7 +129,7 @@ var _add_payment_request = {
             $('#order-relate').hide()
             $('#payment-request-type').val(payment_request_type)
             totalRemain = amount_service - totalPayment_service
-            if (payment_request_type == 1 && (serviceType == 5 || serviceType == 9 || serviceType == 1 || serviceType == 3)) // dvu Tour hoặc dvu Khác hoặc dvu khách sạn hoặc dv vé máy bay
+            if (payment_request_type == 1 && (serviceType == 5 || serviceType == 9 || serviceType == 1 || serviceType == 3 || serviceType==6)) // dvu Tour hoặc dvu Khác hoặc dvu khách sạn hoặc dv vé máy bay
             {
                 //$('#payment-request-pay-type').val(2)
                 //$('#payment-request-pay-type').attr('disabled', true)
@@ -142,6 +142,8 @@ var _add_payment_request = {
                     _add_payment_request.GetHotelPackageOption(serviceId, orderId);
                 if (serviceType == 3)// dvu vé máy bay
                     _add_payment_request.GetFlyBookingPackagesOptional(serviceId, orderId);
+                if (serviceType == 6)// dvu vé máy bay
+                    _add_payment_request.GetVinwonderPackagesOptional(serviceId, orderId);
                 $('#amount').val(0)
             }
             if (payment_request_type == 4) {
@@ -150,7 +152,7 @@ var _add_payment_request = {
          
             $('#payment-request-type').attr('disabled', true)
             $('#payment-request-type').addClass('background-disabled')
-            if (serviceType != 5 && serviceType != 9 && serviceType != 1 && serviceType != 3) // khac dvu Tour va dvu Khac va dvu khách sạn
+            if (serviceType != 5 && serviceType != 9 && serviceType != 1 && serviceType != 3 && serviceType != 6) // khac dvu Tour va dvu Khac va dvu khách sạn
             {
                 $('#amount').val(_add_payment_request.FormatNumberStr(totalRemain < 0 ? 0 : totalRemain))
                 setTimeout(function () {
@@ -403,6 +405,50 @@ var _add_payment_request = {
             maximumSelectionLength: 1,
             ajax: {
                 url: "/PaymentRequest/GetFlyBookingPackagesOptionalSuggest",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        name: params.term,
+                        'serviceId': serviceId
+                    }
+                    return query;
+                },
+                processResults: function (response) {
+                    return {
+                        results: $.map(response, function (item) {
+                            return {
+                                text: item.fullname,
+                                id: item.id,
+                            }
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+    },
+    GetVinwonderPackagesOptional: function (serviceId, orderId) {
+        _global_function.AddLoading()
+        $.ajax({
+            url: "/PaymentRequest/GetVinwonderPackageOption",
+            type: "Post",
+            data: { 'serviceId': serviceId, 'serviceType': serviceType, 'orderId': orderId },
+            success: function (result) {
+                _global_function.RemoveLoading()
+                listTourPackageOption = result.data
+            }
+        });
+        $("#supplier-select").empty()
+        $("#supplier-select").select2({
+            theme: 'bootstrap4',
+            placeholder: "Tên NCC, Điện Thoại, Email",
+            hintText: "Nhập từ khóa tìm kiếm",
+            searchingText: "Đang tìm kiếm...",
+            maximumSelectionLength: 1,
+            ajax: {
+                url: "/PaymentRequest/GetVinwonderPackagesOptionalSuggest",
                 type: "post",
                 dataType: 'json',
                 delay: 250,
@@ -1203,11 +1249,12 @@ var _add_payment_request = {
         }
     },
     OnChooseSupllier: function () {
-        if (serviceId !== undefined && serviceId !== null && parseInt(serviceId) !== 0 && (parseInt(serviceType) === 5 || parseInt(serviceType) === 9 || parseInt(serviceType) === 1 || parseInt(serviceType) === 3)) {
+        if (serviceId !== undefined && serviceId !== null && parseInt(serviceId) !== 0 && (parseInt(serviceType) === 5 || parseInt(serviceType) === 9 || parseInt(serviceType) === 1 || parseInt(serviceType) === 3 || parseInt(serviceType) === 6)) {
             var supplierId = parseInt(($('#supplier-select').val()))
             for (var i = 0; i < listTourPackageOption.length; i++) {
+                debugger
                 if (listTourPackageOption[i].supplierId == supplierId || listTourPackageOption[i].suplierId == supplierId) {
-                    var amountRemain = listTourPackageOption[i].amount - listTourPackageOption[i].totalAmountPay
+                    var amountRemain = listTourPackageOption[i].amount - listTourPackageOption[i].totalAmountPay + listTourPackageOption[i].totalContractPay
                     $('#amount').val(_add_payment_request.FormatNumberStr(amountRemain < 0 ? 0 : amountRemain))
                     break
                 }
@@ -1333,6 +1380,10 @@ var _add_payment_request = {
         var isPaymentBefore = $('#isPaymentBefore').is(":checked")
         if (isPaymentBefore === undefined || isPaymentBefore === null)
             isPaymentBefore = false
+        var amount_supplier_refund_2=0
+        if ($('#amount_supplier_refund').val() != undefined && $('#amount_supplier_refund').val() != null && $('#amount_supplier_refund').val() != '') {
+           amount_supplier_refund_2= parseFloat($('#amount_supplier_refund').val().replaceAll('.', '').replaceAll(',', '')) 
+        }
         let obj = {
             'id': parseInt($('#payId').val()),
             'status': parseInt($('#payStatus').val()),
@@ -1354,8 +1405,8 @@ var _add_payment_request = {
             'clientId': parseInt(($('#client-select').val())),
             'supplierId': parseInt(($('#supplier-select').val())),
             'amount': parseFloat($('#amount').val().replaceAll('.', '').replaceAll(',', '')),
-            'totalAmountService': amount_service,
-            'totalSupplierRefund': amount_supplier_refund,
+            'totalAmountService': amount_service == 0 ? parseFloat($('#amount_service').val().replaceAll('.', '').replaceAll(',', '')) : amount_service,
+            'totalSupplierRefund': amount_supplier_refund == 0 ? amount_supplier_refund_2 : amount_supplier_refund,
             'paymentRequestDetails': paymentRequestDetails,
             'ServiceId': parseInt($('#serviceId').val()),
             'ServiceType': parseInt($('#serviceType').val()),

@@ -90,7 +90,7 @@ namespace Repositories.Repositories
             try
             {
 
-                DataTable dt = await _ContractDAL.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.SP_GetListContract);
+                DataTable dt = await _ContractDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.SP_GetListContract);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = (from row in dt.AsEnumerable()
@@ -156,7 +156,7 @@ namespace Repositories.Repositories
             try
             {
 
-                DataTable dt = await _ContractDAL.TotalConTract(searchModel, currentPage, pageSize, ProcedureConstants.Sp_CountTotalContractByStatus);
+                DataTable dt = await _ContractDAL.TotalConTract(searchModel, currentPage, pageSize, StoreProcedureConstant.Sp_CountTotalContractByStatus);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = (from row in dt.AsEnumerable()

@@ -1025,5 +1025,45 @@ var _payment_request_service = {
                 text.print();
             }
         });
+    },
+    AddNewPaymentVoucher: function (id) {
+        let title = 'Thêm phiếu chi';
+        let url = '/PaymentRequest/AddPaymentVoucher';
+        var param = {
+            paymentRequestId:id
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    KTNote: function (id,noteid) {
+        let title = 'Ghi chú';
+        let url = '/PaymentRequest/PopupNoteKT';
+        var param = {
+            id: id,
+            noteId: noteid,
+
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    SetupNoteKTRequest: function () {
+        var id = $('#Id').val();
+        var noteid = $('#noteId').val();
+        var notekt = $('#notekt').val();
+        $.ajax({
+            url: "/PaymentRequest/SetUpNoteKT",
+            type: "Post",
+            data: { id: id, notekt: notekt, noteid: noteid },
+            success: function (result) {
+                _global_function.RemoveLoading()
+                if (result.isSuccess === true) {
+                    _msgalert.success(result.message);
+                    $.magnificPopup.close();
+                    setTimeout(function () {
+                        window.location.reload()
+                    }, 1000)
+                } else {
+                    _msgalert.error(result.message);
+                }
+            }
+        });
     }
 }

@@ -327,7 +327,7 @@ var _set_service_vinwonder_detail = {
                     $('.add-service-vinwonder-select-location').select2()
                     $(".add-service-vinwonder-select-location").prop("disabled", true);
                     _global_function.RenderFileAttachment($('.attachment-operator'), $('#service-vinwonder-detail-data').attr('data-booking-id'), _set_service_vinwonder_detail.ServiceType, true, false, true)
-
+                    _set_service_vinwonder_detail.SupplierSuggesstion($('.service-vinwonder-packages-suplier-id'))
                 }
             });
         }
@@ -415,6 +415,10 @@ var _set_service_vinwonder_detail = {
                     $("body").on('click', ".send-email-vinwonder-code", function (ev, picker) {
                         _set_service_vinwonder_detail.SendEmailVinWonderTicket($('#service-vinwonder-detail-data').attr('data-booking-id'))
                     });
+                    $("body").on('click', ".service-code-send-email2", function (ev, picker) {
+                        _set_service_vinwonder_detail.PopupSendEmail2()
+
+                    });
                     vinwonder_loading.ServiceCode=true
                 }
             }
@@ -487,6 +491,8 @@ var _set_service_vinwonder_detail = {
         $("body").on('click', ".update-operator-order-amount", function () {
             $('.service-vinwonder-packages-baseprice-operator').removeAttr('disabled')
             $('.service-vinwonder-packages-baseprice-operator').removeClass('input-disabled-background')
+            $('.service-vinwonder-packages-suplier-id').removeAttr('disabled')
+            $('.service-vinwonder-packages-suplier-id').removeClass('input-disabled-background')
             $('.update-operator-order-amount-save').show()
             $('.update-operator-order-amount-cancel').show()
             $('.update-operator-order-amount').hide()
@@ -498,7 +504,7 @@ var _set_service_vinwonder_detail = {
         $("body").on('click', ".update-operator-order-amount-cancel", function () {
             $('.service-vinwonder-detail-button-ordered').attr('data-loaded', '0')
             _set_service_vinwonder_detail.ReloadOrderedTab();
-
+          
         });
     },
     ReloadOrderedTab: function () {
@@ -684,6 +690,7 @@ var _set_service_vinwonder_detail = {
     },
     PopupChangeOperatorInit: function () {
         _set_service_vinwonder_detail.UserSuggesstionMultiple($('.service-vinwonder-change-operator'))
+     
     },
     PopupChangeOperatorClose: function () {
         $('#change_operator_popup').removeClass('show')
@@ -734,6 +741,7 @@ var _set_service_vinwonder_detail = {
                 Id: extra_package_element.attr('data-extra-package-id'),
                 BookingId: $('#service-vinwonder-detail-data').attr('data-booking-id'),
                 UnitPrice: _global_function.GetAmountFromCurrencyInput(extra_package_element.find('.service-vinwonder-packages-unit-price')),
+                SupplierId: _global_function.GetAmountFromCurrencyInput(extra_package_element.find('.service-vinwonder-packages-suplier-id')),
             }
             obj_summit.push(extra_package);
         });
@@ -754,6 +762,9 @@ var _set_service_vinwonder_detail = {
 
                     $('.service-vinwonder-packages-baseprice-operator').attr('disabled', 'disabled')
                     $('.service-vinwonder-packages-baseprice-operator').addClass('input-disabled-background')
+
+                    $('.service-vinwonder-packages-suplier-id').attr('disabled', 'disabled')
+                    $('.service-vinwonder-packages-suplier-id').addClass('input-disabled-background')
 
                     $('.update-operator-order-amount-save').hide()
                     $('.update-operator-order-amount-cancel').hide()
@@ -866,7 +877,51 @@ var _set_service_vinwonder_detail = {
     },
     ReloadServiceCodeTab: function () {
         _set_service_vinwonder_detail.ShowServiceCodeTab();
-    }
+    },
+    SupplierSuggesstion: function (element) {
+        element.select2({
+            theme: 'bootstrap4',
+            placeholder: "Tên NCC ",
+            hintText: "Nhập từ khóa tìm kiếm",
+            searchingText: "Đang tìm kiếm...",
+            ajax: {
+                url: "/PaymentRequest/GetSuppliersSuggest",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        name: params.term,
+                    }
+                    return query;
+                },
+                processResults: function (response) {
+                    return {
+                        results: $.map(response, function (item) {
+                            return {
+                                text: item.id + ' - ' + item.fullname,
+                                id: item.id,
+                            }
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+    },
+    PopupSendEmail2: function () {
+        let title = 'Gửi Email nhà cung cấp';
+        let url = '/SetService/SendEmailSupplier';
+        let param = {
+            id: $('#service-vinwonder-detail-data').attr('data-booking-id').trim(),
+            Orderid: $('#service-vinwonder-detail-data').attr('data-order-id').trim(),
+            type: 8,
+            SupplierId: 0,
+            ServiceType: 6,
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+
+    },
 }
 var _common_function_vinwonder = {
 

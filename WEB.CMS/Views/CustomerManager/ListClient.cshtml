@@ -38,6 +38,8 @@ else
 
                     <th class="mfp-hide" style="width: 120px;">Người tạo</th>
                     <th class="mfp-hide" style="width: 100px;">Trạng thái</th>
+                    <th class="" style="width: 100px;">Ngày tạo đơn cuối</th>
+                    <th class="" style="width: 100px;">Số Ngày tạo đơn cuối</th>
                 </tr>
             </thead>
 
@@ -87,7 +89,12 @@ else
                                     }
                                 </div>
                             </td>
-
+                            <td>
+                                @(item.LastOrderDate!= DateTime.MinValue ? item.LastOrderDate.ToString("dd/MM/yyyy"):"")
+                            </td>
+                            <td>
+                                @(item.LastOrderDate != DateTime.MinValue ? Math.Round((DateTime.Now - item.LastOrderDate).TotalDays) : 0)
+                            </td>
                         </tr>
                     }
 

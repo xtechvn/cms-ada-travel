@@ -34,7 +34,12 @@
                         <td class="center">@counter</td>
                         <td class="center"><img width="35" src="@(item.Image11 ??  item.Image43 ?? item.Image169)" onerror="_imageError(this)"></td>
                         <td>
-                            <div><a href="/news/detail/@item.Id">@item.Title</a></div>
+                            <div>
+                                <a href="/news/detail/@item.Id@(item.PlatForm == 1 && item.AimodelType == 1 ? "?fromAI=true&platform=1" : "")">
+                                    @item.Title
+                                </a>
+                            </div>
+
                             <a href="#" class="italic blue">@item.ArticleCategoryName</a>
                         </td>
                         <td>@(item.PublishDate != DateTime.MinValue ? item.PublishDate.Value.ToString("dd/MM/yyyy HH:mm") : string.Empty)</td>

@@ -17,17 +17,20 @@
         cursor: pointer;
         background: #C4C4C4
     }
+
     .stop-scrolling {
         height: 100%;
         overflow: hidden;
     }
+
     .filter .select2 {
         padding-left: 100px !important;
     }
-    .filter .lbl{
-        width:100px !important;
+
+    .filter .lbl {
+        width: 100px !important;
     }
- </style>
+</style>
 <h2 class="txt_18 bold mb20" style="padding-left: 20px;">Báo cáo Tổng hợp nợ phải thu của Khách hàng</h2>
 <section style=" overflow-x: hidden;">
     <div id="filter" class="row-main container filter">
@@ -48,7 +51,7 @@
                         }
                     </select>
                 </div>
-               
+
             </div>
             <div class="form-group mb10 mr-2" style="min-width: 350px;">
                 <div class="datepicker-wrap add-lbl">
@@ -56,7 +59,7 @@
                     <input class="form-control date text-left date-select" style="padding-left: 100px !important;" id="report_date" type="text" name="report_date" value="" placeholder="Ngày báo cáo" />
                 </div>
             </div>
-           
+
             <div class="form-group mb10 mr-2" style="min-width: 350px;">
                 <div class="datepicker-wrap add-lbl">
                     <span class="lbl">Khách hàng</span>
@@ -104,7 +107,7 @@
                     </button>
 
                 </h4>
-               
+
                 <button type="button" class="close" onclick="_report_client_debt_detail.Close()">×</button>
             </div>
             <div class="modal-body" id="grid-report-clientdebt-detail">
@@ -115,5 +118,7 @@
 </div>
 @section scripts{
     <script type="text/javascript" src="~/modules/report_client_debt.js"></script>
+
     <script>_report_client_debt.Initialization()</script>
+    
 }

@@ -114,7 +114,7 @@
                         <td class="mfp-hide">@item.UtmSource</td>
                         <td class="text-right">@item.Profit.ToString("#,##")</td>
                         <td class="text-right">@item.UtmMedium</td>
-                        <td style="width:12% !important">
+                        <td style="width:10% !important">
                             @switch (item.StatusCode)
                             {
                                 case (int)(OrderStatus.CREATED_ORDER):
@@ -215,12 +215,24 @@
                         <td class="mfp-hide text-right">
                             @((item.Amount - item.Payment).ToString("N0"))
                         </td>
-                        @{
-                            var invoiceByOrder = invoiceList.Count > 0 ? invoiceList.FirstOrDefault(x => x.OrderId.ToString().Trim() == item.OrderId.Trim()) : null;
-                        }
-                        <td class="mfp-hide">
-                            @((invoiceByOrder != null && invoiceByOrder.OrderId > 0 && invoiceByOrder.Status == (int)INVOICE_REQUEST_STATUS.HOAN_THANH) ? "Có":"Không")
 
+                        <td class="mfp-hide">
+                            @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.CHO_TBP_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.CHO_KTT_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.HOA_DON_NHAP))
+                            {
+                                <span class="status-wait">@item.InvoiceRequestStatusName</span>
+                            }
+                            @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.DA_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.HOAN_THANH))
+                            {
+                                <span class="status-approve">@item.InvoiceRequestStatusName</span>
+                            }
+                            @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.TU_CHOI))
+                            {
+                                <span class="status-reject">@item.InvoiceRequestStatusName</span>
+                            }
+                            @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.LUU_NHAP))
+                            {
+                                <span class="status-draft">@item.InvoiceRequestStatusName</span>
+                            }
                         </td>
                        
                     </tr>

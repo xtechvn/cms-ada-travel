@@ -9,12 +9,13 @@ namespace Repositories.IRepositories
     {
         Task<UserDetailViewModel> CheckExistAccount(AccountModel entity);
         Task<bool> ResetPassword(string input);
-        GenericViewModel<UserGridModel> GetPagingList(string userName, string strRoleId, int status, int currentPage, int pageSize);
+        GenericViewModel<UserGridModel> GetPagingList(string userName,  int? status, int currentPage, int pageSize);
         Task<UserDetailViewModel> GetDetailUser(int Id);
         Task<UserDataViewModel> GetUser(int Id);
         Task<int> Create(UserViewModel model);
         Task<int> Update(UserViewModel model);
-        Task<int> UpdateUserRole(int userId, int[] arrayRole, int type);
+        Task<int> UpdateUserRole(int userId, int[] arrayRole);
+        Task<int> DeleteUserRole(int userId, int[] arrayRole);
         Task<int> ChangeUserStatus(int userId);
         Task<User> FindById(int id);
         Task<List<User>> GetUserSuggestionList(string userName);
@@ -25,7 +26,7 @@ namespace Repositories.IRepositories
         Task<List<User>> GetUserSuggesstion(string txt_search);
         Task<List<User>> GetUserSuggesstion(string txt_search, List<int> ids);
         Task<User> GetClientDetailAsync(long clientId);
-        Task<IEnumerable<RolePermission>> GetUserPermissionById(int Id);
+        Task<List<RolePermission>> GetUserPermissionById(int Id);
         public List<UserPosition> GetUserPositions();
         public Task<UserPosition> GetUserPositionsByID(int id);
         Task<List<Role>> GetUserActiveRoleList(int user_id);
@@ -48,5 +49,6 @@ namespace Repositories.IRepositories
         Task<List<User>> GetListUserDepartById(List<int?> ids);
         bool IsAccountantTour(long userId);
         bool IsHeadOfAccountantPhoTPKeToan(long userId);
+        List<UserProfitReportViewModel> GetListUserProfitReport(UserProfitReportModel model);
     }
 }

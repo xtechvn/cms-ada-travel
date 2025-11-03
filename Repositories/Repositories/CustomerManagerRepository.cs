@@ -8,12 +8,14 @@ using Entities.ViewModels;
 using Entities.ViewModels.CustomerManager;
 using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.Funding;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -79,6 +81,7 @@ namespace Repositories.Repositories
                         ClientCode = model.ClientCode,
                         SaleMapId = (int?)model.UserId,
                         ParentId = -1,
+                        UtmSource = Convert.ToInt32(model.UtmSource),
 
                     };
                     var CreateClient = _ClientDAL.SetUpClient(Client);
@@ -95,10 +98,10 @@ namespace Repositories.Repositories
                                 Password = EncodeHelpers.MD5Hash("123456"),
                                 PasswordBackup = EncodeHelpers.MD5Hash("123456"),
                                 Status = 0,
-                                GroupPermission= GroupPermissionStatus.Admin,
+                                GroupPermission = GroupPermissionStatus.Admin,
 
                             };
-                          
+
                             var CreateAccountClient = _AccountClientDAL.CreateAccountClient(Account_Client);
 
                             if (Convert.ToInt32(model.id_loaikhach) != -1)
@@ -131,7 +134,7 @@ namespace Repositories.Repositories
                                 UserId = (int)model.UserId,
                             };
                             var CreateUserAgent = _UserAgentDAL.CreateUserAgent(UserAgent);
-                            if(CreateAccountClient==1 && CreateUserAgent == 1)
+                            if (CreateAccountClient == 1 && CreateUserAgent == 1)
                             {
                                 return 1;
                             }
@@ -175,6 +178,7 @@ namespace Repositories.Repositories
                         TaxNo = model.Maso_Id,
                         ClientCode = model.ClientCode,
                         ParentId = data2.ParentId,
+                        UtmSource = model.UtmSource,
                     };
 
                     var CreateClient = _ClientDAL.SetUpClient(Client);
@@ -205,7 +209,7 @@ namespace Repositories.Repositories
                     var data = dt.ToList<CustomerManagerViewModel>();
                     model = data[0];
                 }
-               
+
                 return model;
             }
             catch (Exception ex)
@@ -219,33 +223,10 @@ namespace Repositories.Repositories
             var model = new GenericViewModel<CustomerManagerViewModel>();
             try
             {
-                DataTable dt = await _ClientDAL.GetPagingList(searchModel, currentPage, pageSize, ProcedureConstants.GETGetAllClient_Search);
+                DataTable dt = await _ClientDAL.GetPagingList(searchModel, currentPage, pageSize, StoreProcedureConstant.GETGetAllClient_Search);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    var data = (from row in dt.AsEnumerable()
-                                select new CustomerManagerViewModel
-                                {
-                                    Id = !row["Id"].Equals(DBNull.Value) ? Convert.ToInt32(row["Id"]) : 0,
-                                    ClientName = !row["ClientName"].Equals(DBNull.Value) ? row["ClientName"].ToString() : "",
-                                    Email = !row["Email"].Equals(DBNull.Value) ? row["Email"].ToString() : "",
-                                    Phone = !row["Phone"].Equals(DBNull.Value) ? row["Phone"].ToString() : "",
-                                    client_type_name = !row["ClienType"].Equals(DBNull.Value) ? row["ClienType"].ToString() : "",
-                                    AgencyType_name = !row["AgencyType"].Equals(DBNull.Value) ? row["AgencyType"].ToString() : "",
-                                    PermisionType_name = !row["PermisionType"].Equals(DBNull.Value) ? row["PermisionType"].ToString() : "",
-                                    UserId = !row["UserId"].Equals(DBNull.Value) ? Convert.ToInt32(row["UserId"]) : 0,
-                                    CreateDate_UserAgent = !row["CreateDate"].Equals(DBNull.Value) ? row["CreateDate"].ToString() : "",
-                                    sum_payment = !row["SumPayment"].Equals(DBNull.Value) ? Convert.ToDouble(row["SumPayment"]) : 0,
-                                    UpdateLast = !row["UpdateTime"].Equals(DBNull.Value) ? row["UpdateTime"].ToString() : "",
-                                    VerifyDate = !row["CreateDate"].Equals(DBNull.Value) ? row["VerifyDate"].ToString() : "",
-                                    JoinDate = Convert.ToDateTime(!row["JoinDate"].Equals(DBNull.Value) ? row["JoinDate"].ToString() : ""),
-                                    UserId_name = !row["FullName"].Equals(DBNull.Value) ? row["FullName"].ToString() : "",
-                                    Create_name = !row["CreateName"].Equals(DBNull.Value) ? row["CreateName"].ToString() : "",
-                                    ACStatus = !row["ACStatus"].Equals(DBNull.Value) ? Convert.ToInt32(row["ACStatus"]) : 0,
-                                    ClientCode = !row["ClientCode"].Equals(DBNull.Value) ? row["ClientCode"].ToString() : "",
-
-
-                                }).ToList();
-
+                    var data = dt.ToList<CustomerManagerViewModel>();
 
                     model.ListData = data;
                     model.CurrentPage = currentPage;
@@ -263,14 +244,14 @@ namespace Repositories.Repositories
             }
 
         }
-        public int ResetStatusAc(long clientId, long Status,int type)
+        public int ResetStatusAc(long clientId, long Status, int type)
         {
             try
             {
 
                 var model = _AccountClientDAL.AccountClientByClientId(clientId);
                 model.Status = (byte?)Status;
-                if(type != 0)
+                if (type != 0)
                 {
                     model.ClientType = type;
                 }
@@ -316,31 +297,10 @@ namespace Repositories.Repositories
             try
             {
                 var data = new List<CustomerManagerViewModel>();
-                DataTable dt = await _ClientDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize, ProcedureConstants.GETGetAllClient_Search);
+                DataTable dt = await _ClientDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize, StoreProcedureConstant.GETGetAllClient_Search);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    data = (from row in dt.AsEnumerable()
-                            select new CustomerManagerViewModel
-                            {
-                                Id = !row["Id"].Equals(DBNull.Value) ? Convert.ToInt32(row["Id"]) : 0,
-                                ClientName = !row["ClientName"].Equals(DBNull.Value) ? row["ClientName"].ToString() : "",
-                                Email = !row["Email"].Equals(DBNull.Value) ? row["Email"].ToString() : "",
-                                Phone = !row["Phone"].Equals(DBNull.Value) ? row["Phone"].ToString() : "",
-                                client_type_name = !row["ClienType"].Equals(DBNull.Value) ? row["ClienType"].ToString() : "",
-                                AgencyType_name = !row["AgencyType"].Equals(DBNull.Value) ? row["AgencyType"].ToString() : "",
-                                PermisionType_name = !row["PermisionType"].Equals(DBNull.Value) ? row["PermisionType"].ToString() : "",
-                                UserId = !row["UserId"].Equals(DBNull.Value) ? Convert.ToInt32(row["UserId"]) : 0,
-                                CreateDate_UserAgent = !row["CreateDate"].Equals(DBNull.Value) ? row["CreateDate"].ToString() : "",
-                                sum_payment = !row["SumPayment"].Equals(DBNull.Value) ? Convert.ToDouble(row["SumPayment"]) : 0,
-                                UpdateLast = !row["UpdateTime"].Equals(DBNull.Value) ? row["UpdateTime"].ToString() : "",
-                                VerifyDate = !row["CreateDate"].Equals(DBNull.Value) ? row["VerifyDate"].ToString() : "",
-                                JoinDate = Convert.ToDateTime(!row["JoinDate"].Equals(DBNull.Value) ? row["JoinDate"].ToString() : ""),
-                                UserId_name = !row["FullName"].Equals(DBNull.Value) ? row["FullName"].ToString() : "",
-                                Create_name = !row["CreateName"].Equals(DBNull.Value) ? row["CreateName"].ToString() : "",
-                                ACStatus = !row["ACStatus"].Equals(DBNull.Value) ? Convert.ToInt32(row["ACStatus"]) : 0,
-                                ClientCode = !row["ClientCode"].Equals(DBNull.Value) ? row["ClientCode"].ToString() : "",
-
-                            }).ToList();
+                    data = dt.ToList<CustomerManagerViewModel>();
 
                 }
                 if (data != null && data.Count > 0)
@@ -374,7 +334,9 @@ namespace Repositories.Repositories
 
                     if (field.NguoiTao) { listfieldtext.Add("Người tạo"); listfield.Add(11); }
                     if (field.Status) { listfieldtext.Add("Trạng thái"); listfield.Add(12); }
-
+                    listfieldtext.Add("Nguồn khách hàng"); listfield.Add(13);
+                    listfieldtext.Add("Ngày tạo đơn cuối"); listfield.Add(14);
+                    listfieldtext.Add("Số cách Ngày tạo đơn cuối"); listfield.Add(15);
                     cell.SetColumnWidth(0, 8);
                     for (int i = 1; i <= listfield.Count; i++)
                     {
@@ -468,7 +430,7 @@ namespace Repositories.Repositories
                                 }
                                 if (listfield2[f] == 3)
                                 {
-                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.Phone + "\n" + item.Email);
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.Phone + " - \n" + item.Email);
                                     listfield2.Remove(listfield2[f]); f--; break;
                                 }
                                 if (listfield2[f] == 4)
@@ -513,18 +475,32 @@ namespace Repositories.Repositories
                                 }
                                 if (listfield2[f] == 12)
                                 {
-                                    if (item.ACStatus == 0)
-                                    {
-                                        ws.Cells[Cell[I] + RowIndex].PutValue("Đang hoạt động");
-                                        listfield2.Remove(listfield2[f]); f--; break;
-                                    }
-                                    else
-                                    {
-                                        ws.Cells[Cell[I] + RowIndex].PutValue("Ngừng hoạt động");
-                                        listfield2.Remove(listfield2[f]); f--; break;
-                                    }
-                                }
 
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.StatusName);
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                }
+                                if (listfield2[f] == 13)
+                                {
+
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.UtmSourceName);
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                } 
+                                if (listfield2[f] == 14)
+                                {
+
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.LastOrderDate != DateTime.MinValue ? item.LastOrderDate.ToString("dd/MM/yyyy") : "");
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                }
+                                if (listfield2[f] == 15)
+                                {
+
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.LastOrderDate != DateTime.MinValue ? Math.Round((DateTime.Now - item.LastOrderDate).TotalDays) : 0);
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                }
                             }
 
 
@@ -543,6 +519,93 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("ExportDeposit - CustomerManagerRepository: " + ex);
             }
             return pathResult;
+        }
+        public async Task<int> UpdateStatusClient(int status, int id)
+        {
+            try
+            {
+                return await _ClientDAL.UpdateStatusClient(status, id);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
+                return 0;
+            }
+        }
+        public async Task<List<Client>> GetClientByPhone(string phone)
+        {
+            try
+            {
+                return await _ClientDAL.GetClientByphone(phone);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
+                return null;
+            }
+        }
+        public async Task<int> CreateClient(CustomerManagerView model)
+        {
+            try
+            {
+                var Client = new Client
+                {
+                    Id = model.Id,
+                    AgencyType = model.AgencyType,
+                    ClientType = Convert.ToInt32(model.id_ClientType),
+                    PermisionType = Convert.ToInt32(model.id_nhomkhach),
+                    Email = model.email,
+                    ClientName = model.Client_name,
+                    Status = 0,
+                    Note = model.Note,
+                    JoinDate = DateTime.Now,
+                    Phone = model.phone,
+                    UpdateTime = DateTime.Now,
+                    Birthday = DateTime.Now,
+                    BusinessAddress = model.DiaChi_giaodich,
+                    ExportBillAddress = model.DC_hoadon,
+                    TaxNo = model.Maso_Id,
+                    ClientCode = model.ClientCode,
+                    SaleMapId = (int?)model.UserId,
+                    ParentId = -1,
+                    UtmSource = Convert.ToInt32(model.UtmSource),
+
+                };
+                var CreateClient = await _ClientDAL.CreateClient(Client);
+                var Detai_Client = await _ClientDAL.GetClientByClientCode(Client.ClientCode);
+                var CreateUserAgent = _UserAgentDAL.UpdataUserAgent(0, (int)model.UserId, (int)model.UserId, Detai_Client.Id);
+                if (CreateUserAgent > 0)
+                {
+                    return (int)Detai_Client.Id;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
+                return 0;
+            }
+        }
+        public async Task<List<SumContractPayByUtmSource>> GetSumContractPayByUtmSource()
+        {
+            try
+            {
+                DataTable dt = await _ClientDAL.GetSumContractPayByUtmSource();
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<SumContractPayByUtmSource>();
+                    return data;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateStatusClient - CustomerManagerRepository: " + ex);
+                return null;
+            }
         }
     }
 }

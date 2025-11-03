@@ -12,5 +12,6 @@ namespace Entities.ViewModels.SetServices
         public string SupplierName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
+        public double TotalContractPay { get; set; }
     }
 }

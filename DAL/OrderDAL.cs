@@ -6,6 +6,7 @@ using Entities.ViewModels.Funding;
 using Entities.ViewModels.OrderManual;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -31,7 +32,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[25];
+                SqlParameter[] objParam = new SqlParameter[26];
 
 
                 objParam[0] = (CheckDate(searchModel.CreateTime) == DateTime.MinValue) ? new SqlParameter("@CreateTime", DBNull.Value) : new SqlParameter("@CreateTime", CheckDate(searchModel.CreateTime));
@@ -123,6 +124,7 @@ namespace DAL
 
                 objParam[23] = new SqlParameter("@OrderId", searchModel.BoongKingCode);
                 objParam[24] = new SqlParameter("@IsSalerDebtLimit", searchModel.IsSalerDebtLimit);
+                objParam[25] = new SqlParameter("@InvoiceRequestStatus", searchModel.InvoiceRequestStatus == null ? "" : string.Join(",", searchModel.InvoiceRequestStatus));
 
 
                 return _DbWorker.GetDataTable(proc, objParam);
@@ -409,6 +411,7 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.StartDate) data.StartDate = min_date.StartDate;
                             if (data.EndDate == null || data.EndDate < max_date.EndDate) data.EndDate = max_date.EndDate;
                             commission += list_flybooking.Sum(x => x.Adgcommission != null ? (double)x.Adgcommission : 0);
+                            commission += list_flybooking.Sum(x => x.OthersAmount != null ? (double)x.OthersAmount : 0);
 
                         }
 
@@ -434,6 +437,8 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.ArrivalDate) data.StartDate = min_date.ArrivalDate;
                             if (data.EndDate == null || data.EndDate < max_date.DepartureDate) data.EndDate = max_date.DepartureDate;
                             commission += list_hotel_booking.Sum(x => x.TotalDiscount != null ? (double)x.TotalDiscount : 0);
+                            commission += list_hotel_booking.Sum(x => x.TotalOthersAmount != null ? (double)x.TotalOthersAmount : 0);
+
 
                         }
                         var hotel_extra = await _DbContext.HotelBookingRoomExtraPackages.AsNoTracking().Where(s => list_hotel_booking_id.Contains((long)s.HotelBookingId)).ToListAsync();
@@ -466,6 +471,7 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.StartDate) data.StartDate = min_date.StartDate;
                             if (data.EndDate == null || data.EndDate < max_date.EndDate) data.EndDate = max_date.EndDate;
                             commission += list_tour_booking.Sum(x => x.Commission != null ? (double)x.Commission : 0);
+                            commission += list_tour_booking.Sum(x => x.OthersAmount != null ? (double)x.OthersAmount : 0);
 
                         }
 
@@ -486,6 +492,7 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.CreatedDate) data.StartDate = VinWonderBooking_Ticket_min_date.DateUsed;
                             if (data.EndDate == null || data.EndDate < max_date.CreatedDate) data.EndDate = VinWonderBooking_Ticket_max_date.DateUsed;
                             commission += vinWonderBookings.Sum(x => x.Commission != null ? (double)x.Commission : 0);
+                            commission += vinWonderBookings.Sum(x => x.OthersAmount != null ? (double)x.OthersAmount : 0);
 
 
                         }
@@ -511,6 +518,7 @@ namespace DAL
                             if (data.StartDate == null || data.StartDate > min_date.StartDate) data.StartDate = min_date.StartDate;
                             if (data.EndDate == null || data.EndDate < max_date.EndDate) data.EndDate = max_date.EndDate;
                             commission += list_other_booking.Sum(x => x.Commission != null ? (double)x.Commission : 0);
+                            commission += vinWonderBookings.Sum(x => x.OthersAmount != null ? (double)x.OthersAmount : 0);
 
                         }
 
@@ -526,6 +534,11 @@ namespace DAL
                         {
                             data.PaymentStatus = (int)PaymentStatus.PAID_NOT_ENOUGH;
                             data.IsFinishPayment = 0;
+                        }
+                        if (amount == contract_pay_total_amount)
+                        {
+                            data.PaymentStatus = (int)PaymentStatus.PAID;
+                            data.IsFinishPayment = 1;
                         }
                         data.Amount = amount;
                         data.Price = price;
@@ -1082,19 +1095,20 @@ namespace DAL
             }
             return null;
         }
-        public async Task<DataTable> CheckAmountRemainBySalerId(long SalerId)
+        public async Task<DataTable> CheckAmountRemainBySalerId(string SalerId, string SalerPermission)
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[1];
+                SqlParameter[] objParam = new SqlParameter[2];
                 objParam[0] = new SqlParameter("@SalerId", SalerId);
+                objParam[1] = new SqlParameter("@SalerPermission", SalerPermission);
                 return _DbWorker.GetDataTable(StoreProcedureConstant.SP_CheckAmountRemainBySalerId, objParam);
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("CheckAmountRemainBySalerId - OrderDal: " + ex);
             }
-            return null ;
+            return null;
         }
         public async Task<int> UpdateOrderIsSalerDebtLimit(long OrderId, long Status, long UpdatedBy, long UserVerify)
         {
@@ -1113,6 +1127,58 @@ namespace DAL
                 LogHelper.InsertLogTelegram("GetDetailOrderServiceByOrderId - OrderDal: " + ex);
             }
             return 0;
+        }
+        public async Task<DataTable> GetListOrder(SearchReportOrderModels searchModel)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[13];
+                objParam[0] = new SqlParameter("@StartDateFrom", searchModel.StartDateFrom == null ? DBNull.Value : searchModel.StartDateFrom);
+                objParam[1] = new SqlParameter("@StartDateTo", searchModel.StartDateTo == null ? DBNull.Value : searchModel.StartDateTo);
+                objParam[2] = new SqlParameter("@EndDateFrom", searchModel.EndDateFrom == null ? DBNull.Value : searchModel.EndDateFrom);
+                objParam[3] = new SqlParameter("@EndDateTo", searchModel.EndDateTo == null ? DBNull.Value : searchModel.EndDateTo);
+                objParam[4] = new SqlParameter("@CreateDateFrom", searchModel.CreateDateFrom == null ? DBNull.Value : searchModel.CreateDateFrom);
+                objParam[5] = new SqlParameter("@CreateDateTo", searchModel.CreateDateTo == null ? DBNull.Value : searchModel.CreateDateTo );
+                objParam[6] = new SqlParameter("@ClientId", searchModel.ClientId == null ? DBNull.Value : searchModel.ClientId);
+                objParam[7] = new SqlParameter("@SupplierId", searchModel.SupplierId == null ? DBNull.Value : searchModel.SupplierId);
+                objParam[8] = new SqlParameter("@OrderId", searchModel.OrderId == null ? DBNull.Value : searchModel.OrderId);
+                objParam[9] = new SqlParameter("@OrderStatus", searchModel.OrderStatus == null ? DBNull.Value : searchModel.OrderStatus);
+                objParam[10] = new SqlParameter("@Module", searchModel.Module == null ? DBNull.Value : searchModel.Module);
+                objParam[11] = new SqlParameter("@PageIndex", searchModel.PageIndex);
+                objParam[12] = new SqlParameter("@PageSize", searchModel.pageSize);
+
+
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListReportOrder, objParam);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListOrder - OrderDal: " + ex);
+            }
+            return null;
+        }
+        public async Task<long> UpdateOrderCutOffDate(long order_id, int user_commit,string CutOffDate)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var exists = _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderId == order_id);
+                    if (exists != null && exists.OrderId > 0)
+                    {
+                        exists.UpdateLast = DateTime.Now;
+                        exists.UserUpdateId = user_commit;
+                        exists.CutOffDate = CheckDate(CutOffDate);
+                        _DbContext.Order.Update(exists);
+                        await _DbContext.SaveChangesAsync();
+                    }
+                    return 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateOrderSaler - OrderDal: " + ex);
+                return -2;
+            }
         }
     }
 }

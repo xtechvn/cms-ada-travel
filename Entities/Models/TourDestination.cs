@@ -8,6 +8,9 @@ namespace Entities.Models
         public long Id { get; set; }
         public long? TourId { get; set; }
         public int? LocationId { get; set; }
+        /// <summary>
+        /// Lưu theo Tour Type 
+        /// </summary>
         public int? Type { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }

@@ -204,6 +204,12 @@ else
                                                 @dataNo.DataNo
                                             </a>
                                         }
+                                        @if (dataNo.ServiceType == (int)ServiceType.VinWonder) // VinWonder
+                                        {
+                                            <a class="blue" href="/SetService/vinwonder/Detail/@dataNo.DataId">
+                                                @dataNo.DataNo
+                                            </a>
+                                        }
                                         @if (counterContent < item.ListServiceCodeAndType.Count)
                                         {
                                             <span>,</span>

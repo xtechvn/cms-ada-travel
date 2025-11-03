@@ -17,6 +17,7 @@
 
 <form id="form_hotel">
     <div class="row row_min">
+        <input style="display:none" class="form-control" asp-for="@Model.HotelId" />
         <div class="grid-item col-md-7">
             <div class="border">
                 <div class="form-default3 pd10">
@@ -98,7 +99,7 @@
                             <div class="wrap_input">
                                 <select class="form-control select2-modal" asp-for="@Model.Star" style="width:100%">
                                     <option value="">Chọn hạng sao</option>
-                                    @if (Model.Star!=null && Model.Star == 1)
+                                    @if (Model.Star != null && Model.Star == 1)
                                     {
                                         <option value="1" selected>1 Star</option>
 
@@ -110,7 +111,7 @@
                                     }
                                     @if (Model.Star != null && Model.Star == 2)
                                     {
-                                        <option value="2"selected>2 Star</option>
+                                        <option value="2" selected>2 Star</option>
 
                                     }
                                     else
@@ -238,7 +239,7 @@
                     <div class="pd10">
                         <label class="lbl">B2B</label>
                         <div class="row pd10">
-                            <div class="col-md-12">                              
+                            <div class="col-md-12">
                                 <select class="form-control" asp-for="@Model.PositionB2B">
                                     <option value="0">Không đặt vị trí</option>
                                     <option value="1">1</option>
@@ -257,6 +258,23 @@
                         <div class="row pd10">
                             <div class="col-md-12">
                                 <select class="form-control" asp-for="@Model.PositionB2C">
+                                    <option value="0">Không đặt vị trí</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="6">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <label class="lbl">Bán chạy</label>
+                        <div class="row pd10">
+                            <div class="col-md-12">
+                                <select class="form-control" asp-for="@Model.PositionBanChay">
                                     <option value="0">Không đặt vị trí</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -324,20 +342,20 @@
 
             </div>
 
-                <div class="form-group col-12">
-                    <div class="col-6">
-                        <label class="choose">
-                            <div class="ava default mb10 blue">
-                                <img id="avatar_image" class="img-preview @(string.IsNullOrEmpty(Model.ImageThumb) ? "mfp-hide" : string.Empty)" title="Click để chọn ảnh đại diện" src="@(!string.IsNullOrEmpty(Model.ImageThumb) ? (Model.ImageThumb) : string.Empty)" />
-                                <a id="ava_upload" class="@(!string.IsNullOrEmpty(Model.ImageThumb) ? "mfp-hide" : string.Empty)" style="display:flex; align-items:center;margin-top: 30px;">
-                                    <i class="fa fa-cloud-upload" style="font-size:40px;"></i> <span class="ml10" style="font-size:15px;">Ảnh đại diện</span>
-                                </a>
-                            </div>
-                            <input class="mfp-hide" type="file" name="ImgAvatar" onchange="hotel_management.OnChangeAvartar()" />
-                        </label>
-                    </div>
+            <div class="form-group col-12">
+                <div class="col-6">
+                    <label class="choose">
+                        <div class="ava default mb10 blue">
+                            <img id="avatar_image" class="img-preview @(string.IsNullOrEmpty(Model.ImageThumb) ? "mfp-hide" : string.Empty)" title="Click để chọn ảnh đại diện" src="@(!string.IsNullOrEmpty(Model.ImageThumb) ? (Model.ImageThumb) : string.Empty)" />
+                            <a id="ava_upload" class="@(!string.IsNullOrEmpty(Model.ImageThumb) ? "mfp-hide" : string.Empty)" style="display:flex; align-items:center;margin-top: 30px;">
+                                <i class="fa fa-cloud-upload" style="font-size:40px;"></i> <span class="ml10" style="font-size:15px;">Ảnh đại diện</span>
+                            </a>
+                        </div>
+                        <input class="mfp-hide" type="file" name="ImgAvatar" onchange="hotel_management.OnChangeAvartar()" />
+                    </label>
                 </div>
             </div>
+        </div>
     </div>
 </form>
 <div class="text-right">

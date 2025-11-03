@@ -18,8 +18,17 @@ namespace Entities.Models
         public int LimitUse { get; set; }
         public decimal? PriceSales { get; set; }
         public string Unit { get; set; }
+        /// <summary>
+        /// Trường này dùng để phân biệt voucher triển khai này chạy theo rule nào. Ví dụ: rule giảm giá với 1 số tiền vnđ trên toàn bộ đơn hàng. Giảm giá 20% phí first pound đầu tiên của nhãn hàng amazon. 1: triển khai rule giảm giá cho toàn bộ đơn hàng. 2 là rule áp dụng cho 20% phí first pound đầu tiên.
+        /// </summary>
         public int? RuleType { get; set; }
+        /// <summary>
+        /// Trường này để lưu nhóm những user được áp dụng trên voucher này
+        /// </summary>
         public string GroupUserPriority { get; set; }
+        /// <summary>
+        /// Nêu set true thì hiểu voucher này được public cho các user thanh toán đơn hàng
+        /// </summary>
         public bool? IsPublic { get; set; }
         public string Description { get; set; }
         public bool? IsLimitVoucher { get; set; }
@@ -28,6 +37,7 @@ namespace Entities.Models
         public bool? IsMaxPriceProduct { get; set; }
         public double? MinTotalAmount { get; set; }
         public int? CampaignId { get; set; }
+        public short? ProjectType { get; set; }
 
         public virtual ICollection<VoucherLogActivity> VoucherLogActivity { get; set; }
     }

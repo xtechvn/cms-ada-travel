@@ -1,0 +1,43 @@
+﻿@using Entities.ViewModels;
+@model List<SystemLogMongDBRecruitmentModel>
+<div class="wrap_bg wrap_bg_no-padding mb20">
+    <div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding">
+        <table class="table table-nowrap">
+            <thead>
+                <tr>
+                    <th class="text-center">Họ Tên</th>
+                    <th class="text-center">Số điện thoại</th>
+                    <th class="text-center">Email liên hệ</th>
+                    <th class="text-center">Vị trí công việc</th>
+                    <th class="text-center">Địa điểm làm việc</th>
+                    <th class="text-center">Ghi chú</th>
+                    <th class="text-center">Tệp đính kèm</th>
+                   
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr class="list-row">
+                            <td>@item.name</td>
+                            <td>@item.phone</td>
+                            <td>@item.email</td>
+                            <td>@item.location</td>
+                            <td>@item.area</td>
+                            <td>@item.note</td>
+                            <td>
+                                <div class="choose-ava lightgallery">
+                                    <a href="@item.Path" target="_blank"><img src="@item.Path" /></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

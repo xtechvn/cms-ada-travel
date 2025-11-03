@@ -5,6 +5,7 @@ using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.SetServices;
+using Entities.ViewModels.Tour;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Repositories.IRepositories;
@@ -29,6 +30,7 @@ namespace Repositories.Repositories
         private readonly OtherBookingPackagesOptionalDAL otherBookingPackagesOptionalDAL;
         private readonly AllCodeDAL AllCodeDAL;
         private readonly IConfiguration _configuration;
+        private readonly TourDAL _tourDAL;
 
         public OtherBookingRepository(IOptions<DataBaseConfig> dataBaseConfig,  IConfiguration configuration)
         {
@@ -39,6 +41,7 @@ namespace Repositories.Repositories
             AllCodeDAL = new AllCodeDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             contactClientDAL = new ContactClientDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
             _configuration = configuration;
+            _tourDAL = new TourDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
         }
         public async Task<List<OtherBookingPackages>> GetOtherBookingPackagesByBookingId(long booking_id)
         {
@@ -431,7 +434,29 @@ namespace Repositories.Repositories
             }
             return new List<OtherBooking>();
         }
+        public async Task<GenericViewModel<OtherBookingPackagesOptionalModel>> GetListOtherBookingPackagesOptionalBySupplierId(OptionalSearshModel Searsh)
+        {
+            var model = new GenericViewModel<OtherBookingPackagesOptionalModel>();
+            try
+            {
+                DataTable dt = await _tourDAL.GetListOptionalBySupplierId(Searsh, StoreProcedureConstant.SP_GetAllListOtherBookingPackagesOptionallBySupplierId);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    model.ListData = dt.ToList<OtherBookingPackagesOptionalModel>();
+                    model.CurrentPage = Searsh.PageIndex;
+                    model.PageSize = Searsh.PageSize;
+                    model.TotalRecord = Convert.ToInt32(dt.Rows[0]["TotalRow"]);
+                    model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / model.PageSize);
+                    return model;
+                }
 
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListHotelBookingRoomsOptionalBySupplierId - OtherBookingRepository: " + ex);
+            }
+            return model;
+        }
 
     }
 }

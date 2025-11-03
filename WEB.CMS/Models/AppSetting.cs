@@ -74,5 +74,6 @@ namespace WEB.CMS.Models
         public int Department_Operator_WaterSport { get; set; }
         public string GET_COMMENT_LISTING { get; set; }
         public string ADD_COMMENT { get; set; }
+        public int Department_Operator_Fly_SG { get; set; }
     }
 }

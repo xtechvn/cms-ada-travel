@@ -67,6 +67,7 @@ var _add_invoice_request = {
         $('input').attr('autocomplete', 'off');
         //$('#btnDeleteImage').hide()
         $('#attachFile').hide()
+        debugger
         if (!isEdit)
             _add_invoice_request.InitItemDetail()
         setTimeout(function () {
@@ -128,6 +129,7 @@ var _add_invoice_request = {
         if (client_id === null || client_id === undefined || client_id === '' || client_id === 0) {
             return
         }
+        var orderid = $('#orderId').val();
         listOrder = []
         _global_function.AddLoading()
         $("#orderCode").empty()
@@ -144,32 +146,70 @@ var _add_invoice_request = {
                     $('#address').val(client.businessAddress)
                 }
                 listOrder = result.data
+                
                 var totalAmount = 0
                 for (var i = 0; i < result.data.length; i++) {
-                    $('#request-relate-table').find('tbody').append(
-                        "<tr id='order_" + i + "'>" +
-                        "<td>" +
-                        " <label class='radio mr-2'>" +
-                        "  <input type='radio' name='optradio' id='order_radio_" + result.data[i].orderId + "' onclick='_add_invoice_request.OnCheckBox(" + i + ")'>" +
-                        " <span class='checkmark'></span> " + (i + 1) +
-                        " </label>" +
-                        "</td>" +
-                        "<td>" +
-                        " <a class='blue' href='/Order/Orderdetails?id=" + result.data[i].orderId + "'> " + result.data[i].orderCode + " </a>"
-                        + "</td>" +
-                        "<td>" + result.data[i].startDate + " - " + result.data[i].endDate + "</td>" +
-                        "<td>" + result.data[i].salerName + "</td>" +
-                        "<td class='text-right'>" + _add_invoice_request.FormatNumberStr(result.data[i].amount) + "</td>" +
-                        "</tr>"
-                    );
-                    totalAmount += result.data[i].amount
-                    if (result.data[i].isChecked) {
-                        let code = result.data[i].orderId
-                        setTimeout(function () {
-                            $('#order_radio_' + code).prop('checked', true)
-                        }, 800)
-                    }
+                    if (orderid != 0 && orderId != undefined) {
+                        if (result.data[i].orderId == orderid) {
+
+                            $('#request-relate-table').find('tbody').append(
+                                "<tr id='order_" + i + "'>" +
+                                "<td>" +
+                                " <label class='radio mr-2'>" +
+                                "  <input type='radio' name='optradio' id='order_radio_" + result.data[i].orderId + "' onclick='_add_invoice_request.OnCheckBox(" + i + ")'>" +
+                                " <span class='checkmark'></span> " + (i + 1) +
+                                " </label>" +
+                                "</td>" +
+                                "<td>" +
+                                " <a class='blue' href='/Order/Orderdetails?id=" + result.data[i].orderId + "'> " + result.data[i].orderCode + " </a>"
+                                + "</td>" +
+                                "<td>" + result.data[i].startDate + " - " + result.data[i].endDate + "</td>" +
+                                "<td>" + result.data[i].salerName + "</td>" +
+                                "<td class='text-right'>" + _add_invoice_request.FormatNumberStr(result.data[i].amount) + "</td>" +
+                                "</tr>"
+                            );
+                            totalAmount += result.data[i].amount
+                            if (result.data[i].isChecked) {
+                                let code = result.data[i].orderId
+                                setTimeout(function () {
+                                    $('#order_radio_' + code).prop('checked', true)
+                                }, 800)
+                            }
+                        }
+                        
+                } else {
+
+                        $('#request-relate-table').find('tbody').append(
+                            "<tr id='order_" + i + "'>" +
+                            "<td>" +
+                            " <label class='radio mr-2'>" +
+                            "  <input type='radio' name='optradio' id='order_radio_" + result.data[i].orderId + "' onclick='_add_invoice_request.OnCheckBox(" + i + ")'>" +
+                            " <span class='checkmark'></span> " + (i + 1) +
+                            " </label>" +
+                            "</td>" +
+                            "<td>" +
+                            " <a class='blue' href='/Order/Orderdetails?id=" + result.data[i].orderId + "'> " + result.data[i].orderCode + " </a>"
+                            + "</td>" +
+                            "<td>" + result.data[i].startDate + " - " + result.data[i].endDate + "</td>" +
+                            "<td>" + result.data[i].salerName + "</td>" +
+                            "<td class='text-right'>" + _add_invoice_request.FormatNumberStr(result.data[i].amount) + "</td>" +
+                            "</tr>"
+                        );
+                        totalAmount += result.data[i].amount
+                        if (result.data[i].isChecked) {
+                            let code = result.data[i].orderId
+                            setTimeout(function () {
+                                $('#order_radio_' + code).prop('checked', true)
+                            }, 800)
+                        }
                 }
+                    
+                    
+                }
+                if (orderid != 0 && orderId != undefined && ($('#price_0').val() == undefined || _add_invoice_request.FormatNumberStr($('#price_0').val()) == 0)) {
+                    $('#price_0').val(_add_invoice_request.FormatNumberStr(totalAmount));
+                }
+                
                 $('#request-relate-table').find('tbody').append(
                     "<tr style='font-weight:bold !important;'>" +
                     "<td class='text-right' colspan='4'> Tổng </td>" +
@@ -177,7 +217,7 @@ var _add_invoice_request = {
                     "</tr>"
                 );
                 setTimeout(function () {
-                    if (orderId !== 0 && orderId !== null && orderId != undefined)
+                    if (orderid !== 0 && orderid !== null && orderid != undefined)
                         $('#order_radio_' + orderId).prop('checked', true)
                     _add_invoice_request.OnCheckBox();
                 }, 1000)

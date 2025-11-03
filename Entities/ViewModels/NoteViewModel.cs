@@ -8,6 +8,7 @@ namespace Entities.ViewModels
     public class NoteViewModel : Note
     {
         public string UserName { get; set; }
+        public string FullName { get; set; }
     }
 
     public class NoteModel

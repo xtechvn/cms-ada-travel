@@ -33,5 +33,6 @@ namespace Entities.Models
         public bool? IsRegisterAffiliate { get; set; }
         public string ReferralId { get; set; }
         public int? ParentId { get; set; }
+        public int? UtmSource { get; set; }
     }
 }

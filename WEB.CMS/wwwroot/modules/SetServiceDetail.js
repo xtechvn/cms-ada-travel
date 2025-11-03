@@ -12,7 +12,7 @@ var _SetService_Detail = {
         html_loading_export: '<a class="loading_export_vinwonder" href="javascript:;"><img src="/images/icons/loading.gif" style="width: 30px;height: 30px; margin-left:15px;" class="img_loading_summit coll"><nw id="loading_exportvw" style="color:red;">Đang xuất vé dịch vụ, vui lòng không đóng cửa sổ này </nw> </a>',
         html_loading_export_text: 'Đang xuất vé dịch vụ tự động, vui lòng không đóng cửa sổ này',
         Loading: '',
-        LoadingSuccess:false
+        LoadingSuccess: false
     },
     ServiceType: 13,
     ServiceTypeSale: 1,
@@ -281,7 +281,7 @@ var _SetService_Detail = {
             serviceId: $('#HotelBookingID').val(),
         };
 
-        _SetService_Detail.ListMarketingPaymentRequest(_searchModel,1);
+        _SetService_Detail.ListMarketingPaymentRequest(_searchModel, 1);
     },
     ListMarketingPaymentRequest: function (input, type) {
         $.ajax({
@@ -728,8 +728,8 @@ var _SetService_Detail = {
                 }
             });
         }
-    
-},
+
+    },
     DeleteHotelBookingCode: function (id, type) {
         _msgconfirm.openDialog("Xóa code dịch vụ", 'Xác nhận xóa code dịch vụ này không?', function () {
             $.ajax({
@@ -771,565 +771,571 @@ var _SetService_Detail = {
         });
 
     },
-PopupSendEmail: function () {
-    let title = 'Gửi Code dịch vụ khách sạn';
-    let url = '/SetService/SendEmail';
-    let param = {
-        id: $('.service-code-send-email').attr('data-booking-id').trim(),
-        Orderid: $('#Orderid').val(),
-        type: 1,
-    };
-    _magnific.OpenSmallPopup(title, url, param);
+    PopupSendEmail: function () {
+        let title = 'Gửi Code dịch vụ khách sạn';
+        let url = '/SetService/SendEmail';
+        let param = {
+            id: $('.service-code-send-email').attr('data-booking-id').trim(),
+            Orderid: $('#Orderid').val(),
+            type: 1,
+        };
+        _magnific.OpenSmallPopup(title, url, param);
 
-},
-PopupSendEmail2: function () {
-    let title = 'Gửi Email nhà cung cấp';
-    let url = '/SetService/SendEmailSupplier';
-    let param = {
-        id: $('#HotelBookingID').val(),
-        Orderid: $('#Orderid').val(),
-        type: 8,
-        SupplierId: 0,
-        ServiceType: 1,
-    };
-    _magnific.OpenSmallPopup(title, url, param);
-
-},
-TemplateSupplier: function () {
-    var id = $('#SupplierId').val();
-    _SetService_Detail.LoadTTLienHe(id);
-    $.ajax({
-        url: "/SetService/TemplateSupplier",
-        type: "Post",
-        data: {
-            id: $('#ServiceId').val(),
+    },
+    PopupSendEmail2: function () {
+        let title = 'Gửi Email nhà cung cấp';
+        let url = '/SetService/SendEmailSupplier';
+        let param = {
+            id: $('#HotelBookingID').val(),
             Orderid: $('#Orderid').val(),
             type: 8,
-            SupplierId: $('#SupplierId').val(),
-            ServiceType: $('#ServiceType').val(),
-        },
-        success: function (result) {
-            $('.data-supplier').html(result);
+            SupplierId: 0,
+            ServiceType: 1,
+        };
+        _magnific.OpenSmallPopup(title, url, param);
 
-        }
-    });
-},
-SendEmail: function () {
-
-    let FromCreate = $('#form-send-email');
-    FromCreate.validate({
-        rules: {
-
-            "Subject": "required",
-            "SalerId": "required",
-
-        },
-        messages: {
-
-            "Subject": "Tiêu đề không được bỏ trống",
-            "SalerId": "Người nhận không được bỏ trống",
-        }
-    });
-    if (FromCreate.valid()) {
-        var id = $("#CC_Email").val()
-        var model = {
-            Subject: $('#Subject').val(),
-            ServiceId: $('#ServiceId').val(),
-            Orderid: $('#Orderid').val(),
-            To_Email: $('#To_Email').find(':selected').val(),
-            CC_Email: $("#CC_Email").val() != undefined && $("#CC_Email").val().length > 0 ? $("#CC_Email").val().toString() : '',
-            BCC_Email: $("#BCC_Email").val() != undefined && $("#BCC_Email").val().length > 0 ? $("#BCC_Email").val().toString() : '',
-            OrderNote: $('#order_note').val(),
-            PaymentNotification: $('#payment_notification').val(),
-            ServiceType: $('#Type').val(),
-            Type: $('#ServiceType').val(),
-            Email: $('#Email').val(),
-            group_booking_id: $('#Type').attr('data-group-booking'),
-
-            OrderAmount: $('#OrderAmount').val() != undefined ? $('#OrderAmount').val().replaceAll(',', '') : 0,
-            totalAmount: $('#totalAmount').val() != undefined ? $('#totalAmount').val().replaceAll(',', '') : 0,
-            OrderNo: $('#orderNo').val(),
-            TTChuyenKhoan: $('#TTChuyenKhoan').val(),
-            NDChuyenKhoan: $('#NDChuyenKhoan').val(),
-            saler_Email: $('#saler_Email').val(),
-            saler_Name: $('#saler_Name').val(),
-            saler_Phone: $('#saler_Phone').val(),
-            user_Email: $('#user_Email').val(),
-            user_Phone: $('#user_Phone').val(),
-            user_Name: $('#user_Name').val(),
-            TileEmail: $('#TileEmail').val(),
-            go_numberOfChild: $('#go_numberOfChild').val(),
-            go_numberOfInfant: $('#go_numberOfInfant').val(),
-            go_numberOfAdult: $('#go_numberOfAdult').val(),
-            go_startpoint: $('#go_startpoint').val(),
-            go_endpoint: $('#go_endpoint').val(),
-            DKHuy: $('#DKHuy').val(),
-            datatableCode: $('#datatableCode').val(),
-            datatable: $('#datatable').val(),
-            go_startdate: $('#go_startdate').val(),
-            go_enddate: $('#go_enddate').val(),
-            go_airline: $('#go_airline').val(),
-            totalToday: $('#totalToday').val(),
-
-            code_1_code: $('#code_1_code').val(),
-            code_1_description: $('#code_1_description').val(),
-            code_2_code: $('#code_2_code').val(),
-            code_2_description: $('#code_2_description').val(),
-            NumberOfRoom: $('#NumberOfRoom').val(),
-            back_airline: $('#back_airline').val(),
-            back_endpoint: $('#back_endpoint').val(),
-            back_startpoint: $('#back_startpoint').val(),
-            back_enddate: $('#back_enddate').val(),
-            back_startdate: $('#back_startdate').val(),
-            back_numberOfInfant: $('#back_numberOfInfant').val(),
-            back_numberOfAdult: $('#back_numberOfAdult').val(),
-            back_numberOfChild: $('#back_numberOfChild').val(),
-
-            SupplierId: $('#SupplierId').val(),
-        }
-        $('#SendEmailDv').attr("disabled", false);
-
-
-        var list_attach_file = _global_function.GetAttachmentFiles($('.attachment-email'))
-
-        _global_function.AddLoading()
+    },
+    TemplateSupplier: function () {
+        var id = $('#SupplierId').val();
+        _SetService_Detail.LoadTTLienHe(id);
         $.ajax({
-            url: "/SetService/ConfirmSendEmail",
+            url: "/SetService/TemplateSupplier",
             type: "Post",
-            data: { model: model, attach_file: list_attach_file },
+            data: {
+                id: $('#ServiceId').val(),
+                Orderid: $('#Orderid').val(),
+                type: 8,
+                SupplierId: $('#SupplierId').val(),
+                ServiceType: $('#ServiceType').val(),
+            },
             success: function (result) {
-                if (result.status === 0) {
-                    _global_function.RemoveLoading()
-                    _msgalert.success(result.msg);
-                    $.magnificPopup.close();
-                    switch (model.Type == 1) {
-                        case 0:
-                        case 1: {
-                            _SetService_Detail.loadDataDetail();
-                            _SetService_Detail.SetActive(5);
-                            _SetService_Detail.OnStatuse(5);
-                        } break;
-                        case 3: {
-                            _set_service_fly_detail.ShowServiceCodeTab();
-                        } break;
-                        case 5: {
-                            _SetService_Tour_Detail.ShowTourCodeTab();
-                        }
-                        case 9: {
-                            _set_service_other_detail.ShowServiceCodeTab();
-                        }
+                $('.data-supplier').html(result);
 
-                    }
-
-                }
-                else {
-                    _global_function.RemoveLoading()
-                    _msgalert.error(result.msg);
-                    $('#SendEmailDv').removeAttr("disabled", true);
-                }
             }
         });
-    }
-
-},
-OpenPopupUserAgent: function (id, orderid, type) {
-
-    let title = 'Đổi điều hành viên';
-    let url = '/SetService/DetailUserHotel';
-    let param = {
-        id: id,
-        orderid: orderid,
-        type: type
-    };
-    _magnific.OpenSmallPopup(title, url, param);
-},
-OnUpdataUserHotel: function () {
-    var id = $('#id').val()
-    var type = $('#type').val()
-    var salerId = $('#UserId_new').val()
-    var Orderid = $('#Orderid').val()
-    let FromUserAgent = $('#UserAgent_Detail');
-    FromUserAgent.validate({
-        rules: {
-
-            "UserId_new": "required",
-
-
-        },
-        messages: {
-
-            "UserId_new": "Vui lòng chọn nhân viên mới",
-        }
-    });
-    if (FromUserAgent.valid()) {
-        $.ajax({
-            url: "/SetService/UpdateHotelBooking",
-            type: "Post",
-            data: { id: id, OrderId: Orderid, salerId: salerId[0], type: type },
-            success: function (result) {
-                if (result.sst_status === 0) {
-                    _msgalert.success(result.smg);
-                    $.magnificPopup.close();
-                    window.location.reload();
-                }
-                else {
-                    _msgalert.error(result.smg);
-
-                }
-            }
-        });
-    }
-
-},
-OnResetStatusPopup: function (id, type, orderid, group_booking_id) {
-    let url = '/SetService/HotelPopupDetail';
-    let param = {
-        id: id,
-        type: type,
-        orderid: orderid,
-        groupbookingid: group_booking_id
-    };
-    var title = 'Từ chối nhận đặt dịch vụ';
-    _magnific.OpenSmallPopup(title, url, param);
-
-
-},
-OnUpdatetStatus: function (id) {
-    let title = 'Xác nhận từ chối dịch vụ';
-    let description = 'Bạn xác nhận muốn từ chối dịch vụ này?';
-    var type = $('#type').val();
-    if (type == 3) {
-        id = $('#group_booking_id').val();
-    }
-    if (id != 0) {
-        let FromCreate = $('#form_Note_TC');
+    },
+    SendEmail: function () {
+        
+        let FromCreate = $('#form-send-email');
         FromCreate.validate({
             rules: {
 
-                "Note_txt": "required",
+                "Subject": "required",
+                "SalerId": "required",
+
             },
             messages: {
 
-                "Note_txt": "Lý do từ chối không được bỏ trống",
+                "Subject": "Tiêu đề không được bỏ trống",
+                "SalerId": "Người nhận không được bỏ trống",
             }
         });
         if (FromCreate.valid()) {
+            let pattern = /@/i;
+            var Subject_email = $('#Subject').val();
+            if (Subject_email.match(pattern)) {
+                _msgalert.error("Tiêu đề email chứa ký tự @ không hợp lệ");
+                return false;
+            }
+            var id = $("#CC_Email").val()
 
+            var model = {
+                Subject: $('#Subject').val(),
+                ServiceId: $('#ServiceId').val(),
+                Orderid: $('#Orderid').val(),
+                To_Email: $('#To_Email').find(':selected').val(),
+                CC_Email: $("#CC_Email").val() != undefined && $("#CC_Email").val().length > 0 ? $("#CC_Email").val().toString() : '',
+                BCC_Email: $("#BCC_Email").val() != undefined && $("#BCC_Email").val().length > 0 ? $("#BCC_Email").val().toString() : '',
+                OrderNote: $('#order_note').val(),
+                PaymentNotification: $('#payment_notification').val(),
+                ServiceType: $('#Type').val(),
+                Type: $('#ServiceType').val(),
+                Email: $('#Email').val() != undefined && $("#Email").val().length > 0 ? $("#Email").val().toString() : '',
+                group_booking_id: $('#Type').attr('data-group-booking'),
 
-            title = 'Xác nhận từ chối dịch vụ';
-            description = 'Bạn xác nhận muốn từ chối dịch vụ này?';
+                OrderAmount: $('#OrderAmount').val() != undefined ? $('#OrderAmount').val().replaceAll(',', '') : 0,
+                totalAmount: $('#totalAmount').val() != undefined ? $('#totalAmount').val().replaceAll(',', '') : 0,
+                OrderNo: $('#orderNo').val(),
+                TTChuyenKhoan: $('#TTChuyenKhoan').val(),
+                NDChuyenKhoan: $('#NDChuyenKhoan').val(),
+                saler_Email: $('#saler_Email').val(),
+                saler_Name: $('#saler_Name').val(),
+                saler_Phone: $('#saler_Phone').val(),
+                user_Email: $('#user_Email').val(),
+                user_Phone: $('#user_Phone').val(),
+                user_Name: $('#user_Name').val(),
+                TileEmail: $('#TileEmail').val(),
+                go_numberOfChild: $('#go_numberOfChild').val(),
+                go_numberOfInfant: $('#go_numberOfInfant').val(),
+                go_numberOfAdult: $('#go_numberOfAdult').val(),
+                go_startpoint: $('#go_startpoint').val(),
+                go_endpoint: $('#go_endpoint').val(),
+                DKHuy: $('#DKHuy').val(),
+                datatableCode: $('#datatableCode').val(),
+                datatable: $('#datatable').val(),
+                go_startdate: $('#go_startdate').val(),
+                go_enddate: $('#go_enddate').val(),
+                go_airline: $('#go_airline').val(),
+                totalToday: $('#totalToday').val(),
 
-        } else {
-            return;
-        }
-    }
-    var Note = $('#Note_txt').val();
-    var orderid = $('#orderid').val();
-    var type = $('#type').val();
-    var groupbookingid = $('#group_booking_id').val();
-    _msgconfirm.openDialog(title, description, function () {
-        $.ajax({
-            url: "/SetService/UpdateServiceStatus",
-            type: "post",
-            data: { id: id, orderid: orderid, type: type, Note: Note, groupbookingid: groupbookingid },
-            success: function (result) {
-                if (result.status == 0) {
-                    _msgalert.success(result.msg);
-                    $.magnificPopup.close();
-                    setTimeout(function () {
-                        window.location.reload();
-                    }, 300);
-                } else {
-                    _msgalert.error(result.msg);
+                code_1_code: $('#code_1_code').val(),
+                code_1_description: $('#code_1_description').val(),
+                code_2_code: $('#code_2_code').val(),
+                code_2_description: $('#code_2_description').val(),
+                NumberOfRoom: $('#NumberOfRoom').val(),
+                back_airline: $('#back_airline').val(),
+                back_endpoint: $('#back_endpoint').val(),
+                back_startpoint: $('#back_startpoint').val(),
+                back_enddate: $('#back_enddate').val(),
+                back_startdate: $('#back_startdate').val(),
+                back_numberOfInfant: $('#back_numberOfInfant').val(),
+                back_numberOfAdult: $('#back_numberOfAdult').val(),
+                back_numberOfChild: $('#back_numberOfChild').val(),
+
+                SupplierId: $('#SupplierId').val(),
+            }
+            $('#SendEmailDv').attr("disabled", false);
+
+            var list_attach_file = _global_function.GetAttachmentFiles($('.attachment-email'))
+
+            _global_function.AddLoading()
+            $.ajax({
+                url: "/SetService/ConfirmSendEmail",
+                type: "Post",
+                data: { model: model, attach_file: list_attach_file },
+                success: function (result) {
+                    if (result.status === 0) {
+                        _global_function.RemoveLoading()
+                        _msgalert.success(result.msg);
+                        $.magnificPopup.close();
+                        switch (model.Type == 1) {
+                            case 0:
+                            case 1: {
+                                _SetService_Detail.loadDataDetail();
+                                _SetService_Detail.SetActive(5);
+                                _SetService_Detail.OnStatuse(5);
+                            } break;
+                            case 3: {
+                                _set_service_fly_detail.ShowServiceCodeTab();
+                            } break;
+                            case 5: {
+                                _SetService_Tour_Detail.ShowTourCodeTab();
+                            }
+                            case 9: {
+                                _set_service_other_detail.ShowServiceCodeTab();
+                            }
+
+                        }
+
+                    }
+                    else {
+                        _global_function.RemoveLoading()
+                        _msgalert.error(result.msg);
+                        $('#SendEmailDv').removeAttr("disabled", true);
+                    }
                 }
+            });
+        }
+
+    },
+    OpenPopupUserAgent: function (id, orderid, type) {
+
+        let title = 'Đổi điều hành viên';
+        let url = '/SetService/DetailUserHotel';
+        let param = {
+            id: id,
+            orderid: orderid,
+            type: type
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    OnUpdataUserHotel: function () {
+        var id = $('#id').val()
+        var type = $('#type').val()
+        var salerId = $('#UserId_new').val()
+        var Orderid = $('#Orderid').val()
+        let FromUserAgent = $('#UserAgent_Detail');
+        FromUserAgent.validate({
+            rules: {
+
+                "UserId_new": "required",
+
+
+            },
+            messages: {
+
+                "UserId_new": "Vui lòng chọn nhân viên mới",
             }
         });
+        if (FromUserAgent.valid()) {
+            $.ajax({
+                url: "/SetService/UpdateHotelBooking",
+                type: "Post",
+                data: { id: id, OrderId: Orderid, salerId: salerId[0], type: type },
+                success: function (result) {
+                    if (result.sst_status === 0) {
+                        _msgalert.success(result.smg);
+                        $.magnificPopup.close();
+                        window.location.reload();
+                    }
+                    else {
+                        _msgalert.error(result.smg);
 
-    });
-},
-LoadFile: function (data_id, type) {
+                    }
+                }
+            });
+        }
 
-},
+    },
+    OnResetStatusPopup: function (id, type, orderid, group_booking_id) {
+        let url = '/SetService/HotelPopupDetail';
+        let param = {
+            id: id,
+            type: type,
+            orderid: orderid,
+            groupbookingid: group_booking_id
+        };
+        var title = 'Từ chối nhận đặt dịch vụ';
+        _magnific.OpenSmallPopup(title, url, param);
 
-DynamicBindHotelServiceBooked: function () {
-    if ($('.servicemanual-hotel-room-tr').length <= 1) {
-        $('.setservice-hotel-room-delete-room').hide()
-    }
 
-    $("body").on('keyup', ".servicemanual-hotel-room-rates-operator-price, .servicemanual-hotel-room-number-of-rooms", function () {
-        var element = $(this)
-        var row_element = element.closest('.servicemanual-hotel-room-tr')
-        _set_service_hotel_booked_function.RecorrectServiceBookedPrice()
-        _set_service_hotel_booked_function.CalucateRowTotalAmountAndProfit(row_element)
+    },
+    OnUpdatetStatus: function (id) {
+        let title = 'Xác nhận từ chối dịch vụ';
+        let description = 'Bạn xác nhận muốn từ chối dịch vụ này?';
+        var type = $('#type').val();
+        if (type == 3) {
+            id = $('#group_booking_id').val();
+        }
+        if (id != 0) {
+            let FromCreate = $('#form_Note_TC');
+            FromCreate.validate({
+                rules: {
+
+                    "Note_txt": "required",
+                },
+                messages: {
+
+                    "Note_txt": "Lý do từ chối không được bỏ trống",
+                }
+            });
+            if (FromCreate.valid()) {
+
+
+                title = 'Xác nhận từ chối dịch vụ';
+                description = 'Bạn xác nhận muốn từ chối dịch vụ này?';
+
+            } else {
+                return;
+            }
+        }
+        var Note = $('#Note_txt').val();
+        var orderid = $('#orderid').val();
+        var type = $('#type').val();
+        var groupbookingid = $('#group_booking_id').val();
+        _msgconfirm.openDialog(title, description, function () {
+            $.ajax({
+                url: "/SetService/UpdateServiceStatus",
+                type: "post",
+                data: { id: id, orderid: orderid, type: type, Note: Note, groupbookingid: groupbookingid },
+                success: function (result) {
+                    if (result.status == 0) {
+                        _msgalert.success(result.msg);
+                        $.magnificPopup.close();
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 300);
+                    } else {
+                        _msgalert.error(result.msg);
+                    }
+                }
+            });
+
+        });
+    },
+    LoadFile: function (data_id, type) {
+
+    },
+
+    DynamicBindHotelServiceBooked: function () {
+        if ($('.servicemanual-hotel-room-tr').length <= 1) {
+            $('.setservice-hotel-room-delete-room').hide()
+        }
+
+        $("body").on('keyup', ".servicemanual-hotel-room-rates-operator-price, .servicemanual-hotel-room-number-of-rooms", function () {
+            var element = $(this)
+            var row_element = element.closest('.servicemanual-hotel-room-tr')
+            _set_service_hotel_booked_function.RecorrectServiceBookedPrice()
+            _set_service_hotel_booked_function.CalucateRowTotalAmountAndProfit(row_element)
+            _set_service_hotel_booked_function.CalucateTotalAmountOfHotelRoom();
+            _set_service_hotel_booked_function.CalucateTotalProfitOfHotelRoom();
+            _set_service_hotel_booked_function.CalucateTotalpriceOfHotelRoom();
+            _set_service_hotel_booked_function.CalucateServiceAmount();
+            _set_service_hotel_booked_function.CalucateServiceProfit();
+
+
+        });
+        $("body").on('keyup', ".servicemanual-hotel-extrapackage-operator-price", function () {
+            var element = $(this)
+            var row_element = element.closest('.servicemanual-hotel-extrapackage-tr')
+            _set_service_hotel_booked_function.CalucateExtraPackageProfit(row_element)
+            _set_service_hotel_booked_function.CalucateTotalProfitOfExtraPacakge();
+            _set_service_hotel_booked_function.CalucateTotalAmountOfExtraPackage();
+            _set_service_hotel_booked_function.CalucateUnitPricetOfExtraPackage();
+            _set_service_hotel_booked_function.CalucateServiceProfit();
+
+        });
+
+
+        $('.servicemanual-hotel-room-rates-daterange').each(function (index, item) {
+            var element = $(item);
+            element.daterangepicker({
+                showDropdowns: true,
+                drops: 'down',
+                autoApply: true,
+                minDate: '01/01/2000',
+                maxDate: '01/01/3000',
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            }, function (start, end, label) {
+
+
+            });
+        });
+        $('.servicemanual-hotel-extrapackage-daterange').each(function (index, item) {
+            var element = $(item);
+            element.daterangepicker({
+                showDropdowns: true,
+                drops: 'down',
+                autoApply: true,
+                minDate: '01/01/2000',
+                maxDate: '01/01/3000',
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            }, function (start, end, label) {
+
+
+            });
+        });
+    },
+    CloneHotelRoom: function (element) {
+        var last_order = _SetService_Detail.GetLastestHotelRoomOrder();
+        last_order++;
+        //-- Create and Append Div:
+        var new_div_id = 'hotel-room-new-room';
+        var element_clone = element.closest('.servicemanual-hotel-room-tr').clone().prop('id', new_div_id);
+        $('.servicemanual-hotel-room-total-summary').before(element_clone)
+        //-- Get new div
+        var new_element = $('#' + new_div_id);
+
+        //-- Change Order Text:
+        new_element.attr('data-room-optional-id', '0');
+        //-- Change Package & daterange-indentifer:
+
+        var html = ` <div class="d-flex align-center servicemanual-hotel-room-div-code">
+                        <select class="form-control servicemanual-hotel-room-suplier-id" disabled placeholder="Nhập tên nhà cung cấp" >
+
+                        </select>
+                    </div>`
+        var element_suggesstion = new_element.find('.servicemanual-hotel-room-suplier-id')
+        var td_suplier = new_element.find('.servicemanual-hotel-room-td-rates-suplier-id')
+        td_suplier.html(html)
+        td_suplier.removeAttr('data-select2-id')
+        _set_service_hotel_booked_function.SupplierSuggesstion($('.servicemanual-hotel-room-suplier-id'))
+        if (loading.EditMode) {
+            $('.servicemanual-hotel-room-suplier-id').removeAttr("disabled");
+        }
+
+        var code = _set_service_hotel_booked_function.GenerateNewPackageOptionalCode()
+        new_element.find('.servicemanual-hotel-room-td-package-name').html(code)
+
+        new_element.attr('id', '')
+
+        _SetService_Detail.ReIndexRoomOrder()
         _set_service_hotel_booked_function.CalucateTotalAmountOfHotelRoom();
         _set_service_hotel_booked_function.CalucateTotalProfitOfHotelRoom();
         _set_service_hotel_booked_function.CalucateTotalpriceOfHotelRoom();
         _set_service_hotel_booked_function.CalucateServiceAmount();
         _set_service_hotel_booked_function.CalucateServiceProfit();
+        $('.setservice-hotel-room-delete-room').show()
 
 
-    });
-    $("body").on('keyup', ".servicemanual-hotel-extrapackage-operator-price", function () {
-        var element = $(this)
-        var row_element = element.closest('.servicemanual-hotel-extrapackage-tr')
-        _set_service_hotel_booked_function.CalucateExtraPackageProfit(row_element)
-        _set_service_hotel_booked_function.CalucateTotalProfitOfExtraPacakge();
-        _set_service_hotel_booked_function.CalucateTotalAmountOfExtraPackage();
-        _set_service_hotel_booked_function.CalucateUnitPricetOfExtraPackage();
+
+    },
+    DeleteHotelRoom: function (element) {
+        element.closest('.servicemanual-hotel-room-tr').remove()
+        _SetService_Detail.ReIndexRoomOrder()
+        _set_service_hotel_booked_function.CalucateTotalAmountOfHotelRoom();
+        _set_service_hotel_booked_function.CalucateTotalProfitOfHotelRoom();
+        _set_service_hotel_booked_function.CalucateTotalpriceOfHotelRoom();
+        _set_service_hotel_booked_function.CalucateServiceAmount();
         _set_service_hotel_booked_function.CalucateServiceProfit();
-
-    });
-
-
-    $('.servicemanual-hotel-room-rates-daterange').each(function (index, item) {
-        var element = $(item);
-        element.daterangepicker({
-            showDropdowns: true,
-            drops: 'down',
-            autoApply: true,
-            minDate: '01/01/2000',
-            maxDate: '01/01/3000',
-            locale: {
-                format: 'DD/MM/YYYY'
-            }
-        }, function (start, end, label) {
-
-
+        if ($('.servicemanual-hotel-room-tr').length <= 1) {
+            $('.setservice-hotel-room-delete-room').hide()
+        }
+    },
+    GetLastestHotelRoomOrder: function () {
+        var last_order = 0;
+        if (!$('.servicemanual-hotel-room-td-order')[0]) return last_order;
+        //-- Get Lastest Order
+        $('.servicemanual-hotel-room-td-order').each(function (index, item) {
+            last_order++;
         });
-    });
-    $('.servicemanual-hotel-extrapackage-daterange').each(function (index, item) {
-        var element = $(item);
-        element.daterangepicker({
-            showDropdowns: true,
-            drops: 'down',
-            autoApply: true,
-            minDate: '01/01/2000',
-            maxDate: '01/01/3000',
-            locale: {
-                format: 'DD/MM/YYYY'
-            }
-        }, function (start, end, label) {
-
-
+        return last_order;
+    },
+    ReIndexRoomOrder: function () {
+        var index = 0
+        $('.servicemanual-hotel-room-td-order').each(function (index, item) {
+            var element = $(item);
+            element.html(_global_function.Comma(++index))
         });
-    });
-},
-CloneHotelRoom: function (element) {
-    var last_order = _SetService_Detail.GetLastestHotelRoomOrder();
-    last_order++;
-    //-- Create and Append Div:
-    var new_div_id = 'hotel-room-new-room';
-    var element_clone = element.closest('.servicemanual-hotel-room-tr').clone().prop('id', new_div_id);
-    $('.servicemanual-hotel-room-total-summary').before(element_clone)
-    //-- Get new div
-    var new_element = $('#' + new_div_id);
+    },
+    OpenPopupSupplier: function (id) {
 
-    //-- Change Order Text:
-    new_element.attr('data-room-optional-id', '0');
-    //-- Change Package & daterange-indentifer:
+        let title = 'Đổi nhà cung cấp';
+        let url = '/SetService/DetailSupplier';
+        let param = {
+            SupplierId: id,
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    OnUpdataSupplier: function () {
+        var _searchModel = {
+            id: $('#Orderid').val(),
+            HotelBookingID: $('#HotelBookingID').val(),
+            ContactClientId: $('#ContactClientId').val(),
+            serviceType: 1,
+            HotelBookingstatus: $('#HotelBookingstatus').val(),
+            type: 1,
+            supplierId: $('#suplier-detail').attr('data-suplier-id'),
+            supplierName: $('#suplier-detail').attr('data-suplier-name'),
+            orderId: $('#Orderid').val(),
+            amount: $('#operator-order-amount').attr('data-amount'),
 
-    var html = ` <div class="d-flex align-center servicemanual-hotel-room-div-code">
-                        <select class="form-control servicemanual-hotel-room-suplier-id" disabled placeholder="Nhập tên nhà cung cấp" >
-
-                        </select>
-                    </div>`
-    var element_suggesstion = new_element.find('.servicemanual-hotel-room-suplier-id')
-    var td_suplier = new_element.find('.servicemanual-hotel-room-td-rates-suplier-id')
-    td_suplier.html(html)
-    td_suplier.removeAttr('data-select2-id')
-    _set_service_hotel_booked_function.SupplierSuggesstion($('.servicemanual-hotel-room-suplier-id'))
-    if (loading.EditMode) {
-        $('.servicemanual-hotel-room-suplier-id').removeAttr("disabled");
-    }
-
-    var code = _set_service_hotel_booked_function.GenerateNewPackageOptionalCode()
-    new_element.find('.servicemanual-hotel-room-td-package-name').html(code)
-
-    new_element.attr('id', '')
-
-    _SetService_Detail.ReIndexRoomOrder()
-    _set_service_hotel_booked_function.CalucateTotalAmountOfHotelRoom();
-    _set_service_hotel_booked_function.CalucateTotalProfitOfHotelRoom();
-    _set_service_hotel_booked_function.CalucateTotalpriceOfHotelRoom();
-    _set_service_hotel_booked_function.CalucateServiceAmount();
-    _set_service_hotel_booked_function.CalucateServiceProfit();
-    $('.setservice-hotel-room-delete-room').show()
-
-
-
-},
-DeleteHotelRoom: function (element) {
-    element.closest('.servicemanual-hotel-room-tr').remove()
-    _SetService_Detail.ReIndexRoomOrder()
-    _set_service_hotel_booked_function.CalucateTotalAmountOfHotelRoom();
-    _set_service_hotel_booked_function.CalucateTotalProfitOfHotelRoom();
-    _set_service_hotel_booked_function.CalucateTotalpriceOfHotelRoom();
-    _set_service_hotel_booked_function.CalucateServiceAmount();
-    _set_service_hotel_booked_function.CalucateServiceProfit();
-    if ($('.servicemanual-hotel-room-tr').length <= 1) {
-        $('.setservice-hotel-room-delete-room').hide()
-    }
-},
-GetLastestHotelRoomOrder: function () {
-    var last_order = 0;
-    if (!$('.servicemanual-hotel-room-td-order')[0]) return last_order;
-    //-- Get Lastest Order
-    $('.servicemanual-hotel-room-td-order').each(function (index, item) {
-        last_order++;
-    });
-    return last_order;
-},
-ReIndexRoomOrder: function () {
-    var index = 0
-    $('.servicemanual-hotel-room-td-order').each(function (index, item) {
-        var element = $(item);
-        element.html(_global_function.Comma(++index))
-    });
-},
-OpenPopupSupplier: function (id) {
-
-    let title = 'Đổi nhà cung cấp';
-    let url = '/SetService/DetailSupplier';
-    let param = {
-        SupplierId: id,
-    };
-    _magnific.OpenSmallPopup(title, url, param);
-},
-OnUpdataSupplier: function () {
-    var _searchModel = {
-        id: $('#Orderid').val(),
-        HotelBookingID: $('#HotelBookingID').val(),
-        ContactClientId: $('#ContactClientId').val(),
-        serviceType: 1,
-        HotelBookingstatus: $('#HotelBookingstatus').val(),
-        type: 1,
-        supplierId: $('#suplier-detail').attr('data-suplier-id'),
-        supplierName: $('#suplier-detail').attr('data-suplier-name'),
-        orderId: $('#Orderid').val(),
-        amount: $('#operator-order-amount').attr('data-amount'),
-
-    };
-    var supplierid = $('#supplier-select').val().toString();
-    var id = $('#HotelBookingID').val();
-    _global_function.AddLoading()
-    $.ajax({
-        url: "/SetService/Updatesupplier",
-        type: "Post",
-        data: { id: id, supplierid: supplierid },
-        success: function (result) {
-            if (result.status == 0) {
-                _global_function.RemoveLoading()
-                _msgalert.success(result.smg);
-                $.magnificPopup.close();
-                _SetService_Detail.hotelBookingDetail(_searchModel);
-            } else {
-                _global_function.RemoveLoading()
-                _msgalert.error(result.smg);
-            }
-        }
-    });
-},
-PopupYCChi: function (id, type) {
-    let title = 'Yêu cầu chi';
-    if (type == 1) {
-        title = 'Yêu cầu chi hoàn trả khách hàng'
-    }
-    let url = '/SetService/SendYCChi';
-    var profit = $('#operator-order-profit').attr('data-profit');
-    if (profit == undefined) {
-        profit = $('#operator-total-profit').attr('data-profit');
-
-    }
-
-    let param = {
-        id: id,
-        profit: profit,
-        type: type,
-    };
-    _magnific.OpenSmallPopup(title, url, param);
-},
-ConfirmYCChi: function (id, type) {
-
-    var profit = $('#operator-order-profit').attr('data-profit');
-    if (profit == undefined) {
-        profit = $('#operator-total-profit').attr('data-profit');
-
-    }
-
-    var model = {
-        GhiChu: $('#GhiChu').val(),
-        Swiftcode: $('#Swiftcode').val(),
-    }
-    _global_function.AddLoading()
-    $.ajax({
-        url: "/SetService/ConfirmSendYCChi",
-        type: "Post",
-        data: { id: id, profit: profit, type: type, model: model },
-        success: function (result) {
-            _global_function.RemoveLoading()
-            if (result.status === 0) {
-                $.magnificPopup.close();
-                let text = window.open();
-                text.document.body.innerHTML = result.html;
-                text.print();
-
-            }
-            else {
-                _global_function.RemoveLoading()
-                _msgalert.error(result.msg);
-
-            }
-        }
-    });
-},
-printYCChi: function () {
-
-},
-LoadTTLienHe: function (id) {
-    if (id == undefined) {
-        id = 0;
-    }
-    $("#Email").select2({
-        theme: 'bootstrap4',
-        placeholder: "Email nhà cung cấp",
-        maximumSelectionLength: 1,
-        allowClear: true,
-        tags: true,
-        ajax: {
-            url: "/SetService/SupplierContactSuggestion",
-            type: "post",
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                var query = {
-                    txt_search: params.term,
-                    Supplierid: id.toString(),
+        };
+        var supplierid = $('#supplier-select').val().toString();
+        var id = $('#HotelBookingID').val();
+        _global_function.AddLoading()
+        $.ajax({
+            url: "/SetService/Updatesupplier",
+            type: "Post",
+            data: { id: id, supplierid: supplierid },
+            success: function (result) {
+                if (result.status == 0) {
+                    _global_function.RemoveLoading()
+                    _msgalert.success(result.smg);
+                    $.magnificPopup.close();
+                    _SetService_Detail.hotelBookingDetail(_searchModel);
+                } else {
+                    _global_function.RemoveLoading()
+                    _msgalert.error(result.smg);
                 }
-                return query;
-            },
-            processResults: function (response) {
-                return {
-                    results: $.map(response.data, function (item) {
-                        return {
-                            text: item.email,
-                            id: item.email,
-                        }
-                    })
-                };
-            },
-            createTag: function (params) {
-                let term = $.trim(params.term);
-                return {
-                    id: term,
-                    text: term,
-                    newTag: true,
-                }
-            },
-            cache: true
+            }
+        });
+    },
+    PopupYCChi: function (id, type) {
+        let title = 'Yêu cầu chi';
+        if (type == 1) {
+            title = 'Yêu cầu chi hoàn trả khách hàng'
         }
-    });
+        let url = '/SetService/SendYCChi';
+        var profit = $('#operator-order-profit').attr('data-profit');
+        if (profit == undefined) {
+            profit = $('#operator-total-profit').attr('data-profit');
 
-},
+        }
+
+        let param = {
+            id: id,
+            profit: profit,
+            type: type,
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    ConfirmYCChi: function (id, type) {
+
+        var profit = $('#operator-order-profit').attr('data-profit');
+        if (profit == undefined) {
+            profit = $('#operator-total-profit').attr('data-profit');
+
+        }
+
+        var model = {
+            GhiChu: $('#GhiChu').val(),
+            Swiftcode: $('#Swiftcode').val(),
+        }
+        _global_function.AddLoading()
+        $.ajax({
+            url: "/SetService/ConfirmSendYCChi",
+            type: "Post",
+            data: { id: id, profit: profit, type: type, model: model },
+            success: function (result) {
+                _global_function.RemoveLoading()
+                if (result.status === 0) {
+                    $.magnificPopup.close();
+                    let text = window.open();
+                    text.document.body.innerHTML = result.html;
+                    text.print();
+
+                }
+                else {
+                    _global_function.RemoveLoading()
+                    _msgalert.error(result.msg);
+
+                }
+            }
+        });
+    },
+    printYCChi: function () {
+
+    },
+    LoadTTLienHe: function (id) {
+        if (id == undefined) {
+            id = 0;
+        }
+        $("#Email").select2({
+            theme: 'bootstrap4',
+            placeholder: "Email nhà cung cấp",
+            /*maximumSelectionLength: 1,*/
+            allowClear: true,
+            tags: true,
+            ajax: {
+                url: "/SetService/SupplierContactSuggestion",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        txt_search: params.term,
+                        Supplierid: id.toString(),
+                    }
+                    return query;
+                },
+                processResults: function (response) {
+                    return {
+                        results: $.map(response.data, function (item) {
+                            return {
+                                text: item.email,
+                                id: item.email,
+                            }
+                        })
+                    };
+                },
+                createTag: function (params) {
+                    let term = $.trim(params.term);
+                    return {
+                        id: term,
+                        text: term,
+                        newTag: true,
+                    }
+                },
+                cache: true
+            }
+        });
+
+    },
 }
 var _set_service_hotel_booked_function = {
     RecorrectServiceBookedPrice: function () {

@@ -1,0 +1,114 @@
+﻿@using Entities.Models
+@model PagedResult<TicketListItemViewModel>
+
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>STT</th>
+                    <th>MÃ SỐ</th>
+                    <th>NGÀY NHẬP</th>
+                    <th>NGÀY HẾT HẠN</th>
+                    <th>DANH MỤC</th>
+                    <th>LOẠI VÉ</th>
+                    <th>NHÀ CUNG CẤP</th>
+                    <th>KHU VỰC VUI CHƠI</th>
+                    <th>TRẠNG THÁI</th>
+                    <th>THỜI GIAN ĐÃ BÁN</th>
+                    <th>QR CODE</th>
+                    <th>THAO TÁC</th>
+
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                @if (Model?.Items != null && Model.Items.Any())
+                {
+                    int index = 1 + (Model.PageIndex - 1) * Model.PageSize;
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@index</td>
+                            <td class="text-primary fw-semibold">@item.TicketCode</td>
+                            <td>@(item.ImportDate?.ToString("dd/MM/yyyy"))</td>
+                            <td>@(item.ExpiredDate?.ToString("dd/MM/yyyy"))</td>
+                            <td>@item.CategoryName</td>
+                            <td>@item.TicketTypeName</td>
+                            <td>@item.SupplierName</td>
+                            <td>@item.PlayZoneName</td>
+                            <td>
+                                <span class="@(item.StatusName == "CHƯA SỬ DỤNG" ? "status-green" :
+                  item.StatusName == "ĐÃ SỬ DỤNG" ? "status-yellow" :
+                  item.StatusName == "HOÀN VÉ" ? "status-red" :
+                  item.StatusName == "ĐÃ BÁN NHƯNG CHƯA DÙNG" ? "status-blue" :
+                  "status-grey")">
+                                    @item.StatusName
+                                </span>
+                            </td>
+
+                            <td>@item.SoldDurationDisplay</td>
+
+                            <td>
+                                @if (item.Status == 1 && item.ExpiredDate >= DateTime.Now)
+                                {
+                                    <a href="javascript:void(0);" class="text-primary text-decoration-none"
+                                       onclick="_ticket_service.ShowTicketPopup(@item.TicketId, @item.Status)">
+                                        Xem vé
+                                    </a>
+                                }
+                                else if (item.ExpiredDate < DateTime.Now)
+                                {
+                                    <span class="text-danger">Hết hạn</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Đã sử dụng</span>
+                                }
+                            </td>
+
+
+                            <td>
+                                @if (item.Status == 2)
+                                {
+                                    <span class="text-secondary" title="Không thể sửa vé đã sử dụng" style="cursor:not-allowed; opacity:0.4;">
+                                        <i class="fa fa-pencil-square-o"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <a href="javascript:void(0);" class="text-primary"
+                                       onclick="_ticket_service.ShowAddOrUpdate('@item.TicketId')"
+                                       title="Sửa vé">
+                                        <i class="fa fa-pencil-square-o"></i>
+                                    </a>
+                                }
+                            </td>
+
+
+
+                        </tr>
+                        index++;
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="11" class="text-muted text-center py-3">Không có dữ liệu</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-3" aria-label="ticket pagination">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link" href="javascript:void(0)" onclick="_ticket_service.applyFilter(@i)">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>

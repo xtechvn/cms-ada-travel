@@ -7,13 +7,13 @@ namespace Entities.Models
     {
         public Tag()
         {
-            ArticleTag = new HashSet<ArticleTag>();
+            ArticleTags = new HashSet<ArticleTag>();
         }
 
         public long Id { get; set; }
         public string TagName { get; set; }
         public DateTime? CreatedOn { get; set; }
 
-        public virtual ICollection<ArticleTag> ArticleTag { get; set; }
+        public virtual ICollection<ArticleTag> ArticleTags { get; set; }
     }
 }

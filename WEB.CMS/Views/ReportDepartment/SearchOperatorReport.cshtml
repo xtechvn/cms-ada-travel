@@ -113,6 +113,7 @@ else
                         <th rowspan="2" style=" min-width: 170px; text-align: center; "> Người phụ trách chính </th>
                         <th rowspan="2" style=" min-width: 400px; text-align: left; "> Điều hành </th>
                         <th rowspan="2" style=" min-width: 250px; text-align: left; "> Ngân hàng nhận tiền </th>
+                        <th rowspan="2" style=" min-width: 250px; text-align: left; "> quỹ chăm sóc khách hàng </th>
 
                     </tr>
                     <tr>
@@ -158,6 +159,7 @@ else
                         <td style="text-align: right;"></td>
                         <td style="text-align: right;"></td>
                         <td style="text-align: right;"></td>
+                        <td style="text-align: right;">@((total_model.TotalFundCustomerCare != null ? (double)total_model.TotalFundCustomerCare : 0).ToString("N0"))</td>
 
                     </tr>
                     @if (root_departments != null && root_departments.Count > 0)
@@ -206,6 +208,7 @@ else
                                     <td style="text-align: right;"></td>
                                     <td style="text-align: right;"></td>
                                     <td style="text-align: right;"></td>
+                                    <td style="text-align: right;">@list.Sum(x => x.TotalFundCustomerCare != null ? (double)x.TotalFundCustomerCare : 0).ToString("N0")</td>
 
                                 </tr>
                                 index = 0;
@@ -244,6 +247,7 @@ else
                                         <td style="text-align: right;">@(item.FullName != null ? item.FullName : "")</td>
                                         <td style="text-align: right;">@(item.OperatorName != null ? item.OperatorName : "")</td>
                                         <td style="text-align: right;">@(item.BankId != null ? item.BankId.Replace(","," ") +" - "+item.AccountNumber : "")</td>
+                                        <td style="text-align: right;">@((item.TotalFundCustomerCare == null ? 0 : (double)item.TotalFundCustomerCare).ToString("N0"))</td>
 
                                     </tr>
                                 }

@@ -7,6 +7,9 @@ namespace Entities.Models
     {
         public long Id { get; set; }
         public int? TourId { get; set; }
+        /// <summary>
+        /// 1: B2C , 2: B2B
+        /// </summary>
         public short? PositionType { get; set; }
         public int? Position { get; set; }
         public int? Status { get; set; }

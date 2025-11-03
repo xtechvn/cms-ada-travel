@@ -274,7 +274,7 @@ namespace Repositories.Repositories
             try
             {
                 var listInvoices = invoiceDAL.GetPagingList(searchModel, currentPage, pageSize,
-                ProcedureConstants.SP_GetListInvoice).ToList<InvoiceViewModel>();
+                StoreProcedureConstant.SP_GetListInvoice).ToList<InvoiceViewModel>();
                 if (listInvoices.FirstOrDefault() != null)
                     total = listInvoices.FirstOrDefault().TotalRow;
                 foreach (var item in listInvoices)

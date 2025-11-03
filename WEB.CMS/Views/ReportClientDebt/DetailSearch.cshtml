@@ -24,6 +24,7 @@
             <td style="text-align: right;">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
             <td style="text-align: right;">@item.LicenceNo</td>
             <td style="text-align: right;">@item.BillNo</td>
+            <td style="text-align: right;">@(item.CutOffDate == null?"": ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy"))</td>
             <td style="text-align: right;">@item.Description</td>
             <td style="text-align: right;">@item.DebtAccount</td>
             <td style="text-align: right;">@item.CorrespondingAccount</td>
@@ -36,6 +37,28 @@
             <td style="text-align: right; ">@(opening_credit.ToString("N0"))</td>
             <td style="text-align: right; "></td>
         </tr>
+        if (item.Refund > 0)
+        {
+            <tr>
+                <td>@(++index)</td>
+                <td style="text-align: right;">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td style="text-align: right;">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td style="text-align: right;">@item.LicenceNo (Hoàn trả)</td>
+                <td style="text-align: right;">@item.BillNo</td>
+                <td style="text-align: right;">@(item.CutOffDate == null ? "" : ((DateTime)item.CutOffDate).ToString("dd/MM/yyyy"))</td>
+                <td style="text-align: right;">@item.Description</td>
+                <td style="text-align: right;">@item.DebtAccount</td>
+                <td style="text-align: right;">@item.CorrespondingAccount</td>
+
+                <td style="text-align: right;" class="item-amount-debit">@((item.Refund != null ? (double)item.Refund : 0).ToString("N0"))</td>
+                <td style="text-align: right;" class="item-amount-credit">@((item.AmountCredit != null ? (double)item.AmountCredit : 0).ToString("N0"))</td>
+                @{
+                    opening_credit = opening_credit + (item.Refund != null ? (double)item.Refund : 0) - (item.AmountCredit != null ? (double)item.AmountCredit : 0);
+                }
+                <td style="text-align: right; ">@(opening_credit.ToString("N0"))</td>
+                <td style="text-align: right; "></td>
+            </tr>
+        }
     }
 }
 <script>

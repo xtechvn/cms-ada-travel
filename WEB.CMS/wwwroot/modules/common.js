@@ -5,9 +5,10 @@
             $(this).addClass("onclick-active");
             $(this).removeClass("onclick");
             $(this).next('.form-down').slideDown();
+            $(this).next('.form-down-filter').slideDown();
             $(this).next('.list-noti').slideDown();
             $('.form-down input').focus();
-
+            $(this).closest('td').find('.form-down').slideDown();
 
         }
     });
@@ -17,6 +18,8 @@
             $(this).addClass("onclick");
             $(this).next('.form-down').slideUp();
             $(this).next('.list-noti').slideUp();
+            $(this).next('.form-down-filter').slideUp();
+            $(this).closest('td').find('.form-down').slideUp();
         }
 
     });
@@ -24,10 +27,26 @@
         if ($(event.target).closest('.wrap-notifi').length == 0) {
             $(".list-noti").slideUp();
             $(".wrap-notifi .notifi").removeClass('active');
-
         }
     });
+    $('body').on('click', '.onclick-filter', function () {
+        if (!$(this).hasClass("onclick-active-filter")) {
+            $(this).addClass("onclick-active-filter");
+            $(this).removeClass("onclick-filter");
+            $(this).next('.form-down-filter').slideDown();
+        }
+    });
+    $('body').on('click', '.onclick-active-filter', function () {
+        if (!$(this).hasClass("onclick-filter")) {
+            $(this).removeClass("onclick-active-filter");
+            $(this).addClass("onclick-filter");
+            $(this).next('.form-down-filter').slideUp();
+        }
 
+    });
+    $('body').on('click', '.cancel', function () {
+        $.magnificPopup.close();
+    });
 });
 var _global_function = {
     AddLoading: function () {
@@ -48,6 +67,16 @@ var _global_function = {
         while (rgx.test(x1))
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
         return x1 + x2;
+    },
+    DateTimeDotNetToString: function (date_string, has_time = false) {
+        //"2024-08-28T09:15:09.43Z"
+        var date = new Date(date_string)
+        var text = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
+        if (has_time == true) {
+            var time_text = + ' ' + (date.getHours()) + ':' + (("0" + date.getMinutes()).slice(-2))
+            return text + ' ' + time_text
+        }
+        return text
     },
     ParseJSDate: function (text) {
         var parse_value = text.split(' ')[0].split('/')
@@ -135,6 +164,9 @@ var _global_function = {
     },
     RemoveSpecialCharacter: function (text) {
         return text.replaceAll(/[^a-zA-Z0-9àáãảạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệđùúủũụưừứửữựòóỏõọôồốổỗộơờớởỡợìíỉĩịäëïîöüûñçýỳỹỵỷ ]/g, '');
+    },
+    RemoveSpecialCharacter_ky_tu_DB: function (text) {
+        return text.replaceAll(/[^a-zA-Z0-9]/g, "_");
     },
     CheckIfStringIsDate: function (text) {
         if (text == null || text == undefined || text.trim() == '')
@@ -238,5 +270,23 @@ var _global_function = {
     },
     DateDotNETToDatePicker: function (date) {
         return ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear() ;
+    },
+    RenderBreadcumb: function (breadcumb_list) {
+        var html = `<div class="header-right">
+             <div class="container">
+                <ol class="breadcrumb">
+                  {breadcrumb}
+                </ol>
+            </div>
+            </div>`
+        var html_breadcumb = '<li class="breadcrumb-item {active}" {aria} ><a href="{url}">{name}</a></li>'
+        var html_sub = ''
+        $(breadcumb_list).each(function (index, item) {
+            html_sub += html_breadcumb.replaceAll('{url}', item.url).replaceAll('{name}', item.name)
+                .replaceAll('{active}', item.activated ? 'active' : '')
+                .replaceAll('{aria}', item.activated ? `aria-current="page"` : '')
+        });
+
+        $('#topbar .flex').prepend(html.replace('{breadcrumb}', html_sub))
     }
 }

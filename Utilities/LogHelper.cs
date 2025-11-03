@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types.InputFiles;
@@ -13,7 +14,7 @@ namespace Utilities
     public static class LogHelper
     {
         public static string botToken = "5321912147:AAFhcJ9DolwPWL74WbMjOOyP6-0G7w88PWY";
-        public static string group_Id = "-739120187";
+        public static string group_Id = "-1002659504336";
         public static string enviromment = "DEV";
         public static string CompanyType = " ";
         public static int CompanyTypeInt = 0;
@@ -60,6 +61,7 @@ namespace Utilities
             var rs = 1;
             try
             {
+                InsertLogDiscord(message);
                 LoadConfig();
                 TelegramBotClient alertMsgBot = new TelegramBotClient(botToken);
                 var rs_push=  alertMsgBot.SendTextMessageAsync(group_Id, "[" + enviromment + "-"+CompanyType+"] - " + message).Result;
@@ -176,11 +178,54 @@ namespace Utilities
                 }
             }
         }*/
+        public static int InsertLogTelegramRequest(string message, string botToken_Request, string group_Id_Request)
+        {
+            var rs = 1;
+            try
+            {
+                LoadConfig();
+                TelegramBotClient alertMsgBot = new TelegramBotClient(botToken_Request);
+                var rs_push = alertMsgBot.SendTextMessageAsync(group_Id_Request, "[" + enviromment + "] - " + message).Result;
+            }
+            catch (Exception)
+            {
+                rs = -1;
+            }
+            return rs;
+        }
+        public static async Task<int> InsertLogDiscord(string message)
+        {
+            var rs = 1;
+            try
+            {
+                HttpClient httpClient = new HttpClient();
+                var model = new LogDiscordModel();
+                using (StreamReader r = new StreamReader("appsettings.json"))
+                {
+                    AppSettings _appconfig = new AppSettings();
+                    string json = r.ReadToEnd();
+                    _appconfig = JsonConvert.DeserializeObject<AppSettings>(json);
+                    model.project_name = _appconfig.API.project_name;
+                    model.log_content = _appconfig.API.Domain_Type + message;
+                    var url = _appconfig.API.Domain + _appconfig.API.log_Discord;
+                    string jsonPayload = JsonConvert.SerializeObject(model);
+                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                    var response = await httpClient.PostAsync(url, content);
+                }
+            }
+            catch (Exception ex)
+            {
+                rs = -1;
+            }
+            return rs;
+        }
+
     }
     public class AppSettings
     {
         public BotSetting BotSetting { get; set; }
         public string CompanyType { get; set; }
+        public API API { get; set; }
       
     }
 
@@ -201,6 +246,19 @@ namespace Utilities
         public string Log { get; set; } // nội dung log
         public DateTime CreatedTime { get; set; } // thời gian tạo
     }
+    public class LogDiscordModel
+    {
+        public string project_name { get; set; }
+        public string log_content { get; set; }
 
+    } 
+    public class API
+    {
+        public string Domain_Type { get; set; }
+        public string log_Discord { get; set; }
+        public string Domain { get; set; }
+        public string project_name { get; set; }
+
+    }
 }
 

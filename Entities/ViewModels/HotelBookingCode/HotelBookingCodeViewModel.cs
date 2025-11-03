@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entities.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -133,6 +134,7 @@ namespace Entities.ViewModels.HotelBookingCode
         public List<TourEmail> TourEmail { get; set; }
         public List<HotelEmail> HotelEmail { get; set; }
         public List<FyEmail> FyEmail { get; set; }
+        public List<VinWonderEmail> VinWonderEmail { get; set; }
         public List<PackagesEmail> Packagesemail { get; set; }
 
     }
@@ -171,6 +173,7 @@ namespace Entities.ViewModels.HotelBookingCode
     }
     public class HotelEmail
     {
+        public string HotelId { get; set; }
         public string HotelName { get; set; }
         public string hotelNote { get; set; }
         public string hotelAmount { get; set; }
@@ -199,6 +202,12 @@ namespace Entities.ViewModels.HotelBookingCode
         public string fyNote { get; set; }
         public string fyStartDistrict { get; set; }
         public string fyEndDistrict { get; set; }
+    }
+    public class VinWonderEmail
+    {
+        public string VinWonderAmount { get; set; }
+        public string VinWonderStartDate { get; set; }
+        public string VinWonderName { get; set; }
     }
     public class HotelBookingCodeModel : Entities.Models.HotelBookingCode
     {

@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Danh sách nhà cung cấp";
+}
+@using Entities.Models
+@{
+    var service_types = (List<AllCode>)ViewBag.ServiceTypes;
+}
+
+<section style="overflow-x: hidden;">
+    <div class="row-main container">
+        <h2 class="txt_18 bold mb20">Kho quản lý vé vui chơi</h2>
+        <div class="flex fillter-donhang">
+          
+            <div class="form-group mb10 mr-2">
+                <input type="text" class="form-control" id="ip_search_fullname" placeholder="Tên nhà cung cấp" style="width: 150px;">
+            </div>
+           
+
+
+         
+            <div class="mb10 mr-2">
+                <button class="btn-search btn-default " type="button" onclick="_ticket_service.Export()" id="btnExport">
+                    <i class="fa fa-file-excel-o" id="icon-export"></i>
+                </button>
+                <button type="button" class="btn btn-default bg-main" onclick="_ticket_service.OnSearch()">
+                    <svg class="icon-svg" style="vertical-align: sub;">
+                        <use xlink:href="/images/icons/icon.svg#search"></use>
+                    </svg>
+                    Tìm kiếm
+                </button>
+            </div>
+        </div>
+        <div class="line-bottom mb20">
+            <div class="flex row-main-head">
+
+                <div class="btn-right text-right ">
+                    <div class="row-main-head mb10 mr-2" style="display: none;">
+                        <div class="down-up">
+                            <a class="btn btn-default onclick" href="javascript:;">
+                                <i class="fa fa-bars"></i>
+                                <i class="fa fa-caret-down"></i>
+                            </a>
+                            <div class="form-down text-nowrap">
+                                <div class="grid-slide">
+                                    <label class="check-list mb10 mr25">
+                                        <input type="checkbox" id="STT" onclick="_ticket_service.ChangeSetting(1)" class="checkbox-tb-column" data-id="1">
+                                        <span class="checkmark"></span>
+                                        STT
+                                    </label>
+                                  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="grid_data" class="wrap_bg wrap_bg_no-padding mb20">
+            <div class="col-xl-12 text-center" style="margin-top:200px">
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script type="text/javascript" src="~/modules/tickets.js?v=3"></script>
+    @* <script type="text/javascript" src="~/modules/Hotel.js"></script> *@
+}

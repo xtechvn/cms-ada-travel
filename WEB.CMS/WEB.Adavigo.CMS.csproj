@@ -11,6 +11,7 @@
     <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
     <PackageReference Include="Otp.NET" Version="1.2.2" />
     <PackageReference Include="PuppeteerSharp" Version="12.0.0" />
+    <PackageReference Include="QRCoder" Version="1.7.0" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
   </ItemGroup>
 
@@ -20,6 +21,13 @@
     <ProjectReference Include="..\Entities\Entities.csproj" />
     <ProjectReference Include="..\Repositories\Repositories.csproj" />
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\PostAuto\Detail.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

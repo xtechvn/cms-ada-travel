@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Utilities;
 
 namespace Entities.ViewModels
 {
@@ -51,7 +52,10 @@ namespace Entities.ViewModels
         public string OperatorIdName { get; set; }
         public string UtmMedium { get; set; }
         public int IsFinishPayment { get; set; }
-
+        public string InvoiceRequestStatusName { get; set; }
+        public int InvoiceRequestStatus { get; set; }
+        public string CutOffDate { get; set; }
+        public int? IsLock { get; set; }
 
 
     }
@@ -118,6 +122,7 @@ namespace Entities.ViewModels
         public string UtmSource { get; set; }
         public List<int>? ServiceType { get; set; }
         public List<int>? Status { get; set; }
+        public List<int>? InvoiceRequestStatus { get; set; }
         public string CreateTime { get; set; }
         public string ToDateTime { get; set; }
         public string CreateName { get; set; }
@@ -281,5 +286,63 @@ namespace Entities.ViewModels
         public double Profit { get; set; }
         public double Price { get; set; }
    
+    }
+    public class SearchReportOrderModels
+    {
+        public string OrderId { get; set; } = null;
+        public string ClientId { get; set; } = null;
+        public string SupplierId { get; set; } = null;
+        public string OrderStatus { get; set; } = null;
+        public string Module { get; set; } = null;
+        public DateTime? StartDateFrom { get; set; } = null;
+        public DateTime? StartDateTo { get; set; } = null;
+        public DateTime? EndDateTo { get; set; } = null;
+        public DateTime? EndDateFrom { get; set; } = null;
+        public string CreateDateFromStr { get; set; } = null;
+        public string CreateDateToStr { get; set; } = null;
+        public int PageIndex { get; set; }
+        public int pageSize { get; set; }
+        public DateTime? CreateDateFrom
+        {
+            get
+            {
+                return DateUtil.StringToDate(CreateDateFromStr);
+            }
+        }
+        public DateTime? CreateDateTo
+        {
+            get
+            {
+                return DateUtil.StringToDate(CreateDateToStr);
+            }
+        }
+    }
+    public class ReportOrderViewModel
+    {
+        public long OrderId { get; set; } 
+        public string OrderNo { get; set; } 
+        public string Amount { get; set; } 
+        public string StatusName { get; set; } 
+        public string StatusCode { get; set; } 
+        public DateTime CreatedDate { get; set; } 
+        public string CreateName { get; set; }
+        public int CountService { get; set; }
+        public List<ReportOrderServiceViewModel> ListService { get; set; }
+    }
+    public class ReportOrderServiceViewModel
+    {
+        public string ServiceId { get; set; }
+        public double Amount { get; set; }
+        public double Price { get; set; }
+        public double Profit { get; set; }
+        public double Refund { get; set; }
+        public double OrderAmount { get; set; }
+        public string Type { get; set; }
+        public string StatusName { get; set; }
+        public string ServiceCode { get; set; }
+        public int Status { get; set; }
+        public int CountPaymentRequest { get; set; }
+      public List<PaymentRequestViewModel> ListPaymentRequest { get; set; }
+
     }
 }

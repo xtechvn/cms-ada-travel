@@ -5,12 +5,15 @@ using System.Threading.Tasks;
 using Entities.ViewModels.SupplierConfig;
 using Entities.ViewModels;
 using Entities.ViewModels.Hotel;
+using Entities.ViewModels.Tour;
 
 namespace Repositories.IRepositories
 {
     public interface ISupplierRepository
     {
         List<SupplierViewModel> GetSuppliers(SupplierSearchModel searchModel);
+        List<SupplierTicketViewModel> GetSuppliersForTickets(SupplierSearchModel searchModel);
+
         SupplierViewModel GetById(int supplierId);
         SupplierDetailViewModel GetDetailById(int supplierId);
 
@@ -55,6 +58,8 @@ namespace Repositories.IRepositories
 
         // Program
         GenericViewModel<SupplierProgramGridViewModel> GetSupplierProgramList(SupplierProgramSearchModel model);
+
+        Task<string> ExportSuppliersOrder(OptionalSearshModel searchModel, string FilePath, int type);
 
     }
 }

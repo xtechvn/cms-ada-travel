@@ -18,5 +18,9 @@ namespace Repositories.IRepositories
         int ResetStatusAc(long clientId, long Status,int type);
         Task<AmountRemainView> GetAmountRemainOfContractByClientId(long ClientId);
         Task<string> ExportDeposit(CustomerManagerViewSearchModel searchModel, string FilePath, field field);
+        Task<int> UpdateStatusClient(int status, int id);
+        Task<List<Client>> GetClientByPhone(string phone);
+        Task<int> CreateClient(CustomerManagerView model);
+        Task<List<SumContractPayByUtmSource>> GetSumContractPayByUtmSource();
     }
 }

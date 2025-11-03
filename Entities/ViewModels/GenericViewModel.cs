@@ -17,6 +17,9 @@ namespace Entities.ViewModels
         public long TotalRecord3 { get; set; }
         public long TotalRecord4 { get; set; }
         public long TotalrecordErr { get; set; }
+        public double Amount { get; set; }
+        public double Profit { get; set; }
+        public double Price { get; set; }
 
         public GenericViewModel<ContractViewModel> where()
         {
