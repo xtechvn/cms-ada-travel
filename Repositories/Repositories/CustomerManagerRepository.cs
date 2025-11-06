@@ -506,7 +506,7 @@ namespace Repositories.Repositories
                                 if (listfield2[f] == 16)
                                 {
 
-                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.ListCommentNhuCau );
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.ListCommentNhuCau.Note );
                                     listfield2.Remove(listfield2[f]); f--; break;
 
                                 }
