@@ -291,18 +291,18 @@ namespace Repositories.Repositories
             }
         }
 
-        public async Task<string> ExportDeposit(CustomerManagerViewSearchModel searchModel, string FilePath, field field)
+        public async Task<string> ExportDeposit(List<CustomerManagerViewModel> data, string FilePath, field field)
         {
             var pathResult = string.Empty;
             try
             {
-                var data = new List<CustomerManagerViewModel>();
-                DataTable dt = await _ClientDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize, StoreProcedureConstant.GETGetAllClient_Search);
-                if (dt != null && dt.Rows.Count > 0)
-                {
-                    data = dt.ToList<CustomerManagerViewModel>();
+                //var data = new List<CustomerManagerViewModel>();
+                //DataTable dt = await _ClientDAL.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize, StoreProcedureConstant.GETGetAllClient_Search);
+                //if (dt != null && dt.Rows.Count > 0)
+                //{
+                //    data = dt.ToList<CustomerManagerViewModel>();
 
-                }
+                //}
                 if (data != null && data.Count > 0)
                 {
                     Workbook wb = new Workbook();
@@ -337,6 +337,8 @@ namespace Repositories.Repositories
                     listfieldtext.Add("Nguồn khách hàng"); listfield.Add(13);
                     listfieldtext.Add("Ngày tạo đơn cuối"); listfield.Add(14);
                     listfieldtext.Add("Số cách Ngày tạo đơn cuối"); listfield.Add(15);
+                    listfieldtext.Add("Nhu cầu"); listfield.Add(16);
+                    listfieldtext.Add("phản hồi gần nhất"); listfield.Add(17);
                     cell.SetColumnWidth(0, 8);
                     for (int i = 1; i <= listfield.Count; i++)
                     {
@@ -498,6 +500,20 @@ namespace Repositories.Repositories
                                 {
 
                                     ws.Cells[Cell[I] + RowIndex].PutValue(item.LastOrderDate != DateTime.MinValue ? Math.Round((DateTime.Now - item.LastOrderDate).TotalDays) : 0);
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                }
+                                if (listfield2[f] == 16)
+                                {
+
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.ListCommentNhuCau );
+                                    listfield2.Remove(listfield2[f]); f--; break;
+
+                                }
+                                if (listfield2[f] == 17)
+                                {
+
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.Note);
                                     listfield2.Remove(listfield2[f]); f--; break;
 
                                 }

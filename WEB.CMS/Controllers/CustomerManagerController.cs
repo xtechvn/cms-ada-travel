@@ -4,6 +4,7 @@ using Entities.ViewModels;
 using Entities.ViewModels.Contract;
 using Entities.ViewModels.CustomerManager;
 using Entities.ViewModels.Funding;
+using Entities.ViewModels.Mongo;
 using Entities.ViewModels.SupplierConfig;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +47,7 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly WorkQueueClient _workQueueClient;
         private LogCacheFilterMongoService _logCacheFilterMongoService;
         private IIdentifierServiceRepository _identifierServiceRepository;
-
+        private CommentClientMongoService _commentClientMongoService;
         public CustomerManagerController(IConfiguration configuration, ICustomerManagerRepository customerManagerRepositories, IDepositHistoryRepository depositHistoryRepository, ManagementUser ManagementUser, IWebHostEnvironment WebHostEnvironment, IAccountClientRepository accountClientRepository,
         IOrderRepositor orderRepositor, IContractPayRepository contractPayRepository, IAllCodeRepository allCodeRepository, IPaymentAccountRepository paymentAccountRepository, IClientRepository clientRepository, IUserRepository userRepository, IContractRepository contractRepository, IBankingAccountRepository bankingAccountRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
@@ -67,6 +68,7 @@ namespace WEB.Adavigo.CMS.Controllers
             _workQueueClient = new WorkQueueClient(configuration);
             _logCacheFilterMongoService = new LogCacheFilterMongoService(configuration);
             _identifierServiceRepository = identifierServiceRepository;
+            _commentClientMongoService = new CommentClientMongoService(_configuration);
         }
         public async Task<IActionResult> Index()
         {
@@ -571,6 +573,21 @@ namespace WEB.Adavigo.CMS.Controllers
         {
             try
             {
+                var model = await _customerManagerRepositories.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize);
+
+                if (model != null && model.ListData != null && model.ListData.Count > 0)
+                {
+                    foreach (var item in model.ListData)
+                    {
+                        var CommentClient = new CommentClientMongoModel();
+                        CommentClient.ClientId = item.Id.ToString();
+                        var ListComment = _commentClientMongoService.GetListComment(CommentClient);
+
+                        item.ListComment = _commentClientMongoService.CommentNew(CommentClient); ;
+                        item.ListCommentNhuCau = _commentClientMongoService.CommentNhuCau(CommentClient); ;
+
+                    }
+                }
                 int _UserId = 0;
                 if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                 {
@@ -598,7 +615,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 }
                 string FilePath = Path.Combine(_UploadDirectory, _FileName);
 
-                var rsPath = await _customerManagerRepositories.ExportDeposit(searchModel, FilePath, field);
+                var rsPath = await _customerManagerRepositories.ExportDeposit(model.ListData, FilePath, field);
 
                 if (!string.IsNullOrEmpty(rsPath))
                 {
