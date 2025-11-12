@@ -9,7 +9,9 @@ using Caching.Elasticsearch;
 using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.HotelBookingCode;
+using Entities.ViewModels.Mongo;
 using Entities.ViewModels.SetServices;
+using Entities.ViewModels.Vinpearl;
 using Entities.ViewModels.VinWonder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -51,7 +53,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
         private readonly IEmailService _emailService;
         private readonly IAttachFileRepository _AttachFileRepository;
         private readonly IContractPayRepository _contractPayRepository;
-
+        private LogActionMongoService LogActionMongo;
         public SetServiceController(IConfiguration configuration, IOrderRepositor orderRepository, IAllCodeRepository allcodeRepository, IContactClientRepository contactClientRepository,
           IUserRepository userRepository, IPassengerRepository passengerRepository, IAirlinesRepository airlinesRepository, IVinWonderBookingRepository VinWonderBookingRepository,
           IPaymentRequestRepository paymentRequestRepository, ISupplierRepository supplierRepository, IOrderRepository orderRepository2, IWebHostEnvironment WebHostEnvironment,
@@ -82,6 +84,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
             _AttachFileRepository = AttachFileRepository;
             _clientRepository = clientRepository;
             _contractPayRepository = contractPayRepository;
+            LogActionMongo = new LogActionMongoService(configuration);
         }
         public IActionResult VinWonder()
         {
@@ -418,6 +421,16 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
                 var id = await _VinWonderBookingRepository.UpdateServiceOperator(booking_id, _UserId);
                 if (id > 0)
                 {
+                    var detail = _VinWonderBookingRepository.GetVinWonderBookingById(booking_id);
+                    var orderStatus = _allCodeRepository.GetListByType("BOOKING_HOTEL_ROOM_STATUS");
+                    var model = new LogActionModel();
+                    model.Type = (int)AttachmentType.OrderDetail;
+                    model.LogId = (long)detail.OrderId;
+                    model.CreatedUserName = current_user.Name;
+                    var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.OnExcution);
+                    model.Log = allCodes.Description;
+                    model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ VinWonder";
+                    LogActionMongo.InsertLog(model);
                     return Ok(new
                     {
                         status = (int)ResponseType.SUCCESS,
@@ -467,6 +480,15 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
                         var order = _orderRepository.GetByOrderId((long)detail.OrderId);
                         string link = "/Order/" + detail.OrderId;
                         apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TRA_CODE).ToString(), order.OrderNo, link, current_user.Role, detail.ServiceCode);
+                        var orderStatus = _allCodeRepository.GetListByType("BOOKING_HOTEL_ROOM_STATUS");
+                        var model = new LogActionModel();
+                        model.Type = (int)AttachmentType.OrderDetail;
+                        model.LogId = (long)detail.OrderId;
+                        model.CreatedUserName = current_user.Name;
+                        var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.ServeCode);
+                        model.Log = allCodes.Description;
+                        model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ VinWonder";
+                        LogActionMongo.InsertLog(model);
                         return Ok(new
                         {
                             status = (int)ResponseType.SUCCESS,
@@ -545,7 +567,15 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.VinWonder
                         apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.QUYET_TOAN).ToString(), order.OrderNo, link, current_user.Role, detail.ServiceCode);
                         //-- update order payment_status
                         await _orderRepository2.UpdateOrderDetail((long)detail.OrderId, _UserId);
-
+                        var orderStatus = _allCodeRepository.GetListByType("BOOKING_HOTEL_ROOM_STATUS");
+                        var model = new LogActionModel();
+                        model.Type = (int)AttachmentType.OrderDetail;
+                        model.LogId = (long)detail.OrderId;
+                        model.CreatedUserName = current_user.Name;
+                        var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Payment);
+                        model.Log = allCodes.Description;
+                        model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ VinWonder";
+                        LogActionMongo.InsertLog(model);
                         return Ok(new
                         {
                             status = (int)ResponseType.SUCCESS,

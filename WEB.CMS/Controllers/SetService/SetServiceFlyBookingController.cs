@@ -9,6 +9,7 @@ using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.HotelBookingCode;
+using Entities.ViewModels.Mongo;
 using Entities.ViewModels.SetServices;
 using ENTITIES.ViewModels.ElasticSearch;
 using Microsoft.AspNetCore.Hosting;
@@ -16,10 +17,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
+using StackExchange.Redis;
+using Telegram.Bot.Types;
 using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
+using static Utilities.Contants.OrderConstants;
 using static Utilities.DepositHistoryConstant;
 
 namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
@@ -46,6 +50,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
         private APIService apiService;
         private readonly IWebHostEnvironment _WebHostEnvironment;
         private readonly IContractPayRepository _contractPayRepository;
+        private LogActionMongoService LogActionMongo;
         public SetServiceController(IConfiguration configuration, IOrderRepositor orderRepository, IAllCodeRepository allcodeRepository, IContactClientRepository contactClientRepository, IWebHostEnvironment WebHostEnvironment,
             IFlyBookingDetailRepository flyBookingDetailRepository, IUserRepository userRepository, IPassengerRepository passengerRepository, IAirlinesRepository airlinesRepository,
             IPaymentRequestRepository paymentRequestRepository, IHotelBookingCodeRepository hotelBookingCodeRepository, ISupplierRepository supplierRepository, IOrderRepository orderRepository2,
@@ -71,6 +76,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
             apiService = new APIService(configuration, userRepository);
             _WebHostEnvironment = WebHostEnvironment;
             _contractPayRepository = contractPayRepository;
+            LogActionMongo = new LogActionMongoService(configuration);
         }
         public IActionResult Fly()
         {
@@ -190,7 +196,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
                     model.OrderId = fly_detail[0].OrderId;
                     model.Refund = (double)(order.Refund == null ? 0 : order.Refund);
                     model.GroupBookingId = search_group;
-                    User user = null;
+                    Entities.Models.User user = null;
                     ViewBag.ClientId = order.ClientId ?? 0;
                     if (order.SalerId != null && (long)order.SalerId > 0)
                     {
@@ -824,6 +830,15 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
                         var order = _orderRepository.GetByOrderId(detail[0].OrderId);
                         string link = "/Order/" + detail[0].OrderId;
                         apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.NHAN_TRIEN_KHAI).ToString(), order.OrderNo, link, current_user.Role, detail[0].ServiceCode);
+                        var orderStatus = _allCodeRepository.GetListByType("BOOKING_HOTEL_ROOM_STATUS");
+                        var model = new LogActionModel();
+                        model.Type = (int)AttachmentType.OrderDetail;
+                        model.LogId = detail[0].OrderId;
+                        model.CreatedUserName = current_user.Name;
+                        var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.ServeCode);
+                        model.Log = allCodes.Description;
+                        model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ vé";
+                        LogActionMongo.InsertLog(model);
                     }
 
                     return Ok(new
@@ -955,6 +970,16 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Fly
                         var order = _orderRepository.GetByOrderId(detail[0].OrderId);
                         string link = "/Order/" + fly_detail[0].OrderId;
                         apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.QUYET_TOAN).ToString(), order.OrderNo, link, current_user.Role, detail[0].ServiceCode);
+
+                        var orderStatus = _allCodeRepository.GetListByType("BOOKING_HOTEL_ROOM_STATUS");
+                        var model = new LogActionModel();
+                        model.Type = (int)AttachmentType.OrderDetail;
+                        model.LogId = detail[0].OrderId;
+                        model.CreatedUserName = current_user.Name;
+                        var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Payment);
+                        model.Log = allCodes.Description;
+                        model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ vé";
+                        LogActionMongo.InsertLog(model);
                         return Ok(new
                         {
                             status = (int)ResponseType.SUCCESS,

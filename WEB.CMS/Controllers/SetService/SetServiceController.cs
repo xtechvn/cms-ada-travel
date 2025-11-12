@@ -714,7 +714,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                     {
                         var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Decline);
                         model.Log = allCodes.Description;
-                        model.Note = user.FullName + " " + allCodes.Description + "dịch vụ đơn";
+                        model.Note = user.FullName + " " + allCodes.Description + " dịch vụ khách sạn";
                         LogActionMongo.InsertLog(model);
                         apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.QUYET_TOAN).ToString(), order.OrderNo, link, current_user.Role.ToString(), Hotel[0].ServiceCode);
                         smg = "Từ chối dịch vụ thành công";
@@ -723,7 +723,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                     {
                         var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.OnExcution);
                         model.Log = allCodes.Description;
-                        model.Note = user.FullName + " " + allCodes.Description + "dịch vụ đơn";
+                        model.Note = user.FullName + " " + allCodes.Description + " dịch vụ khách sạn";
                         LogActionMongo.InsertLog(model);
                         //apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.NHAN_TRIEN_KHAI).ToString(), order.OrderNo, link, current_user.Role.ToString(), Hotel[0].ServiceCode);
                         smg = "Nhận đặt dịch vụ thành công";
@@ -738,7 +738,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                         {
                             var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Payment);
                             model.Log = allCodes.Description;
-                            model.Note = user.FullName + " " + allCodes.Description + "dịch vụ đơn";
+                            model.Note = user.FullName + " " + allCodes.Description + " dịch vụ khách sạn";
                             LogActionMongo.InsertLog(model);
                             apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.QUYET_TOAN).ToString(), order.OrderNo, link, current_user.Role.ToString(), Hotel[0].ServiceCode);
                             smg = "Quyết toán dịch vụ thành công";
@@ -761,7 +761,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                         {
                             var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.ServeCode);
                             model.Log = allCodes.Description;
-                            model.Note = user.FullName + " " + allCodes.Description + "dịch vụ đơn";
+                            model.Note = user.FullName + " " + allCodes.Description + " dịch vụ khách sạn";
                             LogActionMongo.InsertLog(model);
                             apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TRA_CODE).ToString(), order.OrderNo, link, current_user.Role.ToString(), Hotel[0].ServiceCode);
                             smg = "Trả code dịch vụ thành công";
@@ -1443,7 +1443,11 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                     {
                         model.ServiceId = id.ToString();
                     }
-
+                    var orderStatus = _allCodeRepository.GetListByType("BOOKING_HOTEL_ROOM_STATUS");
+                    var model_log = new LogActionModel();
+                    model_log.Type = (int)AttachmentType.OrderDetail;
+                    model_log.LogId = orderid;
+                    model_log.CreatedUserName = current_user.Name;
                     model.Note = Note;
                     await _hotelBookingRepositories.InsertServiceDeclines(model);
                     long UpdatedBy = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -1468,6 +1472,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                     apiService.SendMessage(CreatedatedBy.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TU_CHOI).ToString(), order.OrderNo, link, current_user.Role, listHotel.Count > 0 ? listHotel[0].ServiceCode : "0");
                                     status = (int)ResponseType.SUCCESS;
                                     msg = "Từ chối thành công";
+                                    var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Decline);
+                                    model_log.Log = allCodes.Description + " " + Note;
+                                    model_log.Note = current_user.Name + " " + allCodes.Description + " dịch vụ khách sạn";
+                                    LogActionMongo.InsertLog(model_log);
                                 }
                                 else
                                 {
@@ -1496,6 +1504,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                     apiService.SendMessage(CreatedatedBy.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TU_CHOI).ToString(), order.OrderNo, link, current_user.Role, fly_list[0].ServiceCode);
                                     status = (int)ResponseType.SUCCESS;
                                     msg = "Đổi trạng thái từ chối dịch vụ thành công";
+                                    var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Decline);
+                                    model_log.Log = allCodes.Description + " " + Note;
+                                    model_log.Note = current_user.Name + " " + allCodes.Description + " dịch vụ vé";
+                                    LogActionMongo.InsertLog(model_log);
                                 }
 
                             }
@@ -1517,6 +1529,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                     apiService.SendMessage(CreatedatedBy.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TU_CHOI).ToString(), order.OrderNo, link, current_user.Role, listtour[0].ServiceCode);
                                     status = (int)ResponseType.SUCCESS;
                                     msg = "Từ chối thành công";
+                                    var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Decline);
+                                    model_log.Log = allCodes.Description + " "+Note;
+                                    model_log.Note = current_user.Name + " " + allCodes.Description + " dịch vụ tour";
+                                    LogActionMongo.InsertLog(model_log);
                                 }
                                 else
                                 {
@@ -1544,6 +1560,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                     apiService.SendMessage(CreatedatedBy.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TU_CHOI).ToString(), order.OrderNo, link, current_user.Role, otherBookings.ServiceCode);
                                     status = (int)ResponseType.SUCCESS;
                                     msg = "Từ chối thành công";
+                                    var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Decline);
+                                    model_log.Log = allCodes.Description + " " + Note;
+                                    model_log.Note = current_user.Name + " " + allCodes.Description + " dịch vụ khác";
+                                    LogActionMongo.InsertLog(model_log);
                                 }
                                 else
                                 {
@@ -1571,6 +1591,10 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                                     apiService.SendMessage(CreatedatedBy.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TU_CHOI).ToString(), order.OrderNo, link, current_user.Role, vinwonderBooking.ServiceCode);
                                     status = (int)ResponseType.SUCCESS;
                                     msg = "Từ chối thành công";
+                                    var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Decline);
+                                    model_log.Log = allCodes.Description + " " + Note;
+                                    model_log.Note = current_user.Name + " " + allCodes.Description + " dịch vụ VinWonder";
+                                    LogActionMongo.InsertLog(model_log);
                                 }
                                 else
                                 {

@@ -21,6 +21,8 @@ using WEB.Adavigo.CMS.Service;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using static Utilities.DepositHistoryConstant;
+using Entities.ViewModels.Mongo;
+using Telegram.Bot.Types;
 
 namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
 {
@@ -43,6 +45,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
         private readonly IUserRepository _userRepository;
         private readonly IWebHostEnvironment _WebHostEnvironment;
         private readonly IContractPayRepository _contractPayRepository;
+        private LogActionMongoService LogActionMongo;
         public SetServiceController(IConfiguration configuration, ITourRepository tourRepository, IAllCodeRepository allCodeRepository, IOrderRepository orderRepository, IOrderRepositor orderRepositor, ManagementUser managementUser, IUserRepository userRepository,
             IHotelBookingCodeRepository hotelBookingCodeRepository, IContactClientRepository contactClientRepository, IPaymentRequestRepository paymentRequestRepository, ITourPackagesOptionalRepository tourPackagesOptionalRepository, IWebHostEnvironment WebHostEnvironment, IContractPayRepository contractPayRepository)
         {
@@ -60,6 +63,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
             apiService = new APIService(configuration, userRepository);
             _WebHostEnvironment = WebHostEnvironment;
             _contractPayRepository = contractPayRepository;
+            LogActionMongo = new LogActionMongoService(configuration);
         }
         public async Task<IActionResult> Tour()
         {
@@ -347,31 +351,49 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
             {
                 if (tour_status != 0)
                 {
+                    var model = new LogActionModel();               
                     var _UserId = 0;
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                     var order = _orderRepositor.GetByOrderId(OrderId);
                     var tour = await _tourRepository.GetDetailTourByID(Convert.ToInt32(tourId));
                     string link = "/Order/" + OrderId;
                     var current_user = _ManagementUser.GetCurrentUser();
+                    model.Type = (int)AttachmentType.OrderDetail;
+                    model.LogId = OrderId;
+                    model.CreatedUserName = current_user.Name;
+                    var orderStatus = _allCodeRepository.GetListByType("BOOKING_HOTEL_ROOM_STATUS");
                     int statusOder = 0;
                     if (tour_status == (int)ServiceStatus.Decline)
                     {
+                        var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Decline);
+                        model.Log = allCodes.Description;
+                        model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ tour";
+                        LogActionMongo.InsertLog(model);
                         apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TU_CHOI).ToString(), order.OrderNo, link, current_user.Role.ToString(), tour.ServiceCode);
                         msg = "Từ chối dịch vụ thành công";
                     }
                     if (tour_status == (int)ServiceStatus.OnExcution)
                     {
+                        var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.OnExcution);
+                        model.Log = allCodes.Description;
+                        model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ tour";
+                        LogActionMongo.InsertLog(model);
                         apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.NHAN_TRIEN_KHAI).ToString(), order.OrderNo, link, current_user.Role.ToString(), tour.ServiceCode);
                         msg = "Nhận đặt dịch vụ thành công";
                     }
                     if (tour_status == (int)ServiceStatus.Payment)
                     {
+                    
                         var data = _paymentRequestRepository.GetByServiceId(tourId, 5);
                         var sum = data.Where(n => ((n.Status == (int)(PAYMENT_REQUEST_STATUS.DA_CHI) || n.Status == (int)(PAYMENT_REQUEST_STATUS.CHO_CHI) || n.IsSupplierDebt == true))).Sum(n => n.Amount);
                         if (data != null && data.Count > 0 && sum >= amount)
                         {
                             apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.QUYET_TOAN).ToString(), order.OrderNo, link, current_user.Role.ToString(), tour.ServiceCode);
                             msg = "Quyết toán dịch vụ thành công";
+                            var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.Payment);
+                            model.Log = allCodes.Description;
+                            model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ tour";
+                            LogActionMongo.InsertLog(model);
                         }
                         else
                         {
@@ -388,8 +410,13 @@ namespace WEB.Adavigo.CMS.Controllers.SetService.Tour
                         var hotelBookingCode = await _hotelBookingCodeRepository.GetListlBookingCodeByHotelBookingId(tourId, Type);
                         if (hotelBookingCode != null && hotelBookingCode.Count > 0)
                         {
+                         
                             apiService.SendMessage(_UserId.ToString(), ((int)ModuleType.DICH_VU).ToString(), ((int)ActionType.TRA_CODE).ToString(), order.OrderNo, link, current_user.Role.ToString(), tour.ServiceCode);
                             msg = "Trả code dịch vụ thành công";
+                            var allCodes = orderStatus.FirstOrDefault(s => s.CodeValue == (int)ServiceStatus.ServeCode);
+                            model.Log = allCodes.Description;
+                            model.Note = current_user.Name + " " + allCodes.Description + " dịch vụ tour";
+                            LogActionMongo.InsertLog(model);
                         }
                         else
                         {
