@@ -22,23 +22,44 @@ namespace Entities.Models
     {
         public int TicketId { get; set; }
         public string TicketCode { get; set; }
-        public int? SupplierId { get; set; }     // 👈 thêm dòng này để đồng bộ với Ticket
+        public int? SupplierId { get; set; }
         public string SupplierName { get; set; }
-        public int? Category { get; set; }     // hiện INT theo DB mới
-        public int? TicketType { get; set; }   // hiện INT theo DB mới
-        public int? PlayZone { get; set; }     // hiện INT theo DB mới
-        public int? Status { get; set; }       // hiện INT theo DB mới
+
+        // ✅ Thêm 3 trường mới
+        public int? ProductId { get; set; }
+        public string ProductName { get; set; }
+        public decimal? ImportPrice { get; set; }
+        public int? TargetAudience { get; set; }
+        public string TargetAudienceName { get; set; } // từ AllCode.Description
+
+        public int? Category { get; set; }
+        public string CategoryName { get; set; }
+
+        public int? TicketType { get; set; }
+        public string TicketTypeName { get; set; }
+
+        public int? PlayZone { get; set; }
+        public string PlayZoneName { get; set; }
+
+        public int? Status { get; set; }
+        public string StatusName { get; set; }
+
         public DateTime? ImportDate { get; set; }
         public DateTime? ExpiredDate { get; set; }
         public DateTime? SoldDuration { get; set; }
+        public string QRCode { get; set; }
+        public DateTime? CreatedDate { get; set; }
 
+        // Tổng dòng (cho phân trang)
+        public int TotalRow { get; set; }
+
+        // ⚙️ Format hiển thị thời gian đã bán
         public string SoldDurationDisplay
         {
             get
             {
                 if (!SoldDuration.HasValue) return "";
                 var diff = DateTime.Now - SoldDuration.Value;
-
                 if (diff.TotalDays < 7)
                     return SoldDuration.Value.ToString("dd/MM/yyyy HH:mm:ss");
 
@@ -47,17 +68,8 @@ namespace Entities.Models
                 return $"{months} tháng {days} ngày";
             }
         }
-        public string? QRCode { get; set; }       // 👈 thêm cho đồng bộ SP_Insert
-        public string CategoryName { get; set; }
-
-        public string TicketTypeName { get; set; }
-        public string PlayZoneName { get; set; }
-        public string StatusName { get; set; }
-
-        public DateTime? CreatedDate { get; set; }
-        // Tổng dòng (nếu dùng cho paging)
-        public int TotalRow { get; set; }
     }
+
     public class SupplierTicketViewModel
     {
         public int SupplierId { get; set; }
@@ -80,6 +92,9 @@ namespace Entities.Models
         public int? TicketType { get; set; }    // INT (FK tới bảng TicketType)
         public int? PlayZone { get; set; }      // INT (FK tới bảng PlayZone)
         public int? Status { get; set; }        // INT (FK tới bảng TicketStatus)
+        public int? ProductId { get; set; }        // ✅ FK tới GroupProduct (Tên sản phẩm)
+        public decimal? ImportPrice { get; set; }  // ✅ Giá nhập
+        public int? TargetAudience { get; set; }   // ✅ FK tới AllCode.Type = 'TARGETAUDIENCE_STATUS'
 
         public DateTime? ImportDate { get; set; }
 
@@ -93,7 +108,7 @@ namespace Entities.Models
 
         public DateTime? UpdatedDate { get; set; }
 
-        
+
     }
 
     // ViewModels/TicketListFilter.cs

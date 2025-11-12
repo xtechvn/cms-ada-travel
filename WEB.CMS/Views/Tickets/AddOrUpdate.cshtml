@@ -5,6 +5,8 @@
 @model TicketListItemViewModel
 @{
     var service_types = (List<AllCode>)ViewBag.ServiceTypes;
+    var service_types2 = (List<AllCode>)ViewBag.TargetAudiences;
+
 }
 <style>
     .is-invalid {
@@ -109,6 +111,36 @@
                            }
                        </select>
                     </div>
+                    <!-- Tên sản phẩm -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <select id="ddlProduct" name="ProductId" class="form-select select2">
+                            <option value="">-- Chọn sản phẩm --</option>
+                        </select>
+                    </div>
+
+                    <!-- Giá nhập -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Giá nhập</label>
+                        <input type="number" name="ImportPrice" class="form-control" placeholder="Nhập giá nhập" value="@Model.ImportPrice" />
+                    </div>
+
+                    <!-- Đối tượng -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Đối tượng</label>
+                        <select name="TargetAudience" class="form-select select2">
+                            @if (ViewBag.TargetAudiences != null)
+                            {
+                                foreach (var item in service_types2)
+                                {
+                                    <option value="@item.CodeValue">
+                                        @item.Description
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
 
                    
 

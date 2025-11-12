@@ -1,24 +1,70 @@
 ﻿@using Entities.Models
 @model PagedResult<TicketListItemViewModel>
 
+    <style>
+    /* ✅ Khung cuộn ngang cho bảng */
+    .table-wrap-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap; /* tránh cell xuống dòng */
+        -webkit-overflow-scrolling: touch; /* cuộn mượt trên iOS */
+    }
+
+    /* ✅ Bảng đủ rộng, không bị bóp */
+    .table-wide {
+        min-width: 1200px; /* bạn có thể tăng lên 1400–1600 nếu nhiều cột */
+    }
+
+    /* ✅ Header “dính” khi cuộn (tuỳ chọn) */
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        z-index: 2; /* nổi lên trên body */
+        background: #f8f9fa; /* đồng bộ Bootstrap table-light */
+    }
+
+    /* ✅ Căn phải cột “Giá nhập” (cột thứ 4) — nếu bạn muốn chung */
+    .table-wide td:nth-child(4),
+    .table-wide th:nth-child(4) {
+        text-align: right;
+    }
+
+    /* ✅ (Tuỳ chọn) Định độ rộng tối thiểu cho vài cột để dễ đọc */
+    .table-wide th:nth-child(2), .table-wide td:nth-child(2) {
+        min-width: 180px;
+    }
+    /* MÃ SỐ */
+    .table-wide th:nth-child(3), .table-wide td:nth-child(3) {
+        min-width: 220px;
+    }
+    /* TÊN SẢN PHẨM */
+    .table-wide th:nth-child(10), .table-wide td:nth-child(10) {
+        min-width: 220px;
+    }
+    /* KHU VỰC */
+
+    </style>
 <div class="card shadow-sm border-0">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light text-center">
+    <!-- ✅ Lớp bao để bật cuộn ngang -->
+    <div class="table-wrap-scroll">
+        <table class="table table-hover align-middle mb-0 table-wide">
+            <thead class="table-light text-center sticky-header">
+                <!-- ✅ sticky header (nếu muốn) -->
                 <tr>
                     <th>STT</th>
                     <th>MÃ SỐ</th>
+                    <th>TÊN SẢN PHẨM</th>
+                    <th>GIÁ NHẬP</th>
+                    <th>ĐỐI TƯỢNG</th>
                     <th>NGÀY NHẬP</th>
                     <th>NGÀY HẾT HẠN</th>
                     <th>DANH MỤC</th>
                     <th>LOẠI VÉ</th>
-                    <th>NHÀ CUNG CẤP</th>
                     <th>KHU VỰC VUI CHƠI</th>
                     <th>TRẠNG THÁI</th>
                     <th>THỜI GIAN ĐÃ BÁN</th>
                     <th>QR CODE</th>
                     <th>THAO TÁC</th>
-
                 </tr>
             </thead>
             <tbody class="text-center">
@@ -30,24 +76,24 @@
                         <tr>
                             <td>@index</td>
                             <td class="text-primary fw-semibold">@item.TicketCode</td>
+                            <td>@item.ProductName</td>
+                            <td class="text-end">@String.Format("{0:N0} đ", item.ImportPrice)</td>
+                            <td>@item.TargetAudienceName</td>
                             <td>@(item.ImportDate?.ToString("dd/MM/yyyy"))</td>
                             <td>@(item.ExpiredDate?.ToString("dd/MM/yyyy"))</td>
                             <td>@item.CategoryName</td>
                             <td>@item.TicketTypeName</td>
-                            <td>@item.SupplierName</td>
                             <td>@item.PlayZoneName</td>
                             <td>
                                 <span class="@(item.StatusName == "CHƯA SỬ DỤNG" ? "status-green" :
-                  item.StatusName == "ĐÃ SỬ DỤNG" ? "status-yellow" :
-                  item.StatusName == "HOÀN VÉ" ? "status-red" :
-                  item.StatusName == "ĐÃ BÁN NHƯNG CHƯA DÙNG" ? "status-blue" :
-                  "status-grey")">
+                                    item.StatusName == "ĐÃ SỬ DỤNG" ? "status-yellow" :
+                                    item.StatusName == "HOÀN VÉ" ? "status-red" :
+                                    item.StatusName == "ĐÃ BÁN NHƯNG CHƯA DÙNG" ? "status-blue" :
+                                    "status-grey")">
                                     @item.StatusName
                                 </span>
                             </td>
-
                             <td>@item.SoldDurationDisplay</td>
-
                             <td>
                                 @if (item.Status == 1 && item.ExpiredDate >= DateTime.Now)
                                 {
@@ -65,8 +111,6 @@
                                     <span class="text-muted">Đã sử dụng</span>
                                 }
                             </td>
-
-
                             <td>
                                 @if (item.Status == 2)
                                 {
@@ -83,16 +127,14 @@
                                     </a>
                                 }
                             </td>
-
-
-
                         </tr>
                         index++;
                     }
                 }
                 else
                 {
-                    <tr><td colspan="11" class="text-muted text-center py-3">Không có dữ liệu</td></tr>
+                    <!-- ✅ nhớ chỉnh colspan đúng số cột -->
+                    <tr><td colspan="14" class="text-muted text-center py-3">Không có dữ liệu</td></tr>
                 }
             </tbody>
         </table>

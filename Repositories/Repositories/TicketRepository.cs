@@ -59,6 +59,10 @@ namespace Repositories.Repositories
                         ImportDate = r["ImportDate"] != DBNull.Value ? Convert.ToDateTime(r["ImportDate"]) : (DateTime?)null,
                         ExpiredDate = r["ExpiredDate"] != DBNull.Value ? Convert.ToDateTime(r["ExpiredDate"]) : (DateTime?)null,
                         SoldDuration = r["SoldDuration"] != DBNull.Value ? Convert.ToDateTime(r["ImportDate"]) : (DateTime?)null,
+                        // ✅ Thêm 3 field mới
+                        ProductId = r["ProductId"] != DBNull.Value ? Convert.ToInt32(r["ProductId"]) : (int?)null,
+                        ImportPrice = r["ImportPrice"] != DBNull.Value ? Convert.ToDecimal(r["ImportPrice"]) : (decimal?)null,
+                        TargetAudience = r["TargetAudience"] != DBNull.Value ? Convert.ToInt32(r["TargetAudience"]) : (int?)null,
                         QRCode = r["QRCode"]?.ToString()
                     };
                 }

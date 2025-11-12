@@ -50,6 +50,7 @@ namespace DAL
             new SqlParameter("@CategoryId", (object?)categoryId ?? DBNull.Value),
             new SqlParameter("@TicketTypeId", (object?)ticketTypeId ?? DBNull.Value),
             new SqlParameter("@ExpiredDate", (object?)expiredDate ?? DBNull.Value),
+            
             totalParam
         };
 
@@ -156,7 +157,11 @@ namespace DAL
                     new SqlParameter("@Status", model.Status ?? (object)DBNull.Value),
                     new SqlParameter("@ImportDate", model.ImportDate ?? (object)DBNull.Value),
                     new SqlParameter("@ExpiredDate", model.ExpiredDate ?? (object)DBNull.Value),
-                   
+                    // ✅ Bổ sung thêm 3 trường mới
+                    new SqlParameter("@ProductId", model.ProductId ?? (object)DBNull.Value),
+                    new SqlParameter("@ImportPrice", model.ImportPrice ?? (object)DBNull.Value),
+                    new SqlParameter("@TargetAudience", model.TargetAudience ?? (object)DBNull.Value),
+
                     new SqlParameter("@QRCode", model.QRCode ?? (object)DBNull.Value)
                 };
 
@@ -185,7 +190,10 @@ namespace DAL
                     new SqlParameter("@Status", model.Status ?? (object)DBNull.Value),
                     new SqlParameter("@ImportDate", model.ImportDate ?? (object)DBNull.Value),
                     new SqlParameter("@ExpiredDate", model.ExpiredDate ?? (object)DBNull.Value),
-                  
+                    new SqlParameter("@ProductId", model.ProductId ?? (object)DBNull.Value),
+                    new SqlParameter("@ImportPrice", model.ImportPrice ?? (object)DBNull.Value),
+                    new SqlParameter("@TargetAudience", model.TargetAudience ?? (object)DBNull.Value),
+
                     new SqlParameter("@QRCode", model.QRCode ?? (object)DBNull.Value)
                 };
 

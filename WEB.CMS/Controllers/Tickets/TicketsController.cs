@@ -135,9 +135,10 @@ namespace WEB.CMS.Controllers.Tickets
                                      .Where(x => x.CodeValue != 2)
                                      .ToList();
             ViewBag.ServiceTypes = serviceTypes;
+            ViewBag.TargetAudiences = _allCodeRepository.GetListByType("TARGETAUDIENCE_STATUS"); // ✅ load dropdown đối tượng
 
 
-          
+
             return View(model); // trả PartialView modal
         }
 

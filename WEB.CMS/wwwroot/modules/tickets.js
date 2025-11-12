@@ -151,7 +151,8 @@ var _ticket_service = {
         //         $('[name="statusFilter"]').html(html).trigger('change.select2');
         //     }
         // });
-
+      // ✅ Load các dropdown filter
+      loadSelect('[name="productFilter"]', 85, 'Tên sản phẩm'); // 🔥 parentId = 85
         loadSelect('[name="categoryFilter"]', 76, 'Danh mục');
         loadSelect('[name="playZoneFilter"]', 77, 'Khu vực vui chơi');
 
@@ -176,6 +177,8 @@ var _ticket_service = {
             playZoneId: $('[name="playZoneFilter"]').val() || null,
             categoryId: $('[name="categoryFilter"]').val() || null,
             ticketTypeId: $('[name="ticketTypeFilter"]').val() || null,
+            //productId: $('[name="productFilter"]').val() || null,          // ✅ thêm
+            //targetAudience: $('[name="targetAudienceFilter"]').val() || null // ✅ thêm
             expiredDate: $('[name="expiredDateFilter"]').val() || null
         };
 
@@ -295,7 +298,8 @@ var _ticket_service = {
                 }
             });
         }
-
+        // ✅ Load đầy đủ các dropdown
+        loadSelect('#ddlProduct', 85);   // 🔥 thêm: tên sản phẩm
         // load mặc định
         loadSelect('#ddlCategory', 76);
         loadSelect('#ddlPlayZone', 77);
@@ -326,6 +330,10 @@ var _ticket_service = {
                     form.find('[name="QRCode"]').val(t.qrCode);
                     form.find('[name="Status"]').val(t.status).trigger('change');
                     form.find('[name="SupplierId"]').val(t.supplierId);
+                    // ✅ Điền thêm 3 field mới
+                    form.find('[name="ProductId"]').val(t.productId).trigger('change');
+                    form.find('[name="ImportPrice"]').val(t.importPrice);
+                    form.find('[name="TargetAudience"]').val(t.targetAudience).trigger('change');
 
                     // 🔥 Gọi load dropdown có selectedId để nó render đúng
                     function loadSelect(selectId, parentId, selectedId) {
@@ -347,7 +355,8 @@ var _ticket_service = {
                     // Load danh mục, khu vui chơi, loại vé theo dữ liệu có sẵn
                     $.when(
                         loadSelect("#ddlCategory", 76, t.category),
-                        loadSelect("#ddlPlayZone", 77, t.playZone)
+                        loadSelect("#ddlPlayZone", 77, t.playZone),
+                         loadSelect("#ddlProduct", 85, t.productId)
                     ).done(function () {
                         // Sau khi danh mục load xong -> load loại vé con
                         loadSelect("#ddlTicketType", t.category, t.ticketType);
