@@ -348,8 +348,8 @@ namespace DAL
                 objParam[2] = new SqlParameter("@Email", searchModel.Email);
                 objParam[3] = new SqlParameter("@Phone", searchModel.Phone);
                 objParam[4] = new SqlParameter("@AgencyType", searchModel.AgencyType);
-                objParam[5] = new SqlParameter("@ClientType", searchModel.ClientType);
-                objParam[6] = new SqlParameter("@PermissionType", searchModel.PermissionType);
+                objParam[5] = new SqlParameter("@ClientType", searchModel.ClientType != null && searchModel.ClientType[0] != null & searchModel.ClientType[0] != -1 ? string.Join(",", searchModel.ClientType) : DBNull.Value);
+                objParam[6] = new SqlParameter("@PermissionType", searchModel.PermissionType != null && searchModel.PermissionType[0] != null & searchModel.PermissionType[0] != -1 ? string.Join(",", searchModel.PermissionType) : DBNull.Value);
                 objParam[7] = new SqlParameter("@PageIndex", currentPage);
                 objParam[8] = new SqlParameter("@PageSize", pageSize);
                 objParam[9] = new SqlParameter("@UserId", searchModel.UserId);
@@ -358,11 +358,11 @@ namespace DAL
                 objParam[12] = new SqlParameter("@MinAmount", searchModel.MinAmount);
                 objParam[13] = new SqlParameter("@MaxAmount", searchModel.MaxAmount);
                 objParam[14] = new SqlParameter("@CreatedBy", searchModel.CreatedBy);
-                objParam[15] = new SqlParameter("@UtmSource", searchModel.UtmSource);
+                objParam[15] = new SqlParameter("@UtmSource", searchModel.UtmSource != null && searchModel.UtmSource[0] != null & searchModel.UtmSource[0] != -1 ? string.Join(",", searchModel.UtmSource) : DBNull.Value);
                 objParam[16] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
-                objParam[17] = new SqlParameter("@ClientStatus", searchModel.ClientStatus);
-      
-                var data =_DbWorker.GetDataTable(proc, objParam);
+                objParam[17] = new SqlParameter("@ClientStatus", searchModel.ClientStatus != null && searchModel.ClientStatus[0] != null & searchModel.ClientStatus[0] != -1 ? string.Join(",", searchModel.ClientStatus) : DBNull.Value);
+
+                var data = _DbWorker.GetDataTable(proc, objParam);
                 return data;
             }
             catch (Exception ex)
@@ -485,6 +485,7 @@ namespace DAL
                 {
                     var model = _DbContext.Client.FirstOrDefault(s => s.Id == id);
                     model.Status = status;
+                    model.UpdateTime = DateTime.Now;
                     var Update = _DbContext.Client.Update(model);
                     _DbContext.SaveChanges();
                     return 1;

@@ -173,8 +173,8 @@ namespace WEB.Adavigo.CMS.Controllers
                             searchModel.Email = searchModel.Email == null ? data[0].Email : searchModel.Email;
                             searchModel.Phone = searchModel.Phone == null ? data[0].Phone : searchModel.Phone;
                             searchModel.AgencyType = searchModel.AgencyType == -1 ? data[0].AgencyType : searchModel.AgencyType;
-                            searchModel.ClientType = searchModel.ClientType == -1 ? data[0].ClientType : searchModel.ClientType;
-                            searchModel.PermissionType = searchModel.PermissionType == -1 ? data[0].PermissionType : searchModel.PermissionType;
+                            searchModel.ClientType = searchModel.ClientType == null ? data[0].ClientType : searchModel.ClientType;
+                            searchModel.PermissionType = searchModel.PermissionType == null ? data[0].PermissionType : searchModel.PermissionType;
                             searchModel.CreateDate = searchModel.CreateDate == null ? data[0].CreateDate : searchModel.CreateDate;
                             searchModel.EndDate = searchModel.EndDate == null ? data[0].EndDate : searchModel.EndDate;
                             searchModel.MinAmount = searchModel.MinAmount == -1 ? data[0].MinAmount : searchModel.MinAmount;

@@ -18,6 +18,8 @@ let fieldsV2 = {
     NgayDuyet: false,
     NguoiTao: false,
     Status: true,
+    LastOrderDate: false,
+    LastOrderDateToDay: false,
 }
 let _searchModel = {
     MaKH: null,
@@ -36,6 +38,10 @@ let _searchModel = {
     ClientStatus: null,
 
 };
+let listClientTypeV2 = [];
+let listClientStatusV2 = [];
+let listPermisionTypeV2 = [];
+let listUtmSourceV2 = [];
 let cookieNameV2 = 'customer_manager_filterV2';
 let cookiesearchModel = 'customer_manager_searchModelV2';
 var timer;
@@ -196,13 +202,181 @@ $(document).ready(function () {
     _customer_managerV2.ClearlocalStorage();
     //var model = [{ url: '/', name: 'Trang chủ' }, { url: '/CustomerManagerManual/Index', name: 'Quản lý khách hàng', activated: true }]
     //_global_function.RenderBreadcumb(model)
+
+    const selectClientType = document.querySelector(".select-btn-ClientType");
+    const itemsClientType = document.querySelectorAll(".item-ClientType");
+    const selectClientStatus = document.querySelector(".select-btn-ClientStatus");
+    const itemsClientStatus = document.querySelectorAll(".item-ClientStatus");
+    const selectPermisionType = document.querySelector(".select-btn-PermisionType");
+    const itemsPermisionType = document.querySelectorAll(".item-PermisionType");
+    const selectUtmSource = document.querySelector(".select-btn-UtmSource");
+    const itemsUtmSource = document.querySelectorAll(".item-UtmSource");
+
+    $(document).click(function (event) {
+        var $target = $(event.target);
+
+        if (!$target.closest('#ClientType').length) {
+            if ($('#list-item-ClientType').is(":visible") && !$target[0].id.includes('ClientType_data') && !$target[0].id.includes('ClientType')
+                && !$target[0].id.includes('list-item-ClientType') && !$target[0].id.includes('checkbox_ClientType')) {
+                selectClientType.classList.toggle("open");
+            }
+        }
+
+
+    });
+    $(document).click(function (event) {
+        var $target = $(event.target);
+
+        if (!$target.closest('#ClientStatus').length) {
+            if ($('#list-item-ClientStatus').is(":visible") && !$target[0].id.includes('ClientStatus_data') && !$target[0].id.includes('ClientStatus')
+                && !$target[0].id.includes('list-item-ClientStatus') && !$target[0].id.includes('checkbox_ClientStatus')) {
+                selectClientStatus.classList.toggle("open");
+            }
+        }
+    });
+    $(document).click(function (event) {
+        var $target = $(event.target);
+
+        if (!$target.closest('#PermisionType').length) {
+            if ($('#list-item-PermisionType').is(":visible") && !$target[0].id.includes('PermisionType_data') && !$target[0].id.includes('PermisionType')
+                && !$target[0].id.includes('list-item-PermisionType') && !$target[0].id.includes('checkbox_PermisionType')) {
+                selectPermisionType.classList.toggle("open");
+            }
+        }
+    });
+    $(document).click(function (event) {
+        var $target = $(event.target);
+
+        if (!$target.closest('#UtmSource').length) {
+            if ($('#list-item-UtmSource').is(":visible") && !$target[0].id.includes('UtmSource_data') && !$target[0].id.includes('UtmSource')
+                && !$target[0].id.includes('list-item-UtmSource') && !$target[0].id.includes('checkbox_UtmSource')) {
+                selectUtmSource.classList.toggle("open");
+            }
+        }
+    });
+    selectClientType.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectClientType.classList.toggle("open");
+    });
+    selectClientStatus.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectClientStatus.classList.toggle("open");
+    });
+    selectPermisionType.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectPermisionType.classList.toggle("open");
+    });
+    selectUtmSource.addEventListener("click", (e) => {
+        e.preventDefault();
+        selectUtmSource.classList.toggle("open");
+    });
+    itemsClientType.forEach(item => {
+        item.addEventListener("click", () => {
+            item.classList.toggle("checked");
+
+            let checked = document.querySelectorAll("#list-item-ClientType .checked"),
+                btnText = document.querySelector(".btn-text-ClientType");
+            let listService = []
+             listClientTypeV2= []
+            for (var i = 0; i < checked.length; i++) {
+                id = checked[i].getAttribute('id')
+                if (listClientTypeV2 && id.includes('ClientType_data_')) {
+                    listService.push(checked[i]);
+                }
+                listClientTypeV2.push(parseInt(id.replace('ClientType_data_', '')))
+
+            }
+            if (listService.length > 0) {
+                btnText.innerText = `${listService.length} Selected`;
+            } else {
+                btnText.innerText = "Tất cả hình thức thanh toán";
+            }
+
+
+        });
+    })
+    itemsClientStatus.forEach(item => {
+        item.addEventListener("click", () => {
+            item.classList.toggle("checked");
+
+            let checked = document.querySelectorAll("#list-item-ClientStatus .checked"),
+                btnText = document.querySelector(".btn-text-ClientStatus");
+            let listService = []
+             listClientStatusV2= []
+            for (var i = 0; i < checked.length; i++) {
+                id = checked[i].getAttribute('id')
+                if (listClientStatusV2 && id.includes('ClientStatus_data_')) {
+                    listService.push(checked[i]);
+                }
+                listClientStatusV2.push(parseInt(id.replace('ClientStatus_data_', '')))
+
+            }
+            if (listService.length > 0) {
+                btnText.innerText = `${listService.length} Selected`;
+            } else {
+                btnText.innerText = "Tất cả Trạng thái";
+            }
+
+
+        });
+    })
+    itemsPermisionType.forEach(item => {
+        item.addEventListener("click", () => {
+            item.classList.toggle("checked");
+
+            let checked = document.querySelectorAll("#list-item-PermisionType .checked"),
+                btnText = document.querySelector(".btn-text-PermisionType");
+            var listService = []
+            listPermisionTypeV2 = []
+            for (var i = 0; i < checked.length; i++) {
+                id = checked[i].getAttribute('id')
+                if (listPermisionTypeV2 && id.includes('PermisionType_data_')) {
+                    listService.push(checked[i]);
+                }
+                listPermisionTypeV2.push(parseInt(id.replace('PermisionType_data_', '')))
+
+            }
+            if (listService.length > 0) {
+                btnText.innerText = `${listService.length} Selected`;
+            } else {
+                btnText.innerText = "Tất cả nhóm khách hàng";
+            }
+
+
+        });
+    })
+    itemsUtmSource.forEach(item => {
+        item.addEventListener("click", () => {
+            item.classList.toggle("checked");
+
+            let checked = document.querySelectorAll("#list-item-UtmSource .checked"),
+                btnText = document.querySelector(".btn-text-UtmSource");
+            let listService = []
+            listUtmSourceV2 = []
+            for (var i = 0; i < checked.length; i++) {
+                id = checked[i].getAttribute('id')
+                if (listUtmSourceV2 && id.includes('UtmSource_data_')) {
+                    listService.push(checked[i]);
+                }
+                listUtmSourceV2.push(parseInt(id.replace('UtmSource_data_', '')))
+
+            }
+            if (listService.length > 0) {
+                btnText.innerText = `${listService.length} Selected`;
+            } else {
+                btnText.innerText = "Tất cả Nguồn khách hàng";
+            }
+
+
+        });
+    })
 });
 
 var _customer_managerV2 = {
 
     LoaddataClient: function () {
         var objSearch = this.SearchParam;
-        var x = localStorage.getItem("cookiesearchModelV2");
+        var x = _customer_managerV2.getCookie("cookiesearchModelV2");
         if (x != null) {
             
             input = JSON.parse(x)
@@ -223,6 +397,34 @@ var _customer_managerV2 = {
             _searchModel.EndDate = input.EndDate
             _searchModel.ClientStatus = input.ClientStatus
             objSearch = _searchModel
+            if (input.UtmSource.length > 0) {
+                var btnTextUtmSource = document.querySelector(".btn-text-UtmSource");
+                btnTextUtmSource.innerText = `${input.UtmSource.length} Selected`;
+                for (var i = 0; i < input.UtmSource.length; i++) {
+                    $('#UtmSource_data_' + input.UtmSource[i] + '').addClass('checked')
+                }
+            } 
+            if (input.PermissionType.length > 0) {
+                var btnTextPermissionType = document.querySelector(".btn-text-PermisionType");
+                btnTextPermissionType.innerText = `${input.PermissionType.length} Selected`;
+                for (var i = 0; i < input.PermissionType.length; i++) {
+                    $('#PermisionType_data_' + input.PermissionType[i] + '').addClass('checked')
+                }
+            } 
+            if (input.ClientStatus.length > 0) {
+                var btnTextClientStatus = document.querySelector(".btn-text-ClientStatus");
+                btnTextClientStatus.innerText = `${input.ClientStatus.length} Selected`;
+                for (var i = 0; i < input.ClientStatus.length; i++) {
+                    $('#ClientStatus_data_' + input.ClientStatus[i] + '').addClass('checked')
+                }
+            } 
+            if (input.ClientType.length > 0) {
+                var btnTextClientType = document.querySelector(".btn-text-ClientType");
+                btnTextClientType.innerText = `${input.ClientType.length} Selected`;
+                for (var i = 0; i < input.ClientType.length; i++) {
+                    $('#ClientType_data_' + input.ClientType[i] + '').addClass('checked')
+                }
+            } 
         }
         else {
         let _searchModel = {
@@ -414,10 +616,10 @@ var _customer_managerV2 = {
             Email: null,
             Phone: null,
             AgencyType: $('#AgencyType').val(),
-            ClientType: $('#ClientType').val(),
-            ClientStatus: $('#ClientStatus').val(),
-            PermissionType: $('#PermisionType').val(),
-            UtmSource: $('#UtmSource').val(),
+            ClientType: listClientTypeV2,
+            ClientStatus: listClientStatusV2,
+            PermissionType: listPermisionTypeV2,
+            UtmSource: listUtmSourceV2,
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -629,11 +831,32 @@ var _customer_managerV2 = {
                 } else {
                     fieldsV2.NguoiTao = false
                 }
+                this.eraseCookie(cookieNameV2);
+                this.setCookie(cookieNameV2, JSON.stringify(fieldsV2), 10);
+                break;
             case 13:
                 if ($('.grid-slide #Status').is(":checked")) {
                     fieldsV2.Status = true
                 } else {
                     fieldsV2.Status = false
+                }
+                this.eraseCookie(cookieNameV2);
+                this.setCookie(cookieNameV2, JSON.stringify(fieldsV2), 10);
+                break;
+            case 17:
+                if ($('.grid-slide #LastOrderDate').is(":checked")) {
+                    fieldsV2.LastOrderDate = true
+                } else {
+                    fieldsV2.LastOrderDate = false
+                }
+                this.eraseCookie(cookieNameV2);
+                this.setCookie(cookieNameV2, JSON.stringify(fieldsV2), 10);
+                break;
+            case 18:
+                if ($('.grid-slide #LastOrderDateToDay').is(":checked")) {
+                    fieldsV2.LastOrderDateToDay = true
+                } else {
+                    fieldsV2.LastOrderDateToDay = false
                 }
                 this.eraseCookie(cookieNameV2);
                 this.setCookie(cookieNameV2, JSON.stringify(fieldsV2), 10);
@@ -745,10 +968,10 @@ var _customer_managerV2 = {
             Phone: null,
             CacheName: null,
             AgencyType: $('#AgencyType').val(),
-            ClientType: $('#ClientType').val(),
-            ClientStatus: $('#ClientStatus').val(),
-            PermissionType: $('#PermisionType').val(),
-            UtmSource: $('#UtmSource').val(),
+            ClientType: listClientTypeV2,
+            ClientStatus: listClientStatusV2,
+            PermissionType: listPermisionTypeV2,
+            UtmSource: listUtmSourceV2,
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -783,9 +1006,17 @@ var _customer_managerV2 = {
         }
         var objSearch = this.SearchParam;
         objSearch = _searchModel;
-
-        localStorage.setItem("cookiesearchModelV2", JSON.stringify(_searchModel));
-        
+        _customer_managerV2.setCookie("cookiesearchModelV2", JSON.stringify(_searchModel),1)
+        window.localStorage.setItem("cookiesearchModelV2", JSON.stringify(_searchModel));
+        $('.form-down-filter').attr("style", "width: 600px; display: none;")
+        $('.onclick-active').addClass("onclick")
+        $('.onclick').removeClass("onclick-active")
+        $(".onclick-active").addClass('onclick');
+        $(".onclick-active").removeClass('onclick-active');
+        $(".form-down").slideUp();
+        $(".onclick-togle, .dropdown .dropbtn,.down-up .onclick").removeClass('active');
+        $(".dropdown.active").find('.dropdown-content').slideUp();
+        $(".select--v2__content").slideUp();
         this.SearchClient(objSearch);
         
     },
@@ -1026,9 +1257,10 @@ var _customer_managerV2 = {
             Email: null,
             Phone: null,
             AgencyType: $('#AgencyType').val(),
-            ClientType: $('#ClientType').val(),
-            PermissionType: $('#PermisionType').val(),
-            UtmSource: $('#UtmSource').val(),
+            ClientType: listClientTypeV2,
+            ClientStatus: listClientStatusV2,
+            PermissionType: listPermisionTypeV2,
+            UtmSource: listUtmSourceV2,
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -1111,9 +1343,10 @@ var _customer_managerV2 = {
             Email: null,
             Phone: null,
             AgencyType: $('#AgencyType').val(),
-            ClientType: $('#ClientType').val(),
-            PermissionType: $('#PermisionType').val(),
-            UtmSource: $('#UtmSource').val(),
+            ClientType: listClientTypeV2,
+            ClientStatus: listClientStatusV2,
+            PermissionType: listPermisionTypeV2,
+            UtmSource: listUtmSourceV2,
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -1182,10 +1415,10 @@ var _customer_managerV2 = {
             Phone: null,
             CacheName: null,
             AgencyType: $('#AgencyType').val(),
-            ClientType: $('#ClientType').val(),
-            PermissionType: $('#PermisionType').val(),
-            ClientStatus: $('#ClientStatus').val(),
-            UtmSource: $('#UtmSource').val(),
+            ClientType: listClientTypeV2,
+            ClientStatus: listClientStatusV2,
+            PermissionType: listPermisionTypeV2,
+            UtmSource: listUtmSourceV2,
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -1220,8 +1453,8 @@ var _customer_managerV2 = {
         }
         var objSearch = this.SearchParam;
         objSearch = _searchModel;
-
-
+        _customer_managerV2.setCookie("cookiesearchModelV2", JSON.stringify(_searchModel), 1)
+        localStorage.setItem("cookiesearchModelV2", JSON.stringify(_searchModel));
         $(".onclick-active").addClass('onclick');
         $(".onclick-active").removeClass('onclick-active');
         $(".form-down").slideUp();
@@ -1264,9 +1497,10 @@ var _customer_managerV2 = {
             Phone: null,
             CacheName: Cache_Name,
             AgencyType: $('#AgencyType').val(),
-            ClientType: $('#ClientType').val(),
-            PermissionType: $('#PermisionType').val(),
-            UtmSource: $('#UtmSource').val(),
+            ClientType: listClientTypeV2,
+            ClientStatus: listClientStatusV2,
+            PermissionType: listPermisionTypeV2,
+            UtmSource: listUtmSourceV2,
             CreateDate: CreateDate,
             EndDate: EndDate,
             MinAmount: $('#minamount').val().replaceAll(',', ''),
@@ -1302,6 +1536,28 @@ var _customer_managerV2 = {
         $('#maxamount').val('');
 
 
+    },
+    eraseCookie: function (name) {
+        document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    },
+    getCookie: function (name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    },
+    setCookie: function (name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
     },
 }
 

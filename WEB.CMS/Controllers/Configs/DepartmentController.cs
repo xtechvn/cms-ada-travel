@@ -52,7 +52,8 @@ namespace WEB.Adavigo.CMS.Controllers.Configs
                     Description = department.Description,
                     DepartmentCode = department.DepartmentCode,
                     DepartmentName = department.DepartmentName,
-                    Branch = department.Branch
+                    Branch = department.Branch,
+                    Status = department.Status
                 };
             }
             ViewBag.Branch = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);

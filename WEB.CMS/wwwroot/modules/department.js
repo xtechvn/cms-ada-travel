@@ -89,6 +89,7 @@ var _department = {
         let formData = this.GetFormData(Form);
         console.log(formData);
         formData['Branch'] = $('#branch-code').find(':selected').val();
+        formData['Status'] = $('#branch-status').find(':selected').val();
 
         let url = "/Department/AddOrUpdate";
         _ajax_caller.post(url, { model: formData }, function (result) {

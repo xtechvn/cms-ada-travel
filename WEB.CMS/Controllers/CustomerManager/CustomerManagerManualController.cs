@@ -15,6 +15,7 @@ using Repositories.IRepositories;
 using Repositories.Repositories;
 using StackExchange.Redis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
@@ -423,10 +424,10 @@ namespace WEB.CMS.Controllers.CustomerManager
                             searchModel.Email = searchModel.Email == null ? data[0].Email : searchModel.Email;
                             searchModel.Phone = searchModel.Phone == null ? data[0].Phone : searchModel.Phone;
                             searchModel.AgencyType = searchModel.AgencyType == -1 ? data[0].AgencyType : searchModel.AgencyType;
-                            searchModel.ClientType = searchModel.ClientType == -1 ? data[0].ClientType : searchModel.ClientType;
-                            searchModel.ClientStatus = searchModel.ClientStatus == -1 ? data[0].ClientStatus : searchModel.ClientStatus;
-                            searchModel.UtmSource = searchModel.UtmSource == -1 ? data[0].UtmSource : searchModel.UtmSource;
-                            searchModel.PermissionType = searchModel.PermissionType == -1 ? data[0].PermissionType : searchModel.PermissionType;
+                            searchModel.ClientType = searchModel.ClientType == null ? data[0].ClientType : searchModel.ClientType;
+                            searchModel.ClientStatus = searchModel.ClientStatus == null ? data[0].ClientStatus : searchModel.ClientStatus;
+                            searchModel.UtmSource = searchModel.UtmSource == null ? data[0].UtmSource : searchModel.UtmSource;
+                            searchModel.PermissionType = searchModel.PermissionType == null ? data[0].PermissionType : searchModel.PermissionType;
                             searchModel.CreateDate = searchModel.CreateDate == null ? data[0].CreateDate : searchModel.CreateDate;
                             searchModel.EndDate = searchModel.EndDate == null ? data[0].EndDate : searchModel.EndDate;
                             searchModel.MinAmount = searchModel.MinAmount == -1 ? data[0].MinAmount : searchModel.MinAmount;
@@ -485,8 +486,8 @@ namespace WEB.CMS.Controllers.CustomerManager
                     CommentClient.ClientId = item.Id.ToString();
                     var ListComment = _commentClientMongoService.GetListComment(CommentClient);
 
-                    item.ListComment = _commentClientMongoService.CommentNew(CommentClient); ;
-                    item.ListCommentNhuCau = _commentClientMongoService.CommentNhuCau(CommentClient); ;
+                    item.ListComment = _commentClientMongoService.CommentNew(CommentClient);
+                    item.ListCommentNhuCau = _commentClientMongoService.CommentNhuCau(CommentClient);
 
                 }
             }
@@ -542,7 +543,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 }
                 else
                 {
-                    model.Note = "Cập nhật trạng thái khách hàng :" + ClientType.FirstOrDefault(s => s.CodeValue == Status).Description + ".Mô tả :" + Note;
+                    model.Note =  Note;
                 }
                 var InsertComment = await _commentClientMongoService.InsertCommentClient(model);
                 if (Status != 99)
@@ -742,7 +743,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("ImportWSExcelListing - OrderController: " + ex.ToString());
+                LogHelper.InsertLogTelegram("ImportWSExcelListing - CustomerManagerManualController: " + ex.ToString());
                 return PartialView();
             }
         }
@@ -823,7 +824,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("ImportWSExcelUpload - OrderController: " + ex.ToString());
+                LogHelper.InsertLogTelegram("ImportWSExcelUpload - CustomerManagerManualController: " + ex.ToString());
                 return PartialView();
             }
         }
@@ -866,8 +867,9 @@ namespace WEB.CMS.Controllers.CustomerManager
         }
         public async Task<IActionResult> PopupAddclient(int type)
         {
+            var data = await _departmentRepository.GetAll(String.Empty);
             ViewBag.type = type;
-            ViewBag.DepartmentList = await _departmentRepository.GetAll(String.Empty);
+            ViewBag.DepartmentList = data.Where(s=>s.Status==1).ToList();
 
             return PartialView();
         }
@@ -876,6 +878,12 @@ namespace WEB.CMS.Controllers.CustomerManager
 
             try
             {
+
+                int _UserId = 0;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
                 if (model != null && model != "")
                 {
                     List<ClientExcelImportModel> success_model = new List<ClientExcelImportModel>();
@@ -915,6 +923,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                         model_client.ClientCode = ClientCode;
                         model_client.UtmSource = item.UtmSource;
                         model_client.JoinDate = DateTime.Now;
+                        model_client.CreatedBy = _UserId;
 
 
                         var Result = await _customerManagerRepositories.CreateClient(model_client);
@@ -933,11 +942,6 @@ namespace WEB.CMS.Controllers.CustomerManager
                             var link= "/CustomerManagerManual/Detail/"+Result;
                             apiService.SendMessage(item.UserId.ToString(), ((int)ModuleType.KHACH_HANG).ToString(), ((int)Utilities.Contants.ActionType.KHACH_HANG).ToString(), ClientCode, link, "1", item.Client_name);
 
-                            int _UserId = 0;
-                            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                            {
-                                _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                            }
 
                             var clientdetail = await _clientRepository.GetClientByClientCode(ClientCode);
                             _workQueueClient.SyncES(clientdetail.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
@@ -975,7 +979,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("Addclient - OrderController: " + ex.ToString());
+                LogHelper.InsertLogTelegram("Addclient - CustomerManagerManualController: " + ex.ToString());
                 return Ok(new
                 {
                     isSuccess = (int)ResponseType.FAILED,
@@ -983,6 +987,59 @@ namespace WEB.CMS.Controllers.CustomerManager
 
                 });
             }
+        }
+        public async Task<IActionResult> PopNhuCau(string Clientid)
+        {
+            try
+            {
+                var CommentClient = new CommentClientMongoModel();
+                CommentClient.ClientId = Clientid;
+                var CommentNhuCau = _commentClientMongoService.CommentNhuCau(CommentClient);
+                ViewBag.id = Clientid;
+                ViewBag.Note = CommentNhuCau!=null? CommentNhuCau.Note:"";
+                return PartialView();
+            }
+            catch(Exception ex)
+            {
+                LogHelper.InsertLogTelegram("PopNhuCau -: " + ex.ToString());
+            }
+            return PartialView();
+        }
+        public async Task<IActionResult> UpdateNhuCau(string Clientid,string note)
+        {
+            try
+            {
+                var CommentClient = new CommentClientMongoModel();
+                CommentClient.ClientId = Clientid;
+                var CommentNhuCau = _commentClientMongoService.CommentNhuCau(CommentClient);
+                CommentNhuCau.Note = note;
+                var update=await   _commentClientMongoService.updateCommentClient(CommentNhuCau);
+                if(update>0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        msg = "Cập nhật nhu cầu thành công ",
+                    });
+                }
+                return Ok(new
+                {
+                    status = (int)ResponseType.FAILED,
+                    msg = "Cập nhật nhu cầu không thành công ",
+
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("PopNhuCau -: " + ex.ToString());
+                return Ok(new
+                {
+                    status = (int)ResponseType.FAILED,
+                    msg = "Cập nhật nhu cầu không thành công ",
+
+                });
+            }
+           
         }
     }
 }

@@ -154,5 +154,29 @@ namespace WEB.CMS.Service
             }
             return list_Recruitment;
         }
+        public async Task<long> updateCommentClient(CommentClientMongoModel model)
+        {
+            try
+            {
+                string url = "mongodb://" + configuration["DataBaseConfig:MongoServer:user"] + ":" + configuration["DataBaseConfig:MongoServer:pwd"] + "@" + configuration["DataBaseConfig:MongoServer:Host"] + ":" + configuration["DataBaseConfig:MongoServer:Port"] + "/" + configuration["DataBaseConfig:MongoServer:catalog_log"];
+                var client = new MongoClient(url);
+
+                IMongoDatabase db = client.GetDatabase(configuration["DataBaseConfig:MongoServer:catalog_log"]);
+  
+                IMongoCollection<CommentClientMongoModel> affCollection = db.GetCollection<CommentClientMongoModel>(configuration["DataBaseConfig:MongoServer:Comment_Clent_collection"]);
+
+                var filter = Builders<CommentClientMongoModel>.Filter;
+                var filterDefinition = filter.And(
+                    filter.Eq("_id", model._id));
+                await affCollection.FindOneAndReplaceAsync(filterDefinition, model);
+
+                return model.UserId;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("PushLog - CommentClientMongoService: " + ex.Message);
+            }
+            return 0;
+        }
     }
 }

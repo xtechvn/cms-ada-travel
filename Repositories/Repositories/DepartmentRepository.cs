@@ -40,12 +40,12 @@ namespace Repositories.IRepositories
                 if (model.ParentId != null && model.ParentId.Value > 0) parent_model = await GetById(model.ParentId.Value);
 
                 model.FullParent = parent_model != null ? $"{(!String.IsNullOrEmpty(parent_model.FullParent) ? $"{parent_model.FullParent}," : String.Empty)}{parent_model.Id}" : String.Empty;
-                model.Status = 0;
+                model.Status = model.Status == null ? 0 : model.Status;
                 model.CreatedDate = DateTime.Now;
                 model.CreatedBy = _SysUserModel.Id;
                 var data = await _DepartmentDAL.CreateAsync(model);
-                var update = await GetById(model.Id);
-                update.FullParent += ","+data;
+                var update = await GetById((int)data);
+                update.FullParent += "," + data;
                 await _DepartmentDAL.UpdateAsync(update);
                 return data;
             }
@@ -73,6 +73,7 @@ namespace Repositories.IRepositories
                 data.UpdatedDate = DateTime.Now;
                 data.UpdatedBy = _SysUserModel.Id;
                 data.Branch = model.Branch;
+                data.Status = model.Status;
 
                 await _DepartmentDAL.UpdateAsync(data);
                 return model.Id;
@@ -2715,7 +2716,7 @@ namespace Repositories.IRepositories
                     cell.SetColumnWidth(5, 40);
                     cell.SetColumnWidth(6, 40);
                     cell.SetColumnWidth(7, 40);
-                   
+
                     // Set header value
 
                     ws.Cells["A1"].PutValue("STT");
@@ -2882,7 +2883,7 @@ namespace Repositories.IRepositories
 
                     #region Body
 
-                    range = cell.CreateRange(1, 0, data.Count , 6);
+                    range = cell.CreateRange(1, 0, data.Count, 6);
                     style = ws.Cells["A2"].GetStyle();
                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                     style.Borders[BorderType.TopBorder].Color = Color.Black;

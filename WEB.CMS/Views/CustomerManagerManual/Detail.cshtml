@@ -68,6 +68,7 @@
                         <b class="btn btn-default cancel ml-1" onclick="history.back()">Quay lại</b>
                         <button type="button" class="btn btn-default ml-1" onclick="_customer_managerV2.OpenPopup('@ViewBag.id')">Sửa thông tin khách hàng</button>
                         <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.PopUpClientStatus('@ViewBag.id')">Cập nhật trạng thái khách hàng</button>
+                        <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.PopUpNhuCau('@ViewBag.id')">Cập nhật nhu cầu</button>
                         @if (data_UserAgent != null && data_UserAgent.Count > 0)
                         {
                             <button type="button" class="btn btn-default ml-1" onclick="_customer_manager_Detail.OpenPopupUserAgent('@data_UserAgent[0].Id',@ViewBag.id)">Đổi nhân viên phụ trách</button>

@@ -34,5 +34,6 @@ namespace Entities.Models
         public string ReferralId { get; set; }
         public int? ParentId { get; set; }
         public int? UtmSource { get; set; }
+        public int? CreatedBy { get; set; }
     }
 }

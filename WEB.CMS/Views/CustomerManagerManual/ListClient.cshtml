@@ -42,8 +42,8 @@ else
                         <th style="width: 100px;">Nguồn</th>
                         <th>Nhu cầu</th>
                         <th>Phản hồi gần nhất</th>
-                        <th>Ngày tạo đơn cuối</th>
-                        <th>Số Ngày tạo đơn cuối</th>
+                        <th class="mfp-hide">Ngày tạo đơn cuối</th>
+                        <th class="mfp-hide">Số Ngày tạo đơn cuối</th>
 
                         @*<th class="mfp-hide" style="width: 100px;">Trạng thái tài khoản</th>*@
                     </tr>
@@ -78,7 +78,7 @@ else
 
 
                                 <td class="mfp-hide">@item.JoinDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                <td class="mfp-hide">@(item.UpdateLast != "" ?Convert.ToDateTime(item.UpdateLast).ToString("dd/MM/yyy HH:mm:ss") : "N/A")</td>
+                                <td class="mfp-hide">@(item.UpdateTime != null ?Convert.ToDateTime(item.UpdateTime).ToString("dd/MM/yyy HH:mm:ss") : "N/A")</td>
                                 <td class="mfp-hide">@(item.Create_name == null ? "N/A" : item.Create_name)</td>
                                 <td class="mfp-hide">
                                     @switch ((int)item.Status)
@@ -86,24 +86,42 @@ else
                                         case (int)(ClientStatus.KH_MOI):
                                         case (int)(ClientStatus.CHUA_TC):
                                             {
-                                                <p class="m-0 status-oranger">
+                                                <p class="m-0 status-oranger" style="background:#ff6d01!important">
                                                     @item.StatusName
                                                 </p>
                                             }
                                             break;
                                         case (int)(ClientStatus.DA_TC):
+                                            {
+                                                <p class="m-0 status-green" style="background:#46bdc6!important">
+                                                    @item.StatusName
+                                                </p>
+                                            }
+                                            break;
                                         case (int)(ClientStatus.TIEM_NANG):
+                                            {
+                                                <p class="m-0 status-green" style="background:#4285f4!important">
+                                                    @item.StatusName
+                                                </p>
+                                            }
+                                            break;
                                         case (int)(ClientStatus.DA_GUI_BG):
+                                            {
+                                                <p class="m-0 status-green" style="background:#46bdc6!important">
+                                                    @item.StatusName
+                                                </p>
+                                            }
+                                            break;
                                         case (int)(ClientStatus.CHOT):
                                             {
-                                                <p class="m-0 status-green">
+                                                <p class="m-0 status-green" style="background: #ffff00!important">
                                                     @item.StatusName
                                                 </p>
                                             }
                                             break;
                                         case (int)(ClientStatus.MAT):
                                             {
-                                                <p class="m-0 status-green">
+                                                <p class="m-0 status-red">
                                                     @item.StatusName
                                                 </p>
                                             }
@@ -128,14 +146,14 @@ else
                                         }
                                     </div>
                                 </td>
-                                <td class="">
+                                <td class="mfp-hide">
                                     <div>
 
                                         @(item.LastOrderDate!= DateTime.MinValue ? item.LastOrderDate.ToString("dd/MM/yyyy"):"")
 
                                     </div>
                                 </td>
-                                <td>
+                                <td class="mfp-hide">
                                     @(item.LastOrderDate != DateTime.MinValue ? Math.Round((DateTime.Now - item.LastOrderDate).TotalDays) : 0)
                                 </td>
 

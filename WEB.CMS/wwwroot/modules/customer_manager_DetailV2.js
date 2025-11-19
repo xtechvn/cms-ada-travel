@@ -558,5 +558,38 @@ var _customer_manager_Detail = {
             });
         }
     },
+    PopUpNhuCau: function (id) {
+        let title = 'Cập nhật nhu cầu';
+  
+        let url = '/CustomerManagerManual/PopNhuCau';
+        let param = {
+            Clientid: id,
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    UpdateNhuCau: function () {
+        var Client_id = $('#Clientid_NC').val();
+        var Client_Note = $('#Client_Note_NC').val();
+        _global_function.AddLoading()
+        $.ajax({
+            url: '/CustomerManagerManual/UpdateNhuCau',
+            type: "post",
+            data: { Clientid: Client_id, note: Client_Note },
+            success: function (result) {
+                _global_function.RemoveLoading()
+                if (result.status === 1) {
+                    _msgalert.error(result.msg);
+                }
+                if (result.status === 0) {
+                    _msgalert.success(result.msg);
+                    setTimeout(function () {
+                        $.magnificPopup.close();
+                        location.reload();
+                    }, 500);
+
+                }
+            }
+        });
+    },
 }
 

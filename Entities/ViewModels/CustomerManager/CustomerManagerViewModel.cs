@@ -58,9 +58,9 @@ namespace Entities.ViewModels.CustomerManager
         public string Email { get; set; }
         public string Phone { get; set; }
         public int AgencyType { get; set; } = -1;
-        public int ClientType { get; set; } = -1;
-        public int ClientStatus { get; set; } = -1;
-        public int PermissionType { get; set; } = -1;
+        public List<int?> ClientType { get; set; } 
+        public List<int?> ClientStatus { get; set; } 
+        public List<int?> PermissionType { get; set; } 
         public int PageIndex { get; set; }
         public int PageSize { get; set; }
         public string CreateDate { get; set; }
@@ -70,7 +70,7 @@ namespace Entities.ViewModels.CustomerManager
         public string SalerPermission { get; set; }
         public string CacheName { get; set; }
         public string _id { get; set; }
-        public int UtmSource { get; set; } = -1;
+        public List<int?> UtmSource { get; set; } 
 
     }
 
@@ -99,6 +99,7 @@ namespace Entities.ViewModels.CustomerManager
         public string ClientCode { get; set; }
         public DateTime JoinDate { get; set; }
         public int UtmSource { get; set; } = 0;
+        public int CreatedBy { get; set; } = 0;
 
     }
     public class AmountRemainView
@@ -130,4 +131,5 @@ namespace Entities.ViewModels.CustomerManager
         public double TotalAmount { get; set; }
         
     }
+    
 }
