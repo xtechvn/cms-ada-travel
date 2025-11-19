@@ -37,14 +37,16 @@
         <!-- Form Comment -->
         <form id="commentForm" enctype="multipart/form-data" onsubmit="return false">
             <textarea id="commentContent" class="form-control commentContent" name="commentContent" style="min-height:100px;" placeholder="Nhập nội dung comment"></textarea>
-
+            <div id="grid_data_File">
+                <partial name="_Skeleton" />
+            </div>
             <button type="button" class="btn btn-primary mt10" onclick="_customer_manager_Detail.addComment(@ViewBag.ClientId)">Gửi</button>
         </form>
     </div>
 </div>
 <script>
     const textarea = document.getElementById('commentContent');
-  
+
     textarea.addEventListener("keydown", function (e) {
       if (e.key === "Enter") {
         if (e.shiftKey || e.ctrlKey) {
@@ -61,12 +63,13 @@
             console.log('Xuống dòng (Shift+Enter hoặc Ctrl+Enter)');
         } else {
           // Enter thường => gửi comment
-        
+
           console.log('Enter gửi comment');
-        
+
         }
       }
     });
+    _customer_manager_Detail.LoadFile(@ViewBag.ClientId)
 </script>
 <style>
     .comment-list-wrapper {

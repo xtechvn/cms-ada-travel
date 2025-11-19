@@ -495,10 +495,11 @@ var _customer_manager_Detail = {
                 success: function (result) {
                     if (result.status === 0) {
                         _msgalert.success(result.msg);
+                        _customer_manager_Detail.ConfirmFileUploadComment($('.attachment-file-block'), id)
                         setTimeout(function () {
                            
                             _customer_manager_Detail.ReLoadCommentClient();
-                        }, 500);
+                        }, 1000);
                     } else {
                         _msgalert.error(result.msg);
                     }
@@ -586,6 +587,89 @@ var _customer_manager_Detail = {
                         $.magnificPopup.close();
                         location.reload();
                     }, 500);
+
+                }
+            }
+        });
+    },
+    RenderFileAttachment: function (element, data_id, type, allow_edit = true, allow_preview = false, separate_confirm = false) {
+        var data = {
+            id: element.attr('id'),
+            DataId: data_id,
+            Type: type,
+            option: {
+                allow_edit: allow_edit,
+                allow_preview: allow_preview,
+                separate_confirm: separate_confirm
+            }
+        }
+        $.ajax({
+            url: "/CustomerManagerManual/Widget",
+            data: data,
+            type: "POST",
+            success: function (result) {
+                element.html(result)
+
+            }
+        });
+    },
+    LoadFile: function (input, type) {
+
+        var data = {
+            id: $('#grid_data_File').attr('id'),
+            DataId: input,
+            Type: type,
+            option: {
+                allow_edit: true,
+                allow_preview: false,
+                separate_confirm: false
+            }
+        }
+        $.ajax({
+            url: "/CustomerManagerManual/Widget",
+            data: data,
+            type: "POST",
+            success: function (result) {
+                $('#grid_data_File').html(result)
+
+            }
+        });
+    },
+    ConfirmFileUploadComment: function (element, data_id) {
+        if (data_id != null && data_id != undefined) {
+            element.find('.attachment-widget').attr('data-dataid', data_id)
+        }
+        element.find('.confirm-file-comment').trigger('click')
+
+        var widget = $('.file-widget-' + data_id)
+        var list = []
+        widget.find('.file').each(function (item) {
+            var ele = $(this)
+            list.push(
+                {
+                    id: ele.attr('data-id'),
+                    path: ele.attr('data-path'),
+                    ext: ele.attr('data-ext')
+                }
+            );
+        });
+        var object_summit = {
+            files: list,
+            data_id: widget.attr('data-dataid'),
+            service_type: widget.attr('data-type')
+        }
+        $.ajax({
+            url: "/CustomerManagerManual/ConfirmFileUpload",
+            data: object_summit,
+            type: "POST",
+            success: function (result) {
+                if ( result.status == 0) {
+                    _msgalert.success('Lưu tệp đính kèm thành công')
+                    widget.find(".attachfile-add").val(null);
+
+                }
+                else  {
+                    _msgalert.error('Lưu tệp đính kèm thất bại, vui lòng liên hệ IT')
 
                 }
             }

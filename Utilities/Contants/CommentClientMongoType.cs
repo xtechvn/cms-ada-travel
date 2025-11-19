@@ -8,6 +8,7 @@ namespace Utilities.Contants
 {
     public enum CommentClientMongoType
     {
+        file = 3, // Nhu cầu
         nhu_cau = 2, // Nhu cầu
         Phan_hoi = 1, // Nhu cầu
     }

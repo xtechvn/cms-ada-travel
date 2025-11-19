@@ -2,6 +2,7 @@
 using Caching.Elasticsearch;
 using Entities.Models;
 using Entities.ViewModels;
+using Entities.ViewModels.Attachment;
 using Entities.ViewModels.CustomerManager;
 using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.Mongo;
@@ -22,6 +23,7 @@ using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
+using WEB.CMS.Models;
 using WEB.CMS.Service;
 
 namespace WEB.CMS.Controllers.CustomerManager
@@ -42,6 +44,7 @@ namespace WEB.CMS.Controllers.CustomerManager
         private readonly WorkQueueClient _workQueueClient;
         private APIService apiService;
         private readonly IIdentifierServiceRepository _identifierServiceRepository;
+        private readonly Models.AppSettings config;
         public CustomerManagerManualController(IConfiguration configuration, ManagementUser managementUser, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
             ICustomerManagerRepository customerManagerRepositories, IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IDepartmentRepository departmentRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
@@ -59,6 +62,7 @@ namespace WEB.CMS.Controllers.CustomerManager
             _workQueueClient = new WorkQueueClient(configuration);
             _identifierServiceRepository = identifierServiceRepository;
             apiService = new APIService(configuration, userRepository);
+            config = ReadFile.LoadConfig();
         }
         public async Task<IActionResult> Index()
         {
@@ -1040,6 +1044,124 @@ namespace WEB.CMS.Controllers.CustomerManager
                 });
             }
            
+        }
+        public async Task<IActionResult> ConfirmFileUpload(List<AttachfileViewModel> files, long data_id, int service_type)
+        {
+            try
+            {
+                var key = MFAService.Get_AESKey(MFAService.ConvertBase64StringToByte(ReadFile.LoadConfig().AES_KEY));
+                var iv = MFAService.Get_AESIV(MFAService.ConvertBase64StringToByte(ReadFile.LoadConfig().AES_IV));
+
+
+                var _UserLogin = 0;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserLogin = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                if (files != null && files.Count > 0)
+                {
+                    string url_post = config.IMAGE_DOMAIN + config.API_STATIC_UPLOADFILE;
+                    var _httpClient = new HttpClient();
+                    foreach (var file in files)
+                    {
+                        string full_path = Directory.GetCurrentDirectory() + "\\wwwroot\\" + file.path.Replace("/", "\\");
+                        try
+                        {
+                            var path = file.path.Split("/");
+                            var file_name = path[path.Length - 1];
+                            var encrypt = MFAService.AES_EncryptToByte(DateTime.Now.ToString(), key, iv);
+                            var token = MFAService.ConvertByteToBase64String(encrypt);
+                            //Bind your file location
+                            var readFileData = System.IO.File.ReadAllBytes(full_path);
+                            //Create Multipart Request
+                            var formContent = new MultipartFormDataContent();
+
+                            ByteArrayContent bytes = new ByteArrayContent(readFileData);
+                            MultipartFormDataContent multiContent = new MultipartFormDataContent();
+                            formContent.Add(bytes, "data", path[path.Length - 1]);
+
+                            formContent.Add(new StringContent(path[path.Length - 1]), "name");
+                            formContent.Add(new StringContent(data_id.ToString()), "data_id");
+                            formContent.Add(new StringContent(((int)CommentClientMongoType.file).ToString()), "type");
+                            formContent.Add(new StringContent(token), "token");
+                            var response = await _httpClient.PostAsync(url_post, formContent);
+                            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                            {
+                                var content = Newtonsoft.Json.Linq.JObject.Parse(response.Content.ReadAsStringAsync().Result);
+                                if (content["status"] != null && content["status"].ToString() != null && content["status"].ToString().Trim() != ""
+                                    && content["url"] != null && content["url"].ToString() != null && content["url"].ToString().Trim() != "")
+                                {
+                                    file.path = config.IMAGE_DOMAIN + content["url"].ToString();
+                                    try
+                                    {
+                                        System.IO.File.Delete(full_path);
+                                    }
+                                    catch { }
+                                }
+
+                            }
+                            //lưu
+                            var modelClientMongo = new CommentClientMongoModel();
+                            var detail_user = await _userRepository.GetById(_UserLogin);
+                            modelClientMongo.FullName = detail_user.FullName;
+                            modelClientMongo.UserName = detail_user.UserName;
+                            modelClientMongo.UserId = _UserLogin;
+                            modelClientMongo.ClientId = data_id.ToString();
+                            modelClientMongo.Type = (int)CommentClientMongoType.file;//File đính kèm
+                            modelClientMongo.Note = file.path.StartsWith("http") ? file.path:config.IMAGE_DOMAIN+ file.path;
+                            var InsertComment = await _commentClientMongoService.InsertCommentClient(modelClientMongo);
+
+                        }
+                        catch
+                        {
+
+                        }
+                        var ext_split = file.path.Split(".");
+                        file.ext = ext_split[^1];
+                    }
+
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        msg = "Thành công"
+                    });
+                }
+                else
+                {
+                  
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.SUCCESS,
+                        msg = "Thành công"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ConfirmFileUpload - CustomerManagerManualController" + ex.ToString());
+                return Ok(new
+                {
+                    status = (int)ResponseType.FAILED,
+                    msg = "Lỗi trong quá trình xử lý vui lòng liên hệ IT"
+                });
+            }
+        }
+        public async Task<IActionResult> Widget(string id, long DataId, int Type, AttachmentsOption option)
+        {
+            var _UserLogin = 0;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                _UserLogin = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            }
+         
+            ViewBag.DataId = DataId;
+            ViewBag.Type = AttachmentType.QLKH_Comment;
+            ViewBag.UserId = _UserLogin;
+            ViewBag.ImageExtension = new List<string>() { "png", "jpg", "gif", "jpeg", "PNG", "JPG", "GIF", "JPEG" };
+            ViewBag.VideoExtension = new List<string>() { "mp4", "vod", "mkv", "avi", "MP4", "VOD", "MKV", "AVI" };
+            ViewBag.Option = option;
+            ViewBag.ID = id;
+            return PartialView();
         }
     }
 }

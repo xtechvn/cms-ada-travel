@@ -50,5 +50,7 @@ namespace Utilities.Contants
         Addservice_Comment = 35,
         YCC_Comment = 36,
 
+        QLKH_Comment = 37,
+
     }
 }

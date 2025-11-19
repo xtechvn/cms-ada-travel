@@ -52,6 +52,10 @@
         const imageUrl = input_url.val();
         if (!imageUrl) {
             alert("Link ảnh không được bỏ trống!");
+            widget.find('.on-addfile-loading').remove()
+            widget.find('.attachment-file-url').val('')
+            widget.find('.attachment-file-url').prop('disabled', false)
+            widget.find('.attachment-file-url-confirm').prop('disabled', false)
             return;
         }
         $.ajax({
@@ -210,4 +214,41 @@
             
         }
     }
+    Confirm_comment() {
+        var class_object = this;
+
+        var widget = $('.' + class_object.ElementName)
+        var list = []
+        widget.find('.file').each(function (item) {
+            var ele = $(this)
+            list.push(
+                {
+                    id: ele.attr('data-id'),
+                    path: ele.attr('data-path'),
+                    ext: ele.attr('data-ext')
+                }
+            );
+        });
+        var object_summit = {
+            files: list,
+            data_id: widget.attr('data-dataid'),
+            service_type: widget.attr('data-type')
+        }
+        $.ajax({
+            url: "/CustomerManagerManual/ConfirmFileUpload",
+            data: object_summit,
+            type: "POST",
+            success: function (result) {
+                if (class_object.WidgetOption.separate_confirm && result.status == 0) {
+                    _msgalert.success('Lưu tệp đính kèm thành công')
+                    widget.find(".attachfile-add").val(null);
+
+                }
+                else if (class_object.WidgetOption.separate_confirm) {
+                    _msgalert.error('Lưu tệp đính kèm thất bại, vui lòng liên hệ IT')
+
+                }
+            }
+        });
+    };
 }
