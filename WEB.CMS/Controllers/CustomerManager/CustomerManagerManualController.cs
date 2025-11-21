@@ -392,9 +392,12 @@ namespace WEB.CMS.Controllers.CustomerManager
 
             try
             {
+                var option = new AttachmentsOption();
                 ViewBag.ClientId = Clientid;
+                ViewBag.Type = AttachmentType.QLKH_Comment;
                 var model = new CommentClientMongoModel();
                 model.ClientId = Clientid;
+                ViewBag.Option = option;
                 var data = _commentClientMongoService.GetListComment(model);
                 return PartialView(data);
             }
@@ -1082,7 +1085,7 @@ namespace WEB.CMS.Controllers.CustomerManager
 
                             formContent.Add(new StringContent(path[path.Length - 1]), "name");
                             formContent.Add(new StringContent(data_id.ToString()), "data_id");
-                            formContent.Add(new StringContent(((int)CommentClientMongoType.file).ToString()), "type");
+                            formContent.Add(new StringContent(((int)AttachmentType.QLKH_Comment).ToString()), "type");
                             formContent.Add(new StringContent(token), "token");
                             var response = await _httpClient.PostAsync(url_post, formContent);
                             if (response.StatusCode == System.Net.HttpStatusCode.OK)

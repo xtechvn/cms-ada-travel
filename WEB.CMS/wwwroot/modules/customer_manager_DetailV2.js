@@ -487,24 +487,28 @@ var _customer_manager_Detail = {
                 ClientId: id,
                 Note: $('#commentContent').val()
             }
+            _customer_manager_Detail.ConfirmFileUploadComment($('.attachment-file-block'), id)
+            setTimeout(function () {
+                $.ajax({
+                    url: '/CustomerManagerManual/InsertComment',
+                    type: "post",
+                    data: { model },
+                    success: function (result) {
+                        if (result.status === 0) {
+                            _msgalert.success(result.msg);
 
-            $.ajax({
-                url: '/CustomerManagerManual/InsertComment',
-                type: "post",
-                data: { model },
-                success: function (result) {
-                    if (result.status === 0) {
-                        _msgalert.success(result.msg);
-                        _customer_manager_Detail.ConfirmFileUploadComment($('.attachment-file-block'), id)
-                        setTimeout(function () {
-                           
-                            _customer_manager_Detail.ReLoadCommentClient();
-                        }, 1000);
-                    } else {
-                        _msgalert.error(result.msg);
+                            setTimeout(function () {
+
+                                _customer_manager_Detail.ReLoadCommentClient();
+                            }, 1000);
+                        } else {
+                            _msgalert.error(result.msg);
+                        }
                     }
-                }
-            });
+                });
+               
+            }, 1000);
+       
         }
         
     },
@@ -653,27 +657,30 @@ var _customer_manager_Detail = {
                 }
             );
         });
-        var object_summit = {
-            files: list,
-            data_id: widget.attr('data-dataid'),
-            service_type: widget.attr('data-type')
-        }
-        $.ajax({
-            url: "/CustomerManagerManual/ConfirmFileUpload",
-            data: object_summit,
-            type: "POST",
-            success: function (result) {
-                if ( result.status == 0) {
-                    _msgalert.success('Lưu tệp đính kèm thành công')
-                    widget.find(".attachfile-add").val(null);
-
-                }
-                else  {
-                    _msgalert.error('Lưu tệp đính kèm thất bại, vui lòng liên hệ IT')
-
-                }
+        if (list.length > 0) {
+            var object_summit = {
+                files: list,
+                data_id: widget.attr('data-dataid'),
+                service_type: widget.attr('data-type')
             }
-        });
+            $.ajax({
+                url: "/CustomerManagerManual/ConfirmFileUpload",
+                data: object_summit,
+                type: "POST",
+                success: function (result) {
+                    if (result.status == 0) {
+                        _msgalert.success('Lưu tệp đính kèm thành công')
+                        widget.find(".attachfile-add").val(null);
+
+                    }
+                    else {
+                        _msgalert.error('Lưu tệp đính kèm thất bại, vui lòng liên hệ IT')
+
+                    }
+                }
+            });
+        }
+       
     },
 }
 

@@ -1,12 +1,19 @@
 ﻿@using Entities.ViewModels
+@using  Utilities.Contants
 @using Entities.ViewModels.Mongo
+@using Entities.ViewModels.Attachment;
+@{
+    AttachmentsOption options = (AttachmentsOption)ViewBag.Option;
+    var ClientId = ViewBag.ClientId;
+}
+
 @model List<CommentClientMongoModel>
 <div class="comment-section" id="comment-section" data-request-id="@ViewBag.ClientId">
     <div class="pd-20 bg-white radius10">
         <div class="comment-list-wrapper">
-            @if (Model != null )
+            @if (Model != null)
             {
-                @foreach (var comment in Model)
+                foreach (var comment in Model)
                 {
                     <div id="comment-@comment._id" class="info-basic flex flex-nowrap w-100">
                         <div class="ava">
@@ -19,8 +26,16 @@
                                 <p><b> @comment.UserName.ToString() - @comment.FullName </b></p>
                                 <span style="color:#698096">@comment.CreatedTime.ToString("dd/MM/yyyy")<b class="ml-2"></b></span>
                             </div>
-                            <div style="white-space: pre-line;"> @comment.Note</div>
-                           
+
+                            @if (comment.Type == (int)CommentClientMongoType.file)
+                            {
+                                <a href="@comment.Note" target="_blank"><img src="@comment.Note" style="max-width:10%!important" /></a>
+                            }
+                            else
+                            {
+                                <div style="white-space: pre-line;"> @comment.Note</div>
+                            }
+
                         </div>
                     </div>
                     <div class="line-bottom mt16 mb16"></div>
@@ -38,9 +53,39 @@
         <form id="commentForm" enctype="multipart/form-data" onsubmit="return false">
             <textarea id="commentContent" class="form-control commentContent" name="commentContent" style="min-height:100px;" placeholder="Nhập nội dung comment"></textarea>
             <div id="grid_data_File">
-                <partial name="_Skeleton" />
+                <div id="file-widget-@ViewBag.ClientId" class="bg-white mb20 attachment-widget file-widget-@ViewBag.ClientId" style="width:100% !important;" data-dataid="@ViewBag.ClientId" data-type="@ViewBag.Type">
+                    <div class="lb-form pd10">
+                        Tệp đính kèm <i class="fa fa-paperclip"></i>
+                    </div>
+                    <div class="row list-choose lightgallery attachment-file-gallery">
+
+                    </div>
+                    <div class="flex align-center mb20 attach-edit">
+                        <div class="flex align-center pd10 mb20">
+                            <label class="choose mb0" style="width: 100% !important;">
+                                <input type="file" class="attachfile-add" multiple style="display: none;">
+                                <a class="btn-default" href="javascript:;" onclick="$(this).closest('.choose').find('.attachfile-add').trigger('click')" style="color: #fff;cursor: pointer; margin-top:10px;">
+                                    <i class="fa fa-upload"></i>&nbsp;&nbsp;Upload file
+                                </a>
+                                <button type="button" class="btn btn-primary mt10" onclick="_customer_manager_Detail.addComment(@ClientId)">Gửi</button>
+
+                                <a id="confirm-file-comment" href="javascript:;" class="btn-default confirm-file-comment mfp-hide" style="color: white; display:none;">Lưu tệp đính kèm</a>
+                            </label>
+                            <div class="gray txt_12" style="margin-top: 10px; width: 100% !important;">
+                                <p style="margin-left: 3px;">Upload nhiều file cùng lúc. Định dạng: .jpg,.png, .gif,.pdf, .doc & docx. Dung lượng tối đa 10Mb.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+        const _attach_@(ClientId) = new AttachmentWidget('file-widget-@ViewBag.ClientId',@Json.Serialize(options));
+                    </script>
+
+
+
+                </div>
             </div>
-            <button type="button" class="btn btn-primary mt10" onclick="_customer_manager_Detail.addComment(@ViewBag.ClientId)">Gửi</button>
+
+            @*<button type="button" class="btn btn-primary mt10" onclick="_customer_manager_Detail.addComment(@ViewBag.ClientId)">Gửi</button>*@
         </form>
     </div>
 </div>
@@ -48,28 +93,28 @@
     const textarea = document.getElementById('commentContent');
 
     textarea.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        if (e.shiftKey || e.ctrlKey) {
-            e.preventDefault(); // chặn hành vi mặc định
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const value = textarea.value;
+        if (e.key === "Enter") {
+            if (e.shiftKey || e.ctrlKey) {
+                e.preventDefault(); // chặn hành vi mặc định
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const value = textarea.value;
 
-            // chèn \n vào vị trí con trỏ
-            textarea.value = value.substring(0, start) + "\n" + value.substring(end);
-            // đưa con trỏ xuống sau ký tự \n
-            textarea.selectionStart = textarea.selectionEnd = start + 1;
+                // chèn \n vào vị trí con trỏ
+                textarea.value = value.substring(0, start) + "\n" + value.substring(end);
+                // đưa con trỏ xuống sau ký tự \n
+                textarea.selectionStart = textarea.selectionEnd = start + 1;
 
-            console.log('Xuống dòng (Shift+Enter hoặc Ctrl+Enter)');
-        } else {
-          // Enter thường => gửi comment
+                console.log('Xuống dòng (Shift+Enter hoặc Ctrl+Enter)');
+            } else {
+                // Enter thường => gửi comment
 
-          console.log('Enter gửi comment');
+                console.log('Enter gửi comment');
 
+            }
         }
-      }
     });
-    _customer_manager_Detail.LoadFile(@ViewBag.ClientId)
+
 </script>
 <style>
     .comment-list-wrapper {
@@ -142,5 +187,25 @@
         font-size: 14px;
         color: #777;
     }
-</style>
 
+    .attachment-widget .delete-file {
+        background: #ED5C6A;
+        color: #fff;
+        position: absolute;
+        right: -7px;
+        top: -7px;
+        z-index: 2;
+        border: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        outline: 0;
+        cursor: pointer;
+    }
+    .file p {
+        overflow:hidden;
+    }
+    .file-widget-@ClientId .choose-ava {
+        width: 100% !important;
+    }
+</style>
