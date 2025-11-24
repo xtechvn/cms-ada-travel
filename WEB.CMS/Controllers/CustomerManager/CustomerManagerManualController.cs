@@ -398,6 +398,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 var model = new CommentClientMongoModel();
                 model.ClientId = Clientid;
                 ViewBag.Option = option;
+                ViewBag.ImageExtension = new List<string>() { "png", "jpg", "gif", "jpeg", "PNG", "JPG", "GIF", "JPEG" };
                 var data = _commentClientMongoService.GetListComment(model);
                 return PartialView(data);
             }

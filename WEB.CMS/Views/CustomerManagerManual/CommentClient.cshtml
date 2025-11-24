@@ -2,9 +2,13 @@
 @using  Utilities.Contants
 @using Entities.ViewModels.Mongo
 @using Entities.ViewModels.Attachment;
+@using System;
+@using System.IO;
 @{
     AttachmentsOption options = (AttachmentsOption)ViewBag.Option;
     var ClientId = ViewBag.ClientId;
+    List<string> imageExtensionList = (List<string>)ViewBag.ImageExtension; 
+    string default_icon = "/images/icons/document.png";
 }
 
 @model List<CommentClientMongoModel>
@@ -29,7 +33,28 @@
 
                             @if (comment.Type == (int)CommentClientMongoType.file)
                             {
-                                <a href="@comment.Note" target="_blank"><img src="@comment.Note" style="max-width:10%!important" /></a>
+                                var file_name = comment.Note.Remove(0, comment.Note.LastIndexOf('/') + 1);
+                                string ext = comment.Note.Split('.').Last();
+                                if (imageExtensionList.Contains(ext))
+                                {
+                                    <a href="@comment.Note" target="_blank"><img src="@comment.Note" style="max-width:10%!important" /></a>
+
+                                    <p>
+                                        <span>@(file_name.Substring(0, file_name.Length <= 100 ? file_name.Length : 100))</span>
+                                    </p>
+
+                                }
+                                else
+                                {
+                                    <a target="_blank" href="@comment.Note">
+                                        <img src="@default_icon" alt="img1" style="max-width:10%!important"/>
+                                    </a>
+
+                                    <p>
+                                        <span>@(file_name.Substring(0, file_name.Length <= 100 ? file_name.Length : 100))</span>
+                                    </p>
+
+                                }
                             }
                             else
                             {
