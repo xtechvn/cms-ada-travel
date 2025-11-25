@@ -82,6 +82,7 @@ namespace Repositories.Repositories
                         SaleMapId = (int?)model.UserId,
                         ParentId = -1,
                         UtmSource = Convert.ToInt32(model.UtmSource),
+                        CreatedBy = (int)model.UserId,  
 
                     };
                     var CreateClient = _ClientDAL.SetUpClient(Client);
