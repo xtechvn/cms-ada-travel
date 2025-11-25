@@ -181,6 +181,7 @@
             widget.find('.attach-edit').remove()
         }
         else {
+            $('body').off('change', '.' + class_object.ElementName + ' .attachfile-add');
             $('body').on('change', '.' + class_object.ElementName + ' .attachfile-add', function () {
                 if ($(this)[0].files[0] && !class_object.Trigger) {
                     class_object.Upload()
