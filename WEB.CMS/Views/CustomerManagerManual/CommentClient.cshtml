@@ -7,8 +7,9 @@
 @{
     AttachmentsOption options = (AttachmentsOption)ViewBag.Option;
     var ClientId = ViewBag.ClientId;
-    List<string> imageExtensionList = (List<string>)ViewBag.ImageExtension; 
+    List<string> imageExtensionList = (List<string>)ViewBag.ImageExtension;
     string default_icon = "/images/icons/document.png";
+    string id = DateTime.Now.ToString("yyyyMMddhhmmss") + ViewBag.ClientId;
 }
 
 @model List<CommentClientMongoModel>
@@ -102,7 +103,7 @@
                         </div>
                     </div>
                     <script>
-        const _attach_@(ClientId) = new AttachmentWidget('file-widget-@ViewBag.ClientId',@Json.Serialize(options));
+        const _attach_@(id) = new AttachmentWidget('file-widget-@ViewBag.ClientId',@Json.Serialize(options));
                     </script>
 
 
