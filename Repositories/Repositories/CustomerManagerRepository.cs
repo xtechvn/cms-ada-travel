@@ -180,7 +180,8 @@ namespace Repositories.Repositories
                         ClientCode = model.ClientCode,
                         ParentId = data2.ParentId,
                         UtmSource = model.UtmSource,
-                        CreatedBy = model.CreatedBy,
+                        CreatedBy = data2.CreatedBy,
+                      
                     };
 
                     var CreateClient = _ClientDAL.SetUpClient(Client);
