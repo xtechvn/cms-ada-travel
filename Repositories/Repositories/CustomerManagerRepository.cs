@@ -82,7 +82,7 @@ namespace Repositories.Repositories
                         SaleMapId = (int?)model.UserId,
                         ParentId = -1,
                         UtmSource = Convert.ToInt32(model.UtmSource),
-                        CreatedBy = (int)model.UserId,  
+                        CreatedBy = (int)model.UserId,
 
                     };
                     var CreateClient = _ClientDAL.SetUpClient(Client);
@@ -489,7 +489,7 @@ namespace Repositories.Repositories
                                     ws.Cells[Cell[I] + RowIndex].PutValue(item.UtmSourceName);
                                     listfield2.Remove(listfield2[f]); f--; break;
 
-                                } 
+                                }
                                 if (listfield2[f] == 14)
                                 {
 
@@ -507,7 +507,7 @@ namespace Repositories.Repositories
                                 if (listfield2[f] == 16)
                                 {
 
-                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.ListCommentNhuCau!=null? item.ListCommentNhuCau.Note :"");
+                                    ws.Cells[Cell[I] + RowIndex].PutValue(item.ListCommentNhuCau != null ? item.ListCommentNhuCau.Note : "");
                                     listfield2.Remove(listfield2[f]); f--; break;
 
                                 }
@@ -586,6 +586,7 @@ namespace Repositories.Repositories
                     SaleMapId = (int?)model.UserId,
                     ParentId = -1,
                     UtmSource = Convert.ToInt32(model.UtmSource),
+                    CreatedBy = model.CreatedBy,
 
                 };
                 var CreateClient = await _ClientDAL.CreateClient(Client);
