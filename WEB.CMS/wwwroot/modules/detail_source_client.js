@@ -163,6 +163,10 @@ var _detail_source_client = {
         $('#confirm-ws-import').hide()
         $('#grid_ws tbody tr').each(function () {
             let seft = $(this);
+            var ClientType = seft.find('.ClientType').text();
+            if (ClientType == undefined || ClientType == null || ClientType == "") { 
+                ClientType = 5;
+            }
             data.push({
                 Client_name: seft.find('.ClientName').text(),
                 email: seft.find('.Email').text(),
@@ -171,7 +175,7 @@ var _detail_source_client = {
                 Status: 0,
                 id_loaikhach: 1,
                 id_nhomkhach: 0,
-                id_ClientType: 5,
+                id_ClientType: ClientType,
                 AgencyType: 1,
                 UtmSource: $('#Client_Source').val(),
                 DepartmentId: $('#DepartmentId').val(),
@@ -356,7 +360,7 @@ var _detail_source_client = {
                 Status: 0,
                 id_loaikhach: 1,
                 id_nhomkhach: 0,
-                id_ClientType: 5,
+                id_ClientType: $('#ClientType').val(),
                 AgencyType: 1,
                 UtmSource: $('#Client_Source').val(),
                 DepartmentId: $('#DepartmentId').val(),

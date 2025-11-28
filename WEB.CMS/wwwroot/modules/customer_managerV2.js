@@ -1053,10 +1053,10 @@ var _customer_managerV2 = {
                     required: true,
                     number: true,
                 },
-                "email": {
-                    required: true,
-                    email: true,
-                },
+                //"email": {
+                //    required: true,
+                //    email: true,
+                //},
                 
                 "id_loaikhach": "required",
                 "id_nhomkhach": "required",
@@ -1071,10 +1071,10 @@ var _customer_managerV2 = {
                     required: "Số điện thoại không được bỏ trống",
                     number: "Nhập đúng định dạng số",
                 },
-                "email": {
-                    required: "Email không được bỏ trống",
-                    email: "Nhập đúng định dạnh email",
-                },
+                //"email": {
+                //    required: "Email không được bỏ trống",
+                //    email: "Nhập đúng định dạnh email",
+                //},
                
                 "id_loaikhach": "Vui lòng chọn loại khách hàng",
                 "id_nhomkhach": "Vui lòng chọn nhóm khách hàng",
@@ -1112,7 +1112,7 @@ var _customer_managerV2 = {
                 let data = JSON.stringify(object_summit)
                 _global_function.AddLoading()
                 $.ajax({
-                    url: '/CustomerManager/Setup',
+                    url: '/CustomerManagerManual/Setup',
                     type: "post",
                     data: { data },
                     success: function (result) {

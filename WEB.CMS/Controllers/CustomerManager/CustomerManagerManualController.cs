@@ -731,6 +731,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                         var Email = ws.Cells[row, 2].Value;
                         var Phone = ws.Cells[row, 3].Value;
                         var Note = ws.Cells[row, 4].Value;
+                        var ClientType = ws.Cells[row, 5].Value;
 
                         var data = new ClientExcelImportModel
                         {
@@ -738,6 +739,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                             email = (Email == null ? "" : Email.ToString()),
                             phone = (Phone == null ? "" : Phone.ToString()),
                             Note = (Note == null ? "" : Note.ToString()),
+                            id_ClientType = (ClientType == null ? "" : ClientType.ToString()),
 
                         };
                         data_list.Add(data);
@@ -878,7 +880,9 @@ namespace WEB.CMS.Controllers.CustomerManager
         public async Task<IActionResult> PopupAddclient(int type)
         {
             var data = await _departmentRepository.GetAll(String.Empty);
+            var ClientType = _allCodeRepository.GetListByType(AllCodeType.CLIENT_TYPE);
             ViewBag.type = type;
+            ViewBag.ClientType = ClientType;
             ViewBag.DepartmentList = data.Where(s=>s.Status==1).ToList();
 
             return PartialView();
@@ -1168,6 +1172,110 @@ namespace WEB.CMS.Controllers.CustomerManager
             ViewBag.Option = option;
             ViewBag.ID = id;
             return PartialView();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Setup(string data)
+        {
+            int stt_code = (int)ResponseType.FAILED;
+            string msg = "Error On Excution";
+            try
+            {
+                var DataModel = JsonConvert.DeserializeObject<CustomerManagerView>(data);
+                DataModel.UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+                //Regex regexemail = new Regex(@"^(\s*)([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)(\s*)|((\.(\w){2,})+)(\s*)$");
+                //if (!regexemail.IsMatch(DataModel.email))
+                //{
+                //    return Ok(new
+                //    {
+                //        stt_code = (int)ResponseType.FAILED,
+                //        msg = "Email nhập không đúng định dạng",
+
+                //    });
+                //}
+
+                var list_client = await _customerManagerRepositories.GetClientByPhone(DataModel.phone);
+                if (list_client != null && list_client.Count > 0)
+                {
+                    return Ok(new
+                    {
+                        stt_code = (int)ResponseType.FAILED,
+                        msg = "Số điện thoại đã tồn tại",
+
+                    });
+                }
+
+                if ( DataModel.Id == 0)
+                {
+                    APIService apiService = new APIService(_configuration, _userRepository);
+                    //DataModel.ClientCode = await apiService.buildClientCode(DataModel.id_ClientType);
+                    DataModel.ClientCode = await _identifierServiceRepository.buildClientNo(Convert.ToInt32(DataModel.id_ClientType));
+                    var Result = _customerManagerRepositories.SetUpClient(DataModel);
+                    if (Result != 0)
+                    {
+
+                        if (Result == 2)
+                        {
+                            stt_code = (int)ResponseType.FAILED;
+                            msg = "Mã Code đã tồn tại";
+                        }
+                        else
+                        {
+                            var clientdetail = await _clientRepository.GetClientByClientCode(DataModel.ClientCode);
+                            _workQueueClient.SyncES(clientdetail.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
+
+                            //var SendMail = await apiService.SendMailResetPassword(DataModel.email);
+                            stt_code = (int)ResponseType.SUCCESS;
+                            msg = "Thêm mới thông tin thành công";
+                        }
+                    }
+                    else
+                    {
+                        stt_code = (int)ResponseType.FAILED;
+                        msg = "Thêm mới thông tin không thành công";
+
+                    }
+                }
+                if (DataModel.Id != 0)
+                {
+
+                    var Result = _customerManagerRepositories.SetUpClient(DataModel);
+                    if (Result == 1)
+                    {
+                        _workQueueClient.SyncES(DataModel.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
+
+                        stt_code = (int)ResponseType.SUCCESS;
+                        msg = "Cập nhật thông tin thành công";
+                    }
+                    if (Result == 2)
+                    {
+                        stt_code = (int)ResponseType.FAILED;
+                        msg = "Email đã tồn tại";
+                    }
+
+                    if (Result == 0)
+                    {
+                        stt_code = (int)ResponseType.FAILED;
+                        msg = "Cập nhật thông tin không thành công";
+                    }
+                }
+              
+
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Setup - CustomerManagerController: " + ex);
+                stt_code = (int)ResponseType.ERROR;
+                msg = "Lỗi kỹ thuật vui lòng liên hệ bộ phận IT";
+            }
+
+            return Ok(new
+            {
+                stt_code = stt_code,
+                msg = msg,
+
+            });
         }
     }
 }

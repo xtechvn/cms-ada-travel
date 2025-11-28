@@ -2,6 +2,7 @@
 @using Entities.ViewModels.OrderManual
 @{
     Layout = null;
+    var Client_Type = (List<AllCode>)ViewBag.ClientType;
     var _DepartmentList = (List<Department>)ViewBag.DepartmentList;
 
     async Task ShowDepartment(Department item, int level = 0)
@@ -68,6 +69,17 @@
         <div class="wrap_input">
             <input class="form-control phone" name="phone" id="phone" style="width:100%!important;" />
 
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Loại khách hàng <sup class="red">*</sup></label>
+        <div class="wrap_input">
+            <select class="form-control ClientType" name="ClientType" id="ClientType" style="width:100%!important;">
+                @foreach(var item in Client_Type)
+            {
+                <option value="@item.CodeValue">@item.Description</option>
+            }
+            </select>
         </div>
     </div>
     <div class="form-group">
