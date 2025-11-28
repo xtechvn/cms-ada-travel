@@ -1195,7 +1195,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                 //}
 
                 var list_client = await _customerManagerRepositories.GetClientByPhone(DataModel.phone);
-                if (list_client != null && list_client.Count > 0)
+                if (list_client != null && list_client.Where(s=>s.Id!= DataModel.Id).ToList().Count > 0)
                 {
                     return Ok(new
                     {
@@ -1240,20 +1240,14 @@ namespace WEB.CMS.Controllers.CustomerManager
                 {
 
                     var Result = _customerManagerRepositories.SetUpClient(DataModel);
-                    if (Result == 1)
+                    if (Result>0)
                     {
                         _workQueueClient.SyncES(DataModel.Id, _configuration["DataBaseConfig:Elastic:SP:sp_GetClient"], _configuration["DataBaseConfig:Elastic:Index:Client"], ProjectType.ADAVIGO_CMS, "Setup CustomerManager");
 
                         stt_code = (int)ResponseType.SUCCESS;
                         msg = "Cập nhật thông tin thành công";
                     }
-                    if (Result == 2)
-                    {
-                        stt_code = (int)ResponseType.FAILED;
-                        msg = "Email đã tồn tại";
-                    }
-
-                    if (Result == 0)
+                  else
                     {
                         stt_code = (int)ResponseType.FAILED;
                         msg = "Cập nhật thông tin không thành công";

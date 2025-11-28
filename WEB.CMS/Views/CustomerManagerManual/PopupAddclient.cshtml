@@ -72,12 +72,12 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="lbl">Loại khách hàng <sup class="red">*</sup></label>
+        <label class="lbl">Loại khách hàng </label>
         <div class="wrap_input">
             <select class="form-control ClientType" name="ClientType" id="ClientType" style="width:100%!important;">
                 @foreach(var item in Client_Type)
             {
-                <option value="@item.CodeValue">@item.Description</option>
+                <option value="@item.CodeValue">  @item.Description</option>
             }
             </select>
         </div>

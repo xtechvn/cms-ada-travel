@@ -289,6 +289,8 @@ namespace DAL
                         }
                         else
                         {
+                            var deta = _DbContext.Client.Update(model);
+                            _DbContext.SaveChanges();
                             return 2;
                         }
 
