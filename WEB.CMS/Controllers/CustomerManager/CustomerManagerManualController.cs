@@ -763,6 +763,11 @@ namespace WEB.CMS.Controllers.CustomerManager
             {
                 if (model != null && model != "")
                 {
+                    int _UserId = 0;
+                    if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                    {
+                        _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                    }
                     List<ClientExcelImportModel> success_model = new List<ClientExcelImportModel>();
                     List<ClientExcelImportModel> summit_model = new List<ClientExcelImportModel>();
                     List<ClientExcelImportModel> err_model = new List<ClientExcelImportModel>();
@@ -798,17 +803,14 @@ namespace WEB.CMS.Controllers.CustomerManager
                         model_client.ClientCode = ClientCode;
                         model_client.UtmSource = item.UtmSource;
                         model_client.JoinDate = DateTime.Now;
+                        model_client.CreatedBy = _UserId;
 
 
                         var Result = await _customerManagerRepositories.CreateClient(model_client);
 
                         if (Result > 0)
                         {
-                            int _UserId = 0;
-                            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                            {
-                                _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                            }
+                          
 
                             summit_model.Add(item);
                             var clientdetail = await _clientRepository.GetClientByClientCode(ClientCode);
