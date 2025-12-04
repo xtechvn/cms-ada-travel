@@ -132,6 +132,8 @@ namespace WEB.Adavigo.CMS.Controllers
                         ImageThumb = hotel.ImageThumb,
                         City = hotel.City,
                         IsCommitFund = hotel.IsCommitFund,
+                        IsApartment = hotel.IsApartment,
+
                         Star = hotel.Star,
                         PositionB2B = hotePositionB2B != null && hotePositionB2B.Count > 0 ? (int)hotePositionB2B[0].Position : 0,
                         PositionB2C = hotePositionB2C != null && hotePositionB2C.Count > 0 ? (int)hotePositionB2C[0].Position : 0,
@@ -177,7 +179,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     _redisService.DeleteCacheByKeyword(cache_name, db_index);
                     _workQueueClient.SyncES(result, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotel"], _configuration["DataBaseConfig:Elastic:Index:Hotel"], ProjectType.ADAVIGO_CMS, "SetUpHotel HotelController");
 
-                    return new JsonResult(new
+                        return new JsonResult(new
                     {
                         isSuccess = true,
                         message = "Cập nhật khách sạn thành công"

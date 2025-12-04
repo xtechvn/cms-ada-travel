@@ -38,6 +38,8 @@ namespace Repositories.IRepositories
 
         // Room
         IEnumerable<HotelRoomGridModel> GetHotelRoomList(int hotel_id, int page_index, int page_size);
+        IEnumerable<HotelRoomGridModel> GetHotelRoomList2(int hotel_id, int page_index, int page_size);
+
         HotelRoom GetHotelRoomById(int id);
         int UpsertHotelRoom(HotelRoomUpsertModel model);
         int DeleteHotelRoom(int id);

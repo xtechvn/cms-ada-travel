@@ -56,6 +56,15 @@ namespace Entities.ViewModels
         public int InvoiceRequestStatus { get; set; }
         public string CutOffDate { get; set; }
         public int? IsLock { get; set; }
+        // ===== CĂN HỘ (tên khách sạn) =====
+        public string HotelName { get; set; }    // from Hotel.Name
+        public int HotelId { get; set; }         // from Order.HotelId
+
+        // ===== NHÃN ĐƠN / ĐỊA CHỈ =====
+        public string Street { get; set; }        // Địa chỉ căn hộ (Order.Label)
+      
+        // Loại đơn
+        public bool IsApartmentOrder { get; set; } // từ Order.IsApartmentOrder
 
 
     }

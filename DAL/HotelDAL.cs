@@ -1,6 +1,7 @@
 ﻿using DAL.Generic;
 using DAL.StoreProcedure;
 using Entities.Models;
+using Entities.ViewModels.Apartment;
 using Entities.ViewModels.Hotel;
 using Entities.ViewModels.HotelBooking;
 using Entities.ViewModels.OrderManual;
@@ -148,6 +149,8 @@ namespace DAL
                     new SqlParameter("@CreatedBy", model.CreatedBy?? (object)DBNull.Value),
                     new SqlParameter("@CreatedDate", DateTime.Now),
                     new SqlParameter("@IsCommitFund",model.IsCommitFund?? (object)DBNull.Value),
+                    new SqlParameter("@IsApartment",model.IsApartment?? (object)DBNull.Value),
+
                     new SqlParameter("@Position",model.Position?? (object)DBNull.Value)
 
                 };
@@ -200,6 +203,8 @@ namespace DAL
                     new SqlParameter("@Description", model.Description ?? (object)DBNull.Value),
                     new SqlParameter("@UpdatedBy",model.UpdatedBy?? (object)DBNull.Value),
                     new SqlParameter("@IsCommitFund",model.IsCommitFund?? (object)DBNull.Value),
+                    new SqlParameter("@IsApartment",model.IsApartment?? (object)DBNull.Value),
+
                     new SqlParameter("@Position",model.Position?? (object)DBNull.Value)
                 };
 
@@ -698,7 +703,16 @@ namespace DAL
                 throw;
             }
         }
+        public List<RoomLedgerSummaryModel> GetRoomLedgerSummaryByHotel(int hotelId)
+        {
+            var param = new[]
+            {
+            new SqlParameter("@HotelId", hotelId)
+        };
 
+            var dt = _DbWorker.GetDataTable("SP_Apartment_GetRoomLedgerSummaryByHotel", param);
+            return dt.ToList<RoomLedgerSummaryModel>();
+        }
         public DataTable GetHotelRoomByHotelId(int hotel_id, int page_index, int page_size)
         {
             try

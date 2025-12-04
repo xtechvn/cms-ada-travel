@@ -1,0 +1,132 @@
+﻿@using Entities.ViewModels.Hotel
+@using Utilities.Contants
+@using Entities.ViewModels
+@model GenericViewModel<HotelRoomGridModel>
+
+@{
+    long orderId = ViewBag.OrderId != null ? (long)ViewBag.OrderId : 0;
+    int i = 1;
+
+    decimal totalRevenue = 0;
+    decimal totalPaid = 0;
+    decimal totalCost = 0;
+    decimal totalProfit = 0;
+
+    if (Model != null && Model.ListData != null && Model.ListData.Count > 0)
+    {
+        totalRevenue = Model.ListData.Sum(x => x.TotalMustPay);
+        totalPaid = Model.ListData.Sum(x => x.TotalPaid);
+        totalCost = Model.ListData.Sum(x => x.TotalCost);
+        totalProfit = totalRevenue - totalCost;
+    }
+}
+<input type="hidden" id="orderId" value="@ViewBag.OrderId" />
+<div id="packages-container">
+<div class="border bg-white mb20">
+    <div class="flex space-between row-main-head pd10">
+        <div class="bold">Danh sách phòng trong căn</div>
+    </div>
+
+    <div class="line-bottom pb0"></div>
+
+    <div class="pd10">
+        <div class="table-responsive table-gray">
+            <table class="table table-nowrap">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Loại phòng</th>
+                        <th class="text-right">Tổng phải thu</th>
+                        <th class="text-right">Tổng đã thu</th>
+                        <th class="text-right">Chi phí</th>
+                        <th class="text-right">Lợi nhuận</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.ListData != null && Model.ListData.Count > 0)
+                    {
+                        foreach (var room in Model.ListData)
+                        {
+                            <tr>
+                                <td>@(i++)</td>
+                                <td>
+                                    <div class="bold">@room.Name</div>
+                                    @if (!string.IsNullOrEmpty(room.TypeOfRoom))
+                                    {
+                                        <div>Loại: @room.TypeOfRoom</div>
+                                    }
+                                    @if (room.RoomArea.HasValue && room.RoomArea > 0)
+                                    {
+                                        <div>Diện tích: @room.RoomArea m²</div>
+                                    }
+                                </td>
+                                <td class="text-right">@room.TotalMustPay.ToString("N0")</td>
+                                <td class="text-right">@room.TotalPaid.ToString("N0")</td>
+                                <td class="text-right">@room.TotalCost.ToString("N0")</td>
+                                <td class="text-right">@room.Profit.ToString("N0")</td>
+
+                                <td>
+                                    @if (room.Status == 1)
+                                    {
+                                        <span class="badge" style="background:#27ae60; color:white;">Hoàn thành</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge" style="background:#f1c40f; color:black;">Đang xử lý</span>
+                                    }
+                                </td>
+
+
+                                
+                                <td>
+                                    <a href="javascript:;" class="blue"
+                                       onclick="_order_detail_create.openRoomLedger(@room.Id)">
+                                        Nhập / xem giá
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+
+                        <!-- Tổng hợp cuối căn -->
+                        <tr class="no-border hidden-tablet">
+                            <td></td>
+                            <td class="bold">Tổng doanh thu căn</td>
+                            <td class="text-right red">@totalRevenue.ToString("N0")</td>
+                            <td class="text-right">@totalPaid.ToString("N0")</td>
+                            <td class="text-right">@totalCost.ToString("N0")</td>
+                            <td class="text-right">@totalProfit.ToString("N0")</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                Không có phòng nào trong căn này.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal5">
+    <div class="modal-dialog" style="max-width:100%">
+        <div class="modal-content">
+
+            <div class="modal-header">...</div>
+
+            <div class="modal-body">
+                @* NỘI DUNG *@
+            </div>
+
+            <div class="modal-footer">...</div>
+        </div>
+    </div>
+</div>
+</div>
+

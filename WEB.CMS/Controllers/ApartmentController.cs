@@ -2,10 +2,12 @@
 using Caching.Elasticsearch;
 using Entities.Models;
 using Entities.ViewModels;
+using Entities.ViewModels.Apartment;
 using Entities.ViewModels.Attachment;
 using Entities.ViewModels.Contract;
 using Entities.ViewModels.DebtGuarantee;
 using Entities.ViewModels.ElasticSearch;
+using Entities.ViewModels.Hotel;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Invoice;
 using Entities.ViewModels.Mongo;
@@ -14,7 +16,7 @@ using Entities.ViewModels.Vinpearl;
 using ENTITIES.ViewModels.ElasticSearch;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver.Linq;
-using Nest;
+
 using Newtonsoft.Json;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Repositories.IRepositories;
@@ -34,9 +36,10 @@ using WEB.CMS.Models;
 namespace WEB.Adavigo.CMS.Controllers
 {
     [CustomAuthorize]
-    public class OrderController : Controller
+    public class ApartmentController : Controller
     {
         private readonly IConfiguration _configuration;
+        private readonly IApartmentOrderRepository _apartmentOrderRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IAccountClientRepository _accountClientRepository;
         private readonly IClientRepository _clientRepository;
@@ -70,13 +73,14 @@ namespace WEB.Adavigo.CMS.Controllers
         private LogActionMongoService LogActionMongo;
         private IndentiferService _indentiferService;
         private IDebtGuaranteeRepository _debtGuaranteeRepository;
+        private readonly IHotelRepository _HotelRepository;
 
         private readonly List<int> list_order_status_not_allow_to_edit = new List<int>() { (int)OrderStatus.FINISHED, (int)OrderStatus.CANCEL, (int)OrderStatus.WAITING_FOR_ACCOUNTANT, (int)OrderStatus.WAITING_FOR_OPERATOR };
-        public OrderController(IConfiguration configuration, IOrderRepository orderRepository, IClientRepository clientRepository, IHotelBookingRepositories hotelBookingRepositories, ManagementUser managementUser, IContractRepository contractRepository,
+        public ApartmentController(IConfiguration configuration, IOrderRepository orderRepository, IApartmentOrderRepository apartmentOrderRepository, IClientRepository clientRepository, IHotelBookingRepositories hotelBookingRepositories, ManagementUser managementUser, IContractRepository contractRepository,
             IAllCodeRepository allcodeRepository, IContactClientRepository contactClientRepository, IOrderRepositor iOrderRepositories, IFlightSegmentRepository flightSegmentRepository, IBagageRepository bagageRepository, IContactClientRepository ContactClientRepository, IHotelBookingCodeRepository hotelBookingCodeRepository,
             IFlyBookingDetailRepository flyBookingDetailRepository, IUserRepository userRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, ITourRepository tourRepository, IEmailService emailService, IAttachFileRepository attachFileRepository, IOtherBookingRepository otherBookingRepository,
             IInvoiceRequestRepository invoiceRequestRepository, IVinWonderBookingRepository vinWonderBookingRepository, IIdentifierServiceRepository identifierServiceRepository,
-            IWebHostEnvironment WebHostEnvironment, IInvoiceRepository invoiceRepository, IAccountClientRepository accountClientRepository, IPaymentRequestRepository paymentRequestRepository, IDebtGuaranteeRepository debtGuaranteeRepository)
+            IWebHostEnvironment WebHostEnvironment, IInvoiceRepository invoiceRepository, IAccountClientRepository accountClientRepository, IPaymentRequestRepository paymentRequestRepository, IDebtGuaranteeRepository debtGuaranteeRepository, IHotelRepository hotelRepository)
         {
             _invoiceRequestRepository = invoiceRequestRepository;
             _configuration = configuration;
@@ -112,6 +116,8 @@ namespace WEB.Adavigo.CMS.Controllers
             _identifierServiceRepository = identifierServiceRepository;
             _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
             _debtGuaranteeRepository = debtGuaranteeRepository;
+            _apartmentOrderRepository = apartmentOrderRepository;
+            _HotelRepository = hotelRepository;
         }
 
 
@@ -151,6 +157,124 @@ namespace WEB.Adavigo.CMS.Controllers
 
             return View();
         }
+        [HttpPost]
+        [HttpPost]
+        public IActionResult Packages(int orderId)
+        {
+            try
+            {
+                var st = new Stopwatch();
+                st.Start();
+
+                ViewBag.AllowToEdit = false;
+                ViewBag.IsAddMoreService = false;
+
+                if (orderId == 0)
+                    return PartialView();   // không có gì để load
+
+                ViewBag.OrderId = orderId;
+
+                // Lấy thông tin đơn
+                var dataOrder = _iOrderRepositories.GetByOrderId(orderId);
+                ViewBag.IsLock = dataOrder != null && dataOrder.IsLock != null ? dataOrder.IsLock : false;
+
+                if (dataOrder == null)
+                    return PartialView();
+
+                // ======================================================================
+                // 1. CHỈ XỬ LÝ ĐƠN CĂN HỘ
+                // ======================================================================
+                if (dataOrder.IsApartmentOrder)   // bool flag trên bảng Order
+                {
+                    int hotelId = dataOrder.HotelId ?? 0;
+                    ViewBag.HotelId = hotelId;
+                    ViewBag.OrderStatus = dataOrder.OrderStatus == null
+                        ? (int)OrderStatus.CREATED_ORDER
+                        : (byte)dataOrder.OrderStatus;
+
+                    // Fix page = 1, size = 50 (cần thì sau này truyền từ client)
+                    int pageIndex = 1;
+                    int pageSize = 50;
+
+                    // 👉 Hàm GetHotelRoomList2 đã dùng SP summary (tổng thu/chi/lãi + status)
+                    var datas = _HotelRepository.GetHotelRoomList2(hotelId, pageIndex, pageSize);
+
+                    var model = new GenericViewModel<HotelRoomGridModel>();
+
+                    if (datas != null)
+                    {
+                        var list = datas.ToList();
+                        model.ListData = list;
+                        model.CurrentPage = pageIndex;
+                        model.PageSize = pageSize;
+                        model.TotalRecord = list.Any() ? list.First().TotalRow : 0;
+                        model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / model.PageSize);
+                    }
+
+                    st.Stop();
+                    if (st.ElapsedMilliseconds > 1000)
+                    {
+                        LogHelper.InsertLogTelegram(
+                            $"Packages-OrderController (ApartmentOrder) - id:{orderId} - {st.ElapsedMilliseconds}ms");
+                    }
+
+                    // 👉 View riêng cho đơn căn hộ
+                    return PartialView("PackagesApartment", model);
+                }
+
+                // ======================================================================
+                // 2. ĐƠN THƯỜNG – BỎ, KHÔNG XỬ LÝ Ở ĐÂY
+                // ======================================================================
+                return PartialView(); // hoặc return EmptyResult() nếu muốn trống bét
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Packages-OrderController" + ex);
+                return PartialView();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RoomLedgerPopup(int roomId)
+        {
+            try
+            {
+                var vm = new ApartmentRoomLedgerViewModel();
+
+                // Lấy chi tiết phòng
+                vm.RoomInfo = _HotelRepository.GetHotelRoomById(roomId);
+
+                if (vm.RoomInfo == null)
+                    return PartialView("~/Views/Apartment/_RoomLedgerPopup.cshtml", vm);
+
+                // Lấy danh sách ledger theo RoomId
+                vm.Ledgers = await _apartmentOrderRepository.LoadLedgerPopup(roomId);
+
+                return PartialView("~/Views/Apartment/_RoomLedgerPopup.cshtml", vm);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("RoomLedgerPopup - error: " + ex.ToString());
+                return Content("Có lỗi xảy ra");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveRoomLedger([FromBody] RoomLedgerInput model)
+        {
+            var user = _ManagementUser.GetCurrentUser();
+
+            int rs = await _apartmentOrderRepository.SaveLedger(model, user.Id);
+
+            return Json(new
+            {
+                status = rs > 0,
+                msg = rs > 0 ? "Lưu thành công" : "Không thể lưu"
+            });
+        }
+
+
+
 
         [HttpPost]
         public async Task<IActionResult> Search(OrderViewSearchModel searchModel, int currentPage = 1, int pageSize = 20)
@@ -237,7 +361,7 @@ namespace WEB.Adavigo.CMS.Controllers
                             if (is_admin) break;
                         }
 
-                        model = await _orderRepository.GetList(searchModel, currentPage, pageSize);
+                        model = await _apartmentOrderRepository.GetList(searchModel, currentPage, pageSize);
                         //model2 = await _orderRepository.GetTotalCountSumOrder(searchModel, -1, pageSize);
                     }
 
@@ -309,119 +433,345 @@ namespace WEB.Adavigo.CMS.Controllers
             return PartialView(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Suggest(string term, int size = 20)
+        {
+            var list = await _apartmentOrderRepository.Suggest(term, size);
+
+            var result = list.Select(x => new
+            {
+                id = x.Id,
+                text = x.Name,     // select2 dùng "text"
+                address = x.Address
+            });
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateApartmentOrder(OrderApartmentSummitViewModel model)
+        {
+            try
+            {
+                if (model == null || model.hotel_id <= 0 || string.IsNullOrWhiteSpace(model.label))
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        msg = "Dữ liệu gửi lên không chính xác, vui lòng kiểm tra lại"
+                    });
+                }
+
+                long _UserId = 0;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+
+                int company_type = 0;
+                try
+                {
+                    company_type = Convert.ToInt32(_configuration["CompanyType"]);
+                }
+                catch { }
+
+                // Check: căn hộ đã có đơn chưa
+                var existed = await _orderRepository.GetOrderByHotelId(model.hotel_id);
+                if (existed != null && existed.OrderId > 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        msg = "Căn hộ này đã được tạo đơn trước đó, không thể tạo thêm.",
+                        order_id = -1
+                    });
+                }
+
+                // TODO: nếu ông có logic xác định Branch / Client / Sale thì map vào đây,
+                // tạm thời em set:
+                int defaultBranch = 0; // hoặc lấy từ config / current_user
+                int? defaultSalerId = null; // có thể = (int?)_UserId nếu muốn
+
+                var order = new Entities.Models.Order()
+                {
+                    OrderNo = await _indentiferService.buildOrderManual(company_type),
+                    SalerId = defaultSalerId,                 // nếu muốn gán luôn user hiện tại thì (int)_UserId
+                    SalerGroupId = null,
+                    Note = model.note,
+                    BranchCode = (short?)defaultBranch,
+                    UserUpdateId = _UserId,
+                    CreatedBy = _UserId,
+                    CreateTime = DateTime.Now,
+                    UpdateLast = DateTime.Now,
+                    ClientId = 0,                             // đơn căn hộ không gắn client
+                    AccountClientId = 0,
+                    SystemType = (int)SystemType.Backend,
+                    OrderStatus = (int)OrderStatus.CREATED_ORDER,
+                    PaymentStatus = (int)PaymentStatus.UNPAID,
+                    ExpriryDate = DateTime.Now.AddMonths(1),
+                    StartDate = null,
+                    EndDate = null,
+                    Amount = 0,
+                    Label = model.label,                      // địa chỉ đang gán vào label
+
+                    // Căn hộ
+                    HotelId = model.hotel_id,
+                    IsApartmentOrder = true
+                };
+
+                var exists = await _orderRepository.GetOrderByOrderNo(order.OrderNo);
+                if (exists != null && exists.OrderId > 0)
+                {
+                    return Ok(new
+                    {
+                        status = (int)ResponseType.FAILED,
+                        msg = "Mã đơn hàng đã tồn tại,vui lòng thử lại.",
+                        order_id = -1
+                    });
+                }
+
+                var result = await _orderRepository.CreateOrder(order);
+                var current_user = _ManagementUser.GetCurrentUser();
+
+                string link = "/Order/" + result.OrderId;
+                apiService.SendMessage(
+                    _UserId.ToString(),
+                    ((int)ModuleType.DON_HANG).ToString(),
+                    ((int)ActionType.TAO_MOI).ToString(),
+                    order.OrderNo,
+                    link,
+                    current_user == null ? "0" : current_user.Role
+                );
+
+                workQueueClient.SyncES(result.OrderId,
+                    _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"],
+                    _configuration["DataBaseConfig:Elastic:Index:Order"],
+                    ProjectType.ADAVIGO_CMS,
+                    "CreateApartmentOrder OrderManualController");
+
+                return Ok(new
+                {
+                    status = (int)ResponseType.SUCCESS,
+                    msg = "Tạo đơn hàng căn hộ thành công. Mã đơn hàng: " + result.OrderNo,
+                    order_id = result.OrderId
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("CreateApartmentOrder - OrderManualController: " + ex.ToString());
+                return Ok(new
+                {
+                    status = (int)ResponseType.ERROR,
+                    msg = "Tạo đơn hàng căn hộ không thành công. Vui lòng liên hệ IT"
+                });
+            }
+        }
+
+
+
+        [HttpPost]
+        public IActionResult CreateOrderManual()
+        {
+            ViewBag.Branch = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
+            return View();
+        }
+
+
+
+        [HttpGet]
         public async Task<IActionResult> Orderdetails(long id)
         {
             try
             {
-
                 var result = id;
-                if (id != 0)
-                { 
-                    ViewBag.CN = 1;
-                    var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid((int)id);
-                    if (DetailDebtGuarantee != null)
+                if (id == 0)
+                {
+                    return View();
+                }
+
+                // Mặc định
+                ViewBag.CN = 1;
+                ViewBag.OrderClosing = false;
+                ViewBag.ServiceStatus = 0;
+                ViewBag.ServiceStatus2 = 0;
+                ViewBag.IsDeclineOrder = false;
+                ViewBag.RoleKTTruong = 0;
+                ViewBag.PermisionType = 0;
+                ViewBag.FlyingTicketStause = 0;
+                ViewBag.sale = 0;
+
+                // 1. Check bảo lãnh công nợ
+                var detailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid((int)id);
+                if (detailDebtGuarantee != null)
+                {
+                    ViewBag.CN = 0;
+                }
+
+                // 2. Check khóa sổ
+                var listOrderBookClosing = await _orderRepository.GetListOrderBookClosingByOrderId(id);
+                if (listOrderBookClosing != null && listOrderBookClosing.Count > 0)
+                {
+                    ViewBag.OrderClosing = true;
+                }
+
+                // 3. Thông tin user hiện tại + role
+                var currentUser = _ManagementUser.GetCurrentUser();
+                IEnumerable<int> menu_ids = new List<int>();
+
+                if (currentUser != null && !string.IsNullOrEmpty(currentUser.Role))
+                {
+                    var roleList = new List<int>();
+                    foreach (var a in currentUser.Role.Split(","))
                     {
-                        ViewBag.CN = 0;
-                    }
-                    ViewBag.OrderClosing = false;
-                    var ListOrderBookClosing = await _orderRepository.GetListOrderBookClosingByOrderId(id);
-                    ViewBag.ServiceStatus = 0;
-                    ViewBag.IsDeclineOrder = false;
-                    var current_user = _ManagementUser.GetCurrentUser();
-                    IEnumerable<int> menu_ids = new List<int>();
-                    if (ListOrderBookClosing != null && ListOrderBookClosing.Count > 0)
-                    {
-                        ViewBag.OrderClosing = true;
-                    }
-                    if (current_user != null && current_user.Role != null)
-                    {
-                        List<int> role = new List<int>();
-                        foreach (var a in current_user.Role.Split(","))
+                        try
                         {
-                            try
+                            roleList.Add(Convert.ToInt32(a));
+                        }
+                        catch { }
+                    }
+                    ViewBag.Role = roleList;
+
+                    if (currentUser.Role.Contains(((int)RoleType.KeToanTruong).ToString())
+                        || currentUser.Role.Contains(((int)RoleType.Admin).ToString())
+                        || currentUser.Role.Contains(((int)RoleType.PhoTPKeToan).ToString()))
+                    {
+                        ViewBag.RoleKTTruong = 1;
+                    }
+                }
+
+                // 4. Lấy thông tin đơn hàng
+                var dataOrder = _iOrderRepositories.GetByOrderId(id);
+                if (dataOrder == null)
+                {
+                    LogHelper.InsertLogTelegram($"Orderdetails - OrderId={id} not found");
+                    return View();
+                }
+
+                ViewBag.IsLock = dataOrder.IsLock;
+
+                // 5. 💥 Thông tin CĂN HỘ
+                ViewBag.IsApartmentOrder = dataOrder.IsApartmentOrder;
+                ViewBag.HotelId = dataOrder.HotelId;
+
+                string hotelName = string.Empty;
+                string apartmentAddress = dataOrder.Label; // địa chỉ lưu khi tạo đơn căn hộ
+
+                if (dataOrder.IsApartmentOrder && dataOrder.HotelId.HasValue && dataOrder.HotelId.Value > 0)
+                {
+                    try
+                    {
+                        // dùng HotelRepository mà ông đã có
+                        var hotelDetail = _HotelRepository.GetHotelDetailById(dataOrder.HotelId.Value);
+                        if (hotelDetail != null)
+                        {
+                            hotelName = hotelDetail.Name;
+
+                            // nếu Label đang trống thì fallback sang địa chỉ Hotel.Street
+                            if (string.IsNullOrWhiteSpace(apartmentAddress))
                             {
-                                role.Add(Convert.ToInt32(a));
+                                apartmentAddress = hotelDetail.Street;
                             }
-                            catch { }
-                        }
-                        ViewBag.Role = role;
-                        if (current_user.Role.Contains(((int)RoleType.KeToanTruong).ToString()) || current_user.Role.Contains(((int)RoleType.Admin).ToString()) || current_user.Role.Contains(((int)RoleType.PhoTPKeToan).ToString()))
-                        {
-                            ViewBag.RoleKTTruong = 1;
                         }
                     }
-                    var dataOrder = _iOrderRepositories.GetByOrderId(id);
-                    ViewBag.IsLock = dataOrder != null ? dataOrder.IsLock : false;
-                    var dataOrderService = await _orderRepository.GetAllServiceByOrderId(dataOrder.OrderId);
-                    bool triggered = false;
-                    ViewBag.OrderNo = dataOrder.OrderNo;
-                    ViewBag.SalerId = dataOrder.SalerId;
-                    ViewBag.Amount = dataOrder.Amount;
-                    ViewBag.sale = 0;
-                    if (dataOrder.SalerId == current_user.Id)
+                    catch (Exception ex)
                     {
-                        ViewBag.sale = 1;
+                        LogHelper.InsertLogTelegram("Orderdetails - GetHotelDetailById error: " + ex);
                     }
-                    if (dataOrderService != null && dataOrderService.Count > 0)
+                }
+
+                ViewBag.HotelName = hotelName;
+                ViewBag.ApartmentAddress = apartmentAddress;
+
+                // 6. Dịch vụ theo đơn
+                var dataOrderService = await _orderRepository.GetAllServiceByOrderId(dataOrder.OrderId);
+                bool triggered = false;
+
+                ViewBag.OrderNo = dataOrder.OrderNo;
+                ViewBag.SalerId = dataOrder.SalerId;
+                ViewBag.Amount = dataOrder.Amount;
+
+                if (currentUser != null && dataOrder.SalerId == currentUser.Id)
+                {
+                    ViewBag.sale = 1;
+                }
+
+                if (dataOrderService != null && dataOrderService.Count > 0)
+                {
+                    foreach (var item in dataOrderService)
                     {
-                        foreach (var item in dataOrderService)
+                        if (item.Status == (int)ServiceStatus.Decline || item.Status == (int)ServiceStatus.New)
                         {
-                            if (item.Status == (int)ServiceStatus.Decline || item.Status == (int)ServiceStatus.New)
+                            ViewBag.ServiceStatus = 1;
+                            ViewBag.ServiceStatus2 = 0;
+
+                            if (item.Status == (int)ServiceStatus.Decline)
                             {
-                                ViewBag.ServiceStatus = 1;
-                                ViewBag.ServiceStatus2 = 0;
-                                if (item.Status == (int)ServiceStatus.Decline)
-                                {
-                                    ViewBag.ServiceStatus2 = 1;
-                                }
-                                if (item.Status == (int)ServiceStatus.Decline && !triggered)
-                                {
-                                    ViewBag.IsDeclineOrder = true;
-                                    triggered = true;
-                                }
+                                ViewBag.ServiceStatus2 = 1;
+                            }
+
+                            if (item.Status == (int)ServiceStatus.Decline && !triggered)
+                            {
+                                ViewBag.IsDeclineOrder = true;
+                                triggered = true;
                             }
                         }
                     }
+                }
 
-                    var ClientDetai = await _clientRepository.GetClientDetailByClientId((long)dataOrder.ClientId);
-                    if (ClientDetai != null)
+                // 7. Thông tin client (đơn căn hộ có thể không gắn client)
+                if (dataOrder.ClientId.HasValue && dataOrder.ClientId.Value > 0)
+                {
+                    var clientDetail = await _clientRepository.GetClientDetailByClientId((long)dataOrder.ClientId.Value);
+                    if (clientDetail != null)
                     {
-                        ViewBag.PermisionType = ClientDetai.PermisionType;
+                        ViewBag.PermisionType = clientDetail.PermisionType;
+                    }
+                }
+
+                // 8. Loại mã đơn (manual / b2c)
+                if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                {
+                    ViewBag.OrderNo_Type = 1;
+                }
+                else
+                {
+                    ViewBag.OrderNo_Type = 0;
+                }
+
+                ViewBag.IsManualOrder = false;
+                ViewBag.OrderServiceType = 0;
+                ViewBag.IsB2COrder = false;
+                ViewBag.HasSaleToProgress = true;
+
+                if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                {
+                    ViewBag.IsManualOrder = true;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(dataOrder.OrderNo) && dataOrder.OrderNo.StartsWith("C"))
+                    {
+                        ViewBag.IsB2COrder = true;
                     }
 
-                    if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
+                    if (dataOrder.ServiceType.HasValue)
                     {
-                        ViewBag.OrderNo_Type = 1;
-                    }
-                    else
-                    {
-                        ViewBag.OrderNo_Type = 0;
-                    }
-                    ViewBag.IsManualOrder = false;
-                    ViewBag.OrderServiceType = 0;
-                    ViewBag.IsB2COrder = false;
-                    ViewBag.HasSaleToProgress = true;
-                    if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
-                    {
-                        ViewBag.IsManualOrder = true;
-                    }
-                    else
-                    {
-                        if (dataOrder.OrderNo.StartsWith("C"))
-                        {
-                            ViewBag.IsB2COrder = true;
-                        }
-                        ViewBag.OrderServiceType = (int)dataOrder.ServiceType;
-                        if (dataOrder.SalerId == null || dataOrder.SalerId <= 0)
-                        {
-                            ViewBag.HasSaleToProgress = false;
-                        }
+                        ViewBag.OrderServiceType = (int)dataOrder.ServiceType.Value;
                     }
 
+                    if (!dataOrder.SalerId.HasValue || dataOrder.SalerId <= 0)
+                    {
+                        ViewBag.HasSaleToProgress = false;
+                    }
+                }
 
-                    var dataOrder2 = await _orderRepository.ProductServiceName(id.ToString());
+                // 9. Check trạng thái dịch vụ để enable/disable các button
+                var dataOrder2 = await _orderRepository.ProductServiceName(id.ToString());
+                if (dataOrder2 != null && dataOrder2.Count > 0)
+                {
                     var data = dataOrder2.Where(s => s.Status == 4 ? s.Status == 4 : s.Status == 5).ToList();
                     var data2 = dataOrder2.Any(s => s.Status != 5);
+
                     if (data.Count == dataOrder2.Count)
                     {
                         ViewBag.StatusButton = 1;
@@ -430,6 +780,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     {
                         ViewBag.StatusButton = 0;
                     }
+
                     if (!data2)
                     {
                         ViewBag.stauseButHUY = 1;
@@ -438,36 +789,67 @@ namespace WEB.Adavigo.CMS.Controllers
                     {
                         ViewBag.stauseButHUY = 0;
                     }
-                    var FlyingTicket = (int)ServicesType.FlyingTicket;
-                    if (dataOrder.ProductService != null && dataOrder.ProductService.Contains(FlyingTicket.ToString()))
-                    {
-                        ViewBag.FlyingTicketStause = 1;
-                    }
-                    else
-                    {
-                        ViewBag.FlyingTicketStause = 0;
-                    }
-
-                    ViewBag.OrderId = id;
-                    ViewBag.OrderNo = dataOrder.OrderNo;
-                    ViewBag.ProductService = dataOrder.ProductService;
-                    ViewBag.OrderStatus = dataOrder.OrderStatus;
-                    ViewBag.SalerId = dataOrder.SalerId;
-                    ViewBag.ListOrderStatusNotAllowEdit = new List<int>() { (int)OrderStatus.FINISHED, (int)OrderStatus.CANCEL, (int)OrderStatus.WAITING_FOR_ACCOUNTANT, (int)OrderStatus.WAITING_FOR_OPERATOR };
-                    ViewBag.ListOrderStatusNotAllowToChangeDetail = new List<int>() { (int)OrderStatus.OPERATOR_DECLINE, (int)OrderStatus.ACCOUNTANT_DECLINE };
-                    ViewBag.ListSaleRole = new List<int>() { (int)RoleType.SaleKd, (int)RoleType.SaleOnl, (int)RoleType.SaleTour, (int)RoleType.Admin, (int)RoleType.TPKS, (int)RoleType.TPTour, (int)RoleType.TPVe, (int)RoleType.TPSaleOnl };
-                    return View(result);
+                }
+                else
+                {
+                    ViewBag.StatusButton = 0;
+                    ViewBag.stauseButHUY = 0;
                 }
 
-                return View();
+                // 10. Check dịch vụ vé bay
+                var flyingTicket = (int)ServicesType.FlyingTicket;
+                if (!string.IsNullOrEmpty(dataOrder.ProductService) &&
+                    dataOrder.ProductService.Contains(flyingTicket.ToString()))
+                {
+                    ViewBag.FlyingTicketStause = 1;
+                }
+                else
+                {
+                    ViewBag.FlyingTicketStause = 0;
+                }
+
+                // 11. Các ViewBag chung cho View
+                ViewBag.OrderId = id;
+                ViewBag.OrderNo = dataOrder.OrderNo;
+                ViewBag.ProductService = dataOrder.ProductService;
+                ViewBag.OrderStatus = dataOrder.OrderStatus;
+                ViewBag.SalerId = dataOrder.SalerId;
+
+                ViewBag.ListOrderStatusNotAllowEdit = new List<int>()
+        {
+            (int)OrderStatus.FINISHED,
+            (int)OrderStatus.CANCEL,
+            (int)OrderStatus.WAITING_FOR_ACCOUNTANT,
+            (int)OrderStatus.WAITING_FOR_OPERATOR
+        };
+
+                ViewBag.ListOrderStatusNotAllowToChangeDetail = new List<int>()
+        {
+            (int)OrderStatus.OPERATOR_DECLINE,
+            (int)OrderStatus.ACCOUNTANT_DECLINE
+        };
+
+                ViewBag.ListSaleRole = new List<int>()
+        {
+            (int)RoleType.SaleKd,
+            (int)RoleType.SaleOnl,
+            (int)RoleType.SaleTour,
+            (int)RoleType.Admin,
+            (int)RoleType.TPKS,
+            (int)RoleType.TPTour,
+            (int)RoleType.TPVe,
+            (int)RoleType.TPSaleOnl
+        };
+
+                return View(result);
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("Order - Orderdetails - Orderid=" + id + ";" + ex.ToString());
-
+                LogHelper.InsertLogTelegram("Order - Orderdetails - Orderid=" + id + ";" + ex);
+                return View();
             }
-            return View();
         }
+
 
         public IActionResult OrderdetailNo(string orderNo)
         {
@@ -747,209 +1129,74 @@ namespace WEB.Adavigo.CMS.Controllers
             }
 
         }
+       
+
         [HttpPost]
         public async Task<IActionResult> ClientDetail(int orderId)
         {
-
             try
             {
-                if (orderId != 0)
+                if (orderId == 0)
                 {
-                    var dataOrder = _iOrderRepositories.GetByOrderId(orderId);
-                    if (dataOrder != null)
-                    {
-                        if (dataOrder.AccountClientId != null)
-                        {
-                            var UserCreateclient = await _clientRepository.GetClientDetailByClientId((long)dataOrder.ClientId);
-                            if (UserCreateclient != null)
-                            {
-                                ViewBag.client = UserCreateclient;
-                            }
-                        }
+                    return PartialView();
+                }
 
+                var dataOrder = _iOrderRepositories.GetByOrderId(orderId);
+                if (dataOrder == null)
+                {
+                    return PartialView();
+                }
+
+                // Gắn cờ đơn căn hộ xuống View
+                ViewBag.IsApartmentOrder = dataOrder.IsApartmentOrder;
+
+                // 🔹 CASE 1: ĐƠN CĂN HỘ → ưu tiên lấy thông tin Hotel
+                if (dataOrder.IsApartmentOrder && dataOrder.HotelId.HasValue && dataOrder.HotelId.Value > 0)
+                {
+                    try
+                    {
+                        var hotel = _HotelRepository.GetHotelDetailById(dataOrder.HotelId.Value);
+                        if (hotel != null)
+                        {
+                            ViewBag.HotelName = hotel.Name;
+
+                            // Địa chỉ: ưu tiên Label (khi tạo đơn căn hộ), nếu trống thì fallback sang Street
+                            string address = !string.IsNullOrWhiteSpace(dataOrder.Label)
+                                ? dataOrder.Label
+                                : hotel.Street;
+
+                            ViewBag.ApartmentAddress = address;
+                        }
+                    }
+                    catch (Exception exInner)
+                    {
+                        LogHelper.InsertLogTelegram("ClientDetail - LoadHotelForApartment - OrderController: " + exInner);
+                    }
+
+                    // Trả PartialView – view sẽ tự check IsApartmentOrder để render block căn hộ
+                    return PartialView();
+                }
+
+                // 🔹 CASE 2: ĐƠN THƯỜNG → giữ logic khách hàng như cũ
+                if (dataOrder.ClientId.HasValue && dataOrder.ClientId.Value > 0)
+                {
+                    var userClient = await _clientRepository.GetClientDetailByClientId((long)dataOrder.ClientId.Value);
+                    if (userClient != null)
+                    {
+                        ViewBag.client = userClient;
                     }
                 }
+
                 return PartialView();
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("ClientDetail- OrderController" + ex.ToString());
+                LogHelper.InsertLogTelegram("ClientDetail- OrderController" + ex);
                 return PartialView();
             }
         }
-        public async Task<IActionResult> Packages(int orderId)
-        {
 
-            try
-            {
-                var st = new Stopwatch();
-                st.Start();
-                ViewBag.AllowToEdit = false;
-                ViewBag.IsAddMoreService = false;
-
-                long _UserId = 0;
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
-                if (orderId != 0)
-                {
-                    ViewBag.OrderId = orderId;
-                    ViewBag.OrderStatus = (int)OrderStatus.FINISHED;
-                    var dataOrder = _iOrderRepositories.GetByOrderId(orderId);
-                    ViewBag.IsLock = dataOrder != null && dataOrder.IsLock != null ? dataOrder.IsLock : false;
-                    if (dataOrder != null)
-                    {
-                        //var st2 = new Stopwatch();
-                        //st2.Start();
-                        //var listPaymentRequest = _paymentRequestRepository.GetListPaymentRequestByOrderId(orderId);
-                        //if (listPaymentRequest != null)
-                        //{
-                        //    ViewBag.PaymentRequestAmount = listPaymentRequest.Sum(s => s.Amount);
-                        //}
-                        //else
-                        //{
-                        //    ViewBag.PaymentRequestAmount = 0;
-                        //}
-                        //st2.Stop();
-                        //if (st2.ElapsedMilliseconds > 1000)
-                        //    LogHelper.InsertLogTelegram("Packages-OrderController-GetListPaymentRequestByOrderId:" + st2.ElapsedMilliseconds + "ms");
-                        var st3 = new Stopwatch();
-                        st3.Start();
-
-                        ViewBag.OrderStatus = dataOrder.OrderStatus == null ? (int)OrderStatus.CREATED_ORDER : (byte)dataOrder.OrderStatus;
-                        bool is_allow_to_edit = false;
-                        if ((dataOrder.SalerId != null && dataOrder.SalerId == _UserId) || (dataOrder.SalerGroupId != null && dataOrder.SalerGroupId.Contains(_UserId.ToString())))
-                        {
-                            is_allow_to_edit = true;
-                        }
-                        ViewBag.AllowToEdit = is_allow_to_edit;
-                        if (_indentiferService.IsOrderManual(dataOrder.OrderNo))
-                        {
-                            ViewBag.OrderNo_Type = 1;
-                        }
-                        else
-                        {
-                            ViewBag.OrderNo_Type = 0;
-                        }
-                        if (list_order_status_not_allow_to_edit.Contains((int)dataOrder.OrderStatus))
-                        {
-                            ViewBag.OrderStatus_Type = 1;
-                        }
-                        else
-                        {
-                            ViewBag.OrderStatus_Type = 0;
-                        }
-                        var data = await _orderRepository.GetAllServiceByOrderId(dataOrder.OrderId);
-                      
-                        if (data != null)
-                        {
-                            data = data.OrderBy(s => s.StartDate).ToList();
-                      
-                            foreach (var item in data)
-                            {
-                                item.Price += item.Profit;
-                                switch (item.Type)
-                                {
-                                    case "Tour":
-                                        {
-                                            item.tour = await _tourRepository.GetDetailTourByID(Convert.ToInt32(item.ServiceId));
-                                            var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, 5);
-                                            if (note != null)
-                                                item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
-                                        }
-                                        break;
-                                    case "Khách sạn":
-                                        {
-                                            item.Hotel = await _hotelBookingRepositories.GetDetailHotelBookingByID(Convert.ToInt32(item.ServiceId));
-                                            var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, 1);
-                                            if (note != null)
-                                                item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
-                                        }
-                                        break;
-                                    case "Vé máy bay":
-                                        {
-                                            item.Flight = await _flyBookingDetailRepository.GetDetailFlyBookingDetailById(Convert.ToInt32(item.ServiceId));
-                                            if (item.Flight.GroupBookingId != null)
-                                            {
-                                                var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.Flight.GroupBookingId, 3);
-                                                if (note != null)
-                                                    item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
-                                            }
-                                        }
-                                        break;
-                                    case "Dịch vụ khác":
-                                        {
-                                            item.OtherBooking = await _otherBookingRepository.GetDetailOtherBookingById(Convert.ToInt32(item.ServiceId));
-                                            var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.Other);
-                                            if (note != null)
-                                                item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
-                                        }
-                                        break;
-                                    case "Vinwonder":
-                                        {
-                                            item.VinWonderBooking = await _vinWonderBookingRepository.GetDetailVinWonderByBookingId(Convert.ToInt32(item.ServiceId));
-                                            var note = await _hotelBookingRepositories.GetServiceDeclinesByServiceId(item.ServiceId, (int)ServicesType.VinWonder);
-                                            if (note != null)
-                                                item.Note = note.UserName + " đã từ chối lý do: " + note.Note;
-                                        }
-                                        break;
-                                }
-                            }
-                        }
-                        st3.Stop();
-                        if (st3.ElapsedMilliseconds > 1000)
-                            LogHelper.InsertLogTelegram("Packages-OrderController-GetAllServiceByOrderId" + st3.ElapsedMilliseconds + "ms");
-                        if (data != null && data.Count > 1)
-                        {
-                            for (int o = 0; o < data.Count - 1; o++)
-                            {
-
-                                if (data[o].Flight != null && data[o + 1].Flight != null)
-                                {
-                                    if (data[o].Flight.GroupBookingId == data[o + 1].Flight.GroupBookingId && data[o].Flight.Leg != data[o + 1].Flight.Leg)
-                                    {
-                                        data[o].Flight.StartDistrict2 = data[o + 1].Flight.StartDistrict;
-                                        data[o].Flight.EndDistrict2 = data[o + 1].Flight.EndDistrict;
-                                        data[o].Flight.Leg2 = 3;
-                                        data[o].Flight.BookingCode2 = data[o + 1].Flight.BookingCode;
-                                        data[o].Amount = data[o].Flight.Amount + data[o + 1].Flight.Amount;
-                                        data[o].EndDate = data[o + 1].EndDate;
-                                        data[o].Flight.AirlineName_Vi2 = data[o + 1].Flight.AirlineName_Vi;
-                                       
-                                        data.Remove(data[o + 1]);
-
-                                    }
-                                }
-
-                            }
-                        }
-                        var data2 = await _contractPayRepository.GetContractPayByOrderId(dataOrder.OrderId);
-                        if (data2 != null)
-                        {
-                            ViewBag.paymentAmount = data2.Sum(s => s.AmountPay);
-                        }
-                        if (dataOrder != null && (dataOrder.OrderStatus == (int)OrderStatus.CREATED_ORDER || dataOrder.OrderStatus == (int)OrderStatus.CONFIRMED_SALE))
-                        {
-                            ViewBag.IsAddMoreService = true;
-                        }
-                        ViewBag.data = data;
-                        if (data != null)
-                            ViewBag.quyCSKH = dataOrder.TotalFundCustomerCare != null ? ((double)dataOrder.TotalFundCustomerCare).ToString("N0") : "0";
-                        st.Stop();
-                        if (st.ElapsedMilliseconds > 1000)
-                            LogHelper.InsertLogTelegram("Packages-OrderController - id:" + orderId + "-" + st.ElapsedMilliseconds + "ms");
-                        return PartialView(data);
-                    }
-                }
-                return PartialView();
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("Packages-OrderController" + ex.ToString());
-                return PartialView();
-            }
-        }
+       
         public async Task<IActionResult> ContractPay(int orderId)
         {
             try
@@ -1040,7 +1287,7 @@ namespace WEB.Adavigo.CMS.Controllers
             {
                 ViewBag.id = orderId;
                 ViewBag.CutOffDate = null;
-              
+
                 var dataallcode = _allCodeRepository.GetListByType(AllCodeType.SYSTEM_TYPE);
                 var BRANCH_CODE = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
                 var Order_CODE = _allCodeRepository.GetListByType(AllCodeType.ORDER_STATUS);
@@ -2323,9 +2570,9 @@ namespace WEB.Adavigo.CMS.Controllers
                     modelOrder.OrderStatus = (byte?)Convert.ToInt32(model.OrderStatus);
                     modelOrder.PaymentStatus = Convert.ToInt32(model.PaymentStatus);
                     var updateOrder = _orderRepository.UpdateOrder(modelOrder);
-                    if(Convert.ToInt32(model.OrderStatus)== (int)OrderStatus.CANCEL)
+                    if (Convert.ToInt32(model.OrderStatus) == (int)OrderStatus.CANCEL)
                     {
-                       var detail= _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(Convert.ToInt32(model.OrderId));
+                        var detail = _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid(Convert.ToInt32(model.OrderId));
                         _debtGuaranteeRepository.UpdateDebtGuarantee(detail.Id, (int)DebtGuaranteeStatus.TU_CHOI, (int)UpdatedBy);
                     }
                     //var data2 = await _orderRepository.UpdateOrderStatus(Convert.ToInt32(model.OrderId), Convert.ToInt32(model.OrderStatus), UpdatedBy, UserVerify);

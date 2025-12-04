@@ -98,6 +98,8 @@ builder.Services.AddTransient<IContractRepository, ContractRepository>();
 builder.Services.AddTransient<IPolicyRepository, PolicyRepository>();
 builder.Services.AddTransient<IIdentifierServiceRepository, IdentifierServiceRepository>();
 builder.Services.AddTransient<IAccountClientRepository, AccountClientRepository>();
+builder.Services.AddTransient<IApartmentOrderRepository, ApartmentOrderRepository>();
+
 
 builder.Services.AddTransient<IHotelBookingRepositories, HotelBookingRepositories>();
 builder.Services.AddTransient<IHotelBookingRoomRepository, HotelBookingRoomsRepository>();
@@ -174,6 +176,9 @@ app.MapControllerRoute(name: "transactionsms",
 app.MapControllerRoute(name: "Order",
  pattern: "/Order/{id?}",
  defaults: new { controller = "Order", action = "Orderdetails" });
+app.MapControllerRoute(name: "Apartment",
+ pattern: "/Apartment/{id?}",
+ defaults: new { controller = "Apartment", action = "Orderdetails" });
 app.MapControllerRoute(name: "SetService",
  pattern: "SetService/fly/detail/{group_booking_id}",
  defaults: new { controller = "SetService", action = "FlyDetail" });

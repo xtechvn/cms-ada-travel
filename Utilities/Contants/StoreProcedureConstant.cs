@@ -7,6 +7,8 @@ namespace Utilities.Contants
     public class StoreProcedureConstant
     {
         public static string GetClientByID = "SP_GetClientByID";
+        public static string SP_Apartment_SaveRoomLedger = "SP_Apartment_SaveRoomLedger";
+
         public static string GetClientByAccountClientID = "SP_GetClientByAccountClientID";
         public static string GetContactClientByID = "SP_GetContactClientByID";
         public static string GetContractByID = "SP_GetContractByID";

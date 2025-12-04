@@ -1,0 +1,93 @@
+﻿@using Entities.Models
+
+@{
+    bool isApartmentOrder = false;
+    if (ViewBag.IsApartmentOrder != null)
+    {
+        try
+        {
+            isApartmentOrder = (bool)ViewBag.IsApartmentOrder;
+        }
+        catch { }
+    }
+
+    var client = ViewBag.client as Client;
+
+    string hotelName = ViewBag.HotelName as string ?? "";
+    string apartmentAddress = ViewBag.ApartmentAddress as string ?? "";
+}
+
+@if (isApartmentOrder)
+{
+    <!-- 💥 ĐƠN CĂN HỘ: show thông tin căn hộ -->
+    <div class="border bg-white mb20">
+        <div class="flex space-between pd10">
+            <div class="bold">Thông tin căn hộ</div>
+        </div>
+        <div class="line-bottom pb0 mb0"></div>
+
+        <div class="info-basic flex align-center pd10 mb10">
+            <div class="ava">
+                <span class="thumb_img thumb_5x5">
+                    <img src="/images/graphics/home.png" /> @* icon căn hộ, ông đổi đường dẫn nếu cần *@
+                </span>
+            </div>
+            <div class="content">
+                <div class="name">
+                    @(!string.IsNullOrWhiteSpace(hotelName) ? hotelName : "Chưa có tên căn hộ")
+                </div>
+                <div>
+                    @(!string.IsNullOrWhiteSpace(apartmentAddress) ? apartmentAddress : "Chưa có địa chỉ")
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (client != null)
+{
+    <!-- ĐƠN THƯỜNG: giữ nguyên hiển thị khách hàng -->
+    <div class="border bg-white mb20">
+        <div class="flex space-between pd10">
+            <div class="bold">Thông tin khách hàng</div>
+        </div>
+        <div class="line-bottom pb0 mb0"></div>
+        <div class="info-basic flex align-center pd10 mb10">
+            <div class="ava">
+                <span class="thumb_img thumb_5x5">
+                    @if (!string.IsNullOrEmpty(client.Avartar))
+                    {
+                        <img src="@client.Avartar" />
+                    }
+                    else
+                    {
+                        <img src="/images/graphics/user.jpeg" />
+                    }
+                </span>
+            </div>
+            <div class="content">
+                <div class="name">@(client.ClientName) (@client.ClientCode)</div>
+                <div>@client.Phone - @client.Email</div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- ĐƠN THƯỜNG nhưng chưa có client -->
+    <div class="border bg-white mb20">
+        <div class="flex space-between pd10">
+            <div class="bold">Thông tin khách hàng</div>
+        </div>
+        <div class="line-bottom pb0 mb0"></div>
+        <div class="info-basic flex align-center pd10 mb10">
+            <div class="ava">
+                <span class="thumb_img thumb_5x5">
+                    <img src="/images/graphics/user.jpeg" />
+                </span>
+            </div>
+            <div class="content">
+                <div class="name">Khách chưa được tạo tài khoản</div>
+            </div>
+        </div>
+    </div>
+}
