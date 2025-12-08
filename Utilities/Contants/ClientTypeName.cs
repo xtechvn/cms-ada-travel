@@ -17,7 +17,8 @@ namespace Utilities.Contants
         SALE = 6, // nv kinh doanh
         ENTERPRISE = 7, // Doanh nghiệp
         COLLABORATORS = 8,// Cộng tác viên
-        STAFF = 9//Nhân viên trong công ty
+        STAFF = 9,//Nhân viên trong công ty
+        DTDB = 9//Nhân viên trong công ty
 
     }
     public class ClientTypeName
@@ -32,7 +33,8 @@ namespace Utilities.Contants
             {Convert.ToInt16(ClientTypekh.SALE), "SL" },
             {Convert.ToInt16(ClientTypekh.ENTERPRISE), "DN" },
             {Convert.ToInt16(ClientTypekh.COLLABORATORS), "CT" },
-            {Convert.ToInt16(ClientTypekh.STAFF), "NV" }
+            {Convert.ToInt16(ClientTypekh.STAFF), "NV" },
+            {Convert.ToInt16(ClientTypekh.DTDB), "CLDB" }
         };
     }
 }
