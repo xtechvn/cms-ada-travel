@@ -8,6 +8,12 @@ namespace Utilities.Contants
     {
         public static string GetClientByID = "SP_GetClientByID";
         public static string SP_Apartment_SaveRoomLedger = "SP_Apartment_SaveRoomLedger";
+        public static string SP_GetListHotelShareHolderByHotelId = "SP_GetListHotelShareHolderByHotelId";
+        public static string SP_InsertHotelShareHolder = "SP_InsertHotelShareHolder";
+        public static string SP_UpdateHotelShareHolder = "SP_UpdateHotelShareHolder";
+
+
+
 
         public static string GetClientByAccountClientID = "SP_GetClientByAccountClientID";
         public static string GetContactClientByID = "SP_GetContactClientByID";

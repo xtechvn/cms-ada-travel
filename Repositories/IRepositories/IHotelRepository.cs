@@ -50,8 +50,12 @@ namespace Repositories.IRepositories
         public Hotel GetHotelByHotelID(string hotel_id);
         Task<bool> UpdateHotelSurchargeNote(string body, int id);
         //fe
-        List<HotelPricePolicyViewModel> GetHotelRoomPricePolicy(string hotel_id, string room_ids,  string client_types);
+        List<HotelPricePolicyViewModel> GetHotelRoomPricePolicy(string hotel_id, string room_ids, string client_types);
         List<HotelPosition> GetListHotelPosition(long hotelid);
+        int UpsertHotelShareHolder(HotelShareHolder model);
+        HotelShareHolder GetHotelShareHolderById(int id);
+        IEnumerable<HotelShareHolderGridModel> GetHotelShareHolderList(int hotel_id);
+        int DeleteHotelShareHolder(int id);
 
-    }
+        }
 }

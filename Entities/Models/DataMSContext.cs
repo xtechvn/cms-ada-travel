@@ -71,6 +71,8 @@ namespace Entities.Models
         public virtual DbSet<HotelBookingRooms> HotelBookingRooms { get; set; }
         public virtual DbSet<HotelBookingRoomsOptional> HotelBookingRoomsOptional { get; set; }
         public virtual DbSet<HotelContact> HotelContact { get; set; }
+        public virtual DbSet<HotelShareHolder> HotelShareHolder { get; set; }
+
         public virtual DbSet<HotelGuest> HotelGuest { get; set; }
         public virtual DbSet<HotelRoom> HotelRoom { get; set; }
         public virtual DbSet<HotelSupplier> HotelSupplier { get; set; }

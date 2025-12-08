@@ -398,6 +398,134 @@ namespace DAL
         }
 
         #endregion
+        #region ShareHolder
+
+        public DataTable GetHotelShareHolderDataTable(int hotel_id)
+        {
+            try
+            {
+                SqlParameter[] param = new SqlParameter[]
+                {
+            new SqlParameter("@HotelId", hotel_id)
+                };
+
+                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListHotelShareHolderByHotelId, param);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public HotelShareHolder GetHotelShareHolderById(int id)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var data = (
+                        from sh in _DbContext.HotelShareHolder
+                        join u in _DbContext.User on sh.UserId equals u.Id
+                        where sh.Id == id && sh.IsDeleted == false
+                        select new HotelShareHolder
+                        {
+                            Id = sh.Id,
+                            HotelId = sh.HotelId,
+                            UserId = sh.UserId,
+                            SharePercent = sh.SharePercent,
+                            Note = sh.Note,
+
+                            CreatedBy = sh.CreatedBy,
+                            CreateDate = sh.CreateDate,
+                            UpdatedBy = sh.UpdatedBy,
+                            UpdateDate = sh.UpdateDate,
+                            IsDeleted = sh.IsDeleted,
+
+                            // ✅ THÔNG TIN USER
+                            UserName = u.UserName,
+                            
+                        }
+                    ).FirstOrDefault();
+
+                    return data;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetHotelShareHolderById - LINQ: " + ex);
+                throw;
+            }
+        }
+
+
+        public int DeleteHotelShareHolderById(int id)
+        {
+            try
+            {
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var model = _DbContext.HotelShareHolder.Find(id);
+                    if (model != null)
+                    {
+                        model.IsDeleted = true;
+                        _DbContext.SaveChanges();
+                    }
+                    return id;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public int InsertHotelShareHolder(HotelShareHolder model)
+        {
+            try
+            {
+                SqlParameter[] param = new SqlParameter[]
+                {
+            new SqlParameter("@HotelId", model.HotelId),
+            new SqlParameter("@UserId", model.UserId),
+            new SqlParameter("@SharePercent", model.SharePercent),
+            new SqlParameter("@Note", model.Note ?? (object)DBNull.Value),
+            new SqlParameter("@CreatedBy", model.CreatedBy ?? (object)DBNull.Value)
+                };
+
+                return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_InsertHotelShareHolder, param);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertHotelShareHolder - HotelDAL: " + ex);
+                return -1;
+            }
+        }
+
+        public int UpdateHotelShareHolder(HotelShareHolder model)
+        {
+            try
+            {
+                SqlParameter[] param = new SqlParameter[]
+                {
+            new SqlParameter("@Id", model.Id),
+            new SqlParameter("@HotelId", model.HotelId),
+            new SqlParameter("@UserId", model.UserId),
+            new SqlParameter("@SharePercent", model.SharePercent),
+            new SqlParameter("@Note", model.Note ?? (object)DBNull.Value),
+            new SqlParameter("@UpdatedBy", model.UpdatedBy ?? (object)DBNull.Value)
+                };
+
+                return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdateHotelShareHolder, param);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateHotelShareHolder - HotelDAL: " + ex);
+                return -1;
+            }
+        }
+
+        #endregion
+
 
         #region contact
         public DataTable GetHotelContactDataTable(int hotel_id)

@@ -28,6 +28,69 @@ namespace Repositories.Repositories
             _UrlStaticImage = domainConfig.Value.ImageStatic;
         }
 
+        #region ShareHolder
+
+        public int UpsertHotelShareHolder(HotelShareHolder model)
+        {
+            try
+            {
+                if (model.Id > 0)
+                {
+                    model.UpdatedBy = _SysUserModel.Id;
+                    return _HotelDAL.UpdateHotelShareHolder(model);
+                }
+                else
+                {
+                    model.CreatedBy = _SysUserModel.Id;
+                    return _HotelDAL.InsertHotelShareHolder(model);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public HotelShareHolder GetHotelShareHolderById(int id)
+        {
+            try
+            {
+                return _HotelDAL.GetHotelShareHolderById(id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<HotelShareHolderGridModel> GetHotelShareHolderList(int hotel_id)
+        {
+            try
+            {
+                var dataTable = _HotelDAL.GetHotelShareHolderDataTable(hotel_id);
+                return dataTable.ToList<HotelShareHolderGridModel>();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public int DeleteHotelShareHolder(int id)
+        {
+            try
+            {
+                return _HotelDAL.DeleteHotelShareHolderById(id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        #endregion
+
+
         public int DeleteHotelBankingAccount(int id)
         {
             try
