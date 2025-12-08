@@ -85,28 +85,32 @@ namespace DAL
             {
                 SqlParameter[] param = new SqlParameter[]
                 {
-            new SqlParameter("@Id", model.Id ?? 0),
-            new SqlParameter("@OrderId", model.OrderId ?? 0),
-            new SqlParameter("@HotelId", model.HotelId ?? 0),
-            new SqlParameter("@RoomId", model.RoomId),
+            new SqlParameter("@Id",       model.Id ?? 0),
+            new SqlParameter("@OrderId",  model.OrderId ?? 0),
+            new SqlParameter("@HotelId",  model.HotelId ?? 0),
+            new SqlParameter("@RoomId",   model.RoomId),
 
             new SqlParameter("@LedgerType", model.LedgerType),
 
             // ===== THU =====
-            new SqlParameter("@CustomerName", model.CustomerName ?? (object)DBNull.Value),
-            new SqlParameter("@ContractDate", model.ContractDate ?? (object)DBNull.Value),
-            new SqlParameter("@ContractExpired", model.ContractExpired ?? (object)DBNull.Value),
-            new SqlParameter("@RoomPrice", model.RoomPrice ?? (object)DBNull.Value),
-            new SqlParameter("@ServiceFee", model.ServiceFee ?? (object)DBNull.Value),
-            new SqlParameter("@TotalAmount", model.TotalAmount ?? (object)DBNull.Value),
-            new SqlParameter("@AmountPaid", model.AmountPaid ?? (object)DBNull.Value),
+            new SqlParameter("@CustomerName",    (object)model.CustomerName ?? DBNull.Value),
+            new SqlParameter("@PhoneNumber",     (object)model.PhoneNumber ?? DBNull.Value),     // NEW
+            new SqlParameter("@ContractDate",    (object)model.ContractDate ?? DBNull.Value),
+            new SqlParameter("@ContractExpired", (object)model.ContractExpired ?? DBNull.Value),
+            new SqlParameter("@DurationMonth",   (object)model.DurationMonth ?? DBNull.Value),   // NEW
+            new SqlParameter("@RoomPrice",       (object)model.RoomPrice ?? DBNull.Value),
+            new SqlParameter("@ServiceFee",      (object)model.ServiceFee ?? DBNull.Value),
+            new SqlParameter("@RentAmount",      (object)model.RentAmount ?? DBNull.Value),      // NEW
+            new SqlParameter("@DepositAmount",   (object)model.DepositAmount ?? DBNull.Value),   // NEW
+            new SqlParameter("@TotalAmount",     (object)model.TotalAmount ?? DBNull.Value),
+            new SqlParameter("@AmountPaid",      (object)model.AmountPaid ?? DBNull.Value),
 
             // ===== CHI =====
-            new SqlParameter("@ExpenseTypeId", model.ExpenseTypeId ?? (object)DBNull.Value),
-            new SqlParameter("@ExpenseType", model.ExpenseType ?? (object)DBNull.Value),
-            new SqlParameter("@Description", model.Description ?? (object)DBNull.Value),
-            new SqlParameter("@ExpenseAmount", model.ExpenseAmount ?? (object)DBNull.Value),
-            new SqlParameter("@ExpenseDate", model.ExpenseDate ?? (object)DBNull.Value),
+            new SqlParameter("@ExpenseTypeId", (object)model.ExpenseTypeId ?? DBNull.Value),
+            new SqlParameter("@ExpenseType",   (object)model.ExpenseType ?? DBNull.Value),
+            new SqlParameter("@Description",   (object)model.Description ?? DBNull.Value),
+            new SqlParameter("@ExpenseAmount", (object)model.ExpenseAmount ?? DBNull.Value),
+            new SqlParameter("@ExpenseDate",   (object)model.ExpenseDate ?? DBNull.Value),
 
             new SqlParameter("@UserId", model.CreatedBy)
                 };
@@ -119,7 +123,8 @@ namespace DAL
                 throw;
             }
         }
-        
+
+
         public int DeleteLedger(int id, int userId)
         {
             SqlParameter[] param = new SqlParameter[]

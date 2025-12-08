@@ -2,7 +2,15 @@
 @model ApartmentRoomLedgerViewModel
 
 @using System.Globalization
+<style>
+    .input-auto {
+        background-color: #eaf6ff !important;
+        color: #004a80;
+        cursor: not-allowed;
+        font-weight: 600;
+    }
 
+</style>
 @{
     var vi = new CultureInfo("vi-VN");
 
@@ -23,8 +31,12 @@
     // Tổng đã thanh toán (bảng Thu)
     var sumThuPaid = thuList.Sum(x => x.AmountPaid ?? 0);
 
-    // Tổng phải thu = sum( RoomPrice + ServiceFee )
-    var sumThuMust = thuList.Sum(x => (x.RoomPrice ?? 0) + (x.ServiceFee ?? 0));
+    // Tổng phải thu = sum( Tiền nhà + Phí DV + Cọc )
+    // Tiền nhà = RoomPrice * DurationMonth
+    decimal sumThuMust = thuList.Sum(x =>
+        ((x.RoomPrice ?? 0) * (x.DurationMonth ?? 0))
+        + (x.ServiceFee ?? 0)
+        + (x.DepositAmount ?? 0));
 
     // Tổng đã chi = sum( ExpenseAmount )
     var sumChiTotal = chiList.Sum(x => x.ExpenseAmount ?? 0);
@@ -34,7 +46,7 @@
 }
 
 <div class="modal fade" id="myModal5">
-    <div class="modal-dialog modal-xl" style="max-width: 1200px;">
+    <div class="modal-dialog modal-xl" style="max-width: 1500px;">
 
         <div class="modal-content">
 
@@ -50,8 +62,6 @@
                 <input type="hidden" id="ledger_roomId" value="@Model.RoomInfo?.Id" />
                 <input type="hidden" id="ledger_hotelId" value="@Model.RoomInfo?.HotelId" />
 
-
-
                 <!-- ====================== BẢNG THU ====================== -->
                 <div class="bold mb15 txt_14">Bảng Thu</div>
 
@@ -61,10 +71,14 @@
                             <tr>
                                 <th>STT</th>
                                 <th>Khách hàng</th>
+                                <th>SĐT</th>
                                 <th>Ngày HĐ</th>
+                                <th>Thời hạn (tháng)</th>
                                 <th>Hết hạn</th>
                                 <th>Giá phòng</th>
                                 <th>Phí DV</th>
+                                <th>Tiền nhà</th>
+                                <th>Tiền cọc</th>
                                 <th>Tổng phải thu</th>
                                 <th>Tổng đã thanh toán</th>
                                 <th></th>
@@ -76,51 +90,129 @@
                             {
                                 foreach (var t in thuList)
                                 {
-                                    var totalMust = (t.RoomPrice ?? 0) + (t.ServiceFee ?? 0);
+                                    var duration = t.DurationMonth ?? 0;
+                                    var roomPrice = t.RoomPrice ?? 0;
+                                    var rentAmount = roomPrice * duration;
 
-                                    <tr class="ledger-row">
-                                        <td>@(stt++)</td>
+                                    // Tổng phải thu = Tiền nhà + Phí DV + Cọc
+                                    var totalMust = rentAmount
+                                                    + (t.ServiceFee ?? 0)
+                                                    + (t.DepositAmount ?? 0);
 
-                                        <td>
-                                            <input type="hidden" class="ledger-id" value="@t.Id" />
-                                            <input class="form-control customer" value="@t.CustomerName" />
-                                        </td>
+                                            <tr class="ledger-row">
+                                                <td>@(stt++)</td>
 
-                                        <td>
-                                            <input type="date"
-                                                   class="form-control date-contract"
-                                                   value="@(t.ContractDate?.ToString("yyyy-MM-dd"))" />
-                                        </td>
+                                                <td>
+                                                    <input type="hidden" class="ledger-id" value="@t.Id" />
+                                                    <input class="form-control customer" value="@t.CustomerName" />
+                                                </td>
 
-                                        <td>
-                                            <input type="date"
-                                                   class="form-control date-expire"
+                                                <!-- SĐT -->
+                                                <td>
+                                                    <input class="form-control phone"
+                                                           value="@t.PhoneNumber" />
+                                                </td>
+
+                                                <!-- Ngày HĐ -->
+                                                <td>
+                                                    <input type="date"
+                                                           class="form-control date-contract"
+                                                           value="@(t.ContractDate?.ToString("yyyy-MM-dd"))" />
+                                                </td>
+
+                                                <!-- Thời hạn (tháng) -->
+                                                <td>
+                                                    <input class="form-control duration-month"
+                                                           value="@(t.DurationMonth?.ToString() ?? "")" />
+                                                </td>
+
+                                                <!-- Ngày hết hạn (readonly, auto = Ngày HĐ + Thời hạn) -->
+                                                <td>
+                                                    <input type="date"
+                                                   class="form-control date-expire input-auto"
+                                                           readonly
                                                    value="@(t.ContractExpired?.ToString("yyyy-MM-dd"))" />
+                                                </td>
+
+                                                <!-- GIÁ PHÒNG -->
+                                                <td>
+                                                    <input class="form-control room-price"
+                                                           value="@(t.RoomPrice.HasValue ? t.RoomPrice.Value.ToString("N0", vi) : "")" />
+                                                </td>
+
+                                                <!-- PHÍ DV -->
+                                                <td>
+                                                    <input class="form-control service-fee"
+                                                           value="@(t.ServiceFee.HasValue ? t.ServiceFee.Value.ToString("N0", vi) : "")" />
+                                                </td>
+
+                                                <!-- TIỀN NHÀ (auto) -->
+                                                <td>
+                                            <input class="form-control rent-amount input-auto"
+                                                           readonly
+                                                           value="@(rentAmount > 0 ? rentAmount.ToString("N0", vi) : "")" />
+                                                </td>
+
+                                                <!-- TIỀN CỌC -->
+                                                <td>
+                                                    <input class="form-control deposit-amount"
+                                                           value="@(t.DepositAmount.HasValue ? t.DepositAmount.Value.ToString("N0", vi) : "")" />
+                                                </td>
+
+                                                <!-- TỔNG PHẢI THU (auto = Tiền nhà + Phí DV + Cọc) -->
+                                                <td>
+                                            <input class="form-control total-must-pay input-auto"
+                                                           readonly
+                                                           value="@(totalMust > 0 ? totalMust.ToString("N0", vi) : "")" />
+                                                </td>
+
+                                                <!-- TỔNG ĐÃ THANH TOÁN (AmountPaid) -->
+                                                <td>
+                                                    <input class="form-control total-paid"
+                                                           value="@(t.AmountPaid.HasValue ? t.AmountPaid.Value.ToString("N0", vi) : "")" />
+                                                </td>
+
+                                                <td>
+                                                    <a href="javascript:;" class="red remove-row">
+                                                        <i class="fa fa-times"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                }
+                            }
+                            else
+                            {
+                                    <tr class="ledger-row">
+                                        <td>1</td>
+
+                                        <td>
+                                            <input type="hidden" class="ledger-id" value="0" />
+                                            <input class="form-control customer" />
                                         </td>
 
-                                        <!-- GIÁ PHÒNG -->
+                                        <td><input class="form-control phone" /></td>
+
+                                        <td><input type="date" class="form-control date-contract" /></td>
+
+                                        <td><input class="form-control duration-month" /></td>
+
+                                        <td><input type="date" class="form-control date-expire" readonly /></td>
+
+                                        <td><input class="form-control room-price" /></td>
+                                        <td><input class="form-control service-fee" /></td>
+
+                                        <td><input class="form-control rent-amount" readonly /></td>
+
+                                        <td><input class="form-control deposit-amount" /></td>
+
+                                        <!-- TỔNG PHẢI THU -->
                                         <td>
-                                            <input class="form-control room-price"
-                                                   value="@(t.RoomPrice.HasValue ? t.RoomPrice.Value.ToString("N0", vi) : "")" />
+                                            <input class="form-control total-must-pay" readonly />
                                         </td>
 
-                                        <!-- PHÍ DV -->
+                                        <!-- TỔNG ĐÃ THANH TOÁN -->
                                         <td>
-                                            <input class="form-control service-fee"
-                                                   value="@(t.ServiceFee.HasValue ? t.ServiceFee.Value.ToString("N0", vi) : "")" />
-                                        </td>
-
-                                        <!-- TỔNG PHẢI THU (auto = RoomPrice + ServiceFee) -->
-                                        <td>
-                                            <input class="form-control total-must-pay"
-                                                   value="@(totalMust.ToString("N0", vi))"
-                                                   readonly />
-                                        </td>
-
-                                        <!-- TỔNG ĐÃ THANH TOÁN (AmountPaid) -->
-                                        <td>
-                                            <input class="form-control total-paid"
-                                                   value="@(t.AmountPaid.HasValue ? t.AmountPaid.Value.ToString("N0", vi) : "")" />
+                                            <input class="form-control total-paid" />
                                         </td>
 
                                         <td>
@@ -129,59 +221,26 @@
                                             </a>
                                         </td>
                                     </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr class="ledger-row">
-                                    <td>1</td>
-
-                                    <td>
-                                        <input type="hidden" class="ledger-id" value="0" />
-                                        <input class="form-control customer" />
-                                    </td>
-
-                                    <td><input type="date" class="form-control date-contract" /></td>
-                                    <td><input type="date" class="form-control date-expire" /></td>
-                                    <td><input class="form-control room-price" /></td>
-                                    <td><input class="form-control service-fee" /></td>
-
-                                    <!-- TỔNG PHẢI THU -->
-                                    <td>
-                                        <input class="form-control total-must-pay" readonly />
-                                    </td>
-
-                                    <!-- TỔNG ĐÃ THANH TOÁN -->
-                                    <td>
-                                        <input class="form-control total-paid" />
-                                    </td>
-
-                                    <td>
-                                        <a href="javascript:;" class="red remove-row">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
                             }
 
                             <!-- Dòng Thêm + Tổng đã thanh toán -->
                             <tr>
-                                <!-- Gom từ STT → Phí DV (6 cột đầu) -->
-                                <td colspan="6">
+                                <!-- Gom từ STT → Tiền cọc (10 cột đầu) -->
+                                <td colspan="10">
                                     <a href="javascript:;" id="addThu" class="blue ml-2 mb10">
                                         <i class="fa fa-plus-circle green"></i> Thêm dòng
                                     </a>
                                 </td>
 
-                                <!-- Cột 7: label -->
+                                <!-- Cột 11: label -->
                                 <td class="text-right"><b>Tổng đã thanh toán:</b></td>
 
-                                <!-- Cột 8: value -->
+                                <!-- Cột 12: value -->
                                 <td id="sumThu" class="text-right">
                                     @sumThuPaid.ToString("N0", vi)
                                 </td>
 
-                                <!-- Cột 9: trống -->
+                                <!-- Cột 13: trống -->
                                 <td></td>
                             </tr>
                         </tbody>
@@ -212,34 +271,59 @@
                             {
                                 foreach (var c in chiList)
                                 {
+                                            <tr class="ledger-row">
+                                                <td>@(stt2++)</td>
+
+                                                <td>
+                                                    <input type="hidden" class="ledger-id" value="@c.Id" />
+
+                                                    <select class="form-control expense-type">
+                                                        <option value="1" selected="@(c.ExpenseTypeId == 1 ? "selected" : null)">Hoa hồng</option>
+                                                        <option value="2" selected="@(c.ExpenseTypeId == 2 ? "selected" : null)">Dịch vụ</option>
+                                                    </select>
+                                                </td>
+
+                                                <td>
+                                                    <input class="form-control expense-desc"
+                                                           value="@c.Description" />
+                                                </td>
+
+                                                <!-- TIỀN CHI (ExpenseAmount) -->
+                                                <td>
+                                                    <input class="form-control expense-amount"
+                                                           value="@(c.ExpenseAmount.HasValue ? c.ExpenseAmount.Value.ToString("N0", vi) : "")" />
+                                                </td>
+
+                                                <td>
+                                                    <input type="date"
+                                                           class="form-control expense-date"
+                                                           value="@(c.ExpenseDate?.ToString("yyyy-MM-dd"))" />
+                                                </td>
+
+                                                <td>
+                                                    <a href="javascript:;" class="red remove-row">
+                                                        <i class="fa fa-times"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                }
+                            }
+                            else
+                            {
                                     <tr class="ledger-row">
-                                        <td>@(stt2++)</td>
+                                        <td>1</td>
 
                                         <td>
-                                            <input type="hidden" class="ledger-id" value="@c.Id" />
-
+                                            <input type="hidden" class="ledger-id" value="0" />
                                             <select class="form-control expense-type">
-                                                <option value="1" selected="@(c.ExpenseTypeId == 1 ? "selected" : null)">Hoa hồng</option>
-                                                <option value="2" selected="@(c.ExpenseTypeId == 2 ? "selected" : null)">Dịch vụ</option>
+                                                <option value="1">Hoa hồng</option>
+                                                <option value="2">Dịch vụ</option>
                                             </select>
                                         </td>
 
-                                        <td>
-                                            <input class="form-control expense-desc"
-                                                   value="@c.Description" />
-                                        </td>
-
-                                        <!-- TIỀN CHI (ExpenseAmount) -->
-                                        <td>
-                                            <input class="form-control expense-amount"
-                                                   value="@(c.ExpenseAmount.HasValue ? c.ExpenseAmount.Value.ToString("N0", vi) : "")" />
-                                        </td>
-
-                                        <td>
-                                            <input type="date"
-                                                   class="form-control expense-date"
-                                                   value="@(c.ExpenseDate?.ToString("yyyy-MM-dd"))" />
-                                        </td>
+                                        <td><input class="form-control expense-desc" /></td>
+                                        <td><input class="form-control expense-amount" /></td>
+                                        <td><input type="date" class="form-control expense-date" /></td>
 
                                         <td>
                                             <a href="javascript:;" class="red remove-row">
@@ -247,31 +331,6 @@
                                             </a>
                                         </td>
                                     </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr class="ledger-row">
-                                    <td>1</td>
-
-                                    <td>
-                                        <input type="hidden" class="ledger-id" value="0" />
-                                        <select class="form-control expense-type">
-                                            <option value="1">Hoa hồng</option>
-                                            <option value="2">Dịch vụ</option>
-                                        </select>
-                                    </td>
-
-                                    <td><input class="form-control expense-desc" /></td>
-                                    <td><input class="form-control expense-amount" /></td>
-                                    <td><input type="date" class="form-control expense-date" /></td>
-
-                                    <td>
-                                        <a href="javascript:;" class="red remove-row">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </td>
-                                </tr>
                             }
 
                             <!-- Tổng chi -->

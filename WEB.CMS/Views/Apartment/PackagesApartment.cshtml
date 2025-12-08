@@ -68,14 +68,18 @@
                                 <td class="text-right">@room.Profit.ToString("N0")</td>
 
                                 <td>
-                                    @if (room.Status == 1)
-                                    {
-                                        <span class="badge" style="background:#27ae60; color:white;">Hoàn thành</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge" style="background:#f1c40f; color:black;">Đang xử lý</span>
-                                    }
+                                        @if (room.Status == 0)
+                                        {
+                                            <span class="badge badge-warning">Đang xử lý</span>
+                                        }
+                                        else if (room.Status == 1)
+                                        {
+                                            <span class="badge badge-success">Hoàn thành</span>
+                                        }
+                                        else if (room.Status == 2)
+                                        {
+                                            <span class="badge badge-danger">Hết hạn</span>
+                                        }
                                 </td>
 
 
@@ -89,17 +93,46 @@
                             </tr>
                         }
 
-                        <!-- Tổng hợp cuối căn -->
-                        <tr class="no-border hidden-tablet">
-                            <td></td>
-                            <td class="bold">Tổng doanh thu căn</td>
-                            <td class="text-right red">@totalRevenue.ToString("N0")</td>
-                            <td class="text-right">@totalPaid.ToString("N0")</td>
-                            <td class="text-right">@totalCost.ToString("N0")</td>
-                            <td class="text-right">@totalProfit.ToString("N0")</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold">Tổng phải thu (doanh thu căn)</td>
+                                <td class="red text-right">@totalRevenue.ToString("N0")</td>
+                                <td></td>
+                            </tr>
+
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold">Tổng đã thanh toán</td>
+                                <td class="text-right">@totalPaid.ToString("N0")</td>
+                                <td></td>
+                            </tr>
+
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold">Tổng chi phí</td>
+                                <td class="text-right">@totalCost.ToString("N0")</td>
+                                <td></td>
+                            </tr>
+
+                            <tr class="no-border hidden-tablet">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="bold">Tổng lợi nhuận</td>
+                                <td class="text-right">@totalProfit.ToString("N0")</td>
+                                <td></td>
+                            </tr>
+
                     }
                     else
                     {

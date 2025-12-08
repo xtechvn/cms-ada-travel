@@ -1,5 +1,6 @@
 ﻿var _order_detail_create = {
     _deletedLedgerIds: [],
+
     Initialization: function () {
         _order_detail_create.ClientSuggesstion()
         _order_detail_common.Select2WithFixedOptionAndNoSearch($("#branch"))
@@ -8,6 +9,7 @@
 
         _order_detail_create.DynamicBindClientInput();
         _order_detail_create.UserSuggesstion();
+
         $('#client-select').on('select2:select', function (e) {
             var data = e.params.data;
             if (data && data.address) {
@@ -22,10 +24,9 @@
             $('#btn_summit_order').prop('disabled', true);
         });
 
-
         //================= FORMAT TIỀN VNĐ REALTIME + CỘNG TỔNG =================
         $(document).on("input",
-            ".room-price, .service-fee, .total-paid, .expense-amount",
+            ".room-price, .service-fee, .deposit-amount, .total-paid, .expense-amount",
             function () {
                 let $this = $(this);
                 let raw = $this.val().replace(/\./g, "");
@@ -34,26 +35,41 @@
 
                 let $row = $this.closest("tr");
 
-                // Nếu sửa giá phòng hoặc phí DV -> cập nhật Tổng phải thu & summary
-                if ($this.hasClass("room-price") || $this.hasClass("service-fee")) {
+                // Giá phòng / Phí DV / Cọc => update Tiền nhà + Tổng phải thu
+                if ($this.hasClass("room-price")
+                    || $this.hasClass("service-fee")
+                    || $this.hasClass("deposit-amount")) {
                     _order_detail_create.updateThuRowTotal($row);
                     _order_detail_create.updateSummary();
                 }
 
-                // Nếu sửa Tổng đã thanh toán -> cập nhật Tổng đã thanh toán của cả bảng
+                // Tổng đã thanh toán => update tổng Thu
                 if ($this.hasClass("total-paid")) {
                     _order_detail_create.updateSumThu();
                 }
 
-                // Nếu sửa tiền chi -> cập nhật Tổng chi & summary
+                // Chi => tổng chi / lợi nhuận
                 if ($this.hasClass("expense-amount")) {
                     _order_detail_create.updateSummary();
                 }
             });
 
+        // Khi thay đổi thời hạn => update Tiền nhà + Ngày hết hạn + Tổng phải thu
+        $(document).on("input", ".duration-month", function () {
+            let $row = $(this).closest("tr");
+            _order_detail_create.updateThuRowTotal($row);
+            _order_detail_create.updateExpireDate($row);
+            _order_detail_create.updateSummary();
+        });
+
+        // Khi đổi Ngày HĐ => update Ngày hết hạn
+        $(document).on("change", ".date-contract", function () {
+            let $row = $(this).closest("tr");
+            _order_detail_create.updateExpireDate($row);
+        });
+
         // =============== ADD ROW THU ====================
         $(document).on("click", "#addThu", function () {
-            debugger
             let row = `
 <tr class="ledger-row">
     <td></td>
@@ -61,21 +77,27 @@
         <input type="hidden" class="ledger-id" value="0" />
         <input class="form-control customer"/>
     </td>
+
+    <td><input class="form-control phone" /></td>
     <td><input type="date" class="form-control date-contract"/></td>
-    <td><input type="date" class="form-control date-expire"/></td>
+
+    <td><input class="form-control duration-month"/></td>
+
+    <td><input type="date" class="form-control date-expire input-auto" readonly/></td>
+
     <td><input class="form-control room-price"/></td>
     <td><input class="form-control service-fee"/></td>
 
-    <!-- TỔNG PHẢI THU -->
-    <td><input class="form-control total-must-pay" readonly /></td>
+    <td><input class="form-control rent-amount input-auto" readonly/></td>
 
-    <!-- TỔNG ĐÃ THANH TOÁN -->
+    <td><input class="form-control deposit-amount"/></td>
+
+    <td><input class="form-control total-must-pay input-auto" readonly /></td>
+
     <td><input class="form-control total-paid"/></td>
 
     <td>
-        <a href="javascript:;" class="red remove-row">
-            <i class="fa fa-times"></i>
-        </a>
+        <a href="javascript:;" class="red remove-row"><i class="fa fa-times"></i></a>
     </td>
 </tr>`;
 
@@ -88,32 +110,30 @@
 
         // =============== ADD ROW CHI ====================
         $(document).on("click", "#addChi", function () {
-            debugger
             let row = `
-    <tr class="ledger-row">
-        <td></td>
-        <td>
-            <input type="hidden" class="ledger-id" value="0" />
-            <select class="form-control expense-type">
-                <option value="1">Hoa hồng</option>
-                <option value="2">Dịch vụ</option>
-            </select>
-        </td>
-        <td><input class="form-control expense-desc"/></td>
-        <td><input class="form-control expense-amount"/></td>
-        <td><input type="date" class="form-control expense-date"/></td>
-        <td>
-            <a href="javascript:;" class="red remove-row">
-                <i class="fa fa-times"></i>
-            </a>
-        </td>
-    </tr>`;
+<tr class="ledger-row">
+    <td></td>
+    <td>
+        <input type="hidden" class="ledger-id" value="0" />
+        <select class="form-control expense-type">
+            <option value="1">Hoa hồng</option>
+            <option value="2">Dịch vụ</option>
+        </select>
+    </td>
+    <td><input class="form-control expense-desc"/></td>
+    <td><input class="form-control expense-amount"/></td>
+    <td><input type="date" class="form-control expense-date"/></td>
+    <td>
+        <a href="javascript:;" class="red remove-row">
+            <i class="fa fa-times"></i>
+        </a>
+    </td>
+</tr>`;
 
             $("#tblChi tbody tr:last").before(row);
             _order_detail_create.reIndex();
             _order_detail_create.updateSummary();
         });
-
 
         // =============== REMOVE ROW ====================
         $(document).on("click", ".remove-row", function () {
@@ -130,13 +150,16 @@
             _order_detail_create.updateSummary();
         });
 
-        // Tính lại Tổng phải thu, Tổng chi, Lợi nhuận, Tổng đã thanh toán khi mở popup
+        // Khi mở popup lần đầu => tính lại tất cả
         $("#tblThu tbody tr.ledger-row").each(function () {
-            _order_detail_create.updateThuRowTotal($(this));
+            let $row = $(this);
+            _order_detail_create.updateThuRowTotal($row);
+            _order_detail_create.updateExpireDate($row);
         });
         _order_detail_create.updateSumThu();
         _order_detail_create.updateSummary();
     },
+
     //=============== FORMAT VNĐ ====================
     formatCurrencyVND: function (value) {
         return value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -146,6 +169,7 @@
         if (!value) return 0;
         return parseFloat(value.replace(/\./g, "")) || 0;
     },
+
     // Hàm đánh lại STT cho tất cả row "ledger-row"
     reIndex: function () {
         $("#tblThu tbody tr.ledger-row").each(function (i) {
@@ -156,21 +180,54 @@
             $(this).find("td:first").text(i + 1);
         });
     },
-    // Cập nhật tổng phải thu 1 dòng
+
+    // Tính Ngày hết hạn = Ngày HĐ + Thời hạn (tháng)
+    updateExpireDate: function ($row) {
+        let startStr = $row.find(".date-contract").val();
+        let monthStr = $row.find(".duration-month").val();
+        let months = parseInt(monthStr) || 0;
+
+        if (!startStr || months <= 0) {
+            $row.find(".date-expire").val("");
+            return;
+        }
+
+        let d = new Date(startStr);
+        d.setMonth(d.getMonth() + months);
+
+        let yyyy = d.getFullYear();
+        let mm = ('0' + (d.getMonth() + 1)).slice(-2);
+        let dd = ('0' + d.getDate()).slice(-2);
+
+        $row.find(".date-expire").val(`${yyyy}-${mm}-${dd}`);
+    },
+
+    // Cập nhật Tiền nhà + Tổng phải thu 1 dòng
+    // Tiền nhà = Giá phòng x Thời hạn
+    // Tổng phải thu = Tiền nhà + Phí DV + Cọc
     updateThuRowTotal: function ($row) {
         let room = _order_detail_create.parseMoney($row.find(".room-price").val());
+        let monthStr = $row.find(".duration-month").val();
+        let months = parseInt(monthStr) || 0;
         let fee = _order_detail_create.parseMoney($row.find(".service-fee").val());
-        let total = room + fee;
+        let deposit = _order_detail_create.parseMoney($row.find(".deposit-amount").val());
 
+        // Tiền nhà = Giá phòng x Thời hạn
+        let rent = room * months;
+
+        let $rentInput = $row.find(".rent-amount");
+        if ($rentInput.length) {
+            $rentInput.val(rent > 0 ? _order_detail_create.formatCurrencyVND(rent.toString()) : "");
+        }
+
+        // Tổng phải thu = Tiền nhà + Phí DV + Cọc
+        let total = rent + fee + deposit;
         let $totalInput = $row.find(".total-must-pay");
         if ($totalInput.length) {
-            if (total > 0) {
-                $totalInput.val(_order_detail_create.formatCurrencyVND(total.toString()));
-            } else {
-                $totalInput.val("");
-            }
+            $totalInput.val(total > 0 ? _order_detail_create.formatCurrencyVND(total.toString()) : "");
         }
     },
+
 
     // Tổng đã thanh toán (bảng Thu)
     updateSumThu: function () {
@@ -215,47 +272,12 @@
         $("#sumProfit").text(_order_detail_create.formatCurrencyVND(profit.toString()));
     },
 
-    ClientSuggesstion: function () {
-        $('#client-select').select2({
-            placeholder: 'Chọn căn hộ',
-            allowClear: true,
-            width: '100%',
-            minimumInputLength: 0,
-            dropdownParent: $('#create_order_manual'), // 🔥 BẮT BUỘC khi dùng trong modal
-            ajax: {
-                url: '/Apartment/Suggest',
-                type: 'GET',
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        term: params.term || '',
-                        size: 20
-                    };
-                },
-                processResults: function (data) {
-                    // Controller đã trả đúng { id, text, address } rồi
-                    return {
-                        results: $.map(data, function (item) {
-                            return {
-                                id: item.id,
-                                text: item.text,      // 🔥 text ở đây chắc chắn có
-                                address: item.address // mình giữ lại để fill địa chỉ
-                            };
-                        })
-                    };
-                },
-                cache: true
-            }
-        });
-    },
     openRoomLedger: function (roomId) {
         $.ajax({
             url: "/Apartment/RoomLedgerPopup",
             type: "GET",
             data: { roomId: roomId },
             success: function (html) {
-                debugger
                 // XÓA modal cũ nếu tồn tại
                 $("#myModal5").remove();
 
@@ -269,13 +291,14 @@
     },
 
     saveRoomLedger: function () {
-        debugger
-        let orderId = $("#orderId").val();  // hoặc ViewBag.OrderId đưa vào input hidden
+        let orderId = $("#orderId").val();  // hidden ở ngoài
+
         // Validate form
         if (!_order_detail_create.validateLedger()) return;
+
         let model = {
             RoomId: parseInt($("#ledger_roomId").val()),
-            HotelId: parseInt($("#ledger_hotelId").val()),   // <<< THÊM VÔ NÈ
+            HotelId: parseInt($("#ledger_hotelId").val()),
             Thu: [],
             Chi: [],
             DeletedIds: _order_detail_create._deletedLedgerIds
@@ -295,17 +318,20 @@
             model.Thu.push({
                 Id: parseInt($r.find(".ledger-id").val()) || 0,
                 CustomerName: customer,
+                PhoneNumber: $r.find(".phone").val().trim(),
                 ContractDate: $r.find(".date-contract").val() || null,
                 ExpireDate: $r.find(".date-expire").val() || null,
+                DurationMonth: parseInt($r.find(".duration-month").val()) || 0,
                 RoomPrice: _order_detail_create.parseMoney(price),
                 ServiceFee: _order_detail_create.parseMoney($r.find(".service-fee").val()),
+                RentAmount: _order_detail_create.parseMoney($r.find(".rent-amount").val()),
+                DepositAmount: _order_detail_create.parseMoney($r.find(".deposit-amount").val()),
                 TotalPaid: _order_detail_create.parseMoney(paid)
             });
         });
 
         // === Collect Chi ===
         $("#tblChi tbody tr.ledger-row").each((i, row) => {
-            debugger
             let $r = $(row);
 
             let desc = $r.find(".expense-desc").val().trim();
@@ -322,7 +348,6 @@
             });
         });
 
-        // DEBUG
         console.log("DATA SEND:", model);
 
         $.ajax({
@@ -332,20 +357,14 @@
             data: JSON.stringify(model),
 
             success: function (res) {
-                debugger
                 if (res.status) {
-                    debugger
                     toastr.success(res.msg);
                     $("#myModal5").modal("hide");
 
-                    
-                    // 🔥 TỰ ĐỘNG RELOAD LẠI GIAO DIỆN PACKAGES KHÔNG CẦN F5
-                    //_order_detail_create.reloadPackages();
+                    // quay lại trang đơn căn hộ
                     setTimeout(function () {
                         window.location.href = "/Apartment/" + orderId;
-                    }, 1000);
-                  
-
+                    }, 800);
                 } else {
                     toastr.error(res.msg);
                 }
@@ -356,25 +375,7 @@
                 toastr.error("Có lỗi khi lưu ledger");
             }
         });
-
-
     },
-    reloadPackages: function () {
-        debugger
-        
-
-        $.ajax({
-            url: "/Apartment/Packages",
-            type: "POST",
-            data: { orderId: orderId },
-            success: function (html) {
-                $("#packages-container").html(html);
-                // 🔥 chính là DIV ôm cái bảng PackagesApartment
-            }
-        });
-    },
-
-    
 
     // Validate dữ liệu nhập
     validateLedger: function () {
@@ -418,6 +419,44 @@
 
         return true;
     },
+    ClientSuggesstion: function () {
+        $('#client-select').select2({
+            placeholder: 'Chọn căn hộ',
+            allowClear: true,
+            width: '100%',
+            minimumInputLength: 0,
+            dropdownParent: $('#create_order_manual'), // 🔥 BẮT BUỘC khi dùng trong modal
+            ajax: {
+                url: '/Apartment/Suggest',
+                type: 'GET',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term || '',
+                        size: 20
+                    };
+                },
+                processResults: function (data) {
+                    // Controller đã trả đúng { id, text, address } rồi
+                    return {
+                        results: $.map(data, function (item) {
+                            return {
+                                id: item.id,
+                                text: item.text,      // 🔥 text ở đây chắc chắn có
+                                address: item.address // mình giữ lại để fill địa chỉ
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+    },
+
+
+
+
 
 
 

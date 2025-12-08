@@ -164,28 +164,47 @@ namespace Repositories.Repositories
             // ====== SAVE THU ======
             foreach (var t in model.Thu)
             {
+                // --- TÍNH TOÁN SERVER-SIDE ---
+                var duration = t.DurationMonth;                    // số tháng
+                var roomPrice = t.RoomPrice;                       // giá phòng / tháng
+                var serviceFee = t.ServiceFee;                     // phí DV
+                var deposit = t.DepositAmount;                     // tiền cọc
+
+                // Tiền nhà = giá phòng * thời hạn
+                decimal rentAmount = roomPrice * duration;
+
+                // Ngày hết hạn = Ngày HĐ + thời hạn (tháng)
+                DateTime? contractExpired = null;
+                if (t.ContractDate.HasValue && duration > 0)
+                {
+                    contractExpired = t.ContractDate.Value.AddMonths(duration);
+                }
+
+                // Tổng phải thu = tiền nhà + phí DV + cọc
+                decimal totalAmount = rentAmount + serviceFee + deposit;
+
                 var data = new ApartmentRoomLedgerModel()
                 {
                     Id = t.Id,
                     RoomId = model.RoomId,
-                    HotelId = model.HotelId,     // <<< IMPORTANT!
+                    HotelId = model.HotelId,
                     LedgerType = 1,
 
                     CustomerName = t.CustomerName,
+                    PhoneNumber = t.PhoneNumber,
                     ContractDate = t.ContractDate,
-                    ContractExpired = t.ExpireDate,
+                    ContractExpired = contractExpired,
 
-                    RoomPrice = t.RoomPrice,
-                    ServiceFee = t.ServiceFee,
-                    TotalAmount = t.RoomPrice + t.ServiceFee,   // <<< Tổng phải thu OK
-                    AmountPaid = t.TotalPaid,                   // <<< Tổng đã thanh toán OK
+                    DurationMonth = duration,
+                    RoomPrice = roomPrice,
+                    ServiceFee = serviceFee,
+                    RentAmount = rentAmount,
+                    DepositAmount = deposit,
+                    TotalAmount = totalAmount,            // Tổng phải thu mới
+                    AmountPaid = t.TotalPaid,            // Tổng đã thanh toán
 
                     CreatedBy = userId
                 };
-
-                
-
-
 
                 result = apartmentOrderDAL.SaveLedger(data);
             }
@@ -197,11 +216,11 @@ namespace Repositories.Repositories
                 {
                     Id = c.Id,
                     RoomId = model.RoomId,
-                    HotelId = model.HotelId,     // <<< IMPORTANT!
+                    HotelId = model.HotelId,
                     LedgerType = 2,
 
                     ExpenseTypeId = c.ExpenseTypeId,
-                    ExpenseType = c.ExpenseType,    // <<< THÊM NÀY
+                    ExpenseType = c.ExpenseType,
                     Description = c.Description,
                     ExpenseAmount = c.ExpenseAmount,
                     ExpenseDate = c.ExpenseDate,
@@ -211,6 +230,7 @@ namespace Repositories.Repositories
 
                 result = apartmentOrderDAL.SaveLedger(data);
             }
+
             // Xóa các bản ghi bị remove trên UI
             if (model.DeletedIds != null && model.DeletedIds.Count > 0)
             {
@@ -220,9 +240,9 @@ namespace Repositories.Repositories
                 }
             }
 
-
             return result;
         }
+
 
 
         public async Task<GenericViewModel<OrderViewModel>> GetList(OrderViewSearchModel searchModel, int currentPage, int pageSize)

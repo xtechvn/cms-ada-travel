@@ -60,6 +60,11 @@ namespace Entities.ViewModels.Apartment
 
         // ====================== SYSTEM ======================
         public DateTime CreatedDate { get; set; }
+        public string PhoneNumber { get; set; }
+        public int? DurationMonth { get; set; }
+        public decimal? RentAmount { get; set; }
+        public decimal? DepositAmount { get; set; }
+
     }
 
     public class ApartmentRoomLedgerViewModel
@@ -110,6 +115,11 @@ namespace Entities.ViewModels.Apartment
         public DateTime? ExpenseDate { get; set; }
 
         public int CreatedBy { get; set; }
+        public string PhoneNumber { get; set; }
+        public int? DurationMonth { get; set; }
+        public decimal? RentAmount { get; set; }
+        public decimal? DepositAmount { get; set; }
+
     }
 
 
@@ -139,6 +149,11 @@ namespace Entities.ViewModels.Apartment
         public decimal RoomPrice { get; set; }
         public decimal ServiceFee { get; set; }
         public decimal TotalPaid { get; set; }
+        public string PhoneNumber { get; set; }
+        public int DurationMonth { get; set; }
+        public decimal RentAmount { get; set; }
+        public decimal DepositAmount { get; set; }
+
     }
 
     public class LedgerChiInput
