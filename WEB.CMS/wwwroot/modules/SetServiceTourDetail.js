@@ -137,7 +137,7 @@ var _SetService_Tour_Detail = {
     },
     UpdateTourStatus: function (tourId, status, OrderId) {
         var ServiceCode = $('#ServiceCode').val();
-        var amount = $('#TourAmount').val();
+        var amount = $('#operator-order-amount').val();
         var user = $('#user').val();
         var Saler = $('#Saler-Name').attr('data-sale');
         var title = 'Nhận đặt dịch vụ';
