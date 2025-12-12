@@ -1026,12 +1026,12 @@ namespace Repositories.Repositories
                 if (model != null && model.Count > 0)
                 {
                     double min_price = (double)model.Where(x => x.AdultPrice != null).OrderBy(x => (double)x.AdultPrice).First().AdultPrice;
-                    var tour = await tourDAL.GetTourById(tour_product_id);
-                    if (tour != null && tour.Id > 0)
-                    {
-                        tour.Amount = min_price;
-                        tourDAL.UpdateTour(tour);
-                    }
+                    //var tour = await tourDAL.GetTourById(tour_product_id);
+                    //if (tour != null && tour.Id > 0)
+                    //{
+                    //    tour.Amount = min_price;
+                    //    tourDAL.UpdateTour(tour);
+                    //}
                     foreach (var item in model)
                     {
                         if (item.Id <= 0)
