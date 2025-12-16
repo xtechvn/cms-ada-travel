@@ -27,6 +27,7 @@ namespace Utilities.Contants
         CHUONG_TRINH = 90,//quản chương trình qc
         //CHUONG_TRINH = 82,//quản chương trình pro
         XEP_HANG = 99,//Bảng xếp hạng
+        QL_KHACH_HANG_V2 = 101,//Quản lý khách hàngV2
 
     }
 }
