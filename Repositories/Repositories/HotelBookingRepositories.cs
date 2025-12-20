@@ -908,7 +908,7 @@ namespace Repositories.Repositories
                         ws.Cells["C" + RowIndex].SetStyle(numberStyle);
                         ws.Cells["D" + RowIndex].PutValue(item.Price.ToString("N0"));
                         ws.Cells["D" + RowIndex].SetStyle(numberStyle);
-                        ws.Cells["E" + RowIndex].PutValue((item.RoomNights * item.NumberOfRoom).ToString("N0"));
+                        ws.Cells["E" + RowIndex].PutValue((item.NumberOfRoom).ToString("N0"));
                         ws.Cells["E" + RowIndex].SetStyle(numberStyle);
                     }
                     #endregion
