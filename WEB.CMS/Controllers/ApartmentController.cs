@@ -157,7 +157,7 @@ namespace WEB.Adavigo.CMS.Controllers
 
             return View();
         }
-        [HttpPost]
+    
         [HttpPost]
         public IActionResult Packages(int orderId)
         {

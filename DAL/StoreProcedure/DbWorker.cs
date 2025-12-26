@@ -251,6 +251,46 @@ namespace DAL.StoreProcedure
                 return -1;
             }
         }
+        public int ExecuteNonQuery2(string procedureName, SqlParameter[] parameters = null)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connection))
+                using (SqlCommand cmd = new SqlCommand(procedureName, conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    if (parameters != null)
+                        cmd.Parameters.AddRange(parameters);
+
+                    conn.Open();
+                    using (SqlTransaction trans = conn.BeginTransaction())
+                    {
+                        cmd.Transaction = trans;
+
+                        try
+                        {
+                            cmd.ExecuteNonQuery();
+                            trans.Commit();
+                            return 1;
+                        }
+                        catch (Exception ex)
+                        {
+                            trans.Rollback();
+                            LogHelper.InsertLogTelegram("DB Error: " + ex);
+                            return -1;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ExecuteNonQuery2 Fatal: " + ex);
+                return -1;
+            }
+        }
+
+
         public int ExecuteNonQueryByQuery(string query, SqlParameter[] parameters = null)
         {
             try

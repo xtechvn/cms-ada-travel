@@ -1,4 +1,5 @@
-﻿using Entities.ViewModels;
+﻿using Entities.Models;
+using Entities.ViewModels;
 using Entities.ViewModels.Apartment;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,18 @@ namespace Repositories.IRepositories
         Task<GenericViewModel<OrderViewModel>> GetTotalCountOrder(OrderViewSearchModel searchModel, int currentPage, int pageSize);
         Task<GenericViewModel<OrderViewModel>> GetList(OrderViewSearchModel searchModel, int currentPage, int pageSize);
         Task<List<ApartmentRoomLedger>> LoadLedgerPopup(int roomId);
+        List<ReportHotelShareHolderViewModel> GetReportHotelShareHolder(
+    ReportHotelShareHolderSearchModel model,
+    out long total);
+
+        List<HotelShareHolderPaymentGridModel> GetListPayment(string name, int pageIndex, int pageSize, out long total);
+             int InsertPayment(HotelShareHolderPayment model);
+        int DeletePayment(int id);
+
+        List<ShareHolderSearchViewModel> SearchShareHolder(string keyword);
+        List<ReportHotelShareHolderDetailViewModel>
+    GetShareHolderDetail(int shareHolderId);
+
 
         Task<int> SaveLedger(RoomLedgerInput model, int userId);
 

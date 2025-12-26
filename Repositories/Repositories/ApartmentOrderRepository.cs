@@ -1,9 +1,12 @@
 ﻿using DAL;
+using DAL.StoreProcedure;
 using Entities.ConfigModels;
 using Entities.Models;
 using Entities.ViewModels;
 using Entities.ViewModels.Apartment;
+using Entities.ViewModels.Vinpearl;
 using Microsoft.Extensions.Options;
+using PdfSharp;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
@@ -155,6 +158,28 @@ namespace Repositories.Repositories
             var dt = apartmentOrderDAL.GetLedgerByRoomId(roomId);
             return dt.ToList<ApartmentRoomLedger>();
         }
+        public List<ReportHotelShareHolderViewModel> GetReportHotelShareHolder(
+     ReportHotelShareHolderSearchModel model,
+     out long total)
+        {
+            try
+            {
+                var dt = apartmentOrderDAL.GetReportHotelShareHolder(model);
+
+                var data = dt.ToList<ReportHotelShareHolderViewModel>();
+
+                total = data.Any() ? data.First().TotalRow : 0;
+
+                return data;
+            }
+            catch
+            {
+                total = 0;
+                throw;
+            }
+        }
+
+
 
 
         public async Task<int> SaveLedger(RoomLedgerInput model, int userId)
@@ -322,6 +347,33 @@ namespace Repositories.Repositories
             }
             return model;
         }
+        public List<HotelShareHolderPaymentGridModel> GetListPayment(string name, int pageIndex, int pageSize, out long total)
+        {
+            var data = apartmentOrderDAL.GetListPayment(name, pageIndex, pageSize);
+            total = data.Any() ? data.First().TotalRow : 0;
+            return data;
+        }
+
+     public List<ReportHotelShareHolderDetailViewModel> GetShareHolderDetail(int shareHolderId)
+        {
+            var data = apartmentOrderDAL.GetShareHolderDetail(shareHolderId);
+            
+            return data;
+        }
+        public int InsertPayment(HotelShareHolderPayment model)
+        {
+            return apartmentOrderDAL.InsertPayment(model);
+        }
+
+        public int DeletePayment(int id)
+        {
+            return apartmentOrderDAL.DeletePayment(id);
+        }
+        public List<ShareHolderSearchViewModel> SearchShareHolder(string keyword)
+        {
+            return apartmentOrderDAL.SearchShareHolder(keyword);
+        }
+
 
         ///// <summary>
         ///// Tạo đơn căn hộ

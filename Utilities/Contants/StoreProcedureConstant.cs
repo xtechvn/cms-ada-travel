@@ -11,6 +11,8 @@ namespace Utilities.Contants
         public static string SP_GetListHotelShareHolderByHotelId = "SP_GetListHotelShareHolderByHotelId";
         public static string SP_InsertHotelShareHolder = "SP_InsertHotelShareHolder";
         public static string SP_UpdateHotelShareHolder = "SP_UpdateHotelShareHolder";
+        public static string SP_ReportHotelShareHolder = "SP_ReportHotelShareHolder";
+
 
 
 

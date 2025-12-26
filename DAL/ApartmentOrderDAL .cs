@@ -23,6 +23,63 @@ namespace DAL
             _connection = connection;
             _DbWorker = new DbWorker(connection);
         }
+        public int InsertPayment(HotelShareHolderPayment model)
+        {
+            var param = new SqlParameter[]
+            {
+        new("@ShareHolderId", model.ShareHolderId),
+        new("@HotelId", model.HotelId),
+        new("@Amount", model.Amount),
+        new("@PayDate", model.PayDate ?? (object)DBNull.Value),
+        new("@Note", model.Note ?? (object)DBNull.Value),
+        new("@CreatedBy", model.CreatedBy ?? (object)DBNull.Value)
+            };
+
+            return _DbWorker.ExecuteNonQuery2("SP_InsertHotelShareHolderPayment", param);
+        }
+
+
+        public List<ShareHolderSearchViewModel> SearchShareHolder(string keyword)
+        {
+            var param = new[]
+            {
+        new SqlParameter("@Keyword", string.IsNullOrEmpty(keyword) ? (object)DBNull.Value : keyword)
+    };
+
+            return _DbWorker.GetDataTable("SP_SearchHotelShareHolder", param)
+                .ToList<ShareHolderSearchViewModel>();
+        }
+        public List<ReportHotelShareHolderDetailViewModel> GetShareHolderDetail(int shareHolderId)
+        {
+            var param = new[]
+            {
+        new SqlParameter("@ShareHolderId", shareHolderId)
+    };
+
+            return _DbWorker
+                .GetDataTable("SP_ReportHotelShareHolderDetail", param)
+                .ToList<ReportHotelShareHolderDetailViewModel>();
+        }
+
+
+        public List<HotelShareHolderPaymentGridModel> GetListPayment(string name, int pageIndex, int pageSize)
+        {
+            SqlParameter[] param =
+            {
+            new("@ShareHolderName", name ?? (object)DBNull.Value),
+            new("@PageIndex", pageIndex),
+            new("@PageSize", pageSize)
+        };
+
+            return _DbWorker.GetDataTable("SP_GetListHotelShareHolderPayment", param)
+                            .ToList<HotelShareHolderPaymentGridModel>();
+        }
+
+        public int DeletePayment(int id)
+        {
+            SqlParameter[] param = { new("@Id", id) };
+            return _DbWorker.ExecuteNonQuery("SP_DeleteHotelShareHolderPayment", param);
+        }
 
         /// <summary>
         /// Gợi ý danh sách Căn hộ (Hotel.IsApartment = 1) theo từ khóa.
@@ -70,6 +127,29 @@ namespace DAL
                 return new List<ApartmentSuggestViewModel>();
             }
         }
+        public DataTable GetReportHotelShareHolder(ReportHotelShareHolderSearchModel model)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[]
+                {
+            new SqlParameter("@ShareHolderName", model.ShareHolderName ?? (object)DBNull.Value),
+            new SqlParameter("@PageIndex", model.PageIndex),
+            new SqlParameter("@PageSize", model.PageSize)
+                };
+
+                return _DbWorker.GetDataTable(
+                    StoreProcedureConstant.SP_ReportHotelShareHolder,
+                    objParam
+                );
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetReportHotelShareHolder DAL: " + ex);
+                return new DataTable();
+            }
+        }
+
         public DataTable GetLedgerByRoomId(int roomId)
         {
             SqlParameter[] param =
@@ -79,6 +159,23 @@ namespace DAL
 
             return _DbWorker.GetDataTable("SP_Apartment_GetLedgerByRoomId", param);
         }
+        public IEnumerable<HotelShareHolderReportModel> GetHotelShareHolderReport(
+    int? userId, int pageIndex, int pageSize, out long total)
+        {
+            SqlParameter[] param =
+            {
+        new SqlParameter("@UserId", userId ?? (object)DBNull.Value),
+        new SqlParameter("@PageIndex", pageIndex),
+        new SqlParameter("@PageSize", pageSize),
+        new SqlParameter("@Total", SqlDbType.BigInt) { Direction = ParameterDirection.Output }
+    };
+
+            var dt = _DbWorker.GetDataTable("SP_ReportHotelShareHolder", param);
+
+            total = Convert.ToInt64(param[3].Value);
+            return dt.ToList<HotelShareHolderReportModel>();
+        }
+
         public int SaveLedger(ApartmentRoomLedgerModel model)
         {
             try
