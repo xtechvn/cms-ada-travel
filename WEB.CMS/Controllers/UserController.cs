@@ -94,6 +94,32 @@ namespace WEB.CMS.Controllers
             }
             return PartialView(model);
         }
+        [HttpPost]
+        public IActionResult Search2(string userName, int? status, int currentPage = 1, int pageSize = 20)
+        {
+            try
+            {
+                if (status < 0 || status > 2) status = null;
+                if (!string.IsNullOrWhiteSpace(userName))
+                    userName = CommonHelper.RemoveUnicode(userName);
+
+                var model = _UserRepository.GetPagingList(userName, status, currentPage, pageSize);
+
+                return Json(new
+                {
+                    data = model.ListData   // ✅ SELECT2 SẼ DÙNG CÁI NÀY
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Search - UserController: " + ex);
+
+                return Json(new
+                {
+                    data = new List<UserGridModel>()
+                });
+            }
+        }
 
         public async Task<IActionResult> AddOrUpdate(int Id, bool IsClone = false)
         {

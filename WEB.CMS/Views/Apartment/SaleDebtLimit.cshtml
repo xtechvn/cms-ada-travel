@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Quỹ chăm sóc khách hàng";
+}
+@using Entities.Models
+@{
+
+}
+
+<section style=" overflow-x: hidden;">
+    <div class="main-container">
+        <div class="row-main container">
+            <h2 class="txt_18 bold mb20">Bảo lãnh công nợ</h2>
+            <div class="wrap_bg wrap_bg_no-padding mb20" style="width: 70% !important;" bis_skin_checked="1">
+                <div class="table-responsive table-default table-gray" bis_skin_checked="1">
+                    <table class="table table-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Tổng hạn mức bảo lãnh</th>
+
+                                <th>Số tiền đang bảo lãnh</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                
+                                        @ViewBag.DebtLimit
+                                        
+                                   
+                                </td>
+
+                                <td>
+                                    @ViewBag.AmountTotal
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <h2 class="txt_18 bold mb20">Danh sách đơn hàng</h2>
+
+
+            <div id="grid-data" class="wrap_bg wrap_bg_no-padding mb20">
+                <div class="col-xl-12 text-center" style="margin-top:200px">
+                    <img src="~/images/icons/loading.gif" style=" width: 100px; height: 100px; display:none;"
+                         id="imgLoading" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script type="text/javascript" src="~/modules/saler_debt_limit.js" asp-append-version="true"></script>
+}
+

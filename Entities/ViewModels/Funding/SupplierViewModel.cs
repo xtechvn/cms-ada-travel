@@ -33,6 +33,7 @@ namespace Entities.ViewModels.Funding
             }
         }
         public string fullname { get; set; }
+        public int? QuantityTickets { get; set; }
     }
 
     public class SupplierDetailViewModel : Supplier

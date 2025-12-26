@@ -1,4 +1,194 @@
-﻿var hotel_contact = {
+﻿var hotel_shareholders = {
+    Init: function () {
+        this.modal = $('#global_modal_popup');
+        this.search_params = {
+            hotel_id: $('#global_hotel_id').val()
+        };
+        this.ReloadListing();
+    },
+
+    GetFormData: function ($form) {
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function (n, i) {
+            indexed_array[n['name']] = n['value'];
+        });
+
+        return indexed_array;
+    },
+
+    // ===================== INIT DROPDOWN % =====================
+    InitPercentDropdown: function (selected) {
+        let $select = $("#share_percent");
+        $select.empty();
+
+        for (let i = 0; i <= 100; i++) {
+            let opt = `<option value="${i}" ${i == selected ? "selected" : ""}>${i}%</option>`;
+            $select.append(opt);
+        }
+    },
+
+    // ===================== OPEN POPUP ADD / UPDATE =====================
+    OnAddOrUpdate: function (id) {
+        debugger
+        let title = id > 0 ? "Cập nhật cổ đông" : "Thêm cổ đông";
+        let url = "/Hotel/ShareHolderUpsert";
+
+        this.modal.find('.modal-title').html(title);
+        this.modal.find('.modal-dialog').css('max-width', '600px');
+
+        _ajax_caller.get(url, {
+            id: id,
+            hotel_id: this.search_params.hotel_id
+        }, function (html) {
+
+            hotel_shareholders.modal.find('.modal-body').html(html);
+            hotel_shareholders.modal.modal('show');
+
+            // ✅ SELECT2 USER SEARCH
+            // ✅ SELECT2 USER SEARCH
+            $("#share_user_select").select2({
+                placeholder: "Nhập tên / SĐT / email để tìm...",
+                width: "100%",
+                dropdownParent: $("#global_modal_popup"),
+                minimumInputLength: 1,
+                ajax: {
+                    url: "/User/Search2",
+                    type: "POST",
+                    dataType: "json",
+                    delay: 300,
+                    data: function (params) {
+                        return {
+                            userName: params.term,
+                            status: null,
+                            currentPage: 1,
+                            pageSize: 20
+                        };
+                    },
+                    processResults: function (res) {
+                        let data = res.data || [];
+                        return {
+                            results: data.map(x => ({
+                                id: x.id,
+                                text: x.userName
+                            }))
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            // ✅✅✅ AUTO SET USER KHI UPDATE
+            let userId = $("#share_user_select").data("id");
+            let userText = $("#share_user_select").data("text");
+
+            if (userId && userText) {
+                let option = new Option(userText, userId, true, true);
+                $("#share_user_select").append(option).trigger("change");
+            }
+
+
+            // ✅ INIT % CỔ PHẦN DROPDOWN
+            let currentPercent = $("#share_percent").data("value") || 0;
+            hotel_shareholders.InitPercentDropdown(currentPercent);
+        });
+    },
+
+    // ===================== SAVE =====================
+    Upsert: function () {
+        debugger
+        let form = $("#form_hotel_shareholders");
+
+        form.validate({
+            rules: {
+                UserId: "required",
+                SharePercent: {
+                    required: true,
+                    min: 1,
+                    max: 100
+                }
+            },
+            messages: {
+                UserId: "Vui lòng chọn user",
+                SharePercent: "Chọn % từ 1 - 100"
+            }
+        });
+
+        if (!form.valid()) return;
+
+        let newPercent = parseInt($("#share_percent").val()) || 0;
+        let currentId = parseInt($("#form_hotel_shareholders input[name='Id']").val()) || 0;
+
+        let sumOld = 0;
+
+        $("#grid_hotel_shareholders .share-percent").each(function () {
+            let percent = parseInt($(this).data("value")) || 0;
+            let rowId = parseInt($(this).data("id")) || 0;
+
+            // ✅ NẾU ĐANG UPDATE → BỎ QUA PHẦN TỬ CŨ
+            if (currentId > 0 && rowId === currentId) return;
+
+            sumOld += percent;
+        });
+
+        if (sumOld + newPercent > 100) {
+            _msgalert.error("Tổng % cổ phần không được vượt quá 100%");
+            return;
+        }
+
+
+        let data = this.GetFormData(form);
+
+        _ajax_caller.post("/Hotel/ShareHolderUpsert", { model: data }, function (res) {
+            if (res.isSuccess) {
+                debugger
+                _msgalert.success(res.message);
+                hotel_shareholders.modal.modal("hide");
+                hotel_shareholders.ReloadListing();
+            } else {
+                _msgalert.error(res.message);
+            }
+        });
+    },
+
+    // ===================== DELETE =====================
+    Delete: function (id) {
+        let url = "/Hotel/ShareHolderDelete";
+        let title = "Xóa cổ đông";
+        let des = "Bạn có chắc muốn xóa cổ đông này?";
+
+        _msgconfirm.openDialog(title, des, function () {
+            _ajax_caller.post(url, { id: id }, function (res) {
+                if (res.isSuccess) {
+                    _msgalert.success(res.message);
+                    hotel_shareholders.ReloadListing();
+                } else {
+                    _msgalert.error(res.message);
+                }
+            });
+        });
+    },
+
+    // ===================== LISTING =====================
+    Listing: function () {
+        _ajax_caller.post("/Hotel/ShareHolderListing", this.search_params, function (html) {
+            $("#grid_hotel_shareholders").html(html);
+        });
+    },
+
+    ReloadListing: function () {
+        this.Listing();
+    },
+
+    Paging: function (input) {
+        this.search_params.page_index = input;
+        this.Listing(this.search_params);
+    }
+};
+
+
+var hotel_contact = {
     Init: function () {
         this.modal = $('#global_modal_popup');
         this.search_params = {
@@ -697,6 +887,8 @@ $(document).ready(function () {
     supplier_program.Init();
     hotel_surcharge.Init();
     hotel_room.Init();
+    hotel_shareholders.Init();
+
 });
 
 var hotel_management = {

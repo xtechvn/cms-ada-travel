@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Báo cáo cổ đông";
+}
+
+<h2 class="txt_18 bold mb20" style="padding-left: 20px;">Báo cáo cổ đông</h2>
+
+<section style="overflow-x:hidden;">
+    <div id="filter" class="row-main container filter">
+        <div class="flex">
+
+            <!-- SEARCH CỔ ĐÔNG -->
+            <div class="form-group mb10 mr-2" style="min-width: 350px;">
+                <input type="text"
+                       class="form-control"
+                       id="txt-shareholder-search"
+                       placeholder="Nhập tên cổ đông để tìm..." />
+            </div>
+
+            <div class="mb10 mr-2">
+                <button type="button"
+                        class="btn btn-default bg-main"
+                        onclick="_report_shareholder.ActionSearch()">
+                    🔍 Tìm kiếm
+                </button>
+            </div>
+
+
+        </div>
+
+        <div>
+            <div id="grid-data" class="wrap_bg wrap_bg_no-padding mb20"></div>
+            <img src="~/images/icons/loading.gif"
+                 style="margin-left:45%; width: 100px; height: 100px; display:none"
+                 class="loading" id="imgLoading" />
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script src="~/modules/report_shareholder.js"></script>
+}

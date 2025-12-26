@@ -1,0 +1,54 @@
+﻿@using Entities.Models
+@model List<ReportHotelShareHolderDetailViewModel>
+
+<div class="modal-header">
+    <h6 class="modal-title">
+        📊 Bảng chi tiết phân chia lợi nhuận của cổ đông
+        <b class="text-primary">@ViewBag.ShareHolderName</b>
+    </h6>
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    
+</div>
+
+<div class="modal-body">
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-nowrap">
+            <thead class="thead-light">
+                <tr>
+                    <th>Căn hộ / Apartment</th>
+                    <th class="text-right">Tổng LN của căn hộ</th>
+                    <th class="text-center">Tỷ lệ sở hữu (%)</th>
+                    <th class="text-right">LN được phân bổ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="bold">@item.HotelName</td>
+                        <td class="text-right">
+                            @item.HotelProfit.ToString("N0")
+                        </td>
+                        <td class="text-center">
+                            @item.SharePercent.ToString("N2")
+                        </td>
+                        <td class="text-right bold red">
+                            @item.ProfitByShare.ToString("N0")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <!-- ✅ NÚT ĐÓNG -->
+    <button type="button"
+            class="btn btn-default"
+            data-dismiss="modal">
+        Đóng
+    </button>
+</div>

@@ -50,6 +50,8 @@ namespace Entities.Models
         public bool? IsVinHotel { get; set; }
         public string OtherSurcharge { get; set; }
         public bool? IsCommitFund { get; set; }
+        public bool? IsApartment { get; set; }
+
         public int? Position { get; set; }
     }
 }

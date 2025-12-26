@@ -7,6 +7,16 @@ namespace Utilities.Contants
     public class StoreProcedureConstant
     {
         public static string GetClientByID = "SP_GetClientByID";
+        public static string SP_Apartment_SaveRoomLedger = "SP_Apartment_SaveRoomLedger";
+        public static string SP_GetListHotelShareHolderByHotelId = "SP_GetListHotelShareHolderByHotelId";
+        public static string SP_InsertHotelShareHolder = "SP_InsertHotelShareHolder";
+        public static string SP_UpdateHotelShareHolder = "SP_UpdateHotelShareHolder";
+        public static string SP_ReportHotelShareHolder = "SP_ReportHotelShareHolder";
+
+
+
+
+
         public static string GetClientByAccountClientID = "SP_GetClientByAccountClientID";
         public static string GetContactClientByID = "SP_GetContactClientByID";
         public static string GetContractByID = "SP_GetContractByID";
@@ -351,6 +361,8 @@ namespace Utilities.Contants
         public static string SP_UpdateSupplier = "SP_UpdateSupplier";
         public static string SP_GetSupplierById = "SP_GetSupplierById";
         public static string SP_GetListSupplier = "SP_GetListSupplier";
+        public static string SP_GetListSupplierForTickets = "SP_GetListSupplierForTickets";
+
 
         public static string SP_GetDetailSupplierContact = "SP_GetDetailSupplierContact";
         public static string SP_GetDetailSupplierContactBySupplierId = "SP_GetDetailSupplierContactBySupplierId";

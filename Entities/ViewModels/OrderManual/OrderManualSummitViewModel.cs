@@ -15,4 +15,10 @@ namespace Entities.ViewModels.OrderManual
         public string note { get; set; }
         public string label { get; set; }
     }
+    public class OrderApartmentSummitViewModel
+    {
+        public int hotel_id { get; set; }   // Hotel.Id (căn hộ)
+        public string label { get; set; }   // Địa chỉ
+        public string note { get; set; }    // Ghi chú
+    }
 }

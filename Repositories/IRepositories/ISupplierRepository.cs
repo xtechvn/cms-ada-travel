@@ -12,6 +12,8 @@ namespace Repositories.IRepositories
     public interface ISupplierRepository
     {
         List<SupplierViewModel> GetSuppliers(SupplierSearchModel searchModel);
+        List<SupplierTicketViewModel> GetSuppliersForTickets(SupplierSearchModel searchModel);
+
         SupplierViewModel GetById(int supplierId);
         SupplierDetailViewModel GetDetailById(int supplierId);
 

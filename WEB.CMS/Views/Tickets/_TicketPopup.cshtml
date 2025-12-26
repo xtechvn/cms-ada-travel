@@ -1,0 +1,52 @@
+﻿@using Entities.Models
+@model TicketListItemViewModel
+@{
+    Layout = null;
+}
+
+<div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+    <div class="modal-content">
+        <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold">VÉ VÀO CỬA</h5>
+            <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+            </button>
+        </div>
+
+        <div class="modal-body text-center p-0" style="background:linear-gradient(180deg,#fff,#e6f0ff);border-radius:10px;">
+            <div style="padding:15px 0;">
+                @* <img src="https://vinwonders.com/wp-content/uploads/2020/09/VinKE-logo.png" style="height:50px;" /> *@
+                <h4 style="color:#0044cc;margin:10px 0;">AQUARIUM</h4>
+            </div>
+
+            <div style="margin:10px 0;">
+                <img src="@Url.Action("GenerateQR", "Tickets", new { code = Model.TicketCode })"
+                     alt="QR Code" style="width:180px;height:180px;border:2px solid #ccc;border-radius:8px;" />
+            </div>
+
+            <div class="p-3">
+                <h5 class="fw-bold text-primary">@Model.TicketCode</h5>
+                <div class="small text-muted mb-2">
+                    @(Model.ImportDate?.ToString("dd/MM/yyyy")) - @(Model.ExpiredDate?.ToString("dd/MM/yyyy"))
+                </div>
+                <p><strong>VÉ NGƯỜI LỚN | ADULT</strong></p>
+                <p class="small text-secondary mb-0">Dành cho khách cao từ 140cm trở lên</p>
+            </div>
+
+            <div class="text-start px-4 py-3" style="background:#f7f9ff;border-top:1px dashed #ccc;">
+                <b>Lưu ý:</b>
+                <ul class="small mt-2" style="padding-left:16px;line-height:1.5;">
+                    <li>Không mang đồ ăn, thức uống, động vật vào khu vui chơi</li>
+                    <li>Vé chỉ có giá trị sử dụng 1 lần</li>
+                    <li>Không đổi trả sau khi xuất vé</li>
+                    <li>Giữ vé cẩn thận trong suốt thời gian sử dụng</li>
+                </ul>
+            </div>
+
+            <div class="py-2 small bg-light text-secondary">
+                <b>Hotline:</b> 1900 6677<br />
+                VinWonders.com | fb.com/VinWonders.TimesCityOfficial
+            </div>
+        </div>
+    </div>
+</div>

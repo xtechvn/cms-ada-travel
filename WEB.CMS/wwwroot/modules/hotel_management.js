@@ -26,6 +26,7 @@
     },
 
     OnAddOrUpdate: function (id) {
+        debugger
         let title = `${id > 0 ? "Cập nhật" : "Thêm mới"} khách sạn`;
         let url = '/Hotel/AddOrUpdate';
 
@@ -59,6 +60,7 @@
     },
 
     Upsert: function () {
+        debugger
         let url = '/Hotel/Save';
         let Form = $('#form_hotel');
         Form.validate({
@@ -116,9 +118,11 @@
         let avatar = $('#avatar_image').attr('src');
         formData.ImageThumb = (avatar != null && avatar != "") ? avatar : "";
         formData.HotelId = $('#HotelId').val();
-        formData.IsCommitFund = $('#IsCommitFund').is(":checked")
+        formData.IsCommitFund = $('#IsCommitFund').is(":checked");
+        formData.IsApartment = $('#IsApartment').is(":checked"); // ← NEW
         formData.ProvinceId = $('#ProvinceId').val();
         formData.State = $('#ProvinceId option:selected').text().trim();
+
 
 
         if ((formData.ImageThumb == null || formData.ImageThumb == "") && status == 0) {

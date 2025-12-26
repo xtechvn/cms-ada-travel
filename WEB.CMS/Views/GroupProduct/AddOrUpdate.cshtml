@@ -92,34 +92,49 @@
                 Ảnh đại diện
                 <span class="txt_12 gray mt5">(Chấp nhận ảnh jpg, gif, png)</span>
             </label>
+
             <div class="wrap_input">
                 <div class="row mb10">
                     <div class="col-md-5 col-xs-12">
                         <select class="form-control sl-image-size" asp-for="@Model.PositionId" style="width: 200px;">
                             <option value="-1" size="150x200">Chọn kích thước</option>
+
+                            <!-- NEW: chọn full ảnh (không crop) -->
+                            <option value="0" data-nocrop="1">Select (Full image)</option>
+
                             @foreach (var item in PositionList)
                             {
-                                <option value="@item.Id" size="@(item.Width+"x"+item.Height)">@item.PositionName (@(item.Width+"x"+item.Height))</option>
+                                <option value="@item.Id" size="@(item.Width + "x" + item.Height)">
+                                    @item.PositionName (@(item.Width + "x" + item.Height))
+                                </option>
                             }
                         </select>
                     </div>
                 </div>
+
                 <div class="wrap-croppie mb10" style="display:none;width: 300px;text-align: center;">
-                    <div id="croppie-content">
-                    </div>
+                    <div id="croppie-content"></div>
                     <button type="button" class="btn btn-danger" style="display:none;" id="btn-cropimage">Save edit</button>
                     <button type="button" class="btn btn-default cancel" style="display:none;" id="btn-cancel-crop">Cancel</button>
                 </div>
+
                 <div class="wrap-image-preview" style="width: 150px;text-align: center;">
                     <img class="image-preview mb10"
                          src="@(!string.IsNullOrEmpty(Model.ImagePath) ? Model.ImagePath : "/images/icons/noimage.png")"
                          onerror="_imageError(this)" />
-                    <input type="file" id="image_file" style="display:none;" />
+                    <input type="file" id="image_file" style="display:none;" accept="image/*" />
                     <input type="hidden" asp-for="@Model.ImagePath" />
-                    <button type="button" class="btn btn-primary" style="margin-left: 0px!important;" id="btn-upload-image" onclick="$('#image_file').trigger('click');"><i class="fa fa-image"></i>Upload</button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            style="margin-left: 0px!important;"
+                            id="btn-upload-image"
+                            onclick="$('#image_file').trigger('click');">
+                        <i class="fa fa-image"></i>Upload
+                    </button>
                 </div>
             </div>
         </div>
+
 
         <div class="form-group">
             <label class="lbl">
@@ -148,112 +163,144 @@
 </form>
 
 <script>
+    // --- flags ---
+    var isNoCrop = false;
+
+    // init croppie default (sẽ re-init theo size khi change)
     var uploadCrop = $('#croppie-content').croppie({
-        viewport: {
-            width: 177,
-            height: 270,
-            type: 'square'
-        },
-        boundary: {
-            width: 300,
-            height: 300
-        },
+        viewport: { width: 177, height: 270, type: 'square' },
+        boundary: { width: 300, height: 300 },
         url: '/images/icons/noimage.png'
     });
 
+    function resetToPreviewMode(base64) {
+        $('.wrap-croppie').hide();
+        $('.wrap-image-preview').show();
+
+        $('#btn-upload-image').show();
+        $('#btn-cropimage').hide();
+        $('#btn-cancel-crop').hide();
+
+        if (base64) {
+            $('.image-preview').attr('src', base64);
+        }
+
+        $('#image_file').val('');
+        $('.btn-dynamic-enable').prop('disabled', false);
+    }
+
+    function showCropMode() {
+        $('.wrap-croppie').show();
+        $('.wrap-image-preview').hide();
+        $('#btn-upload-image').hide();
+        $('#btn-cropimage').show();
+        $('#btn-cancel-crop').show();
+        $('.btn-dynamic-enable').prop('disabled', true);
+    }
+
+    function buildCroppie(width, height, url) {
+        try { $('#croppie-content').croppie('destroy'); } catch (e) { }
+
+        uploadCrop = $('#croppie-content').croppie({
+            viewport: { width: width, height: height, type: 'square' },
+            boundary: { width: 300, height: 300 },
+            url: url || '/images/icons/noimage.png'
+        });
+    }
+
+    // chọn size / chọn full ảnh
     $('.sl-image-size').change(function () {
-        var value = $("option:selected", this).attr('size');
-        var width = parseInt(value.split("x")[0]);
-        var height = parseInt(value.split("x")[1]);
+        var selected = $("option:selected", this);
+
+        // full image mode
+        isNoCrop = (selected.data('nocrop') == 1) || (selected.val() == "0");
+
+        // nếu chọn full ảnh: nếu đang có file thì show preview luôn, không crop
+        if (isNoCrop) {
+            var f = $('#image_file')[0].files[0];
+            if (f) {
+                var r = new FileReader();
+                r.onload = function (e) { resetToPreviewMode(e.target.result); };
+                r.readAsDataURL(f);
+            } else {
+                // chỉ switch UI về preview
+                resetToPreviewMode();
+            }
+            return;
+        }
+
+        // crop mode
+        var sizeAttr = selected.attr('size');
+        if (!sizeAttr || sizeAttr.indexOf('x') < 0) return;
+
+        var width = parseInt(sizeAttr.split("x")[0]);
+        var height = parseInt(sizeAttr.split("x")[1]);
+
         var filedata = $('#image_file')[0].files[0];
-        $('#croppie-content').croppie('destroy');
+
         if (filedata) {
-            $('.wrap-croppie').show();
-            $('.wrap-image-preview').hide();
-            $('#btn-cropimage').show();
+            showCropMode();
             var reader = new FileReader();
-            reader.readAsDataURL(filedata);
             reader.onload = function () {
-                $('#croppie-content').croppie({
-                    viewport: {
-                        width: width,
-                        height: height,
-                        type: 'square'
-                    },
-                    boundary: {
-                        width: 300,
-                        height: 300
-                    },
-                    url: reader.result
-                });
+                buildCroppie(width, height, reader.result);
             };
+            reader.readAsDataURL(filedata);
         } else {
-            $('#croppie-content').croppie({
-                viewport: {
-                    width: width,
-                    height: height,
-                    type: 'square'
-                },
-                boundary: {
-                    width: 300,
-                    height: 300
-                },
-                url: '/images/icons/noimage.png'
-            });
+            // chưa có file -> chỉ dựng khung crop theo size
+            buildCroppie(width, height, '/images/icons/noimage.png');
         }
     });
 
+    // chọn file
     $('#image_file').change(function (event) {
-        if (event.target.files && event.target.files[0]) {
-            $('.wrap-croppie').show();
-            $('.wrap-image-preview').hide();
-            $('#btn-upload-image').hide();
-            $('#btn-cropimage').show();
-            $('#btn-cancel-crop').show();
+        if (!(event.target.files && event.target.files[0])) return;
+
+        var file = event.target.files[0];
+
+        // nếu đang chọn full ảnh => bỏ crop, show preview luôn
+        if (isNoCrop) {
             $('.btn-dynamic-enable').prop('disabled', true);
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                uploadCrop.croppie('bind', {
-                    url: e.target.result
-                });
+            var readerFull = new FileReader();
+            readerFull.onload = function (e) {
+                resetToPreviewMode(e.target.result);
             };
-            reader.readAsDataURL(event.target.files[0]);
+            readerFull.readAsDataURL(file);
+            return;
         }
+
+        // crop flow như cũ
+        showCropMode();
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            // nếu croppie chưa đúng size (chưa change dropdown) -> bind vào instance hiện tại
+            // (khuyến khích user chọn size trước, nhưng vẫn support)
+            uploadCrop.croppie('bind', { url: e.target.result });
+        };
+        reader.readAsDataURL(file);
     });
 
+    // save crop
     $('#btn-cropimage').click(function () {
         uploadCrop.croppie('result', {
             type: 'canvas',
             size: 'original'
         }).then(function (base64img) {
-            $('.wrap-croppie').hide();
-
-            $('#btn-upload-image').show();
-            $('#btn-cropimage').hide();
-            $('#btn-cancel-crop').hide();
-
-            $('.image-preview').attr('src', base64img);
-            $('.wrap-image-preview').show();
-            $('#image_file').val('');
-            $('.btn-dynamic-enable').prop('disabled', false);
+            resetToPreviewMode(base64img);
         });
     });
 
+    // cancel crop
     $('#btn-cancel-crop').click(function () {
-        $('.wrap-croppie').hide();
-        $('#btn-upload-image').show();
-        $('#btn-cropimage').hide();
-        $('#btn-cancel-crop').hide();
-        $('.wrap-image-preview').show();
-        $('#image_file').val('');
-        $('.btn-dynamic-enable').prop('disabled', false);
+        resetToPreviewMode();
     });
+
+
+    // ====== PHẦN CÒN LẠI CỦA M (GIỮ NGUYÊN) ======
 
     $('#minus-btn').click(function () {
         var value = parseInt($('.qty_input').val()) - 1;
-        if (value < 0) {
-            value = 0;
-        }
+        if (value < 0) value = 0;
         $('.qty_input').val(value);
     });
 

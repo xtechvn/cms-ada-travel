@@ -1,0 +1,165 @@
+﻿@{
+    Layout = null;
+}
+@using Entities.Models
+@model TicketListItemViewModel
+@{
+    var service_types = (List<AllCode>)ViewBag.ServiceTypes;
+    var service_types2 = (List<AllCode>)ViewBag.TargetAudiences;
+
+}
+<style>
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    .invalid-feedback {
+        display: block;
+        font-size: 0.85rem;
+        color: #dc3545;
+    }
+
+    .select2-container.is-invalid .select2-selection {
+        border-color: #dc3545 !important;
+    }
+
+</style>
+
+
+<!-- === Modal Bootstrap chuẩn === -->
+<div class="modal-dialog modal-dialog-centered" style="max-width: 720px;">
+    <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header">
+            <h5 class="modal-title fw-bold">
+                @(Model.TicketId > 0 ? "Cập nhật vé" : "Thêm vé mới")
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body" style="padding: 20px 24px;">
+            <form id="form_ticket">
+                <input type="hidden" name="TicketId" value="@Model.TicketId" />
+                <input type="hidden" name="SupplierId" value="@Model.SupplierId" />
+                <input type="hidden" name="QRCode" value="@Model.QRCode" />
+
+                <div class="row g-3">
+                    <!-- Mã vé -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Mã số <span class="text-danger">*</span></label>
+                        <input type="text" name="TicketCode" class="form-control"
+                               value="@Model.TicketCode" placeholder="Nhập mã vé" required />
+                    </div>
+
+                    <!-- Ngày nhập -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Ngày nhập</label>
+                        <input type="date" name="ImportDate" class="form-control"
+                               value="@(Model.ImportDate.HasValue ? Model.ImportDate.Value.ToString("yyyy-MM-dd") : "")" />
+                    </div>
+
+                    <!-- Ngày hết hạn -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Ngày hết hạn</label>
+                        <input type="date" name="ExpiredDate" class="form-control"
+                               value="@(Model.ExpiredDate.HasValue ? Model.ExpiredDate.Value.ToString("yyyy-MM-dd") : "")" />
+                    </div>
+
+                    <!-- Danh mục -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Danh mục <span class="text-danger">*</span></label>
+
+                        <select id="ddlCategory" name="Category" class="form-select select2">
+                            <option value="">-- Chọn danh mục --</option>
+                        </select>
+                    </div>
+
+                    <!-- Loại vé -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Loại vé <span class="text-danger">*</span></label>
+
+                        <select id="ddlTicketType" name="TicketType" class="form-select select2">
+                            <option value="">-- Chọn loại vé --</option>
+                        </select>
+                    </div>
+
+                    <!-- Khu vực vui chơi -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Khu vực vui chơi <span class="text-danger">*</span></label>
+
+                        <select id="ddlPlayZone" name="PlayZone" class="form-select select2">
+                            <option value="">-- Chọn khu vực --</option>
+                        </select>
+                    </div>
+
+                    <!-- Trạng thái -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Trạng thái <span class="text-danger">*</span></label>
+
+                       <select name="Status" class="form-select select2">
+                           @if (service_types != null && service_types.Any())
+                           {
+                               foreach (var item in service_types)
+                               {
+                                   <option value="@item.CodeValue">
+                                       @item.Description
+                                   </option>
+                               }
+                           }
+                       </select>
+                    </div>
+                    <!-- Tên sản phẩm -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <select id="ddlProduct" name="ProductId" class="form-select select2">
+                            <option value="">-- Chọn sản phẩm --</option>
+                        </select>
+                    </div>
+
+                    <!-- Giá nhập -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Giá nhập</label>
+                        <input type="number" name="ImportPrice" class="form-control" placeholder="Nhập giá nhập" value="@Model.ImportPrice" />
+                    </div>
+
+                    <!-- Đối tượng -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Đối tượng</label>
+                        <select name="TargetAudience" class="form-select select2">
+                            @if (ViewBag.TargetAudiences != null)
+                            {
+                                foreach (var item in service_types2)
+                                {
+                                    <option value="@item.CodeValue">
+                                        @item.Description
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+
+                   
+
+                   
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer justify-content-center" style="padding: 16px;">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Bỏ qua</button>
+            @if (Model.TicketId > 0)
+            {
+                <button type="button" class="btn btn-primary" onclick="_ticket_service.OnSave()">Lưu thay đổi</button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-primary" onclick="_ticket_service.OnSave()">Tạo mới</button>
+            }
+        </div>
+    </div>
+</div>

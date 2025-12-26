@@ -28,6 +28,69 @@ namespace Repositories.Repositories
             _UrlStaticImage = domainConfig.Value.ImageStatic;
         }
 
+        #region ShareHolder
+
+        public int UpsertHotelShareHolder(HotelShareHolder model)
+        {
+            try
+            {
+                if (model.Id > 0)
+                {
+                    model.UpdatedBy = _SysUserModel.Id;
+                    return _HotelDAL.UpdateHotelShareHolder(model);
+                }
+                else
+                {
+                    model.CreatedBy = _SysUserModel.Id;
+                    return _HotelDAL.InsertHotelShareHolder(model);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public HotelShareHolder GetHotelShareHolderById(int id)
+        {
+            try
+            {
+                return _HotelDAL.GetHotelShareHolderById(id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<HotelShareHolderGridModel> GetHotelShareHolderList(int hotel_id)
+        {
+            try
+            {
+                var dataTable = _HotelDAL.GetHotelShareHolderDataTable(hotel_id);
+                return dataTable.ToList<HotelShareHolderGridModel>();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public int DeleteHotelShareHolder(int id)
+        {
+            try
+            {
+                return _HotelDAL.DeleteHotelShareHolderById(id);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        #endregion
+
+
         public int DeleteHotelBankingAccount(int id)
         {
             try
@@ -203,6 +266,38 @@ namespace Repositories.Repositories
             {
                 var dataTable = _HotelDAL.GetHotelRoomByHotelId(hotel_id, page_index, page_size);
                 return dataTable.ToList<HotelRoomGridModel>();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public IEnumerable<HotelRoomGridModel> GetHotelRoomList2(int hotel_id, int page_index, int page_size)
+        {
+            try
+            {
+                var rooms = _HotelDAL.GetHotelRoomByHotelId(hotel_id, page_index, page_size)
+                                     .ToList<HotelRoomGridModel>();
+
+                if (!rooms.Any()) return rooms;
+
+                // Lấy tổng ledger theo phòng
+                var ledger = _HotelDAL.GetRoomLedgerSummaryByHotel(hotel_id);
+                var map = ledger.ToDictionary(x => x.RoomId, x => x);
+
+                foreach (var r in rooms)
+                {
+                    if (map.TryGetValue(r.Id, out var lg))
+                    {
+                        r.TotalMustPay = lg.TotalMustPay;
+                        r.TotalPaid = lg.TotalPaid;
+                        r.TotalCost = lg.TotalCost;
+                        r.Status = lg.Status;
+                        // Profit auto → get;
+                    }
+                }
+
+                return rooms;
             }
             catch
             {

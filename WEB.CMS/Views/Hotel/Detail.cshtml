@@ -100,6 +100,8 @@
                 <a href="#tab-benefit" data-toggle="tab">Tiện ích</a>
                 <a href="#tab-payment" data-toggle="tab">Thông tin thanh toán</a>
                 <a href="#tab-contact" data-toggle="tab">Liên hệ</a>
+                <a href="#tab-shareholders" data-toggle="tab">Cổ Đông</a>
+
             </div>
             <div class="tab-content">
                 <div class="tab-pane show active" id="tab-room" role="tabpanel">
@@ -222,6 +224,20 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12" id="grid_hotel_contact">
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab-shareholders" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-12 mb10">
+                            <button type="button" class="btn btn-success min"
+                                    onclick="hotel_shareholders.OnAddOrUpdate(0)">
+                                Thêm Cổ Đông
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" id="grid_hotel_shareholders">
                         </div>
                     </div>
                 </div>

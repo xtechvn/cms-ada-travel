@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Phiếu chi cổ đông (Apartment)";
+}
+
+<h2 class="txt_18 bold mb20" style="padding-left: 20px;">
+    Phiếu chi cổ đông Apartment
+</h2>
+
+<section style="overflow-x:hidden;">
+    <div id="filter" class="row-main container filter">
+
+        <div class="flex">
+
+            <!-- SEARCH CỔ ĐÔNG -->
+            <div class="form-group mb10 mr-2" style="min-width: 350px;">
+                <input type="text"
+                       class="form-control"
+                       id="txt_shareholder"
+                       placeholder="Nhập tên cổ đông để tìm..." />
+            </div>
+
+            <!-- BTN SEARCH -->
+            <div class="mb10 mr-2">
+                <button type="button"
+                        class="btn btn-default bg-main"
+                        onclick="_apartment_payment.ActionSearch(1)">
+                    🔍 Tìm kiếm
+                </button>
+            </div>
+
+            <!-- BTN ADD -->
+            <div class="mb10">
+                <button type="button"
+                        class="btn btn-success"
+                        onclick="_apartment_payment.OpenAddPopup()">
+                    ➕ Thêm phiếu chi
+                </button>
+            </div>
+        </div>
+
+        <div>
+            <div id="grid_data" class="wrap_bg wrap_bg_no-padding mb20"></div>
+
+            <img src="~/images/icons/loading.gif"
+                 style="margin-left:45%; width: 100px; height: 100px; display:none"
+                 class="loading"
+                 id="loading" />
+        </div>
+    </div>
+</section>
+
+<!-- GLOBAL MODAL POPUP -->
+<div class="modal fade" id="global_modal_popup">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Phiếu chi cổ đông</h4>
+                <button type="button" class="close" data-dismiss="modal">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Load popup here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/modules/apartment_payment.js"></script>
+}

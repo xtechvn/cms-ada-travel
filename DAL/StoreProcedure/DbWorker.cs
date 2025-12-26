@@ -60,6 +60,26 @@ namespace DAL.StoreProcedure
 
             return dataTable;
         }
+        public DataTable GetDataTableByQuery(string query, SqlParameter[] parameters = null)
+        {
+            using (SqlConnection conn = new SqlConnection(_connection))
+            {
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.CommandType = CommandType.Text; // ✅ Chạy query thường
+                    if (parameters != null)
+                        cmd.Parameters.AddRange(parameters);
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
+                        return dt;
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// GET DataSet
@@ -228,6 +248,68 @@ namespace DAL.StoreProcedure
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("ExecuteNonQuery - DbWorker: " + ex);
+                return -1;
+            }
+        }
+        public int ExecuteNonQuery2(string procedureName, SqlParameter[] parameters = null)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connection))
+                using (SqlCommand cmd = new SqlCommand(procedureName, conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    if (parameters != null)
+                        cmd.Parameters.AddRange(parameters);
+
+                    conn.Open();
+                    using (SqlTransaction trans = conn.BeginTransaction())
+                    {
+                        cmd.Transaction = trans;
+
+                        try
+                        {
+                            cmd.ExecuteNonQuery();
+                            trans.Commit();
+                            return 1;
+                        }
+                        catch (Exception ex)
+                        {
+                            trans.Rollback();
+                            LogHelper.InsertLogTelegram("DB Error: " + ex);
+                            return -1;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ExecuteNonQuery2 Fatal: " + ex);
+                return -1;
+            }
+        }
+
+
+        public int ExecuteNonQueryByQuery(string query, SqlParameter[] parameters = null)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connection))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.CommandType = CommandType.Text; // ✅ chạy text query
+                    if (parameters != null)
+                        cmd.Parameters.AddRange(parameters);
+
+                    conn.Open();
+                    int rows = cmd.ExecuteNonQuery();
+                    return rows;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ExecuteNonQueryByQuery - DbWorker: " + ex);
                 return -1;
             }
         }

@@ -1,0 +1,70 @@
+﻿@using MongoDB.Driver.Linq
+@model Entities.Models.HotelShareHolderPayment
+
+<form id="form_apartment_payment">
+    <input type="hidden" name="HotelId" id="hotelId" />
+
+    <div class="form-group">
+        <label>Chọn cổ đông <sup class="red">*</sup></label>
+        <select id="shareholder_select"
+                name="ShareHolderId"
+                class="form-control"
+                style="min-width: 300px; width: 100%;">
+        </select>
+    </div>
+
+
+    <div class="form-group">
+        <label>Số tiền chi <sup class="red">*</sup></label>
+        <input type="text" class="form-control" name="Amount" id="amount" />
+    </div>
+
+    <div class="form-group">
+        <label>Ngày chi</label>
+        <input type="date" class="form-control" name="PayDate" value="@Model.PayDate?.ToString("yyyy-MM-dd")" />
+    </div>
+
+    <div class="form-group">
+        <label>Ghi chú</label>
+        <textarea class="form-control" name="Note"></textarea>
+    </div>
+
+    <div class="text-right">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-success" onclick="_apartment_payment.Save()">Lưu</button>
+    </div>
+
+</form>
+
+<script>
+       $("#shareholder_select").select2({
+        placeholder: "Nhập tên cổ đông...",
+        dropdownParent: $("#global_modal_popup"),
+        ajax: {
+            url: "/ApartmentPayment/SearchShareHolder",
+            type: "POST",
+            dataType: "json",
+            delay: 300,
+            data: function(params) {
+                return { keyword: params.term };
+            },
+            processResults: function(res) {
+                debugger
+                return {
+
+                    results: res.data.map(x => ({
+                        id: x.shareHolderId,
+                        text: x.fullName,
+                        hotelId: x.hotelId     // 👈 TRẢ RA HOTELID
+                    }))
+                };
+            }
+        }
+    });
+        $("#shareholder_select").on("select2:select", function (e) {
+        let hotelId = e.params.data.hotelId;
+        $("#hotelId").val(hotelId);
+    });
+
+
+</script>
