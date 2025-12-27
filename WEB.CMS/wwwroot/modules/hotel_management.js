@@ -120,6 +120,7 @@
         formData.HotelId = $('#HotelId').val();
         formData.IsCommitFund = $('#IsCommitFund').is(":checked");
         formData.IsApartment = $('#IsApartment').is(":checked"); // ← NEW
+        formData.IsFlashSale = $('#IsFlashSale').is(":checked");
         formData.ProvinceId = $('#ProvinceId').val();
         formData.State = $('#ProvinceId option:selected').text().trim();
 

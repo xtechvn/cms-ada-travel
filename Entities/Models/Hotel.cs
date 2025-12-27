@@ -51,6 +51,8 @@ namespace Entities.Models
         public string OtherSurcharge { get; set; }
         public bool? IsCommitFund { get; set; }
         public bool? IsApartment { get; set; }
+        public bool? IsFlashSale { get; set; }
+
 
         public int? Position { get; set; }
     }

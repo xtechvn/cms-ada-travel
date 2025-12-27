@@ -133,6 +133,8 @@ namespace WEB.Adavigo.CMS.Controllers
                         City = hotel.City,
                         IsCommitFund = hotel.IsCommitFund,
                         IsApartment = hotel.IsApartment,
+                        IsFlashSale = hotel.IsFlashSale,
+
 
                         Star = hotel.Star,
                         PositionB2B = hotePositionB2B != null && hotePositionB2B.Count > 0 ? (int)hotePositionB2B[0].Position : 0,

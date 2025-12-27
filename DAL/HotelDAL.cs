@@ -150,6 +150,7 @@ namespace DAL
                     new SqlParameter("@CreatedDate", DateTime.Now),
                     new SqlParameter("@IsCommitFund",model.IsCommitFund?? (object)DBNull.Value),
                     new SqlParameter("@IsApartment",model.IsApartment?? (object)DBNull.Value),
+                    new SqlParameter("@IsFlashSale", model.IsFlashSale ?? (object)DBNull.Value), // ⭐ NEW
 
                     new SqlParameter("@Position",model.Position?? (object)DBNull.Value)
 
@@ -204,6 +205,7 @@ namespace DAL
                     new SqlParameter("@UpdatedBy",model.UpdatedBy?? (object)DBNull.Value),
                     new SqlParameter("@IsCommitFund",model.IsCommitFund?? (object)DBNull.Value),
                     new SqlParameter("@IsApartment",model.IsApartment?? (object)DBNull.Value),
+                     new SqlParameter("@IsFlashSale", model.IsFlashSale ?? (object)DBNull.Value), // ⭐ NEW
 
                     new SqlParameter("@Position",model.Position?? (object)DBNull.Value)
                 };
