@@ -316,7 +316,7 @@ namespace WEB.Adavigo.CMS.Controllers
 
                 var result = id;
                 if (id != 0)
-                {
+                { 
                     ViewBag.CN = 1;
                     var DetailDebtGuarantee = await _debtGuaranteeRepository.DetailDebtGuaranteebyOrderid((int)id);
                     if (DetailDebtGuarantee != null)

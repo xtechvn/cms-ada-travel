@@ -234,6 +234,44 @@
                         </div>
                     </div>
                 </div>
+                @* <div class="border mb20"> *@
+                @*     <div class="lb-form">Loại hình chỗ ở</div> *@
+                @*     <div class="pd10"> *@
+                @*         <div class="row pd10"> *@
+                @*             <div class="col-md-12"> *@
+                @*                 <label class="check-list"> *@
+                @*                     <input type="checkbox" *@
+                @*                            class="ckb_extend_type" *@
+                @*                            id="IsApartment" *@
+                @*                            name="IsApartment" *@
+                @*                     @(Model.IsApartment != null && Model.IsApartment == true ? "checked" : "") /> *@
+
+                @*                     <span class="checkmark"></span> *@
+                @*                     Đây là căn hộ (Apartment) *@
+                @*                 </label> *@
+                @*             </div> *@
+                @*         </div> *@
+                @*     </div> *@
+                @* </div> *@
+                <div class="border mb20">
+                    <div class="lb-form">Chương trình khuyến mãi</div>
+                    <div class="pd10">
+                        <div class="row pd10">
+                            <div class="col-md-12">
+                                <label class="check-list">
+                                    <input type="checkbox"
+                                           id="IsFlashSale"
+                                           name="IsFlashSale"
+                                    @(Model.IsFlashSale != null && Model.IsFlashSale == true ? "checked" : "") />
+                                    <span class="checkmark"></span>
+                                    Khách sạn thuộc chương trình FlashSale ⚡
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="border mb20">
                     <div class="lb-form">Vị trí hiển thị</div>
                     <div class="pd10">

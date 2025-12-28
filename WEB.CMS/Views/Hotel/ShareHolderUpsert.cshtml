@@ -1,0 +1,59 @@
+﻿@{
+    Layout = null;
+}
+
+@using Entities.Models
+@model HotelShareHolder
+
+<form id="form_hotel_shareholders">
+    <div class="grid-item">
+        <div class="pd10">
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="HotelId" />
+
+            <!-- CHỌN USER -->
+            <!-- USER -->
+            <div class="form-group">
+                <label>Chọn user <sup class="red">*</sup></label>
+                <select class="form-control"
+                        id="share_user_select"
+                        name="UserId"
+                        data-id="@Model.UserId"
+                        data-text="@Model.UserName">
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+                <label class="lbl">% Cổ phần <sup class="red">*</sup></label>
+                <div class="wrap_input">
+                    <select id="share_percent"
+                            name="SharePercent"
+                            class="form-control"
+                            data-value="@Model.SharePercent">
+                    </select>
+
+                </div>
+            </div>
+
+
+            <!-- GHI CHÚ -->
+            <div class="form-group">
+                <label class="lbl">Ghi chú</label>
+                <div class="wrap_input">
+                    <textarea class="form-control" asp-for="Note"></textarea>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="text-right">
+        <button type="button" class="btn btn-default cancel" data-dismiss="modal">Bỏ qua</button>
+        <button type="button" class="btn btn-default" onclick="hotel_shareholders.Upsert()">
+            @(Model.Id > 0 ? "Cập nhật" : "Thêm mới")
+        </button>
+    </div>
+</form>

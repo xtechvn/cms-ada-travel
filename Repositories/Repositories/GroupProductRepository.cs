@@ -502,6 +502,21 @@ namespace Repositories.Repositories
             return null;
         }
 
-
+        public async Task<List<GroupProduct>> GetListByParentId(int parentId)
+        {
+            try
+            {
+                var all = await _GroupProductDAL.GetAllAsync();
+                return all
+                    .Where(s => s.ParentId == parentId && s.Status == (int)StatusType.BINH_THUONG)
+                    .OrderBy(s => s.OrderNo)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListByParentId - GroupProductRepository: " + ex);
+                return new List<GroupProduct>();
+            }
+        }
     }
 }

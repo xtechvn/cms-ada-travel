@@ -132,6 +132,10 @@ namespace WEB.Adavigo.CMS.Controllers
                         ImageThumb = hotel.ImageThumb,
                         City = hotel.City,
                         IsCommitFund = hotel.IsCommitFund,
+                        IsApartment = hotel.IsApartment,
+                        IsFlashSale = hotel.IsFlashSale,
+
+
                         Star = hotel.Star,
                         PositionB2B = hotePositionB2B != null && hotePositionB2B.Count > 0 ? (int)hotePositionB2B[0].Position : 0,
                         PositionB2C = hotePositionB2C != null && hotePositionB2C.Count > 0 ? (int)hotePositionB2C[0].Position : 0,
@@ -177,7 +181,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     _redisService.DeleteCacheByKeyword(cache_name, db_index);
                     _workQueueClient.SyncES(result, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotel"], _configuration["DataBaseConfig:Elastic:Index:Hotel"], ProjectType.ADAVIGO_CMS, "SetUpHotel HotelController");
 
-                    return new JsonResult(new
+                        return new JsonResult(new
                     {
                         isSuccess = true,
                         message = "Cập nhật khách sạn thành công"
@@ -349,6 +353,120 @@ namespace WEB.Adavigo.CMS.Controllers
             }
         }
         #endregion
+        #region ShareHolder
+
+        [HttpPost]
+        public IActionResult ShareHolderListing(int hotel_id)
+        {
+            var model = new GenericViewModel<HotelShareHolderGridModel>();
+            try
+            {
+                var datas = _HotelRepository.GetHotelShareHolderList(hotel_id);
+                model.CurrentPage = 1;
+                model.ListData = datas.ToList();
+                model.PageSize = 20;
+                model.TotalRecord = datas != null && datas.Any() ? datas.FirstOrDefault().TotalRow : 0;
+                model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / 20);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SupplierController - ShareHolderListing: " + ex);
+            }
+            return PartialView(model);
+        }
+
+        public IActionResult ShareHolderUpsert(int id, int hotel_id)
+        {
+            var model = new HotelShareHolder()
+            {
+                HotelId = hotel_id
+            };
+
+            try
+            {
+                if (id > 0)
+                    model = _HotelRepository.GetHotelShareHolderById(id);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SupplierController - ShareHolderUpsert: " + ex);
+            }
+
+            return PartialView(model);
+        }
+
+        [HttpPost]
+        public IActionResult ShareHolderUpsert(HotelShareHolder model)
+        {
+            try
+            {
+                var result = _HotelRepository.UpsertHotelShareHolder(model);
+
+                if (result > 0)
+                {
+                    return Json(new
+                    {
+                        isSuccess = true,
+                        message = "Lưu cổ đông thành công"
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        isSuccess = false,
+                        message = "Lưu cổ đông thất bại"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ShareHolderUpsert - SupplierController: " + ex.Message);
+                return Json(new
+                {
+                    isSuccess = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ShareHolderDelete(int id)
+        {
+            try
+            {
+                var result = _HotelRepository.DeleteHotelShareHolder(id);
+
+                if (result > 0)
+                {
+                    return Json(new
+                    {
+                        isSuccess = true,
+                        message = "Xóa cổ đông thành công"
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        isSuccess = false,
+                        message = "Xóa cổ đông thất bại"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ShareHolderDelete - SupplierController: " + ex.Message);
+                return Json(new
+                {
+                    isSuccess = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+        #endregion
+
 
         #region Contact
         [HttpPost]
