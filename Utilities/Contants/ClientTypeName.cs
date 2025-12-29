@@ -18,7 +18,7 @@ namespace Utilities.Contants
         ENTERPRISE = 7, // Doanh nghiệp
         COLLABORATORS = 8,// Cộng tác viên
         STAFF = 9,//Nhân viên trong công ty
-        DTDB = 10//Đối tác chiến lược Đăc biệt
+        DTDB = 10//Nhân viên trong công ty
 
     }
     public class ClientTypeName
