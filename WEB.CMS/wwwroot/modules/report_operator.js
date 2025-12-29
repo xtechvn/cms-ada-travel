@@ -304,22 +304,22 @@ var _report_operator = {
             }
         })
         report_operator_search_object.searchModel = {
-            FromDate: _report_operator.getDateRangeValue('#operator-create-date', true),
-            ToDate: _report_operator.getDateRangeValue('#operator-create-date', false),
-            StartDateFrom: _report_operator.getDateRangeValue('#operator-from-date', true),
-            StartDateTo: _report_operator.getDateRangeValue('#operator-from-date', false),
-            EndDateFrom: _report_operator.getDateRangeValue('#operator-to-date', true),
-            EndDateTo: _report_operator.getDateRangeValue('#operator-to-date', false),
+            FromDate: _global_function.GetDayText($('#operator-create-date').data('daterangepicker').startDate._d, true),
+            ToDate: _global_function.GetDayText($('#operator-create-date').data('daterangepicker').endDate._d, true),
+            StartDateFrom: _global_function.GetDayText($('#operator-from-date').data('daterangepicker').startDate._d, true),
+            StartDateTo: _global_function.GetDayText($('#operator-from-date').data('daterangepicker').endDate._d, true),
+            EndDateFrom: _global_function.GetDayText($('#operator-to-date').data('daterangepicker').startDate._d, true),
+            EndDateTo: _global_function.GetDayText($('#operator-to-date').data('daterangepicker').endDate._d, true),
             OrderStatus: $('#operator-order-finish-status').find(':selected').val(),
             InvoiceStatus: $('#operator-invoice-finish-status').find(':selected').val(),
-            ExportDateFrom: _report_operator.getDateRangeValue('#operator-export-date', true),
-            ExportDateTo: _report_operator.getDateRangeValue('#operator-export-date', false),
+            ExportDateFrom: _global_function.GetDayText($('#operator-export-date').data('daterangepicker').startDate._d, true),
+            ExportDateTo: _global_function.GetDayText($('#operator-export-date').data('daterangepicker').endDate._d, true),
             SalerId: $('#operator-saler').find(':selected').val(),
             DepartmentIdSearch: department_list.join(','),
             SalerPermission: null,
             Branch: $('#operator-branch-code').find(':selected').val(),
-            PaymentFromDate:_report_operator.getDateRangeValue('#operator-payment-fromdate', true),
-            PaymentToDate: _report_operator.getDateRangeValue('#operator-payment-fromdate', false)
+            PaymentFromDate: _global_function.GetDayText($('#operator-payment-fromdate').data('daterangepicker').startDate._d, true),
+            PaymentToDate: _global_function.GetDayText($('#operator-payment-todate').data('daterangepicker').startDate._d, true)
         }
     },
     SearchData: function () {
@@ -353,21 +353,4 @@ var _report_operator = {
 
         });
     },
-    getDateRangeValue: function (selector, isStart) {
-        var el = $(selector);
-        if (!el.val()) return null;
-
-        var picker = el.data('daterangepicker');
-        if (!picker) return null;
-
-        var date = isStart ? picker.startDate._d : picker.endDate._d;
-
-        if (!date) return null;
-
-        var dd = ("0" + date.getDate()).slice(-2);
-        var mm = ("0" + (date.getMonth() + 1)).slice(-2);
-        var yyyy = date.getFullYear();
-
-        return mm + '/' + dd + '/' + yyyy;
-    }
 }
