@@ -26,25 +26,25 @@ namespace DAL
             _DbWorker = new DbWorker(connection);
 
         }
-        public async Task<Order> GetByHotelId(int hotelId)
-        {
-            try
-            {
-                using (var _DbContext = new EntityDataContext(_connection))
-                {
-                    return await _DbContext.Order
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(x => x.HotelId == hotelId
-                                                  && x.IsApartmentOrder == true);
-                    // Nếu Sếp có IsDeleted: && x.IsDeleted == false
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("GetByHotelId - OrderDAL: " + ex);
-                return null;
-            }
-        }
+        //public async Task<Order> GetByHotelId(int hotelId)
+        //{
+        //    try
+        //    {
+        //        using (var _DbContext = new EntityDataContext(_connection))
+        //        {
+        //            return await _DbContext.Order
+        //                .AsNoTracking()
+        //                .FirstOrDefaultAsync(x => x.HotelId == hotelId
+        //                                          && x.IsApartmentOrder == true);
+        //            // Nếu Sếp có IsDeleted: && x.IsDeleted == false
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogHelper.InsertLogTelegram("GetByHotelId - OrderDAL: " + ex);
+        //        return null;
+        //    }
+        //}
 
         public async Task<DataTable> GetPagingList(OrderViewSearchModel searchModel, int currentPage, int pageSize, string proc)
         {

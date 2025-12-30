@@ -52,18 +52,18 @@ namespace Repositories.Repositories
             _hotelBookingCodeDAL = new HotelBookingCodeDAL(dataBaseConfig.Value.SqlServer.ConnectionString);
 
         }
-        public async Task<Entities.Models.Order> GetOrderByHotelId(int hotelId)
-        {
-            try
-            {
-                return await _OrderDal.GetByHotelId(hotelId);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.InsertLogTelegram("GetOrderByHotelId - OrderRepository: " + ex);
-                return null;
-            }
-        }
+        //public async Task<Entities.Models.Order> GetOrderByHotelId(int hotelId)
+        //{
+        //    try
+        //    {
+        //        return await _OrderDal.GetByHotelId(hotelId);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogHelper.InsertLogTelegram("GetOrderByHotelId - OrderRepository: " + ex);
+        //        return null;
+        //    }
+        //}
 
         public async Task<GenericViewModel<OrderViewModel>> GetTotalCountOrder(OrderViewSearchModel searchModel, int currentPage, int pageSize)
         {

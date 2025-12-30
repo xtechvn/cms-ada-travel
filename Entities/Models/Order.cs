@@ -75,8 +75,8 @@ namespace Entities.Models
         public DateTime? ClosingEndDate { get; set; }
         public bool? IsSalerDebtLimit { get; set; }
         public DateTime? CutOffDate { get; set; }
-        public int? HotelId { get; set; }          // Id căn hộ trong bảng Hotel
-        public bool IsApartmentOrder { get; set; } // Đơn này thuộc loại Căn hộ
+        //public int? HotelId { get; set; }          // Id căn hộ trong bảng Hotel
+        //public bool IsApartmentOrder { get; set; } // Đơn này thuộc loại Căn hộ
 
         public virtual ContactClient ContactClient { get; set; }
         public virtual Contract Contract { get; set; }

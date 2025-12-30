@@ -11,7 +11,7 @@ namespace Repositories.IRepositories
 {
     public interface IOrderRepository
     {
-        Task<Order> GetOrderByHotelId(int hotelId);
+        //Task<Order> GetOrderByHotelId(int hotelId);
 
         Task<GenericViewModel<OrderViewModel>> GetTotalCountOrder(OrderViewSearchModel searchModel, int currentPage, int pageSize);
         Task<GenericViewModel<OrderViewModel>> GetList(OrderViewSearchModel searchModel, int currentPage, int pageSize);
