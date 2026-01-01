@@ -11,8 +11,43 @@
 <section style=" overflow-x: hidden;">
     <div class="main-container">
         <div class="row-main container">
-           
-               
+
+            <h2 class="txt_18 bold mb20">Danh sách phiếu yêu cầu chi</h2>
+            <div class="flex fillter-donhang">
+                <div class="form-group mb10 mr-2">
+                    <input type="text" class="form-control" id="billNo" placeholder="Mã phiếu" style=" width: 200px;">
+                </div>
+                <div class="form-group mb10 mr-2">
+                    <input type="text" class="form-control" id="serviceCode" placeholder="Mã dịch vụ" style=" width: 200px;">
+                </div>
+                <div class="form-group mb10 mr-2">
+                    <input type="text" class="form-control" id="orderNo" placeholder="Mã đơn hàng" style=" width: 200px;">
+                </div>
+                @*<div class="form-group mb10 mr-2">
+            <input type="text" class="form-control" id="content" placeholder="Phiếu chi liên quan" style=" width: 200px;">
+        </div>*@
+                <div class="form-group mb10 mr-2">
+                    <div class="multiple-select form-group mb10 mr-2" style="width: 200px;    margin-top: 10px;">
+                        <div class="select-btn select-btn-status-type" id="select-btn-status-type">
+                            <span class="btn-text-status-type">Tất cả trạng thái</span>
+                            <span class="arrow-dwn">
+                                <i class="fa fa-angle-down"></i>
+                            </span>
+                        </div>
+
+                        <ul class="list-items" id="list-item-status">
+                            @foreach (var item in allCode_PAYMENT_REQUEST_STATUS)
+                            {
+                                <li class="item item-status-type" id="status_type_@item.CodeValue">
+                                    <span class="checkbox" id="checkbox_status_type_@item.CodeValue">
+                                        <i class="fa fa-check"></i>
+                                    </span>
+                                    <span class="item-text" id="status_type_text_@item.CodeValue">@item.Description</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
                 <div class="form-group mb10 mr-2">
                     <div class="multiple-select form-group mb10 mr-2" style="width: 200px;    margin-top: 10px;">
                         <div class="select-btn select-btn-service-type" id="select-btn-service-type">
