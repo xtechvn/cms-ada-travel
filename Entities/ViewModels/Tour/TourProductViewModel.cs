@@ -54,6 +54,7 @@ namespace Entities.ViewModels.Tour
     public class TourProductUpsertModel : TourProduct
     {
         public IEnumerable<TourProductScheduleModel> TourSchedule { get; set; }
+        public IEnumerable<TourProgramPackages> ListTourProgramPackages { get; set; }
         public IEnumerable<string> OtherImages { get; set; }
         public IEnumerable<int> EndPoints { get; set; }
         public string SupplierName { get; set; }

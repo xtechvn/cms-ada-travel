@@ -113,7 +113,6 @@ $(document).ready(function () {
     $("#txtNguoiTao").select2({
         theme: 'bootstrap4',
         placeholder: "Tên nhân viên, Email",
-        maximumSelectionLength: 1,
         ajax: {
             url: "/Order/UserSuggestion",
             type: "post",
@@ -503,7 +502,16 @@ var _customer_managerV2 = {
             if (window.localStorage.getItem("textNV") != null) {
                 var cookie1 = window.localStorage.getItem("textNV")
                 var SaleName = JSON.parse(cookie1)
-                $('#txtNguoiTao').html('<option selected value = ' + input.UserId + '> ' + SaleName + '</option>')
+                // tách theo dấu ,
+                var arrText = SaleName.split(',').map(x => x.trim());
+                // tách theo dấu ,
+                var arrId = input.UserId.split(',').map(x => x.trim());
+                var html_txtNguoiTao=``
+                for (let i = 0; i < arrId.length; i++) {
+
+                    html_txtNguoiTao+=('<option selected value = ' + arrId[i] + '> ' + arrText[i] + '</option>')
+                }
+                $('#txtNguoiTao').html(html_txtNguoiTao)
             }
         }
         $.ajax({
@@ -598,7 +606,7 @@ var _customer_managerV2 = {
         var CreateDate;
         var EndDate;
         var MaKH_data= $('#client').select2("val");
-        var UserId_data = $('#txtNguoiTao').select2("val");
+        var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
         var CreatedBy_data = $('#CreatedBy').select2("val");
         if ($('#createdate').data('daterangepicker') !== undefined &&
             $('#createdate').data('daterangepicker') != null && isPickerApprove) {
@@ -625,10 +633,10 @@ var _customer_managerV2 = {
             MinAmount: $('#minamount').val().replaceAll(',', ''),
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: value,
-            PageSize: $("#selectPaggingOptions").find(':selected').val(),
+            PageSize: parseFloat($("#selectPaggingOptions").find(':selected').val()),
         };
         if (MaKH_data != null) { _searchModel.MaKH = MaKH_data[0] }
-        if (UserId_data != null) { _searchModel.UserId = UserId_data[0] }
+        if (UserId_data != null) { _searchModel.UserId = UserId_data }
         if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data[0] }
         _searchModel.currentPage = value;
         var objSearch = this.SearchParam
@@ -947,8 +955,8 @@ var _customer_managerV2 = {
         var CacheName_data = $('#filter-client').select2("val");
         var MaKH_data = $('#client').select2("val");
         textClient = $('#client').find(':selected').text();
-        var UserId_data = $('#txtNguoiTao').select2("val");
-        textNV = $('#txtNguoiTao').find(':selected').text();
+        var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
+        textNV = $('#txtNguoiTao').select2('data').map(item => item.text).join(',');;
         var CreatedBy_data = $('#CreatedBy').select2("val");
         textNT = $('#CreatedBy').find(':selected').text();
         if ($('#createdate').data('daterangepicker') !== undefined &&
@@ -977,7 +985,7 @@ var _customer_managerV2 = {
             MinAmount: $('#minamount').val().replaceAll(',', ''),
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: 1,
-            PageSize: $("#selectPaggingOptions").find(':selected').val(),
+            PageSize: parseFloat($("#selectPaggingOptions").find(':selected').val()),
         };
         if (MaKH_data != null && MaKH_data[0] != null) {
             _searchModel.MaKH = MaKH_data[0]
@@ -986,8 +994,8 @@ var _customer_managerV2 = {
         else {
             window.localStorage.removeItem("textClient")
         }
-        if (UserId_data != null && UserId_data[0] != null) {
-            _searchModel.UserId = UserId_data[0]
+        if (UserId_data != null && UserId_data != null) {
+            _searchModel.UserId = UserId_data
             window.localStorage.setItem("textNV", JSON.stringify(textNV));
         }
         else {
@@ -1240,7 +1248,7 @@ var _customer_managerV2 = {
         var CreateDate;
         var EndDate;
         var MaKH_data = $('#client').select2("val");
-        var UserId_data = $('#txtNguoiTao').select2("val")
+        var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null
         var CreatedBy_data = $('#CreatedBy').select2("val");
         if ($('#createdate').data('daterangepicker') !== undefined &&
             $('#createdate').data('daterangepicker') != null && isPickerApprove) {
@@ -1269,9 +1277,9 @@ var _customer_managerV2 = {
             PageSize: value,
         };
         if (MaKH_data != null) { _searchModel.MaKH = MaKH_data[0] }
-        if (UserId_data != null) { _searchModel.UserId = UserId_data[0] }
+        if (UserId_data != null) { _searchModel.UserId = UserId_data }
         if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data[0] }
-        _searchModel.PageSize = $("#selectPaggingOptions").find(':selected').val()
+        _searchModel.PageSize = parseFloat($("#selectPaggingOptions").find(':selected').val()) 
        
         var objSearch = this.SearchParam;
         objSearch = _searchModel
@@ -1323,7 +1331,7 @@ var _customer_managerV2 = {
         var EndDate;
         var MaKH_data = $('#client').select2("val");
         textClient = $('#client').find(':selected').text();
-        var UserId_data = $('#txtNguoiTao').select2("val");
+        var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
         textNT = $('#txtNguoiTao').find(':selected').text();
         var CreatedBy_data = $('#CreatedBy').select2("val");
         textNV = $('#CreatedBy').find(':selected').text();
@@ -1355,7 +1363,7 @@ var _customer_managerV2 = {
             PageSize: $("#countClient").val(),
         };
         if (MaKH_data != null) { _searchModel.MaKH = MaKH_data[0] }
-        if (UserId_data != null) { _searchModel.UserId = UserId_data[0] }
+        if (UserId_data != null) { _searchModel.UserId = UserId_data }
         if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data[0] }
         var objSearch = this.SearchParam;
         objSearch = _searchModel;
@@ -1394,7 +1402,7 @@ var _customer_managerV2 = {
         var CacheName_data = $('#filter-client').select2("val");
         var MaKH_data = $('#client').select2("val");
         textClient = $('#client').find(':selected').text();
-        var UserId_data = $('#txtNguoiTao').select2("val");
+        var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
         textNV = $('#txtNguoiTao').find(':selected').text();
         var CreatedBy_data = $('#CreatedBy').select2("val");
         textNT = $('#CreatedBy').find(':selected').text();
@@ -1424,7 +1432,7 @@ var _customer_managerV2 = {
             MinAmount: $('#minamount').val().replaceAll(',', ''),
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: 1,
-            PageSize: $("#selectPaggingOptions").find(':selected').val(),
+            PageSize: parseFloat($("#selectPaggingOptions").find(':selected').val()),
         };
         if (MaKH_data != null && MaKH_data[0] != null) {
             _searchModel.MaKH = MaKH_data[0]
@@ -1433,8 +1441,8 @@ var _customer_managerV2 = {
         else {
             window.localStorage.removeItem("textClient")
         }
-        if (UserId_data != null && UserId_data[0] != null) {
-            _searchModel.UserId = UserId_data[0]
+        if (UserId_data != null && UserId_data != null) {
+            _searchModel.UserId = UserId_data
 
         }
         else {
@@ -1476,7 +1484,7 @@ var _customer_managerV2 = {
         }
         var MaKH_data = $('#client').select2("val");
         textClient = $('#client').find(':selected').text();
-        var UserId_data = $('#txtNguoiTao').select2("val");
+        var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
         textNV = $('#txtNguoiTao').find(':selected').text();
         var CreatedBy_data = $('#CreatedBy').select2("val");
         textNT = $('#CreatedBy').find(':selected').text();
@@ -1506,7 +1514,7 @@ var _customer_managerV2 = {
             MinAmount: $('#minamount').val().replaceAll(',', ''),
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: 1,
-            PageSize: $("#selectPaggingOptions").find(':selected').val(),
+            PageSize: parseFloat($("#selectPaggingOptions").find(':selected').val()),
         };
 
         var objSearch = this.SearchParam;

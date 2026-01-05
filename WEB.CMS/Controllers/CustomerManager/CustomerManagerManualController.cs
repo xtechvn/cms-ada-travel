@@ -427,7 +427,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                         {
                             searchModel.MaKH = searchModel.MaKH == -1 ? data[0].MaKH : searchModel.MaKH;
                             searchModel.CreatedBy = searchModel.CreatedBy == -1 ? data[0].CreatedBy : searchModel.CreatedBy;
-                            searchModel.UserId = searchModel.UserId == -1 ? data[0].UserId : searchModel.UserId;
+                            searchModel.UserId = searchModel.UserId == "-1" ? data[0].UserId : searchModel.UserId;
                             searchModel.TenKH = searchModel.TenKH == null ? data[0].TenKH : searchModel.TenKH;
                             searchModel.Email = searchModel.Email == null ? data[0].Email : searchModel.Email;
                             searchModel.Phone = searchModel.Phone == null ? data[0].Phone : searchModel.Phone;

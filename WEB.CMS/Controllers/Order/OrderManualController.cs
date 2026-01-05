@@ -63,13 +63,14 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private readonly IHotelBookingCodeRepository _hotelBookingCodeRepository;
         private LogActionMongoService LogActionMongo;
         private readonly WorkQueueClient workQueueClient;
+        private readonly ICustomerManagerRepository _customerManagerRepositories;
 
         public OrderController(IConfiguration configuration, IOrderRepository orderRepository, IClientRepository clientRepository, IAllCodeRepository allcodeRepository, IUserRepository userRepository, IIdentifierServiceRepository identifierServiceRepository
                 , IAccountClientRepository accountClientRepository, IHotelBookingRepositories hotelBookingRepository, IHotelBookingRoomRepository hotelBookingRoomRepository, IHotelBookingRoomRatesRepository hotelBookingRoomRatesRepository,
                 IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository, IHotelBookingGuestRepository hotelBookingGuestRepository, IFlyBookingDetailRepository flyBookingDetailRepository, IAirlinesRepository airlinesRepository,
                  IPassengerRepository passengerRepository, IProvinceRepository provinceRepository, INationalRepository nationalRepository, ManagementUser managementUser, IOtherBookingRepository otherBookingRepository,
                  ITourRepository tourRepository, ISupplierRepository supplierRepository, IContractRepository contractRepository, IAttachFileRepository attachFileRepository, IVinWonderBookingRepository vinWonderBookingRepository,
-                 IGroupProductRepository groupProductRepository, IHotelBookingCodeRepository hotelBookingCodeRepository, IDepartmentRepository departmentRepository, IContractPayRepository contractPayRepository)
+                 IGroupProductRepository groupProductRepository, IHotelBookingCodeRepository hotelBookingCodeRepository, IDepartmentRepository departmentRepository, IContractPayRepository contractPayRepository, ICustomerManagerRepository customerManagerRepositories)
         {
             _configuration = configuration;
             _orderRepository = orderRepository;
@@ -79,7 +80,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             _identifierServiceRepository = identifierServiceRepository;
             _clientESRepository = new ClientESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _userESRepository = new UserESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
-            _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"],configuration);
+            _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _nationalESRepository = new NationalESRepository(_configuration["DataBaseConfig:Elastic:Host"]);
             _accountClientRepository = accountClientRepository;
             _provinceRedisService = new ProvinceRedisService(_configuration);
@@ -94,20 +95,20 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             _tourRepository = tourRepository;
             _provinceRepository = provinceRepository;
             _nationalRepository = nationalRepository;
-            _indentiferService = new IndentiferService(configuration, identifierServiceRepository,orderRepository,contractPayRepository);
+            _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
             _supplierRepository = supplierRepository;
             _ManagementUser = managementUser;
             _contractRepository = contractRepository;
             _AttachFileRepository = attachFileRepository;
             _otherBookingRepository = otherBookingRepository;
-            apiService = new APIService(configuration,userRepository);
+            apiService = new APIService(configuration, userRepository);
             _vinWonderBookingRepository = vinWonderBookingRepository;
             _groupProductRepository = groupProductRepository;
             _tourESRepository = new TourESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
             _hotelBookingCodeRepository = hotelBookingCodeRepository;
             LogActionMongo = new LogActionMongoService(configuration);
             workQueueClient = new WorkQueueClient(configuration);
-
+            _customerManagerRepositories = customerManagerRepositories;
         }
 
         [HttpPost]
@@ -1179,6 +1180,11 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                     });
                 }
                 var result = await _orderRepository.CreateOrder(order);
+                var list_order =  _orderRepository.GetOrderByClientId((long)order.ClientId);
+                if(list_order != null && list_order.Count == 1)
+                {
+                    var UpdateStatus = await _customerManagerRepositories.UpdateStatusClient((int)ClientStatus.CHOT, (int)order.ClientId);
+                }
                 var current_user = _ManagementUser.GetCurrentUser();
                
                 string link = "/Order/" + result.OrderId;

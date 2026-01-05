@@ -53,7 +53,7 @@ namespace Entities.ViewModels.CustomerManager
     {
         public int MaKH { get; set; } = -1;
         public int CreatedBy { get; set; } = -1;
-        public int UserId { get; set; } = -1;
+        public string UserId { get; set; } 
         public string TenKH { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }

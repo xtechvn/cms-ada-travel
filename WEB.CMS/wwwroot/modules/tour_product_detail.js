@@ -141,7 +141,26 @@
             _msgalert.error("Vui lòng chọn điểm đến");
             return;
         }
+        if ($('#Id').val() != undefined && !isNaN(parseInt($('#Id').val())) && parseInt($('#Id').val()) <= 0) {
+           parent = $('#tour-product-price').find('.tour-product-price-tr')
+                var obj = []
+                var tour_product_id = ProductID
+                parent.each(function (index, item) {
+                    var element = $(this)
+                    var item = {
+                        Id: element.attr('data-id'),
+                        TourProductId: tour_product_id,
+                        FromDate: _global_function.GetDayText(element.find('.tour-product-price-item-fromdate').data('daterangepicker').startDate._d, true),
+                        ToDate: _global_function.GetDayText(element.find('.tour-product-price-item-todate').data('daterangepicker').startDate._d, true),
+                        IsDaily: element.find('.tour-product-price-item-isdaily').is(":checked") ? true : false,
+                        AdultPrice: element.find('.tour-product-price-item-adult-price').val().replaceAll(',', ''),
+                        ChildPrice: element.find('.tour-product-price-item-child-price').val().replaceAll(',', ''),
+                        ClientType: element.find('.tour-product-price-item-clienttypes').find(':selected').val(),
 
+                    }
+                    obj.push(item)
+                });
+        }
         formData.EndPoints = endPoints;
         formData.Description = tinyMCE.get(`Description`).getContent();
         formData.Include = tinyMCE.get(`Include`).getContent();
@@ -152,6 +171,7 @@
         formData.OldPrice = isNaN(formData.OldPrice) ? ConvertMoneyToNumber(formData.OldPrice) : null;
         formData.Price = parseFloat($('#Price').val().replaceAll(',', ''));
         formData.Status = status;
+        formData.ListTourProgramPackages = obj;
 
         var b2c = $('#PositionB2C :checked').text();
         var b2B = $('#PositionB2B :checked').text();
