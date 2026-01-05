@@ -144,7 +144,7 @@
         if ($('#Id').val() != undefined && !isNaN(parseInt($('#Id').val())) && parseInt($('#Id').val()) <= 0) {
            parent = $('#tour-product-price').find('.tour-product-price-tr')
                 var obj = []
-                var tour_product_id = ProductID
+            var tour_product_id = parseInt($('#Id').val())
                 parent.each(function (index, item) {
                     var element = $(this)
                     var item = {
