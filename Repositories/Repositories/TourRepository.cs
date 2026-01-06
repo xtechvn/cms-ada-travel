@@ -821,20 +821,24 @@ namespace Repositories.Repositories
                         tourDAL.CreateMultipleTourDestination(TourDestinations);
                     }
                 }
-                foreach (var item in model.ListTourProgramPackages)
+                if (model.ListTourProgramPackages != null && model.ListTourProgramPackages.Count() > 0)
                 {
-                    if (item.Id <= 0)
+                    foreach (var item in model.ListTourProgramPackages)
                     {
-                        item.TourProductId = tour_id;
-                        item.CreatedBy = model.CreatedBy;
-                        item.CreatedDate = DateTime.Now;
-                        item.UpdatedBy = model.CreatedBy;
-                        item.UpdatedDate = DateTime.Now;
-                        tourProductDAL.CreateTourPackages(item);
- 
+                        if (item.Id <= 0)
+                        {
+                            item.TourProductId = tour_id;
+                            item.CreatedBy = model.CreatedBy;
+                            item.CreatedDate = DateTime.Now;
+                            item.UpdatedBy = model.CreatedBy;
+                            item.UpdatedDate = DateTime.Now;
+                            tourProductDAL.CreateTourPackages(item);
+
+                        }
+
                     }
-                    
                 }
+            
                 return tour_id;
             }
             catch
