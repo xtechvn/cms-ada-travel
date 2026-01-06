@@ -44,6 +44,7 @@ namespace WEB.CMS.Service
                     MaxAmount = model.MaxAmount,
                     SalerPermission = model.SalerPermission,
                     CacheName = model.CacheName,
+                    UtmSource = model.UtmSource,
 
                 };
                 IMongoCollection<CustomerManagerViewSearchModel> affCollection = db.GetCollection<CustomerManagerViewSearchModel>(configuration["DataBaseConfig:MongoServer:Cache_Filter_KH"]);
@@ -65,8 +66,10 @@ namespace WEB.CMS.Service
             var listLog = new List<CustomerManagerViewSearchModel>();
             try
             {
-                var db = MongodbService.GetDatabase();
+                string url = "mongodb://" + configuration["DataBaseConfig:MongoServer:user"] + ":" + configuration["DataBaseConfig:MongoServer:pwd"] + "@" + configuration["DataBaseConfig:MongoServer:Host"] + ":" + configuration["DataBaseConfig:MongoServer:Port"] + "/" + configuration["DataBaseConfig:MongoServer:catalog_log"];
+                var client = new MongoClient(url);
 
+                IMongoDatabase db = client.GetDatabase(configuration["DataBaseConfig:MongoServer:catalog_log"]);
 
                 var collection = db.GetCollection<CustomerManagerViewSearchModel>(configuration["DataBaseConfig:MongoServer:Cache_Filter_KH"]);
                 var filter = Builders<CustomerManagerViewSearchModel>.Filter.Empty;
