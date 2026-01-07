@@ -27,5 +27,6 @@
         KeToanTruong = 21,//Quản lý phòng kế toán
         TPSaleOnl = 31,//Quản lý phòng kế toán
         PhoTPKeToan = 32,//Phó trưởng phòng Kế toán
+        Digital_Marketing = 33,//Digital Marketing 
     }
 }

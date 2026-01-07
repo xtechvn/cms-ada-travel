@@ -15,6 +15,7 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using StackExchange.Redis;
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -149,6 +150,7 @@ namespace WEB.CMS.Controllers.CustomerManager
         {
             try
             {
+                var current_user = _ManagementUser.GetCurrentUser();
                 var key_token_api = _configuration["DataBaseConfig:key_api:api_manual"];
                 var AgencyType = _allCodeRepository.GetListByType("AGENCY_TYPE");
                 var PermisionType = _allCodeRepository.GetListByType("PERMISION_TYPE");
@@ -158,8 +160,12 @@ namespace WEB.CMS.Controllers.CustomerManager
                 ViewBag.PermisionType = PermisionType;
                 ViewBag.ClientType = ClientType;
                 ViewBag.UtmSource = UtmSource;
-
-                if (id != 0)
+                ViewBag.isedit = 0;
+                if (current_user.Role.Contains(((int)RoleType.Admin).ToString())   || current_user.Role.Contains(((int)RoleType.Digital_Marketing).ToString()) || current_user.Role.Contains(((int)RoleType.Marketing).ToString()))
+                {
+                    ViewBag.isedit = 1;
+                }
+                    if (id != 0)
                 {
                     var model = await _clientRepository.GetClientDetailByClientId(id);
                     ViewBag.dataModel = model;

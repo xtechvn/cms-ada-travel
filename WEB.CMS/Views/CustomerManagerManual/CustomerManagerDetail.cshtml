@@ -77,7 +77,7 @@
                         <div class="col-md-8 mb10">
                             <input type="text" maxlength="15" value="@dataModel.Phone" class="form-control" asp-for="@Model.phone">
                         </div>
-                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Email <sup class="red">*</sup></label></div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Email </label></div>
                         <div class="col-md-8 mb10">
                             <input type="text" value="@dataModel.Email" class="form-control" asp-for="@Model.email">
                         </div>
@@ -145,26 +145,54 @@
                         </div>
                         <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Nguồn khách hàng <sup class="red">*</sup></label></div>
                         <div class="col-md-8 mb10">
-                            <select class="select2 form-control" asp-for="@Model.UtmSource" value="@dataModel.UtmSource" style="width: 100%" >
+                            @if (ViewBag.isedit == 1)
+                            {
+                                <select class="select2 form-control" asp-for="@Model.UtmSource"  value="@dataModel.UtmSource" style="width: 100%">
 
-                                @if (Client_Source != null)
-                                {
-                                    foreach (var item in Client_Source)
+                                    @if (Client_Source != null)
                                     {
-                                        if (item.CodeValue == dataModel.UtmSource)
+                                        foreach (var item in Client_Source)
                                         {
-                                            <option value="@item.CodeValue" selected="selected">@item.Description</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@item.CodeValue">@item.Description</option>
-                                        }
+                                            if (item.CodeValue == dataModel.UtmSource)
+                                            {
+                                                <option value="@item.CodeValue" selected="selected">@item.Description</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.CodeValue">@item.Description</option>
+                                            }
 
+                                        }
                                     }
-                                }
 
 
-                            </select>
+                                </select>
+
+                            }
+                            else
+                            {
+                                <select class="select2 form-control" asp-for="@Model.UtmSource" style="width: 100%; background: #F1F5F9" disabled value="@dataModel.UtmSource" style="width: 100%">
+
+                                    @if (Client_Source != null)
+                                    {
+                                        foreach (var item in Client_Source)
+                                        {
+                                            if (item.CodeValue == dataModel.UtmSource)
+                                            {
+                                                <option value="@item.CodeValue" selected="selected">@item.Description</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.CodeValue">@item.Description</option>
+                                            }
+
+                                        }
+                                    }
+
+
+                                </select>
+
+                            }
                             <label id="id_nhomkhach_err" class="lbl mt5 red"> </label>
                         </div>
 
@@ -226,7 +254,7 @@
                             <input type="text" maxlength="15" class="form-control" asp-for="@Model.phone">
 
                         </div>
-                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Email <sup class="red">*</sup></label></div>
+                        <div class="col-md-4 mb10"><label class="lbl mt5 mb0">Email </label></div>
                         <div class="col-md-8 mb10">
                             <input type="text" class="form-control" asp-for="@Model.email">
 
