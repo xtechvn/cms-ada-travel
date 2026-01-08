@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Entities.Models
+{
+    public partial class FlashSaleProduct
+    {
+        public long Id { get; set; }
+        public int? CampaignId { get; set; }
+        public double? DiscountValue { get; set; }
+        public int? ValueType { get; set; }
+        public int? Status { get; set; }
+        public int? Position { get; set; }
+        public bool? SuperSale { get; set; }
+        public int? BadgeType { get; set; }
+    }
+}
