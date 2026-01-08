@@ -46,6 +46,7 @@ namespace WEB.CMS.Controllers.CustomerManager
         private APIService apiService;
         private readonly IIdentifierServiceRepository _identifierServiceRepository;
         private readonly Models.AppSettings config;
+
         public CustomerManagerManualController(IConfiguration configuration, ManagementUser managementUser, IAllCodeRepository allCodeRepository, IUserRepository userRepository,
             ICustomerManagerRepository customerManagerRepositories, IClientRepository clientRepository, IUserAgentRepository userAgentRepository, IDepartmentRepository departmentRepository, IIdentifierServiceRepository identifierServiceRepository)
         {
@@ -76,11 +77,13 @@ namespace WEB.CMS.Controllers.CustomerManager
                 var ClientType = _allCodeRepository.GetListByType(AllCodeType.CLIENT_TYPE);
                 var ClientStatus = _allCodeRepository.GetListByType(AllCodeType.CLIENT_STATUS);
                 var CLIENT_SOURCE = _allCodeRepository.GetListByType(AllCodeType.CLIENT_SOURCE);
+                var departments = await _departmentRepository.GetAll("");
                 ViewBag.AgencyType = AgencyType;
                 ViewBag.PermisionType = PermisionType;
                 ViewBag.ClientType = ClientType;
                 ViewBag.ClientStatus = ClientStatus;
                 ViewBag.CLIENT_SOURCE = CLIENT_SOURCE;
+                ViewBag.departments = departments;
 
                 var current_user = _ManagementUser.GetCurrentUser();
                 ViewBag.buttomThem = 0;
@@ -432,7 +435,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                         if (data != null)
                         {
                             searchModel.MaKH = searchModel.MaKH == -1 ? data[0].MaKH : searchModel.MaKH;
-                            searchModel.CreatedBy = searchModel.CreatedBy == -1 ? data[0].CreatedBy : searchModel.CreatedBy;
+                            searchModel.CreatedBy = searchModel.CreatedBy == null ? data[0].CreatedBy : searchModel.CreatedBy;
                             searchModel.UserId = searchModel.UserId == null ? data[0].UserId : searchModel.UserId;
                             searchModel.TenKH = searchModel.TenKH == null ? data[0].TenKH : searchModel.TenKH;
                             searchModel.Email = searchModel.Email == null ? data[0].Email : searchModel.Email;
@@ -446,6 +449,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                             searchModel.EndDate = searchModel.EndDate == null ? data[0].EndDate : searchModel.EndDate;
                             searchModel.MinAmount = searchModel.MinAmount == -1 ? data[0].MinAmount : searchModel.MinAmount;
                             searchModel.MaxAmount = searchModel.MaxAmount == -1 ? data[0].MaxAmount : searchModel.MaxAmount;
+                            searchModel.DepartmentId = searchModel.DepartmentId == -1 ? data[0].DepartmentId : searchModel.DepartmentId;
 
                         }
 

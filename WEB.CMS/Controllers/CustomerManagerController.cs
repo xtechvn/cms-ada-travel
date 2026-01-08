@@ -167,8 +167,8 @@ namespace WEB.Adavigo.CMS.Controllers
                         if (data != null)
                         {
                             searchModel.MaKH = searchModel.MaKH == -1 ? data[0].MaKH : searchModel.MaKH;
-                            searchModel.CreatedBy = searchModel.CreatedBy == -1 ? data[0].CreatedBy : searchModel.CreatedBy;
-                            searchModel.UserId = searchModel.UserId == "-1" ? data[0].UserId : searchModel.UserId;
+                            searchModel.CreatedBy = searchModel.CreatedBy == null ? data[0].CreatedBy : searchModel.CreatedBy;
+                            searchModel.UserId = searchModel.UserId == null ? data[0].UserId : searchModel.UserId;
                             searchModel.TenKH = searchModel.TenKH == null ? data[0].TenKH : searchModel.TenKH;
                             searchModel.Email = searchModel.Email == null ? data[0].Email : searchModel.Email;
                             searchModel.Phone = searchModel.Phone == null ? data[0].Phone : searchModel.Phone;
@@ -179,6 +179,7 @@ namespace WEB.Adavigo.CMS.Controllers
                             searchModel.EndDate = searchModel.EndDate == null ? data[0].EndDate : searchModel.EndDate;
                             searchModel.MinAmount = searchModel.MinAmount == -1 ? data[0].MinAmount : searchModel.MinAmount;
                             searchModel.MaxAmount = searchModel.MaxAmount == -1 ? data[0].MaxAmount : searchModel.MaxAmount;
+                            searchModel.DepartmentId = searchModel.DepartmentId == -1 ? data[0].DepartmentId : searchModel.DepartmentId;
 
                         }
 
@@ -573,6 +574,31 @@ namespace WEB.Adavigo.CMS.Controllers
         {
             try
             {
+                if (searchModel.CacheName != null)
+                {
+                    var data = _logCacheFilterMongoService.GetListLogCache(null, searchModel.CacheName);
+                    if (data != null)
+                    {
+                        searchModel.MaKH = searchModel.MaKH == -1 ? data[0].MaKH : searchModel.MaKH;
+                        searchModel.CreatedBy = searchModel.CreatedBy == null ? data[0].CreatedBy : searchModel.CreatedBy;
+                        searchModel.UserId = searchModel.UserId == null ? data[0].UserId : searchModel.UserId;
+                        searchModel.TenKH = searchModel.TenKH == null ? data[0].TenKH : searchModel.TenKH;
+                        searchModel.Email = searchModel.Email == null ? data[0].Email : searchModel.Email;
+                        searchModel.Phone = searchModel.Phone == null ? data[0].Phone : searchModel.Phone;
+                        searchModel.AgencyType = searchModel.AgencyType == -1 ? data[0].AgencyType : searchModel.AgencyType;
+                        searchModel.ClientType = searchModel.ClientType == null ? data[0].ClientType : searchModel.ClientType;
+                        searchModel.ClientStatus = searchModel.ClientStatus == null ? data[0].ClientStatus : searchModel.ClientStatus;
+                        searchModel.UtmSource = searchModel.UtmSource == null ? data[0].UtmSource : searchModel.UtmSource;
+                        searchModel.PermissionType = searchModel.PermissionType == null ? data[0].PermissionType : searchModel.PermissionType;
+                        searchModel.CreateDate = searchModel.CreateDate == null ? data[0].CreateDate : searchModel.CreateDate;
+                        searchModel.EndDate = searchModel.EndDate == null ? data[0].EndDate : searchModel.EndDate;
+                        searchModel.MinAmount = searchModel.MinAmount == -1 ? data[0].MinAmount : searchModel.MinAmount;
+                        searchModel.MaxAmount = searchModel.MaxAmount == -1 ? data[0].MaxAmount : searchModel.MaxAmount;
+                        searchModel.DepartmentId = searchModel.DepartmentId == -1 ? data[0].DepartmentId : searchModel.DepartmentId;
+
+                    }
+
+                }
                 var model = await _customerManagerRepositories.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize);
 
                 if (model != null && model.ListData != null && model.ListData.Count > 0)

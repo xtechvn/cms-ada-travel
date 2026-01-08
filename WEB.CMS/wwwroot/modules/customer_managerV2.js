@@ -142,7 +142,7 @@ $(document).ready(function () {
     $("#CreatedBy").select2({
         theme: 'bootstrap4',
         placeholder: "Người tạo",
-        maximumSelectionLength: 1,
+       
         ajax: {
             url: "/Order/UserSuggestion",
             type: "post",
@@ -497,7 +497,17 @@ var _customer_managerV2 = {
             if (window.localStorage.getItem("textNT") != null) {
                 var cookie1 = window.localStorage.getItem("textNT")
                 var SaleName = JSON.parse(cookie1)
-                $('#CreatedBy').html('<option selected value = ' + input.CreatedBy + '> ' + SaleName + '</option>')
+
+                var arrText = SaleName.split(',').map(x => x.trim());
+                // tách theo dấu ,
+                var arrIdCreatedBy = input.CreatedBy.split(',').map(x => x.trim());
+                var html_CreatedBy = ``
+                for (let i = 0; i < arrIdCreatedBy.length; i++) {
+
+                    html_CreatedBy += ('<option selected value = ' + arrIdCreatedBy[i] + '> ' + arrText[i] + '</option>')
+                }
+                $('#CreatedBy').html(html_CreatedBy)
+               
             }
             if (window.localStorage.getItem("textNV") != null) {
                 var cookie1 = window.localStorage.getItem("textNV")
@@ -607,7 +617,8 @@ var _customer_managerV2 = {
         var EndDate;
         var MaKH_data= $('#client').select2("val");
         var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
-        var CreatedBy_data = $('#CreatedBy').select2("val");
+        var CreatedBy_data = $('#CreatedBy').select2("val") != null ? $('#CreatedBy').select2("val").toString() : null;
+        var CacheName_data = $('#filter-client').select2("val");
         if ($('#createdate').data('daterangepicker') !== undefined &&
             $('#createdate').data('daterangepicker') != null && isPickerApprove) {
             CreateDate = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
@@ -623,6 +634,8 @@ var _customer_managerV2 = {
             TenKH: null,
             Email: null,
             Phone: null,
+            CacheName: null,
+            DepartmentId: $('#DepartmentId').val(),
             AgencyType: $('#AgencyType').val(),
             ClientType: listClientTypeV2,
             ClientStatus: listClientStatusV2,
@@ -637,7 +650,11 @@ var _customer_managerV2 = {
         };
         if (MaKH_data != null) { _searchModel.MaKH = MaKH_data[0] }
         if (UserId_data != null) { _searchModel.UserId = UserId_data }
-        if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data[0] }
+        if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data}
+        if (CacheName_data != null && CacheName_data[0] != null) {
+            _searchModel.CacheName = CacheName_data[0]
+
+        }
         _searchModel.currentPage = value;
         var objSearch = this.SearchParam
         objSearch = _searchModel
@@ -957,7 +974,7 @@ var _customer_managerV2 = {
         textClient = $('#client').find(':selected').text();
         var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
         textNV = $('#txtNguoiTao').select2('data').map(item => item.text).join(',');;
-        var CreatedBy_data = $('#CreatedBy').select2("val");
+        var CreatedBy_data = $('#CreatedBy').select2("val") != null ? $('#CreatedBy').select2("val").toString() : null;
         textNT = $('#CreatedBy').find(':selected').text();
         if ($('#createdate').data('daterangepicker') !== undefined &&
             $('#createdate').data('daterangepicker') != null && isPickerApprove) {
@@ -975,6 +992,7 @@ var _customer_managerV2 = {
             Email: null,
             Phone: null,
             CacheName: null,
+            DepartmentId: $('#DepartmentId').val(),
             AgencyType: $('#AgencyType').val(),
             ClientType: listClientTypeV2,
             ClientStatus: listClientStatusV2,
@@ -1001,8 +1019,8 @@ var _customer_managerV2 = {
         else {
             window.localStorage.removeItem("textNV")
         }
-        if (CreatedBy_data != null && CreatedBy_data[0] != null) {
-            _searchModel.CreatedBy = CreatedBy_data[0]
+        if (CreatedBy_data != null && CreatedBy_data!= null) {
+            _searchModel.CreatedBy = CreatedBy_data
             window.localStorage.setItem("textNT", JSON.stringify(textNT));
         }
         else {
@@ -1249,7 +1267,8 @@ var _customer_managerV2 = {
         var EndDate;
         var MaKH_data = $('#client').select2("val");
         var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null
-        var CreatedBy_data = $('#CreatedBy').select2("val");
+        var CreatedBy_data = $('#CreatedBy').select2("val") != null ? $('#CreatedBy').select2("val").toString() : null;
+        var CacheName_data = $('#filter-client').select2("val");
         if ($('#createdate').data('daterangepicker') !== undefined &&
             $('#createdate').data('daterangepicker') != null && isPickerApprove) {
             CreateDate = $('#createdate').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
@@ -1264,6 +1283,8 @@ var _customer_managerV2 = {
             TenKH: null,
             Email: null,
             Phone: null,
+            CacheName: null,
+            DepartmentId: $('#DepartmentId').val(),
             AgencyType: $('#AgencyType').val(),
             ClientType: listClientTypeV2,
             ClientStatus: listClientStatusV2,
@@ -1278,7 +1299,11 @@ var _customer_managerV2 = {
         };
         if (MaKH_data != null) { _searchModel.MaKH = MaKH_data[0] }
         if (UserId_data != null) { _searchModel.UserId = UserId_data }
-        if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data[0] }
+        if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data}
+        if (CacheName_data != null && CacheName_data[0] != null) {
+
+            _searchModel.CacheName = CacheName_data[0]
+        }
         _searchModel.PageSize = parseFloat($("#selectPaggingOptions").find(':selected').val()) 
        
         var objSearch = this.SearchParam;
@@ -1333,7 +1358,7 @@ var _customer_managerV2 = {
         textClient = $('#client').find(':selected').text();
         var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
         textNT = $('#txtNguoiTao').find(':selected').text();
-        var CreatedBy_data = $('#CreatedBy').select2("val");
+        var CreatedBy_data = $('#CreatedBy').select2("val") != null ? $('#CreatedBy').select2("val").toString() : null;
         textNV = $('#CreatedBy').find(':selected').text();
         if ($('#createdate').data('daterangepicker') !== undefined &&
             $('#createdate').data('daterangepicker') != null && isPickerApprove) {
@@ -1343,6 +1368,7 @@ var _customer_managerV2 = {
             CreateDate = null
             EndDate = null
         }
+        var CacheName_data = $('#filter-client').select2("val");
         let _searchModel = {
             MaKH: null,
             UserId: null,
@@ -1361,10 +1387,16 @@ var _customer_managerV2 = {
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: 1,
             PageSize: $("#countClient").val(),
+            CacheName: null,
+            DepartmentId: $('#DepartmentId').val(),
         };
         if (MaKH_data != null) { _searchModel.MaKH = MaKH_data[0] }
         if (UserId_data != null) { _searchModel.UserId = UserId_data }
-        if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data[0] }
+        if (CreatedBy_data != null) { _searchModel.CreatedBy = CreatedBy_data}
+        if (CacheName_data != null && CacheName_data[0] != null) {
+
+            _searchModel.CacheName = CacheName_data[0]
+        }
         var objSearch = this.SearchParam;
         objSearch = _searchModel;
         $('#btnExport').prop('disabled', true);
@@ -1404,7 +1436,7 @@ var _customer_managerV2 = {
         textClient = $('#client').find(':selected').text();
         var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
         textNV = $('#txtNguoiTao').find(':selected').text();
-        var CreatedBy_data = $('#CreatedBy').select2("val");
+        var CreatedBy_data = $('#CreatedBy').select2("val") != null ? $('#CreatedBy').select2("val").toString() : null;
         textNT = $('#CreatedBy').find(':selected').text();
         if ($('#createdate').data('daterangepicker') !== undefined &&
             $('#createdate').data('daterangepicker') != null && isPickerApprove) {
@@ -1422,6 +1454,7 @@ var _customer_managerV2 = {
             Email: null,
             Phone: null,
             CacheName: null,
+            DepartmentId: $('#DepartmentId').val(),
             AgencyType: $('#AgencyType').val(),
             ClientType: listClientTypeV2,
             ClientStatus: listClientStatusV2,
@@ -1448,8 +1481,8 @@ var _customer_managerV2 = {
         else {
             window.localStorage.removeItem("textNV")
         }
-        if (CreatedBy_data != null && CreatedBy_data[0] != null) {
-            _searchModel.CreatedBy = CreatedBy_data[0]
+        if (CreatedBy_data != null && CreatedBy_data!= null) {
+            _searchModel.CreatedBy = CreatedBy_data
 
         }
         else {
@@ -1457,7 +1490,7 @@ var _customer_managerV2 = {
         }
         if (CacheName_data != null && CacheName_data[0] != null) {
 
-
+            _searchModel.CacheName = CacheName_data[0]
         }
         var objSearch = this.SearchParam;
         objSearch = _searchModel;
@@ -1486,7 +1519,7 @@ var _customer_managerV2 = {
         textClient = $('#client').find(':selected').text();
         var UserId_data = $('#txtNguoiTao').select2("val") != null ? $('#txtNguoiTao').select2("val").toString() : null;
         textNV = $('#txtNguoiTao').find(':selected').text();
-        var CreatedBy_data = $('#CreatedBy').select2("val");
+        var CreatedBy_data = $('#CreatedBy').select2("val") != null ? $('#CreatedBy').select2("val").toString() : null;
         textNT = $('#CreatedBy').find(':selected').text();
         if ($('#createdate').data('daterangepicker') !== undefined &&
             $('#createdate').data('daterangepicker') != null && isPickerApprove) {
@@ -1504,6 +1537,7 @@ var _customer_managerV2 = {
             Email: null,
             Phone: null,
             CacheName: Cache_Name,
+            DepartmentId: $('#DepartmentId').val(),
             AgencyType: $('#AgencyType').val(),
             ClientType: listClientTypeV2,
             ClientStatus: listClientStatusV2,
@@ -1515,6 +1549,7 @@ var _customer_managerV2 = {
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: 1,
             PageSize: parseFloat($("#selectPaggingOptions").find(':selected').val()),
+
         };
 
         var objSearch = this.SearchParam;
@@ -1536,14 +1571,25 @@ var _customer_managerV2 = {
     },
     Clearboloc: function (id) {
         document.getElementById(id).reset();
-        var text_ClientType = $('#ClientType').select2('data')[0].text;
-
-        $('#select2-ClientType-container').html(text_ClientType);
-        $('#select2-CreatedBy-container').html('');
+ 
         $('#minamount').val('');
         $('#maxamount').val('');
+        $('#DepartmentId').val(0);
+
+        $("#list-item-ClientType .item").removeClass("checked");
+        $("#list-item-ClientStatus .item").removeClass("checked");
+        $("#list-item-PermisionType .item").removeClass("checked");
+        $("#list-item-UtmSource .item").removeClass("checked");
 
 
+        listClientTypeV2 = [];
+        listClientStatusV2 = [];
+        listPermisionTypeV2 = [];
+        listUtmSourceV2 =
+        document.querySelector(".btn-text-ClientType").innerText = "Tất cả hình thức thanh toán";
+        document.querySelector(".btn-text-ClientStatus").innerText = "Tất cả Trạng thái";
+        document.querySelector(".btn-text-PermisionType").innerText = "Tất cả Trạng thái";
+        document.querySelector(".btn-text-UtmSource").innerText = "Tất cả Nguồn khách hàng";
     },
     eraseCookie: function (name) {
         document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';

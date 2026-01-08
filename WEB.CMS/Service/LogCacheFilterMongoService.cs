@@ -45,6 +45,7 @@ namespace WEB.CMS.Service
                     SalerPermission = model.SalerPermission,
                     CacheName = model.CacheName,
                     UtmSource = model.UtmSource,
+                    DepartmentId = model.DepartmentId,
 
                 };
                 IMongoCollection<CustomerManagerViewSearchModel> affCollection = db.GetCollection<CustomerManagerViewSearchModel>(configuration["DataBaseConfig:MongoServer:Cache_Filter_KH"]);

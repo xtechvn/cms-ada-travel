@@ -344,7 +344,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[18];
+                SqlParameter[] objParam = new SqlParameter[19];
                 objParam[0] = new SqlParameter("@MaKH", searchModel.MaKH);
                 objParam[1] = new SqlParameter("@TenKH", searchModel.TenKH);
                 objParam[2] = new SqlParameter("@Email", searchModel.Email);
@@ -363,6 +363,7 @@ namespace DAL
                 objParam[15] = new SqlParameter("@UtmSource", searchModel.UtmSource != null && searchModel.UtmSource[0] != null & searchModel.UtmSource[0] != -1 ? string.Join(",", searchModel.UtmSource) : DBNull.Value);
                 objParam[16] = new SqlParameter("@SalerPermission", searchModel.SalerPermission);
                 objParam[17] = new SqlParameter("@ClientStatus", searchModel.ClientStatus != null && searchModel.ClientStatus[0] != null & searchModel.ClientStatus[0] != -1 ? string.Join(",", searchModel.ClientStatus) : DBNull.Value);
+                objParam[18] = new SqlParameter("@DepartmentId", searchModel.DepartmentId != -1 ?  searchModel.DepartmentId : DBNull.Value);
 
                 var data = _DbWorker.GetDataTable(proc, objParam);
                 return data;

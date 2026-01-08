@@ -6,6 +6,7 @@
     var ClientType = (List<AllCode>)ViewBag.ClientType;
     var ClientStatus = (List<AllCode>)ViewBag.ClientStatus;
     var CLIENT_SOURCE = (List<AllCode>)ViewBag.CLIENT_SOURCE;
+    var departments = (List<Department>)ViewBag.departments;
 }
 <style>
     .row-main-head .down-up .form-down {
@@ -264,6 +265,25 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="lbl">Phòng ban</label>
+                                                <div class="wrap_input ">
+                                                  
+                                                        <select class="select2 client-select main-staff-select" id="DepartmentId" style="width:100% !important">
+                                                            <option value="0">Tất cả phòng ban</option>
+                                                            @if (departments != null)
+                                                            {
+                                                                foreach (var item in departments)
+                                                                {
+                                                                    <option value="@item.Id">@item.DepartmentName</option>
+                                                                }
+                                                            }
+                                                        </select>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group flex justify-content-between mt-3 pt-3 border-top">
                                         <a href="#add-bo-loc" class="text-primary open-popup">
@@ -296,6 +316,8 @@
             <select class="select2 client-select main-staff-select" id="txtNguoiTao" multiple="multiple" style="width:100% !important">
             </select>
         </div>
+
+     
 
         <div class="form-group mb10 mr-2">
             <a href="javascript:;" class="btn btn-default onclick-filter">

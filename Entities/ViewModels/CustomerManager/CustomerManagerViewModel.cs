@@ -52,7 +52,7 @@ namespace Entities.ViewModels.CustomerManager
     public class CustomerManagerViewSearchModel
     {
         public int MaKH { get; set; } = -1;
-        public int CreatedBy { get; set; } = -1;
+        public string CreatedBy { get; set; } 
         public string UserId { get; set; } 
         public string TenKH { get; set; }
         public string Email { get; set; }
@@ -71,6 +71,7 @@ namespace Entities.ViewModels.CustomerManager
         public string CacheName { get; set; }
         public string _id { get; set; }
         public List<int?> UtmSource { get; set; } 
+        public int DepartmentId { get; set; } = -1;
 
     }
 
