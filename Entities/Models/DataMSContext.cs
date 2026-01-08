@@ -158,7 +158,8 @@ namespace Entities.Models
         public virtual DbSet<TourPosition> TourPosition { get; set; }
         public virtual DbSet<Recruitment> Recruitment { get; set; }
         public virtual DbSet<RecruitmentCategory> RecruitmentCategory { get; set; }
-       
+        public virtual DbSet<FlashSale> FlashSales { get; set; }
+        public virtual DbSet<FlashSaleProduct> FlashSaleProducts { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -3006,7 +3007,15 @@ namespace Entities.Models
 
                 entity.Property(e => e.UpTime).HasColumnType("datetime");
             });
+            modelBuilder.Entity<FlashSale>(entity =>
+            {
+                entity.ToTable("FlashSale");
 
+            });
+            modelBuilder.Entity<FlashSaleProduct>(entity =>
+            {
+                entity.ToTable("FlashSaleProduct");
+            });
             OnModelCreatingPartial(modelBuilder);
         }
 

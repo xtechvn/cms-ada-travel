@@ -311,6 +311,11 @@ namespace Utilities.Contants
         public static string SP_GetListClientByUtmSource = "SP_GetListClientByUtmSource";
         public static string SP_GetSumContractPayByUtmSource = "SP_GetSumContractPayByUtmSource";
 
+        public static string SP_InsertFlashSale = "SP_InsertFlashSale";
+        public static string SP_UpdateFlashSale = "SP_UpdateFlashSale";
+        public static string SP_GetListFlashSale = "SP_GetListFlashSale";
+
+
 
 
         #region vin wonder
