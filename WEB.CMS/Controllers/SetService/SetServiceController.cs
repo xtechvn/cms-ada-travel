@@ -1240,13 +1240,14 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 ViewBag.ServiceType = ServiceType;
                 var model = new SendEmailViewModel();
                 model = null;
+                string payment_notification = "1. Tên Công ty: CÔNG TY CỔ PHẦN THƯƠNG MẠI VÀ DỊCH VỤ QUỐC TẾ ĐẠI VIỆT.\r\n2. Mã số doanh nghiệp: 0108008526\r\n3. Địa chỉ trụ sở chính: Tầng 1, Toà nhà D Khu văn phòng Vinaconex 1, Số 289A Khuất Duy Tiến, Phường Đại Mỗ, Thành phố Hà Nội.\r\n4. Thời gian bắt đầu thay đổi: 07/07/2025.\r\n5. Địa chỉ nhận hóa đơn: hoadondientu@adavigo.com";
                 switch (type)
                 {
 
                     case (int)EmailType.Supplier:
                         {
 
-                            ViewBag.EmailBody = await _emailService.GetTemplateSupplier(model, id, SupplierId, ServiceType, "", "", true);
+                            ViewBag.EmailBody = await _emailService.GetTemplateSupplier(model, id, SupplierId, ServiceType, "", payment_notification, true);
 
                         }
                         break;

@@ -486,7 +486,7 @@ namespace WEB.CMS.Controllers.CustomerManager
                     }
                     if (i != 0)
                     {
-                        model = await _customerManagerRepositories.GetPagingList(searchModel, currentPage, pageSize);
+                        model = await _customerManagerRepositories.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize);
                     }
 
                 }

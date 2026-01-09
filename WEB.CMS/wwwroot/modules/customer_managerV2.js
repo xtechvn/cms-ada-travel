@@ -1295,6 +1295,7 @@ var _customer_managerV2 = {
             MinAmount: $('#minamount').val().replaceAll(',', ''),
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: 1,
+            currentPage: 1,
             PageSize: value,
         };
         if (MaKH_data != null) { _searchModel.MaKH = MaKH_data[0] }
