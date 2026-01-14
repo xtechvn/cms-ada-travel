@@ -1181,7 +1181,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 }
                 var result = await _orderRepository.CreateOrder(order);
                 var list_order =  _orderRepository.GetOrderByClientId((long)order.ClientId);
-                if(list_order != null && list_order.Count == 1)
+                if(list_order != null && (list_order.Count == 0|| list_order.Count == 1 ))
                 {
                     var UpdateStatus = await _customerManagerRepositories.UpdateStatusClient((int)ClientStatus.CHOT, (int)order.ClientId);
                 }
