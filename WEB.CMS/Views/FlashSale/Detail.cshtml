@@ -1,1 +1,186 @@
-﻿
+﻿@using Entities.Models
+@using Entities.ViewModels
+@* @using Entities.ViewModels.Products *@
+@using Utilities
+@{
+    ViewData["Title"] = "Chi tiết chiến dịch FlashSale";
+    FlashSale detail = (FlashSale)ViewBag.Detail;
+    List<FlashSaleProduct> products = (List<FlashSaleProduct>)ViewBag.Products;
+    
+
+}
+<section class="main-container main-products add-product main-order">
+    <input style="display:none;" id="flashsale-detail" value="@(detail!=null && detail.Id>0? detail.Id.ToString():"0")" />
+    <div class="row-main container">
+        <div class="bg-white p-3 mb-3 tongquan">
+            <h5 class="bold mb-3">Thông tin cơ bản</h5>
+            <div class="flex gap10 align-items-center mb-3">
+                <div class="w-200px">Tên chiến dịch</div>
+                <div id="supplier-id" class="flex gap10 align-items-center" style="min-width:400px;">
+                    <input id="flashsale-name" class="form-control" placeholder="Tên chiến dịch" value="@(detail!=null && detail.Id>0? detail.Name:"")">
+
+                </div>
+            </div>
+            
+         
+            <div class="flex gap10 align-items-center mb-3">
+                <div class="w-200px">Bật / Tắt</div>
+                <div class="flex gap10 align-items-center" style="min-width:400px;">
+                    <td>
+                        <label class="switch no-text">
+                            <input id="voucher-is-public" type="checkbox" @(detail != null && detail.Status == 1 ? "checked" : "")>
+                            <span class="slider round"></span>
+                        </label>
+                    </td>
+                </div>
+            
+        </div>
+        <div class="bg-white p-3 mb-3">
+            <div class="flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="bold">Sản phẩm tham gia Flash Sale của Shop</h5>
+                    <div class="text-secondary">Chạy chương trình Flash Sale để tăng doanh số.</div>
+                </div>  
+                <a id="add-flashsale-btn" href="javascript:;" class="btn btn-add"><i class="icofont-plus mr-2"></i>Thêm sản phẩm</a>
+            </div>
+            <div id="flashsale" class="box-edit mt-3">
+                <div class="table-responsive table-default">
+                    <table class="table text-center table-nowrap  w-100">
+                        <thead>
+                            <tr id="flashsale-detail-apply-all">
+                                <td colspan="3" class="text-left">
+                                    <h6>Chỉnh sửa hàng loạt</h6>
+                                    <small class="text-secondary">
+                                        Bạn đã chọn <nw class="count">0</nw>/10 sản phẩm cho khung giờ
+                                        này
+                                    </small><br />
+                                    <a href="javascript:;" class="btn btn-base btn-round mt-2">Cập nhật hàng loạt</a>
+                                </td>
+                             
+                                <td></td>
+
+                                <td>
+                                    <label class="switch no-text">
+                                        <input class="flashsale-applyall-tr-status" type="checkbox" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <a class="icon-action flashsale-applyall-tr-deleteall" href="javascript:;">  <i class="icofont-trash"></i></a>
+                                </td>
+                            </tr>
+                            <tr class="thead">
+                                <td style="max-width: 0">
+                                    <label class="check-list mb20 check-list-all">
+                                        <input type="checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                    <td class="text-left">Tên tour</td>
+                                    <td>Giá</td>
+                                    <td>Vị trí</td>
+                                    <td>Bật / Tắt</td>
+                                    <td>Hành động</td>
+                            </tr>
+                        </thead>
+                            <tbody id="flashsale-data-tr-product-body">
+                                @{
+                                    var tours = (List<TourProduct>)ViewBag.ProductsDetail;
+                                }
+
+                                @if (products != null && products.Count > 0 && tours != null)
+                                {
+                                    foreach (var fs in products)
+                                    {
+                                        var tour = tours.FirstOrDefault(x => x.Id == fs.ProductId);
+                                        if (tour == null) { continue; }
+
+                                        var price = tour.Price;
+                                        var position = fs.Position ?? 0;
+                                        var isActive = fs.Status == 1;
+                                        <tr class="flashsale-data-tr-product"
+                                            data-id="@fs.Id"
+                                            data-product="@tour.Id"
+                                            data-amount="@price">
+                                            <td style="max-width: 0">
+                                                <label class="check-list mb20 mr25">
+                                                    <input type="checkbox" class="flashsale-row-check">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+
+                                            <!-- TÊN TOUR -->
+                                            <td class="text-left">
+                                                <div class="item-order">
+                                                    <div class="info">
+
+
+                                                        <h3 class="name-product mb-1" style="font-size:14px;font-weight:600;margin:0;">
+                                                            @tour.TourName
+                                                        </h3>
+                                                        <small class="text-secondary">
+                                                            Mã tour: @tour.Id
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <!-- GIÁ -->
+                                            <td class="text-center">
+                                                <span class="fw-bold">
+                                                    @price.ToString("N0") đ
+                                                </span>
+                                            </td>
+
+                                            <!-- VỊ TRÍ -->
+                                            <td class="tr-index">
+                                                @position
+                                            </td>
+
+                                            <!-- BẬT / TẮT -->
+                                            <td>
+                                                <label class="switch no-text">
+                                                    <input class="flashsale-data-tr-status"
+                                                           type="checkbox"
+                                                    @(isActive ? "checked" : "")>
+                                                    <span class="slider round"></span>
+                                                </label>
+                                            </td>
+
+                                            <!-- HÀNH ĐỘNG -->
+                                            <td style=" width: 100px !important; ">
+                                                <div class="flex gap10 align-items-center justify-content-center">
+                                                    <a class="icon-action  delete-row" href="javascript:;">  <i class="icofont-trash"></i></a>
+                                                    <a class="icon-action flashsale-drag" href="javascript:;"> <i class="icofont-drag"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-secondary">
+                                            Chưa có tour nào trong FlashSale
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="action-form">
+        <a id="flashsale-detail-cancel" href="javascript:;" class="btn btn-round btn-outline-base btn-hide">Hủy</a>
+        <a id="flashsale-detail-confirm" href="javascript:;" class="btn btn-round btn-base btn-update">Xác nhận</a>
+
+    </div>
+</section>
+@section scripts {
+    <script type="text/javascript" src="~/js/moment.min.js"></script>
+    <script type="text/javascript" src="~/js/daterangepicker.min.js"></script>
+    <script type="text/javascript" src="~/modules/flashsale/detail.js"></script>
+}
+

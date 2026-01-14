@@ -1,1 +1,55 @@
-﻿
+﻿@using Entities.ViewModels
+@using Entities.ViewModels.Tour
+@model GenericViewModel<TourProductGridModel>
+
+@{
+    Layout = null;
+}
+
+@if (Model?.ListData != null && Model.ListData.Count > 0)
+{
+    foreach (var t in Model.ListData)
+    {
+        if (t == null) continue;
+
+        // TODO: thay field giá thật của bạn
+        decimal price = 0;
+
+        <tr data-id="@t.id"
+            data-code="@t.id"
+            data-name="@t.TourName"
+            data-price="@t.Price">
+            <td style="width:40px;">
+                <label class="check-list mb20 mr25">
+                    <input class="check-tour" type="checkbox" value="@t.id">
+                    <span class="checkmark"></span>
+                </label>
+            </td>
+
+            <td class="text-left">
+                <div class="fs-tour-info">
+                    <div class="fs-tour-name" title="@t.TourName">@t.TourName</div>
+                    <div class="fs-tour-code">Mã: <span>@t.id</span></div>
+                </div>
+            </td>
+
+            <td class="tour-amount" data-amount="@t.Price">
+                @(t.Price > 0 ? ("đ " + t.Price.ToString("N0")) : "—")
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="3" class="text-center">
+            <div class="search-null center mt40 mb40">
+                <div class="mb24">
+                    <img src="/images/graphics/icon-search.png" alt="">
+                </div>
+                <h2 class="title txt_24">Không tìm thấy kết quả</h2>
+                <div class="gray">Vui lòng thử lại</div>
+            </div>
+        </td>
+    </tr>
+}

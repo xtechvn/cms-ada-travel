@@ -11,6 +11,9 @@ namespace Entities.Models
         public DateTime UpdateLast { get; set; }
         public long UserUpdateId { get; set; }
         public int UserCreateId { get; set; }
+       // public string? UserCreateName { get; set; } // JOIN thêm User
         public string Name { get; set; }
     }
+
+
 }

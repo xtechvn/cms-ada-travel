@@ -2,6 +2,7 @@
 
 using Entities.ViewModels;
 using Entities.ViewModels.FlashSales;
+using Entities.ViewModels.Tour;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -38,6 +39,7 @@ namespace Repositories.IRepositories
         /// <returns>DataTable chứa danh sách Flash Sale.</returns>
         public Task<GenericViewModel<FlashSaleListingModel>> GetList(DateTime? fromdate, DateTime? todate, int status, int page_index, int page_size);
         Task<FlashSale> GetByID(int id);
+        Task<FlashSale> GetActiveFlashSaleExceptId(int currentId);
         Task<List<FlashSale>> GetAll();
     }
 
@@ -58,6 +60,7 @@ namespace Repositories.IRepositories
         /// <returns>ID của FlashSaleProduct đã được cập nhật, hoặc 0 nếu có lỗi.</returns>
         long UpdateFlashSaleProduct(FlashSaleProduct model);
         Task<List<FlashSaleProduct>> GetByFlashSaleID(int id);
+        Task<List<TourProduct>> GetToursByIds(List<long> tourIds);
 
         Task<List<FlashSaleProduct>> GetAll();
     }

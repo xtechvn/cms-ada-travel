@@ -14,5 +14,6 @@ namespace Entities.ViewModels.FlashSales
         public string FlashSaleStatusText { get; set; }
         public string SupplierName { get; set; }
         public int TotalRow { get; set; }
+        public string UserCreateName { get; set; } // JOIN thêm User
     }
 }

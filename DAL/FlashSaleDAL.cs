@@ -6,7 +6,9 @@ using Entities.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
@@ -70,12 +72,11 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[5];
+                SqlParameter[] objParam = new SqlParameter[3];
                 objParam[0] = new SqlParameter("@PageIndex", page_index);
                 objParam[1] = new SqlParameter("@PageSize", page_size);
-                objParam[2] = new SqlParameter("@FromDate", fromdate ?? (object)DBNull.Value);
-                objParam[3] = new SqlParameter("@ToDate", todate ?? (object)DBNull.Value);
-                objParam[4] = new SqlParameter("@FlashSaleStatusFilter", status);
+              
+                objParam[2] = new SqlParameter("@Name", DBNull.Value);
                
                 return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListFlashSale, objParam);
             }
@@ -106,6 +107,191 @@ namespace DAL
                 return null;
             }
         }
+        public async Task<FlashSale> GetActiveFlashSaleExceptId(int currentId)
+        {
+            try
+            {
+
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    // Tuỳ ORM bạn dùng. Ví dụ với EF:
+                    return await _DbContext.FlashSales
+                        .Where(x => x.Status == 1 && x.Id != currentId)
+                        .OrderByDescending(x => x.UpdateLast)   // hoặc CreateDate
+                        .FirstOrDefaultAsync();
+                }
+             
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetByID - FlashSaleDAL: " + ex.ToString());
+                return null;
+            }
+        }
+    }
+
+    public class FlashSaleProductDAL : GenericService<FlashSaleProduct>
+    {
+        private static DbWorker _DbWorker;
+
+        public FlashSaleProductDAL(string connection) : base(connection)
+        {
+            _DbWorker = new DbWorker(connection);
+        }
+
+        /// <summary>
+        /// Thêm một sản phẩm vào Flash Sale.
+        /// </summary>
+        /// <param name="model">Đối tượng FlashSaleProduct chứa thông tin sản phẩm.</param>
+        /// <returns>ID của FlashSaleProduct mới được tạo, hoặc 0 nếu có lỗi.</returns>
+        public long CreateFlashSaleProduct(FlashSaleProduct model)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[]
+                {
+            new SqlParameter("@CampaignId", (object)model.CampaignId ?? DBNull.Value),
+            new SqlParameter("@DiscountValue", (object)model.DiscountValue ?? DBNull.Value),
+               new SqlParameter("@ProductId", (object)model.ProductId ?? DBNull.Value),
+            new SqlParameter("@ValueType", (object)model.ValueType ?? DBNull.Value),
+            new SqlParameter("@Status", (object)model.Status ?? DBNull.Value),
+            new SqlParameter("@Position", (object)model.Position ?? DBNull.Value),
+            new SqlParameter("@SuperSale", (object)model.SuperSale ?? DBNull.Value),
+            new SqlParameter("@BadgeType", (object)model.BadgeType ?? DBNull.Value),
+                };
+
+                model.Id = Convert.ToInt64(
+                    _DbWorker.ExecuteNonQuery(
+                        StoreProcedureConstant.SP_InsertFlashSaleProduct,
+                        objParam
+                    )
+                );
+
+                return model.Id;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("CreateFlashSaleProduct - FlashSaleProductDAL: " + ex.Message);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin sản phẩm trong Flash Sale.
+        /// </summary>
+        /// <param name="model">Đối tượng FlashSaleProduct chứa thông tin cập nhật.</param>
+        /// <returns>ID của FlashSaleProduct đã được cập nhật, hoặc 0 nếu có lỗi.</returns>
+        public long UpdateFlashSaleProduct(FlashSaleProduct model)
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[]
+                {
+            new SqlParameter("@Id", model.Id),
+            new SqlParameter("@CampaignId", (object)model.CampaignId ?? DBNull.Value),
+            new SqlParameter("@ProductId", (object)model.ProductId ?? DBNull.Value),
+            new SqlParameter("@DiscountValue", (object)model.DiscountValue ?? DBNull.Value),
+            new SqlParameter("@ValueType", (object)model.ValueType ?? DBNull.Value),
+            new SqlParameter("@Status", (object)model.Status ?? DBNull.Value),
+            new SqlParameter("@Position", (object)model.Position ?? DBNull.Value),
+            new SqlParameter("@SuperSale", (object)model.SuperSale ?? DBNull.Value),
+            new SqlParameter("@BadgeType", (object)model.BadgeType ?? DBNull.Value),
+                };
+
+                long updatedId = Convert.ToInt64(
+                    _DbWorker.ExecuteNonQuery(
+                        StoreProcedureConstant.SP_UpdateFlashSaleProduct,
+                        objParam
+                    )
+                );
+
+                return updatedId;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateFlashSaleProduct - FlashSaleProductDAL: " + ex.Message);
+                return 0;
+            }
+        }
+
+
+        /// <summary>
+        /// Cập nhật thông tin sản phẩm trong Flash Sale.
+        /// </summary>
+        /// <param name="model">Đối tượng FlashSaleProduct chứa thông tin cập nhật.</param>
+        /// <returns>ID của FlashSaleProduct đã được cập nhật, hoặc 0 nếu có lỗi.</returns>
+        //public long UpdateFlashSaleProduct(FlashSaleProduct model)
+        //{
+        //    try
+        //    {
+        //        SqlParameter[] objParam =
+        //        [
+        //            new SqlParameter("@Id", model.Id),
+        //            new SqlParameter("@CampaignId", (object)model.CampaignId ?? DBNull.Value),
+        //            new SqlParameter("@ProductId", (object)model.ProductId ?? DBNull.Value),
+        //            new SqlParameter("@DiscountValue", (object)model.DiscountValue ?? DBNull.Value),
+        //            new SqlParameter("@ValueType", (object)model.ValueType ?? DBNull.Value),
+        //            new SqlParameter("@Status", (object)model.Status ?? DBNull.Value),
+        //            new SqlParameter("@Position", (object)model.Position ?? DBNull.Value),
+        //            new SqlParameter("@SuperSale", (object)model.SuperSale ?? DBNull.Value),
+        //           new SqlParameter("@BadgeType", (object)model.BadgeType ?? DBNull.Value),
+
+        //        ];
+
+        //        long updatedId = Convert.ToInt64(_DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdateFlashSaleProduct, objParam));
+        //        return updatedId; // DbWorker sẽ tự động trả về giá trị của @Identity
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogHelper.InsertLogTelegram("UpdateFlashSaleProduct - FlashSaleProductDAL: " + ex.Message);
+        //        return 0;
+        //    }
+        //}
+        public async Task<List<FlashSaleProduct>> GetByFlashSaleID(int id)
+        {
+            try
+            {
+
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var detail = await _DbContext.FlashSaleProducts.AsNoTracking().Where(x => x.CampaignId == id).ToListAsync();
+                    if (detail != null)
+                    {
+                        return detail;
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetByFlashSaleID - FlashSaleProductDAL: " + ex.ToString());
+                return null;
+            }
+        }
+        public async Task<List<TourProduct>> GetToursByIds(List<long> tourIds)
+        {
+            try
+            {
+                if (tourIds == null || tourIds.Count == 0)
+                    return new List<TourProduct>();
+
+                using (var _DbContext = new EntityDataContext(_connection))
+                {
+                    var tours = await _DbContext.TourProduct
+                        .AsNoTracking()
+                        .Where(x => tourIds.Contains(x.Id))
+                        .ToListAsync();
+
+                    return tours;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetToursByIds - TourDAL: " + ex);
+                return new List<TourProduct>();
+            }
+        }
+
     }
 
 }

@@ -13,7 +13,8 @@ namespace Utilities.Contants
         public static string SP_UpdateHotelShareHolder = "SP_UpdateHotelShareHolder";
         public static string SP_ReportHotelShareHolder = "SP_ReportHotelShareHolder";
 
-
+        public static string SP_InsertFlashSaleProduct = "SP_InsertFlashSaleProduct";
+        public static string SP_UpdateFlashSaleProduct = "SP_UpdateFlashSaleProduct";
 
 
 

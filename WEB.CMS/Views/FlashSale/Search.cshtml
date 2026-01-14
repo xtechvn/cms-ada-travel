@@ -1,1 +1,91 @@
-﻿
+﻿@using Entities.ViewModels;
+@using Entities.ViewModels.FlashSales
+
+@using Utilities.Contants
+@{
+    Layout = null;
+    string StaticDomain = (string)ViewBag.StaticDomain;
+
+}
+@model GenericViewModel<FlashSaleListingModel>
+<input id="total-record" style="display:none;" value="@Model.TotalRecord" />
+<div class="table-responsive table-default">
+    <table class="table text-center table-nowrap  w-100">
+        <thead>
+            <tr>
+                <th style="width: 80px">ID</th>
+                <th style="width: 250px">Tên chương trình</th>
+                <th style="width: 180px">Người tạo</th>
+                <th style="width: 200px">Thời gian tạo</th>
+                <th style="width: 150px">Trạng thái</th>
+                <th style="width: 150px">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model?.ListData != null && Model.ListData.Any())
+            {
+                foreach (var item in Model.ListData)
+                {
+                    <tr data-id="@item.Id">
+                        <td class="text-center">@item.Id</td>
+
+                        <td class="text-center">
+                            <strong>@item.Name</strong><br />
+                            <small class="text-muted">
+                                Số SP: @item.FlashSaleProductCount.ToString("N0")
+                            </small>
+                        </td>
+
+                        <td class="text-center">
+                            @item.UserCreateName
+                        </td>
+
+                        <td class="text-center">
+                            @item.CreateDate.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+
+                        <td class="text-center">
+                            @{
+                                var now = DateTime.Now;
+
+                                if (item.Status == 1)
+                                {
+                                    <div class="status-green">Đang diễn ra</div>
+                                }
+                              
+                                else
+                                {
+                                    <div class="status-red">Đã kết thúc</div>
+                                }
+                            }
+                        </td>
+
+
+                        <td class="text-center">
+                            <a href="/flashsale/detail/@item.Id"
+                               class="text-primary">
+                                Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+
+    </table>
+</div>
+
+@await Component.InvokeAsync("PagingNew", new
+    {
+        pageModel = new Paging()
+    {
+        TotalRecord = Model.TotalRecord,
+        TotalPage = Model.TotalPage,
+        CurrentPage = Model.CurrentPage,
+        PageSize = Model.PageSize,
+        RecordName = "chiến dịch",
+        PageAction = "flashsale.OnPaging({0})",
+        PageSelectPageSize = "flashsale.onSelectPageSize()"
+    }
+    })
+

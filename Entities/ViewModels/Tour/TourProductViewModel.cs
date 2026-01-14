@@ -48,6 +48,7 @@ namespace Entities.ViewModels.Tour
         public DateTime? UpdatedDate { get; set; }
         public int IsDisplayWeb { get; set; }
         public int Status { get; set; }
+        public long Price { get; set; }
         public int TotalRow { get; set; }
     }
 

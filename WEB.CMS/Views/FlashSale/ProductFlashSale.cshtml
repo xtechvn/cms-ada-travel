@@ -1,1 +1,186 @@
-﻿\
+﻿@using Entities.Models
+@{
+    var tour_types = (List<AllCode>)ViewBag.TourTypes;
+    int flashsale_id = (int)ViewBag.FlashSaleId;
+    Layout = null;
+}
+
+<style>
+    /* ===== SCROLL FIX (quan trọng nhất) ===== */
+    #add-flashsale .flashsale-tour-scroll {
+        max-height: 500px;
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+
+        #add-flashsale .flashsale-tour-scroll table {
+            margin-bottom: 0;
+        }
+
+    /* Nếu theme đang set overflow hidden cho modal/content */
+    #add-flashsale .modal-content,
+    #add-flashsale .content_lightbox {
+        overflow: visible !important;
+    }
+
+    /* Header dính khi scroll (optional, nhưng đẹp) */
+    #add-flashsale .flashsale-tour-scroll thead td {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #fff;
+    }
+
+    /* Giảm chữ cho đẹp */
+    #add-flashsale .fs-tour-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    #add-flashsale .fs-tour-name {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.25;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    #add-flashsale .fs-tour-code {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    #add-flashsale .tour-amount {
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    /* Select2 trong modal (nếu bạn dùng select2) */
+    #add-flashsale .select2-container {
+        width: 100% !important;
+    }
+    /* Footer dính đáy modal */
+    #add-flashsale .fs-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        background: #fff;
+        padding: 12px 0;
+        margin-top: 12px;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    /* Chừa khoảng trống cuối list để không bị footer che */
+    #add-flashsale .flashsale-tour-scroll {
+        padding-bottom: 10px;
+    }
+
+</style>
+
+<div class="modal fade" id="add-flashsale"
+     style="display:none; background-color: rgba(0,0,0,0.5);"
+     aria-hidden="true"
+     data-id="@flashsale_id">
+
+    <div class="modal-dialog" style="max-width: 860px;">
+        <div class="modal-content">
+            <div class="content_lightbox">
+                <h6 class="text-uppercase mb-3">Chọn tour</h6>
+
+                <div class="row">
+                    <!-- Search name/code -->
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label class="col-sm-3 col-4">Tên / Mã tour</label>
+                            <div class="col-sm-9 col-8">
+                                <div class="form-group w-100">
+                                    <div class="search-wrapper">
+                                        <input id="add-flashsale-search-name"
+                                               type="text"
+                                               class="input_search onclick-togle border"
+                                               placeholder="Tìm theo mã tour, tên tour">
+                                        <span class="search-btn">
+                                            <button type="button" id="btn-search-tour">
+                                                <svg class="icon-svg">
+                                                    <use xlink:href="#search"></use>
+                                                </svg>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <label class="col-sm-3 col-4">Loại tour</label>
+                            <div class="col-sm-9 col-8">
+                                <div class="form-group w-100 ">
+                                    <div class="search-wrapper">
+                                        <select id="add-flashsale-search-display" class="select2 w-100" style="width:100% !important;">
+                                            <option value="-1">Tất cả</option>
+                                            @if (tour_types != null && tour_types.Any())
+                                            {
+                                                foreach (var item in tour_types)
+                                                {
+                                                    <option value="@item.CodeValue">@item.Description</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap10 justify-content-between align-items-center mt-2">
+                    <div class="action">
+                        <a href="javascript:;" id="add-flashsale-search-confirm" class="btn btn-round btn-outline-base">Tìm</a>
+                        <a href="javascript:;" id="add-flashsale-search-clear" class="btn btn-round btn-base">Nhập lại</a>
+                    </div>
+                </div>
+
+                <!-- ===== SCROLL WRAPPER (đây là chỗ fix) ===== -->
+                <div class="table-responsive table-default mt-3 flashsale-tour-scroll">
+                    <table class="table text-center table-nowrap w-100">
+                        <thead>
+                            <tr class="thead">
+                                <td style="width:40px;">
+                                    <label class="check-list mb20 check-list-all">
+                                        <input type="checkbox" id="check-all-tour">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </td>
+                                <td class="text-left">Tour</td>
+                                <td style="width:120px;">Giá</td>
+                            </tr>
+                        </thead>
+                        <tbody id="flashsale-tour-tbody">
+                            @* ajax will fill *@
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="action fs-footer">
+                    <a href="javascript:;" id="add-flashsale-btn-cancel" class="btn btn-round btn-outline-base">Hủy</a>
+                    <a href="javascript:;" id="add-flashsale-btn-confirm" class="btn btn-round btn-base">Xác nhận</a>
+                </div>
+
+            </div>
+
+            <button title="Close (Esc)" type="button" class="mfp-close" data-dismiss="modal">×</button>
+        </div>
+    </div>
+</div>

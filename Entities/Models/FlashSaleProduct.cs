@@ -7,6 +7,8 @@ namespace Entities.Models
     {
         public long Id { get; set; }
         public int? CampaignId { get; set; }
+        public long? ProductId { get; set; }
+
         public double? DiscountValue { get; set; }
         public int? ValueType { get; set; }
         public int? Status { get; set; }
