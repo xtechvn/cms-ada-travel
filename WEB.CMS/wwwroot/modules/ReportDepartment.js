@@ -489,7 +489,7 @@ var _ReportDepartment = {
 
         var EndDateFrom; //Ngày bat dau
         var EndDateTo; //Ngày hết hạn
-
+        var checkbox_Marketing = $('#checkbox_Marketing').is(':checked') ? 1 : 0;;
         if ($('#filter_date_daterangepicker').data('daterangepicker') !== undefined && $('#filter_date_daterangepicker').data('daterangepicker') != null && isPickerApprove) {
             FromDate = $('#filter_date_daterangepicker').data('daterangepicker').startDate._d.toLocaleDateString("en-GB");
             ToDate = $('#filter_date_daterangepicker').data('daterangepicker').endDate._d.toLocaleDateString("en-GB");
@@ -539,6 +539,7 @@ var _ReportDepartment = {
             CreateDateTo: CreateDateTo,
             PageIndex: 1,
             PageSize: $("#selectPaggingOptions").find(':selected').val(),
+            IsMKT: checkbox_Marketing,
         };
         return _searchModel;
     },

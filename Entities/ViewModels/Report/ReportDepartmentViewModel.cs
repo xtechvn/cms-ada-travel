@@ -61,6 +61,7 @@ namespace Entities.ViewModels.Report
         public string SalerPermission { get;set;}
         public int? PageIndex { get; set; } = 0;
         public int? PageSize { get; set; } = -1;
+        public int? IsMKT { get; set; } = 0;
     }
     public class SearchReportDepartmentViewModel
     {

@@ -28,7 +28,7 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[17];
+                SqlParameter[] objParam = new SqlParameter[18];
                 objParam[0] = (CheckDate(searchModel.FromDate) == DateTime.MinValue) ? new SqlParameter("@FromDate", DBNull.Value) : new SqlParameter("@FromDate", CheckDate(searchModel.FromDate));
                 objParam[1] = (CheckDate(searchModel.ToDate) == DateTime.MinValue) ? new SqlParameter("@ToDate", DBNull.Value) : new SqlParameter("@ToDate", CheckDate(searchModel.ToDate));
                 objParam[2] = searchModel.SalerId == null ? new SqlParameter("@SalerId", DBNull.Value) : new SqlParameter("@SalerId", searchModel.SalerId);
@@ -46,6 +46,7 @@ namespace DAL
                 objParam[14] = (CheckDate(searchModel.CreateDateTo) == DateTime.MinValue) ? new SqlParameter("@CreateDateTo", DBNull.Value) : new SqlParameter("@CreateDateTo", CheckDate(searchModel.CreateDateTo));
                 objParam[15] = new SqlParameter("@PermisionType", searchModel.PermisionType);
                 objParam[16] = new SqlParameter("@PaymentStatus", searchModel.PaymentStatus);
+                objParam[17] = new SqlParameter("@IsMKT", searchModel.IsMKT);
                 return DbWorker.GetDataTable(StoreProcedureConstant.SP_Report_TotalRevenueByDepartment, objParam);
             }
             catch (Exception ex)

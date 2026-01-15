@@ -146,6 +146,24 @@
                     </select>
                 </div>
             </div>
+            <div class="form-group">
+                @if (ViewBag.IsMKT == 1)
+                {
+                    <div class="wrap_input">
+
+                        <input type="checkbox" checked name="checkbox_Marketing" id="checkbox_Marketing"> Thêm Marketing
+                    </div>
+                }
+                else
+                {
+                    <div class="wrap_input">
+
+                        <input type="checkbox" name="checkbox_Marketing" id="checkbox_Marketing"> Thêm Marketing
+                    </div>
+                }
+              
+                
+            </div>
             <div class="form-group mb0">
                 <label class="lbl">Ghi chú</label>
                 <div class="wrap_input">

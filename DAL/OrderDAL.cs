@@ -684,7 +684,7 @@ namespace DAL
         {
             try
             {
-                SqlParameter[] objParam_order = new SqlParameter[34];
+                SqlParameter[] objParam_order = new SqlParameter[35];
                 objParam_order[0] = model.OrderNo == null ? new SqlParameter("@OrderNo", DBNull.Value) : new SqlParameter("@OrderNo", model.OrderNo);
                 objParam_order[1] = model.ServiceType == null ? new SqlParameter("@ServiceType", DBNull.Value) : new SqlParameter("@ServiceType", model.ServiceType);
                 objParam_order[2] = model.Amount == null ? new SqlParameter("@Amount", DBNull.Value) : new SqlParameter("@Amount", model.Amount);
@@ -782,8 +782,7 @@ namespace DAL
                 objParam_order[31] = model.Note == null ? new SqlParameter("@Note", DBNull.Value) : new SqlParameter("@Note", model.Note);
                 objParam_order[32] = model.UtmMedium == null ? new SqlParameter("@UtmMedium", DBNull.Value) : new SqlParameter("@UtmMedium", model.UtmMedium);
                 objParam_order[33] = model.UtmSource == null ? new SqlParameter("@UtmSource", DBNull.Value) : new SqlParameter("@UtmSource", model.UtmSource);
-
-
+                objParam_order[34] = model.IsMKT == null ? new SqlParameter("@IsMKT", DBNull.Value) : new SqlParameter("@IsMKT", model.IsMKT);
 
                 var id = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.CreateOrder, objParam_order);
                 model.OrderId = id;

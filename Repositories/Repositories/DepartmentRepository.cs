@@ -639,6 +639,7 @@ namespace Repositories.IRepositories
                                     ws.Cells["M2"].PutValue("Ngày In kết thúc");
                                     ws.Cells["N2"].PutValue("Ngày Out bắt đầu");
                                     ws.Cells["O2"].PutValue("Ngày Out kết thúc");
+                                    ws.Cells["P2"].PutValue("Đơn Marketing");
 
                                     #endregion
 
@@ -717,6 +718,7 @@ namespace Repositories.IRepositories
                                         ws.Cells["M" + RowIndex].PutValue(searchModel.StartDateToStr);
                                         ws.Cells["N" + RowIndex].PutValue(searchModel.EndDateFromStr);
                                         ws.Cells["O" + RowIndex].PutValue(searchModel.EndDateToStr);
+                                        ws.Cells["P" + RowIndex].PutValue(searchModel.IsMKT);
 
                                     }
 

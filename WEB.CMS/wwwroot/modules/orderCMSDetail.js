@@ -176,7 +176,10 @@ var _orderDetail = {
         });
     },
     UpdateOrder: function () {
-
+        var checkbox_Marketing = $('#checkbox_Marketing').is(':checked') ? 1 : 0;;
+        if ($('#checkbox_Marketing').is(':checked')) {
+            checkbox_Marketing = 1;
+        }
         var model = {
 
             OrderId: $('#order_Id').val(),
@@ -185,6 +188,7 @@ var _orderDetail = {
             Label: $('#Label').val(),
             Note: $('#Note').val(),
             ProductService: $('#ProductService').val(),
+            IsMKT: checkbox_Marketing,
         }
         $.ajax({
             url: "/Order/UpdateOrder",

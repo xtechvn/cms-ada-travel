@@ -1,4 +1,5 @@
 ﻿using APP_CHECKOUT.RabitMQ;
+using Aspose.Cells;
 using Caching.Elasticsearch;
 using Entities.Models;
 using Entities.ViewModels;
@@ -1040,7 +1041,7 @@ namespace WEB.Adavigo.CMS.Controllers
             {
                 ViewBag.id = orderId;
                 ViewBag.CutOffDate = null;
-              
+                ViewBag.IsMKT = 0;
                 var dataallcode = _allCodeRepository.GetListByType(AllCodeType.SYSTEM_TYPE);
                 var BRANCH_CODE = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
                 var Order_CODE = _allCodeRepository.GetListByType(AllCodeType.ORDER_STATUS);
@@ -1063,6 +1064,7 @@ namespace WEB.Adavigo.CMS.Controllers
                         ViewBag.Note = dataOrder.Note;
                         ViewBag.orderNo = dataOrder.OrderNo;
                         ViewBag.OrderStatus = dataOrder.OrderStatus;
+                        ViewBag.IsMKT= dataOrder.IsMKT;
                         foreach (var item in dataallcode)
                         {
                             if (dataOrder.SystemType == item.CodeValue)
