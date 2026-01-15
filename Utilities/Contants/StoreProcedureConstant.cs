@@ -315,6 +315,7 @@ namespace Utilities.Contants
         public static string SP_InsertFlashSale = "SP_InsertFlashSale";
         public static string SP_UpdateFlashSale = "SP_UpdateFlashSale";
         public static string SP_GetListFlashSale = "SP_GetListFlashSale";
+        public static string SP_GetListSuggestSupplier = "SP_GetListSuggestSupplier";
 
 
 

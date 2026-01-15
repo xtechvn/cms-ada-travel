@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
 
@@ -244,6 +245,32 @@ namespace DAL.Funding
                 return null;
             }
         }
+
+        public async Task<DataTable> GetListSuggestSupplier(string textSearch)
+        {
+            try
+            {
+                try
+                {
+                    SqlParameter[] objParam = new SqlParameter[]
+                    {
+                         new SqlParameter("@TextSearch", textSearch)
+                    };
+
+                    return  _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListSuggestSupplier, objParam);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.InsertLogTelegram("GetSuggestSupplier - GetListSuggestSupplier. " + ex);
+                    throw;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         #endregion
 
         #region supplier - contact
