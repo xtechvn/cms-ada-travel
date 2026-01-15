@@ -282,11 +282,12 @@ var flashsale_detail = {
     FlashsaleSearch: function () {
         debugger
         var display = $('#add-flashsale-search-display').val();
-        display = (display === undefined || display === null || display === "") ? -1 : display;
+        display = (display === undefined || display === null || display === "" || display === "-1") ? null : display;
 
         var model = {
             TourName: $('#add-flashsale-search-name').val(), // search theo mã/tên (backend của bạn đang dùng TourName)
-            IsDisplayWeb: display,
+            IsDisplayWeb: -1,
+            TourType: display ,
             IsSelfDesign: false,
             PageIndex: 1,
             PageSize: 10
