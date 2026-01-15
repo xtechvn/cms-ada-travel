@@ -1003,7 +1003,7 @@ var _customer_managerV2 = {
             MinAmount: $('#minamount').val().replaceAll(',', ''),
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: 1,
-            PageSize: parseFloat($("#selectPaggingOptions").find(':selected').val()),
+            PageSize: 10,
         };
         if (MaKH_data != null && MaKH_data[0] != null) {
             _searchModel.MaKH = MaKH_data[0]
@@ -1466,7 +1466,7 @@ var _customer_managerV2 = {
             MinAmount: $('#minamount').val().replaceAll(',', ''),
             MaxAmount: $('#maxamount').val().replaceAll(',', ''),
             PageIndex: 1,
-            PageSize: parseFloat($("#selectPaggingOptions").find(':selected').val()),
+            PageSize: 10,
         };
         if (MaKH_data != null && MaKH_data[0] != null) {
             _searchModel.MaKH = MaKH_data[0]
@@ -1586,7 +1586,7 @@ var _customer_managerV2 = {
         listClientTypeV2 = [];
         listClientStatusV2 = [];
         listPermisionTypeV2 = [];
-        listUtmSourceV2 =
+        listUtmSourceV2 = [];
         document.querySelector(".btn-text-ClientType").innerText = "Tất cả hình thức thanh toán";
         document.querySelector(".btn-text-ClientStatus").innerText = "Tất cả Trạng thái";
         document.querySelector(".btn-text-PermisionType").innerText = "Tất cả Trạng thái";
