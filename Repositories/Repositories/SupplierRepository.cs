@@ -288,16 +288,15 @@ namespace Repositories.Repositories
             List<Supplier> data = new List<Supplier>();
             try
             {
-                var suppliers = await supplierDAL.GetAllAsync();
-                data = suppliers;
+                
                 if (!string.IsNullOrEmpty(name))
                 {
-                    data = suppliers.Where(s =>
-                    s.FullName.Trim().ToLower().Contains(name.Trim().ToLower())
-                    || (!string.IsNullOrEmpty(s.ShortName) && s.ShortName.Trim().ToLower().Contains(name.Trim().ToLower()))
-                    || (!string.IsNullOrEmpty(s.Email) && s.Email.Trim().ToLower().Contains(name.Trim().ToLower()))
-                    || (!string.IsNullOrEmpty(s.Phone) && s.Phone.Trim().ToLower().Contains(name.Trim().ToLower()))
-                    ).ToList();
+                    DataTable dt = await supplierDAL.GetListSuggestSupplier(name);
+                    if(dt != null&& dt.Rows.Count > 0)
+                    {
+                        data = dt.ToList<Supplier>();
+                    }
+                    
                 }
             }
             catch (Exception ex)
