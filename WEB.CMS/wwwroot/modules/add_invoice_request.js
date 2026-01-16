@@ -141,10 +141,10 @@ var _add_invoice_request = {
                 _global_function.RemoveLoading()
                 $("#body_orderList").empty();
                 var client = result.client
-                if (client != null && !isEditView) {
-                    $('#taxtNo').val(client.taxNo)
-                    $('#address').val(client.businessAddress)
-                }
+                //if (client != null && !isEditView) {
+                //    $('#taxtNo').val(client.taxNo)
+                //    $('#address').val(client.businessAddress)
+                //}
                 listOrder = result.data
                 
                 var totalAmount = 0

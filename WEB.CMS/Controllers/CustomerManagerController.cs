@@ -574,6 +574,8 @@ namespace WEB.Adavigo.CMS.Controllers
         {
             try
             {
+                var i = 0;
+                var current_user = _ManagementUser.GetCurrentUser();
                 if (searchModel.CacheName != null)
                 {
                     var data = _logCacheFilterMongoService.GetListLogCache(null, searchModel.CacheName);
@@ -598,6 +600,36 @@ namespace WEB.Adavigo.CMS.Controllers
 
                     }
 
+                }
+                if (current_user != null && !string.IsNullOrEmpty(current_user.Role))
+                {
+                    var list = Array.ConvertAll(current_user.Role.Split(','), int.Parse);
+                    foreach (var item in list)
+                    {
+                        //kiểm tra chức năng có đc phép sử dụng
+                        var listPermissions = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.TRUY_CAP, (int)MenuId.QL_KHACH_HANG_V2);
+                        var listPermissions6 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.VIEW_ALL, (int)MenuId.QL_KHACH_HANG_V2);
+                        var listPermissions7 = await _userRepository.CheckRolePermissionByUserAndRole(current_user.Id, item, (int)Utilities.Contants.SortOrder.DUYET, (int)MenuId.QL_KHACH_HANG_V2);
+                        if (listPermissions == true)
+                        {
+                            searchModel.SalerPermission = current_user.Id.ToString(); i++;
+                        }
+                        if (listPermissions6 == true)
+                        {
+                            searchModel.SalerPermission = current_user.UserUnderList;
+                            i++;
+                        }
+                        if (listPermissions7 == true && listPermissions6 == true)
+                        {
+                            searchModel.SalerPermission = null;
+                            i++;
+                        }
+                        if (item == (int)RoleType.Admin || item == (int)RoleType.KeToanTruong || item == (int)RoleType.PhoTPKeToan)
+                        {
+                            searchModel.SalerPermission = null;
+                            i++;
+                        }
+                    }
                 }
                 var model = await _customerManagerRepositories.GetPagingList(searchModel, searchModel.PageIndex, searchModel.PageSize);
 

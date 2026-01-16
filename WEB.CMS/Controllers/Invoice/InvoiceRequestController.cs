@@ -39,9 +39,10 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
         private ManagementUser _ManagementUser;
         private APIService apiService;
         private readonly IConfiguration _configuration;
+        private readonly IInvoiceRepository _invoiceRepository;
         public InvoiceRequestController(IAllCodeRepository allCodeRepository, IInvoiceRequestRepository invoiceRequestRepository,
             IWebHostEnvironment hostEnvironment, ManagementUser ManagementUser, IUserRepository userRepository,
-            IClientRepository clientRepository, IOrderRepositor orderRepository, IConfiguration configuration)
+            IClientRepository clientRepository, IOrderRepositor orderRepository, IConfiguration configuration, IInvoiceRepository invoiceRepository)
         {
             _allCodeRepository = allCodeRepository;
             _invoiceRequestRepository = invoiceRequestRepository;
@@ -51,6 +52,7 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
             _clientRepository = clientRepository;
             _orderRepository = orderRepository;
             apiService = new APIService(configuration, userRepository);
+            _invoiceRepository = invoiceRepository;
         }
 
         public IActionResult Index()
@@ -239,21 +241,35 @@ namespace WEB.Adavigo.CMS.Controllers.Invoice
             }
         }
 
-        public IActionResult Add(long orderId)
+        public async Task<IActionResult> Add(long orderId)
         {
             ViewBag.orderId = orderId;
             ViewBag.ClientId = 0;
             ViewBag.ClientName = string.Empty;
             ViewBag.TaxNo = string.Empty;
             ViewBag.Address = string.Empty;
+
+            ViewBag.AddressIR = string.Empty;
+            ViewBag.NameIR = string.Empty;
+            ViewBag.TaxNoIR = string.Empty;
             var orderDetail = _orderRepository.GetDetailOrderByOrderId((int)orderId).Result.FirstOrDefault();
+            if(orderId > 0) {
+                var invoiceRepository_Detail =await _invoiceRepository.GetListInvoiceRequestbyOrderId(orderId.ToString());
+               
+                ViewBag.AddressIR = invoiceRepository_Detail!=null &&invoiceRepository_Detail.Count>0?invoiceRepository_Detail[0].Address: string.Empty;
+                ViewBag.Address = invoiceRepository_Detail!=null &&invoiceRepository_Detail.Count>0?invoiceRepository_Detail[0].Address: string.Empty;
+                ViewBag.NameIR = invoiceRepository_Detail!=null &&invoiceRepository_Detail.Count>0?invoiceRepository_Detail[0].CompanyName: string.Empty;
+                ViewBag.TaxNoIR = invoiceRepository_Detail!=null &&invoiceRepository_Detail.Count>0?invoiceRepository_Detail[0].TaxNo: string.Empty;
+                ViewBag.TaxNo = invoiceRepository_Detail!=null &&invoiceRepository_Detail.Count>0?invoiceRepository_Detail[0].TaxNo: string.Empty;
+    
+
+            }
             if (orderDetail != null)
             {
                 ViewBag.orderId = orderId;
                 ViewBag.ClientId = orderDetail.ClientId;
                 ViewBag.ClientName = orderDetail.ClientName;
-                ViewBag.TaxNo = orderDetail.TaxNo;
-                ViewBag.Address = orderDetail.BusinessAddress;
+               
             }
             var userLogin = 0;
             if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
