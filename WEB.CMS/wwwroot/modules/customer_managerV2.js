@@ -460,10 +460,13 @@ var _customer_managerV2 = {
 
     },
     SearchClient: function (input) {
+        var Page_Index = input.PageIndex;
+        var Page_Size = input.PageSize;
         if(localStorage.getItem("cookiesearchModelV2") != null){
             var cookieModel = localStorage.getItem("cookiesearchModelV2");
             input = JSON.parse(cookieModel);
-
+            input.PageIndex = Page_Index;
+            input.PageSize = Page_Size;
             if (input.AgencyType != null) {
                 $('#AgencyType').val(input.AgencyType).attr("selected", "selected");
                 var text = $("#AgencyType").find(':selected').text();
