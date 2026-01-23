@@ -1429,8 +1429,17 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{SalerPhone}}", "<input type =\"text\" id=\"saler_Phone\" value=\"" + saler.Phone + "\" />");
                     body = body.Replace("{{SalerEmail}}", "<input type =\"text\" id=\"saler_Email\" value=\"" + saler.Email + "\" />");
                     body = body.Replace("{{totalToday}}", "<input type=\"text\" id=\"totalToday\" value=\"" + sumtoday.ToString() + "\" />");
-
-                    //body = body.Replace("{{LockAdminPwdEnc}}", LockAdminPwdEnc);
+                    var LockAdminPwdEnc = "";
+                   var BookingRoom=await  _hotelBookingRoomRepository.GetByHotelBookingID(hotel.Id);
+                    foreach(var item in BookingRoom)
+                    {
+                       var detail_room=await _hotelBookingRoomRepository.GetHotelRoomByServiceName(hotel.Id.ToString(), item.RoomTypeName);
+                        if (detail_room != null)
+                        {
+                            LockAdminPwdEnc += "Phòng "+detail_room.Id+"-"+detail_room.Name+"("+detail_room.LockAdminPwdEnc+").";
+                        }
+                    }
+                    body = body.Replace("{{LockAdminPwdEnc}}", LockAdminPwdEnc);
 
 
                     body = body.Replace("{{Note}}", "<input type=\"text\" id=\"order_note\" value=\"" + order_note + "\" />");
@@ -1501,7 +1510,18 @@ namespace WEB.Adavigo.CMS.Service
                     {
                         body = body.Replace("{{datatableCode}}", modelEmail.datatableCode);
                     }
-
+                    var hotel = await _hotelBookingRepositories.GetHotelBookingByID(id);
+                    var LockAdminPwdEnc = "";
+                    var BookingRoom = await _hotelBookingRoomRepository.GetByHotelBookingID(hotel.Id);
+                    foreach (var item in BookingRoom)
+                    {
+                        var detail_room = await _hotelBookingRoomRepository.GetHotelRoomByServiceName(hotel.Id.ToString(), item.RoomTypeName);
+                        if (detail_room != null)
+                        {
+                            LockAdminPwdEnc += "Phòng " + detail_room.Id + "-" + detail_room.Name + "(" + detail_room.LockAdminPwdEnc + ").";
+                        }
+                    }
+                    body = body.Replace("{{LockAdminPwdEnc}}", LockAdminPwdEnc);
 
                     body = body.Replace("{{datatable}}", datatable);
 

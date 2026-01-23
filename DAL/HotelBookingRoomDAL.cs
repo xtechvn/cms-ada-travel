@@ -117,5 +117,21 @@ namespace DAL
                 return null;
             }
         }
+        public async Task<DataTable> GetHotelRoomByServiceName(string HotelBookingId, string ServiceName)
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[2];
+                objParam[0] = new SqlParameter("@HotelBookingID", HotelBookingId);
+                objParam[1] = new SqlParameter("@ServiceName", ServiceName);
+                return dbWorker.GetDataTable(StoreProcedureConstant.SP_GetHotelRoomByServiceName, objParam);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetHotelBookingRoomByHotelBookingID - HotelBookingRoomDAL: " + ex);
+            }
+            return null;
+        }
     }
 }

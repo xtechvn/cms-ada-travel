@@ -17,6 +17,6 @@ namespace Repositories.IRepositories
         Task<long> UpdateHotelBookingUnitPrice(HotelBookingUnitPriceChangeSummitModel data, long hotel_booking_id, int user_update);
         Task<List<HotelBookingRoomRatesOptionalViewModel>> GetHotelBookingRoomRatesOptionalByBookingId(long HotelBookingId);
         Task<GenericViewModel<HotelBookingRoomsOptionalModel>> GetListHotelBookingRoomsOptionalBySupplierId(OptionalSearshModel Searsh);
-
+        Task<HotelBookingRoomsLockAdminModel> GetHotelRoomByServiceName(string HotelBookingId, string ServiceName);
     }
 }

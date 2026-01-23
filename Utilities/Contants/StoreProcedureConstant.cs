@@ -327,6 +327,8 @@ namespace Utilities.Contants
         public static string SP_GetListClientByUtmSource = "SP_GetListClientByUtmSource";
         public static string SP_GetSumContractPayByUtmSource = "SP_GetSumContractPayByUtmSource";
 
+        public static string SP_GetHotelRoomByServiceName = "SP_GetHotelRoomByServiceName";
+
 
 
         #region vin wonder

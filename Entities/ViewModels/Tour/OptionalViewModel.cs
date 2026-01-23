@@ -79,4 +79,10 @@ namespace Entities.ViewModels.Tour
         public string EndDateStr { get; set; }
         public string CreateDateStr { get; set; }
     }
+    public class HotelBookingRoomsLockAdminModel
+    {
+        public int? Id { get; set; }
+        public string? Name { get; set; }
+        public string? LockAdminPwdEnc { get; set; }
+    }
 }

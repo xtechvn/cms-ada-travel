@@ -333,6 +333,26 @@ namespace Repositories.Repositories
                 LogHelper.InsertLogTelegram("GetListHotelBookingRoomsOptionalBySupplierId - HotelBookingRepository: " + ex);
             }
             return model;
+        }    
+        public async Task<HotelBookingRoomsLockAdminModel> GetHotelRoomByServiceName(string HotelBookingId, string ServiceName)
+        {
+           
+            try
+            {
+                DataTable dt = await _hotelBookingRoomDAL.GetHotelRoomByServiceName(HotelBookingId, ServiceName);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var ListData = dt.ToList<HotelBookingRoomsLockAdminModel>();
+                 
+                    return ListData[0];
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetHotelRoomByServiceName - HotelBookingRepository: " + ex);
+            }
+            return null;
         }
 
     }
