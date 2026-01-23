@@ -45,11 +45,11 @@ namespace DAL
                 var exists = true;
                 if (for_update)
                 {
-                     exists = _DbContext.Province.AsNoTracking().Any(x => x.Name.Trim() == newProvince.Name.Trim() && x.Status==newProvince.Status);
+                     exists = _DbContext.Provinces.AsNoTracking().Any(x => x.Name.Trim() == newProvince.Name.Trim() && x.Status==newProvince.Status);
                 }
                 else
                 {
-                     exists = _DbContext.Province.AsNoTracking().Any(x => x.Name.Trim() == newProvince.Name.Trim());
+                     exists = _DbContext.Provinces.AsNoTracking().Any(x => x.Name.Trim() == newProvince.Name.Trim());
                 }
                 if (exists)
                 {
@@ -84,7 +84,7 @@ namespace DAL
             try
             {
                 var _DbContext = new EntityDataContext(_connection);
-                lastest_item = _DbContext.Province.AsNoTracking().OrderByDescending(x=>x.ProvinceId).FirstOrDefault();
+                lastest_item = _DbContext.Provinces.AsNoTracking().OrderByDescending(x=>x.ProvinceId).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -98,7 +98,7 @@ namespace DAL
             try
             {
                 var _DbContext = new EntityDataContext(_connection);
-                lastest_item = await _DbContext.Province.AsNoTracking().FirstOrDefaultAsync(x=>x.Id==province_id);
+                lastest_item = await _DbContext.Provinces.AsNoTracking().FirstOrDefaultAsync(x=>x.Id==province_id);
             }
             catch (Exception e)
             {
@@ -129,7 +129,7 @@ namespace DAL
             try
             {
                 var _DbContext = new EntityDataContext(_connection);
-                var list = await _DbContext.District.AsNoTracking().Where(x=>x.ProvinceId== provinceID).ToListAsync();
+                var list = await _DbContext.Districts.AsNoTracking().Where(x=>x.ProvinceId== provinceID).ToListAsync();
                 return list;
             }
             catch (Exception e)
@@ -173,12 +173,12 @@ namespace DAL
                 var exists = true;
                 if (for_update)
                 {
-                     exists = _DbContext.District.AsNoTracking().Any(x => x.Name.Trim() == newDistrict.Name.Trim() && x.Type.Trim() == newDistrict.Type.Trim() && x.ProvinceId.Trim() == newDistrict.ProvinceId.Trim() && x.Status == newDistrict.Status);
+                     exists = _DbContext.Districts.AsNoTracking().Any(x => x.Name.Trim() == newDistrict.Name.Trim() && x.Type.Trim() == newDistrict.Type.Trim() && x.ProvinceId.Trim() == newDistrict.ProvinceId.Trim() && x.Status == newDistrict.Status);
 
                 }
                 else
                 {
-                    exists = _DbContext.District.AsNoTracking().Any(x => x.Name.Trim() == newDistrict.Name.Trim() && x.Type.Trim() == newDistrict.Type.Trim() && x.ProvinceId.Trim() == newDistrict.ProvinceId.Trim());
+                    exists = _DbContext.Districts.AsNoTracking().Any(x => x.Name.Trim() == newDistrict.Name.Trim() && x.Type.Trim() == newDistrict.Type.Trim() && x.ProvinceId.Trim() == newDistrict.ProvinceId.Trim());
 
                 }
                 if (exists) return 1;
@@ -196,7 +196,7 @@ namespace DAL
             try
             {
                 var _DbContext = new EntityDataContext(_connection);
-                lastest_item = _DbContext.District.AsNoTracking().OrderByDescending(x => x.DistrictId).FirstOrDefault();
+                lastest_item = _DbContext.Districts.AsNoTracking().OrderByDescending(x => x.DistrictId).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -228,7 +228,7 @@ namespace DAL
             try
             {
                 var _DbContext = new EntityDataContext(_connection);
-                var list = await _DbContext.Ward.AsNoTracking().Where(x => x.DistrictId == districtID).ToListAsync();
+                var list = await _DbContext.Wards.AsNoTracking().Where(x => x.DistrictId == districtID).ToListAsync();
                 return list;
             }
             catch (Exception e)
@@ -272,12 +272,12 @@ namespace DAL
                 var exists = true;
                 if (for_update)
                 {
-                    exists = _DbContext.Ward.AsNoTracking().Any(x => x.Name.Trim() == newWard.Name.Trim() && x.Type.Trim() == newWard.Type.Trim() && x.DistrictId.Trim() == newWard.DistrictId.Trim() && x.Status==newWard.Status);
+                    exists = _DbContext.Wards.AsNoTracking().Any(x => x.Name.Trim() == newWard.Name.Trim() && x.Type.Trim() == newWard.Type.Trim() && x.DistrictId.Trim() == newWard.DistrictId.Trim() && x.Status==newWard.Status);
 
                 }
                 else
                 {
-                    exists = _DbContext.Ward.AsNoTracking().Any(x => x.Name.Trim() == newWard.Name.Trim() && x.Type.Trim() == newWard.Type.Trim() && x.DistrictId.Trim() == newWard.DistrictId.Trim());
+                    exists = _DbContext.Wards.AsNoTracking().Any(x => x.Name.Trim() == newWard.Name.Trim() && x.Type.Trim() == newWard.Type.Trim() && x.DistrictId.Trim() == newWard.DistrictId.Trim());
                 }
                 if (exists) return 1;
                 else return 0;
@@ -294,7 +294,7 @@ namespace DAL
             try
             {
                 var _DbContext = new EntityDataContext(_connection);
-                lastest_item = _DbContext.Ward.AsNoTracking().OrderByDescending(x => x.WardId).FirstOrDefault();
+                lastest_item = _DbContext.Wards.AsNoTracking().OrderByDescending(x => x.WardId).FirstOrDefault();
             }
             catch (Exception e)
             {

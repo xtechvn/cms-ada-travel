@@ -26,7 +26,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Label.AsNoTracking().FirstOrDefaultAsync(s => s.Id == label_id);
+                    return await _DbContext.Labels.AsNoTracking().FirstOrDefaultAsync(s => s.Id == label_id);
                 }
             }
             catch (Exception ex)
@@ -42,7 +42,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Label.AsNoTracking().Where(n => n.Status == (int)Status.HOAT_DONG).ToListAsync();
+                    return await _DbContext.Labels.AsNoTracking().Where(n => n.Status == (int)Status.HOAT_DONG).ToListAsync();
                 }
             }
             catch (Exception ex)

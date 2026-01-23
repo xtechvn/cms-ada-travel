@@ -32,7 +32,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.VinWonderBooking.FirstOrDefault(x => x.Id == booking_id);
+                    return _DbContext.VinWonderBookings.FirstOrDefault(x => x.Id == booking_id);
                 }
             }
             catch (Exception ex)
@@ -50,13 +50,13 @@ namespace DAL
                 {
                     List<long> vinwonder_guest_new_id = new List<long>();
                     List<long> vinwonder_packages_new_id = new List<long>();
-                    var order = await _DbContext.Order.AsNoTracking().FirstOrDefaultAsync(x => x.OrderId == model.detail.OrderId);
+                    var order = await _DbContext.Orders.AsNoTracking().FirstOrDefaultAsync(x => x.OrderId == model.detail.OrderId);
                     if (order == null || order.OrderId <= 0)
                     {
                         return -1;
                     }
 
-                    var exists_vinwonder = await _DbContext.VinWonderBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.detail.Id);
+                    var exists_vinwonder = await _DbContext.VinWonderBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.detail.Id);
                     if (exists_vinwonder != null && exists_vinwonder.Id > 0)
                     {
 
@@ -82,7 +82,7 @@ namespace DAL
                         foreach (var package in model.packages)
                         {
                             package.BookingId = model.detail.Id;
-                            var exists_vinwonder_package = await _DbContext.VinWonderBookingTicket.AsNoTracking().FirstOrDefaultAsync(x => x.Id == package.Id);
+                            var exists_vinwonder_package = await _DbContext.VinWonderBookingTickets.AsNoTracking().FirstOrDefaultAsync(x => x.Id == package.Id);
                             if (exists_vinwonder_package != null && exists_vinwonder_package.Id > 0)
                             {
                                 package.CreatedBy = exists_vinwonder_package.CreatedBy;
@@ -100,7 +100,7 @@ namespace DAL
                             foreach (var guest in model.guests)
                             {
                                 guest.BookingId = model.detail.Id;
-                                var exists_vinwonder_guest = await _DbContext.VinWonderBookingTicketCustomer.AsNoTracking().FirstOrDefaultAsync(x => x.Id == guest.Id);
+                                var exists_vinwonder_guest = await _DbContext.VinWonderBookingTicketCustomers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == guest.Id);
                                 if (exists_vinwonder_guest != null && exists_vinwonder_guest.Id > 0)
                                 {
                                     guest.CreatedBy = exists_vinwonder_guest.CreatedBy;
@@ -123,7 +123,7 @@ namespace DAL
                         CreateVinWonderBooking(model.detail);
                         model.detail.ServiceCode = "VINWONDER" + string.Format(String.Format("{0,4:0000}", model.detail.Id));
 
-                        _DbContext.VinWonderBooking.Update(model.detail);
+                        _DbContext.VinWonderBookings.Update(model.detail);
                         await _DbContext.SaveChangesAsync();
                         foreach (var package in model.packages)
                         {
@@ -159,7 +159,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var delete_guest = await _DbContext.VinWonderBookingTicketCustomer.AsNoTracking().Where(x => x.BookingId == vinwonder_id && !remain_guests.Contains(x.Id)).ToListAsync();
+                    var delete_guest = await _DbContext.VinWonderBookingTicketCustomers.AsNoTracking().Where(x => x.BookingId == vinwonder_id && !remain_guests.Contains(x.Id)).ToListAsync();
                     if (delete_guest != null && delete_guest.Count > 0)
                     {
                         foreach (var guest in delete_guest)
@@ -169,7 +169,7 @@ namespace DAL
                             UpdateVinWonderGuest(guest);
                         }
                     }
-                    var delete_packages = await _DbContext.VinWonderBookingTicket.AsNoTracking().Where(x => x.BookingId == vinwonder_id && !remain_packages.Contains(x.Id)).ToListAsync();
+                    var delete_packages = await _DbContext.VinWonderBookingTickets.AsNoTracking().Where(x => x.BookingId == vinwonder_id && !remain_packages.Contains(x.Id)).ToListAsync();
                     if (delete_packages != null && delete_packages.Count > 0)
                     {
                         foreach (var package in delete_packages)
@@ -195,35 +195,35 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var booking = await _DbContext.VinWonderBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var booking = await _DbContext.VinWonderBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (booking != null && booking.Id > 0)
                     {
                         
-                        var extra = await _DbContext.VinWonderBookingTicket.AsNoTracking().Where(x => x.BookingId == booking.Id).ToListAsync();
+                        var extra = await _DbContext.VinWonderBookingTickets.AsNoTracking().Where(x => x.BookingId == booking.Id).ToListAsync();
                         var ticket_id = extra.Select(x => x.Id);
                         if (extra != null && extra.Count > 0)
                         {
-                            _DbContext.VinWonderBookingTicket.RemoveRange(extra);
+                            _DbContext.VinWonderBookingTickets.RemoveRange(extra);
                             await _DbContext.SaveChangesAsync();
                         }
                         
                         if(ticket_id != null && ticket_id.Count() > 0)
                         {
                             var ticket_ids = ticket_id.ToList();
-                            var ticket_details = await _DbContext.VinWonderBookingTicketDetail.AsNoTracking().Where(x => x.BookingTicketId!=null?  ticket_ids.Contains((long)x.BookingTicketId) : x.Id<=0).ToListAsync();
+                            var ticket_details = await _DbContext.VinWonderBookingTicketDetails.AsNoTracking().Where(x => x.BookingTicketId!=null?  ticket_ids.Contains((long)x.BookingTicketId) : x.Id<=0).ToListAsync();
                             if (extra != null && extra.Count > 0)
                             {
-                                _DbContext.VinWonderBookingTicketDetail.RemoveRange(ticket_details);
+                                _DbContext.VinWonderBookingTicketDetails.RemoveRange(ticket_details);
                                 await _DbContext.SaveChangesAsync();
                             }
                         }
-                        var passengers = await _DbContext.VinWonderBookingTicketCustomer.AsNoTracking().Where(x => x.BookingId == booking.Id).ToListAsync();
+                        var passengers = await _DbContext.VinWonderBookingTicketCustomers.AsNoTracking().Where(x => x.BookingId == booking.Id).ToListAsync();
                         if (passengers != null && passengers.Count > 0)
                         {
-                            _DbContext.VinWonderBookingTicketCustomer.RemoveRange(passengers);
+                            _DbContext.VinWonderBookingTicketCustomers.RemoveRange(passengers);
                             await _DbContext.SaveChangesAsync();
                         }
-                        _DbContext.VinWonderBooking.Remove(booking);
+                        _DbContext.VinWonderBookings.Remove(booking);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -241,7 +241,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var booking = await _DbContext.VinWonderBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var booking = await _DbContext.VinWonderBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (booking != null && booking.Id > 0)
                     {
                         if (booking.Status == (int)ServiceStatus.Decline)
@@ -249,7 +249,7 @@ namespace DAL
                             booking.Status = (int)ServiceStatus.Cancel;
                             booking.UpdatedBy = user_id;
                             booking.UpdatedDate = DateTime.Now;
-                            _DbContext.VinWonderBooking.Update(booking);
+                            _DbContext.VinWonderBookings.Update(booking);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -675,13 +675,13 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.VinWonderBooking.AsNoTracking().FirstOrDefaultAsync(s => s.Id == booking_id);
+                    var exists = await _DbContext.VinWonderBookings.AsNoTracking().FirstOrDefaultAsync(s => s.Id == booking_id);
                     if (exists != null && exists.Id > 0)
                     {
                         exists.UpdatedDate = DateTime.Now;
                         exists.UpdatedBy = user_commit;
                         exists.SalerId = user_id;
-                        _DbContext.VinWonderBooking.Update(exists);
+                        _DbContext.VinWonderBookings.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -699,14 +699,14 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.VinWonderBooking.AsNoTracking().Where(s => s.Id == booking_id).FirstOrDefaultAsync();
+                    var exists = await _DbContext.VinWonderBookings.AsNoTracking().Where(s => s.Id == booking_id).FirstOrDefaultAsync();
                     if (exists != null && exists.Id > 0 && exists.Status == (int)ServiceStatus.WaitingExcution)
                     {
                         exists.UpdatedDate = DateTime.Now;
                         exists.UpdatedBy = user_id;
                         exists.SalerId = user_id;
                         exists.Status = (int)ServiceStatus.OnExcution;
-                        _DbContext.VinWonderBooking.Update(exists);
+                        _DbContext.VinWonderBookings.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -724,14 +724,14 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.VinWonderBooking.AsNoTracking().Where(s => s.Id == booking_id).FirstOrDefaultAsync();
+                    var exists = await _DbContext.VinWonderBookings.AsNoTracking().Where(s => s.Id == booking_id).FirstOrDefaultAsync();
                     if (exists != null && exists.Id > 0)
                     {
                         exists.StatusOld = exists.Status;
                         exists.UpdatedDate = DateTime.Now;
                         exists.UpdatedBy = user_id;
                         exists.Status = status;
-                        _DbContext.VinWonderBooking.Update(exists);
+                        _DbContext.VinWonderBookings.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -749,7 +749,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.VinWonderBooking.FirstOrDefault(x => x.ServiceCode.ToUpper().Contains(service_code.ToUpper()));
+                    return _DbContext.VinWonderBookings.FirstOrDefault(x => x.ServiceCode.ToUpper().Contains(service_code.ToUpper()));
                 }
             }
             catch (Exception ex)

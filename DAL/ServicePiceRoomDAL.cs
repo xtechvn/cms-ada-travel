@@ -25,7 +25,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var find = _DbContext.ServicePiceRoom.ToList();
+                    var find = _DbContext.ServicePiceRooms.ToList();
                     return find;
                 }
             }
@@ -40,7 +40,7 @@ namespace DAL
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var find = _DbContext.ServicePiceRoom.FirstOrDefault(x => x.RoomId == room_id);
+                var find = _DbContext.ServicePiceRooms.FirstOrDefault(x => x.RoomId == room_id);
                 if (find != null && find.Id > 0)
                 {
                     return find.RoomCode;
@@ -57,17 +57,17 @@ namespace DAL
                 {
                    foreach(var room in room_list)
                    {
-                        var find = _DbContext.ServicePiceRoom.FirstOrDefault(x=>x.RoomId==room.RoomId && x.HotelId==room.HotelId);
+                        var find = _DbContext.ServicePiceRooms.FirstOrDefault(x=>x.RoomId==room.RoomId && x.HotelId==room.HotelId);
                         if(find!=null && find.Id > 0)
                         {
                             find.Price = room.Price;
                             find.CreateDate = room.CreateDate;
                             find.RoomName = room.RoomName;
-                            _DbContext.ServicePiceRoom.Update(find);
+                            _DbContext.ServicePiceRooms.Update(find);
                         }
                         else
                         {
-                            _DbContext.ServicePiceRoom.AddAsync(room);
+                            _DbContext.ServicePiceRooms.AddAsync(room);
                         }
 
                    }
@@ -85,7 +85,7 @@ namespace DAL
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var find = _DbContext.ServicePiceRoom.FirstOrDefault(x => x.RoomId == room_id);
+                var find = _DbContext.ServicePiceRooms.FirstOrDefault(x => x.RoomId == room_id);
                 if (find != null && find.Id > 0)
                 {
                     return find.RoomName;
@@ -97,7 +97,7 @@ namespace DAL
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var find = _DbContext.ServicePiceRoom.FirstOrDefault(x => x.RoomId == room_id && x.HotelId==hotel_id);
+                var find = _DbContext.ServicePiceRooms.FirstOrDefault(x => x.RoomId == room_id && x.HotelId==hotel_id);
                 if (find != null && find.Id > 0)
                 {
                     return (double)find.Price;
@@ -111,7 +111,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.ServicePiceRoom.Where(x => packages_id.Contains((int)x.RoomPackageId)).ToListAsync();
+                    return await _DbContext.ServicePiceRooms.Where(x => packages_id.Contains((int)x.RoomPackageId)).ToListAsync();
 
 
                 }

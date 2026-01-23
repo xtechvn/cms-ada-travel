@@ -127,13 +127,13 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var client = _DbContext.Client.FirstOrDefault(x=>x.Id==client_id);
+                    var client = _DbContext.Clients.FirstOrDefault(x=>x.Id==client_id);
                     if(client==null || client.Id <= 0)
                     {
                         return -1;
                     }
                     if (client.ClientType == (int)ClientType.kl) return 0;
-                    var contract = _DbContext.Contract.FirstOrDefault(x=>x.ContractStatus ==0 && x.VerifyStatus==1);
+                    var contract = _DbContext.Contracts.FirstOrDefault(x=>x.ContractStatus ==0 && x.VerifyStatus==1);
                     if(contract==null || contract.ContractId <= 0)
                     {
                         return contract.ContractId;
@@ -155,7 +155,7 @@ namespace DAL
                 {
                     if (model.ContractId == 0)
                     {
-                        //_DbContext.Contract.Add(model);
+                        //_DbContext.Contracts.Add(model);
                         //await _DbContext.SaveChangesAsync();
                         //return 1;
                         SqlParameter[] objParam = new SqlParameter[18];
@@ -190,7 +190,7 @@ namespace DAL
                             model.UpdateLast = DateTime.Now;
                             model.ExpireDate = model.ExpireDate;
 
-                            _DbContext.Contract.Update(model);
+                            _DbContext.Contracts.Update(model);
                             await _DbContext.SaveChangesAsync();
                             if (model.ContractStatus == ContractStatus.DA_DUYET)
                             {
@@ -279,7 +279,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Contract.AsNoTracking().Where(x => (((DateTime?)x.ContractDate) ?? DateTime.Now).Year == DateTime.Now.Year).Count();
+                    return _DbContext.Contracts.AsNoTracking().Where(x => (((DateTime?)x.ContractDate) ?? DateTime.Now).Year == DateTime.Now.Year).Count();
                 }
             }
             catch (Exception ex)
@@ -294,7 +294,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return  _DbContext.Contract.AsNoTracking().Where(x => (((DateTime?)x.ExpireDate)>= DateTime.Now) && x.ContractStatus == ContractStatus.DA_DUYET && x.ClientId== ClientId).ToList();
+                    return  _DbContext.Contracts.AsNoTracking().Where(x => (((DateTime?)x.ExpireDate)>= DateTime.Now) && x.ContractStatus == ContractStatus.DA_DUYET && x.ClientId== ClientId).ToList();
                 }
             }
             catch (Exception ex)
@@ -309,7 +309,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Contract.AsNoTracking().Where(x => (((DateTime?)x.ExpireDate) >= DateTime.Now) && x.ContractStatus == ContractStatus.DA_DUYET && x.ClientId == ClientId).FirstOrDefaultAsync();
+                    return await _DbContext.Contracts.AsNoTracking().Where(x => (((DateTime?)x.ExpireDate) >= DateTime.Now) && x.ContractStatus == ContractStatus.DA_DUYET && x.ClientId == ClientId).FirstOrDefaultAsync();
                 }
             }
             catch (Exception ex)
@@ -324,7 +324,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Contract.FirstOrDefault(s=>s.ContractId== ClientId);
+                    return _DbContext.Contracts.FirstOrDefault(s=>s.ContractId== ClientId);
                 }
             }
             catch (Exception ex)

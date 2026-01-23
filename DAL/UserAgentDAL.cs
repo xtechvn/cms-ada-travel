@@ -28,7 +28,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var deta = _DbContext.UserAgent.Add(model);
+                    var deta = _DbContext.UserAgents.Add(model);
                     _DbContext.SaveChanges();
 
 
@@ -47,14 +47,14 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.UserAgent.FirstOrDefault(s => s.ClientId == ClientId);
-                    var modelclient = _DbContext.Client.FirstOrDefault(s => s.Id == ClientId);
+                    var model = _DbContext.UserAgents.FirstOrDefault(s => s.ClientId == ClientId);
+                    var modelclient = _DbContext.Clients.FirstOrDefault(s => s.Id == ClientId);
                     if (model != null) { 
                     model.UserId = UserId;
                     model.UpdateLast = DateTime.Now;
                     modelclient.UpdateTime = DateTime.Now;
-                    var deta = _DbContext.UserAgent.Update(model);
-                    var Updateclient = _DbContext.Client.Update(modelclient);
+                    var deta = _DbContext.UserAgents.Update(model);
+                    var Updateclient = _DbContext.Clients.Update(modelclient);
                     _DbContext.SaveChanges();
                     }
                     else
@@ -67,7 +67,7 @@ namespace DAL
                         model2.ClientId = ClientId;
                         model2.UserId = UserId;
                         model2.CreatedBy = create_id;
-                        var deta = _DbContext.UserAgent.Add(model2);
+                        var deta = _DbContext.UserAgents.Add(model2);
                         _DbContext.SaveChanges();
                     }
 
@@ -87,8 +87,8 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model =(from a in _DbContext.UserAgent.Where(s => s.ClientId == ClientId)
-                                join b in _DbContext.User on a.UserId equals b.Id
+                    var model =(from a in _DbContext.UserAgents.Where(s => s.ClientId == ClientId)
+                                join b in _DbContext.Users on a.UserId equals b.Id
                                 select new UserAgentViewModel
                                 {
                                     Id=a.Id,
@@ -114,7 +114,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.UserAgent.FirstOrDefault(s => s.ClientId == ClientId);
+                    var model = _DbContext.UserAgents.FirstOrDefault(s => s.ClientId == ClientId);
                     return model;
                 }
                
@@ -131,7 +131,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var deta = _DbContext.UserAgent.Update(model);
+                    var deta = _DbContext.UserAgents.Update(model);
                     _DbContext.SaveChanges();
                     return 1;
                 }

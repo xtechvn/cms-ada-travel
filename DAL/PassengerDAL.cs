@@ -25,7 +25,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var passengers = await _DbContext.Passenger.AsNoTracking().Where(x => x.OrderId == order_id && x.GroupBookingId.Trim()==group_fly.Trim()).ToListAsync();
+                    var passengers = await _DbContext.Passengers.AsNoTracking().Where(x => x.OrderId == order_id && x.GroupBookingId.Trim()==group_fly.Trim()).ToListAsync();
                    
                     return passengers;
                 }
@@ -42,7 +42,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var passengers = await _DbContext.Passenger.AsNoTracking().Where(x => x.OrderId == order_id ).ToListAsync();
+                    var passengers = await _DbContext.Passengers.AsNoTracking().Where(x => x.OrderId == order_id ).ToListAsync();
 
                     return passengers;
                 }

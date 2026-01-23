@@ -1430,6 +1430,8 @@ namespace WEB.Adavigo.CMS.Service
                     body = body.Replace("{{SalerEmail}}", "<input type =\"text\" id=\"saler_Email\" value=\"" + saler.Email + "\" />");
                     body = body.Replace("{{totalToday}}", "<input type=\"text\" id=\"totalToday\" value=\"" + sumtoday.ToString() + "\" />");
 
+                    //body = body.Replace("{{LockAdminPwdEnc}}", LockAdminPwdEnc);
+
 
                     body = body.Replace("{{Note}}", "<input type=\"text\" id=\"order_note\" value=\"" + order_note + "\" />");
                     body = body.Replace("{{payment_notification}}", "<input type=\"text\" id=\"payment_notification\" value=\"" + payment_notification + "\" />");

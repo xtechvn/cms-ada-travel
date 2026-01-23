@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
-// If you have enabled NRTs for your project, then un-comment the following line:
-// #nullable disable
-
 namespace Entities.Models
 {
     public partial class Client
     {
+        public Client()
+        {
+            UserAgents = new HashSet<UserAgent>();
+        }
+
         public long Id { get; set; }
         public int? ClientMapId { get; set; }
         public int? SaleMapId { get; set; }
@@ -34,5 +35,8 @@ namespace Entities.Models
         public string ReferralId { get; set; }
         public int? ParentId { get; set; }
         public int? UtmSource { get; set; }
+        public int? CreatedBy { get; set; }
+
+        public virtual ICollection<UserAgent> UserAgents { get; set; }
     }
 }

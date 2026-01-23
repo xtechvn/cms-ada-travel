@@ -124,7 +124,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.HotelBookingCode.AsNoTracking().Where(x => x.ServiceId==service_id && x.Type==type).ToListAsync();
+                    var detail = await _DbContext.HotelBookingCodes.AsNoTracking().Where(x => x.ServiceId==service_id && x.Type==type).ToListAsync();
                     return detail;
                 }
             }
@@ -141,7 +141,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.HotelBookingCode.AsNoTracking().FirstOrDefault(s => s.ServiceId == data_id && s.Note.ToLower().Contains(note.ToLower()) && s.BookingCode.ToLower().Equals(BookingCode.ToLower()));
+                    return _DbContext.HotelBookingCodes.AsNoTracking().FirstOrDefault(s => s.ServiceId == data_id && s.Note.ToLower().Contains(note.ToLower()) && s.BookingCode.ToLower().Equals(BookingCode.ToLower()));
                 }
             }
             catch (Exception ex)
@@ -157,13 +157,13 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var exists= await _DbContext.HotelBookingCode.AsNoTracking().Where(s => s.ServiceId == data_id && s.Note.ToLower().Contains(note.ToLower())).ToListAsync();
+                    var exists= await _DbContext.HotelBookingCodes.AsNoTracking().Where(s => s.ServiceId == data_id && s.Note.ToLower().Contains(note.ToLower())).ToListAsync();
                     if(exists!=null && exists.Count > 0)
                     {
                         foreach(var detail in exists)
                         {
                             detail.ServiceId = detail.ServiceId * -1;
-                            _DbContext.HotelBookingCode.Update(detail);
+                            _DbContext.HotelBookingCodes.Update(detail);
                             await _DbContext.SaveChangesAsync();
                         }
                     }

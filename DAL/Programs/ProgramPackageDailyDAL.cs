@@ -162,7 +162,7 @@ namespace DAL.Programs
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var ProgramsBK = _DbContext.ProgramPackageDaily.Where(s => s.ProgramId == id && s.RoomTypeId== RoomTypeId).FirstOrDefault();
+                    var ProgramsBK = _DbContext.ProgramPackageDailies.Where(s => s.ProgramId == id && s.RoomTypeId== RoomTypeId).FirstOrDefault();
                     if (ProgramsBK != null)
                     {
                         return ProgramsBK;

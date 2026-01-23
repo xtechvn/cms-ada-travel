@@ -26,7 +26,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = _DbContext.FlyBookingPackagesOptional.AsNoTracking().FirstOrDefault(s => s.Id == packages.Id);
+                    var exists = _DbContext.FlyBookingPackagesOptionals.AsNoTracking().FirstOrDefault(s => s.Id == packages.Id);
                     if (exists != null && exists.Id > 0)
                     {
                         return UpdateFlyBookingPackagesOptional(packages);
@@ -51,7 +51,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.FlyBookingPackagesOptional.AsNoTracking().Where(s => s.BookingId == booking_id).ToListAsync();
+                    return await _DbContext.FlyBookingPackagesOptionals.AsNoTracking().Where(s => s.BookingId == booking_id).ToListAsync();
 
                 }
             }

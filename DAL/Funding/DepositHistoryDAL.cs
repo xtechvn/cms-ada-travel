@@ -31,7 +31,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var query = _DbContext.DepositHistory.AsNoTracking().AsQueryable();
+                    var query = _DbContext.DepositHistories.AsNoTracking().AsQueryable();
 
                     if (!string.IsNullOrEmpty(searchModel.TransNo))
                     {
@@ -156,7 +156,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.DepositHistory.AsNoTracking().FirstOrDefault(x => x.Id == depositHistoryId);
+                    var detail = _DbContext.DepositHistories.AsNoTracking().FirstOrDefault(x => x.Id == depositHistoryId);
                     if (detail != null)
                     {
                         return detail;
@@ -177,7 +177,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.DepositHistory.AsNoTracking().FirstOrDefault(x => x.TransNo == depositHistoryNo);
+                    var detail = _DbContext.DepositHistories.AsNoTracking().FirstOrDefault(x => x.TransNo == depositHistoryNo);
                     if (detail != null)
                     {
                         return detail;
@@ -198,7 +198,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var details = _DbContext.DepositHistory.AsNoTracking().Where(x => depositHistoryIds.Contains(x.Id)).ToList();
+                    var details = _DbContext.DepositHistories.AsNoTracking().Where(x => depositHistoryIds.Contains(x.Id)).ToList();
                     if (details != null)
                     {
                         return details;
@@ -220,10 +220,10 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data_DepositHistory = _DbContext.DepositHistory.AsNoTracking().Where(s => s.UserId == userId);
-                    var data = (from a in _DbContext.DepositHistory.AsNoTracking().Where(s => s.UserId == userId)
-                                join b in _DbContext.AllCode.AsNoTracking().Where(s => s.Type == AllCodeType.PAYMENT_TYPE) on a.PaymentType equals b.CodeValue
-                                join c in _DbContext.AllCode.AsNoTracking().Where(s => s.Type == AllCodeType.DEPOSIT_STATUS) on a.Status equals c.CodeValue
+                    var data_DepositHistory = _DbContext.DepositHistories.AsNoTracking().Where(s => s.UserId == userId);
+                    var data = (from a in _DbContext.DepositHistories.AsNoTracking().Where(s => s.UserId == userId)
+                                join b in _DbContext.AllCodes.AsNoTracking().Where(s => s.Type == AllCodeType.PAYMENT_TYPE) on a.PaymentType equals b.CodeValue
+                                join c in _DbContext.AllCodes.AsNoTracking().Where(s => s.Type == AllCodeType.DEPOSIT_STATUS) on a.Status equals c.CodeValue
                                 select new DepositHistoryViewMdel
                                 {
                                     Id = a.Id,

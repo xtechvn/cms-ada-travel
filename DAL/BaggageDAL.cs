@@ -24,7 +24,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Baggage.AsNoTracking().Where(s => passengerIdList.Contains((int)s.PassengerId)).ToList();
+                    return _DbContext.Baggages.AsNoTracking().Where(s => passengerIdList.Contains((int)s.PassengerId)).ToList();
                 }
             }
             catch (Exception ex)

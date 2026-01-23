@@ -27,7 +27,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.BankingAccount.AsNoTracking().ToList();
+                    return _DbContext.BankingAccounts.AsNoTracking().ToList();
                 }
             }
             catch (Exception ex)
@@ -42,7 +42,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.BankOnePay.FirstOrDefault(s => s.BankName == bank_name);
+                    return _DbContext.BankOnePays.FirstOrDefault(s => s.BankName == bank_name);
                 }
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.BankingAccount.AsNoTracking().FirstOrDefault(n => n.Id == bankAccountId);
+                    return _DbContext.BankingAccounts.AsNoTracking().FirstOrDefault(n => n.Id == bankAccountId);
                 }
             }
             catch (Exception ex)

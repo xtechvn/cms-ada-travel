@@ -22,7 +22,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Voucher.FirstOrDefaultAsync(s => s.Code.ToUpper() == voucherCode.ToUpper());
+                    return await _DbContext.Vouchers.FirstOrDefaultAsync(s => s.Code.ToUpper() == voucherCode.ToUpper());
                 }
             }
             catch (Exception ex)
@@ -38,7 +38,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Voucher.FirstOrDefaultAsync(s => s.Code.ToUpper() == voucherCode.ToUpper() && s.IsPublic == is_public);
+                    return await _DbContext.Vouchers.FirstOrDefaultAsync(s => s.Code.ToUpper() == voucherCode.ToUpper() && s.IsPublic == is_public);
                 }
             }
             catch (Exception ex)
@@ -55,7 +55,7 @@ namespace DAL
                 var current_date = DateTime.Now;
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Voucher.AsNoTracking().Where(s => s.IsPublic == is_public && s.Cdate <= current_date && s.EDate >= current_date).ToListAsync();
+                    return await _DbContext.Vouchers.AsNoTracking().Where(s => s.IsPublic == is_public && s.Cdate <= current_date && s.EDate >= current_date).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -71,7 +71,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var Voucher = await _DbContext.Voucher.FirstOrDefaultAsync(s => s.Id == voucherId);
+                    var Voucher = await _DbContext.Vouchers.FirstOrDefaultAsync(s => s.Id == voucherId);
                     return Voucher.Code;
                 }
             }

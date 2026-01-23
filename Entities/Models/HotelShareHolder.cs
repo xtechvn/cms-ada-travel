@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entities.Models
 {
-    public class HotelShareHolder
+    public partial class HotelShareHolder
     {
         public int Id { get; set; }
         public int HotelId { get; set; }

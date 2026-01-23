@@ -32,7 +32,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.VinWonderBookingTicket.Where(x => x.BookingId == booking_id).ToListAsync();
+                    return await _DbContext.VinWonderBookingTickets.Where(x => x.BookingId == booking_id).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -65,14 +65,14 @@ namespace DAL
                 {
                     foreach (var item in data)
                     {
-                        var exists_ticket = await _DbContext.VinWonderBookingTicket.AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.Id);
+                        var exists_ticket = await _DbContext.VinWonderBookingTickets.AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.Id);
                         if (exists_ticket != null && exists_ticket.Id > 0 && item.UnitPrice >= 0)
                         {
                             exists_ticket.UnitPrice = item.UnitPrice;
                             exists_ticket.SupplierId = item.SupplierId;
                             exists_ticket.UpdatedBy = user_summit;
                             exists_ticket.UpdatedDate = DateTime.Now;
-                            _DbContext.VinWonderBookingTicket.Update(exists_ticket);
+                            _DbContext.VinWonderBookingTickets.Update(exists_ticket);
                             await _DbContext.SaveChangesAsync();
                         }
 

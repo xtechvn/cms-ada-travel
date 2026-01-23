@@ -32,7 +32,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Order
+                    return await _DbContext.Orders
                         .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.HotelId == hotelId
                                                   && x.IsApartmentOrder == true);
@@ -171,7 +171,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderId == OrderId);
+                    return _DbContext.Orders.AsNoTracking().FirstOrDefault(s => s.OrderId == OrderId);
                 }
             }
             catch (Exception ex)
@@ -188,7 +188,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.Order.AsNoTracking().Where(s => orderIds.Contains(s.OrderId)).ToList();
+                    return _DbContext.Orders.AsNoTracking().Where(s => orderIds.Contains(s.OrderId)).ToList();
                 }
             }
             catch (Exception ex)
@@ -204,7 +204,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.Order.AsNoTracking().Where(s => orderNos.Contains(s.OrderNo)).ToList();
+                    return _DbContext.Orders.AsNoTracking().Where(s => orderNos.Contains(s.OrderNo)).ToList();
                 }
             }
             catch (Exception ex)
@@ -220,7 +220,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.Order.AsNoTracking().Where(s => s.ClientId == Client_Id).OrderByDescending(s => s.CreateTime).ToList();
+                    return _DbContext.Orders.AsNoTracking().Where(s => s.ClientId == Client_Id).OrderByDescending(s => s.CreateTime).ToList();
                 }
             }
             catch (Exception ex)
@@ -242,7 +242,7 @@ namespace DAL
                     }
                     else
                     {
-                        _DbContext.Order.Add(order);
+                        _DbContext.Orders.Add(order);
                         await _DbContext.SaveChangesAsync();
                         return order.OrderId;
                     }
@@ -261,7 +261,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Order.AsNoTracking().Where(x => (x.CreateTime ?? DateTime.Now).Year == DateTime.Now.Year).Count();
+                    return _DbContext.Orders.AsNoTracking().Where(x => (x.CreateTime ?? DateTime.Now).Year == DateTime.Now.Year).Count();
                 }
             }
             catch (Exception ex)
@@ -277,7 +277,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var data = _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderNo == order_no);
+                    var data = _DbContext.Orders.AsNoTracking().FirstOrDefault(s => s.OrderNo == order_no);
                     return data == null ? "" : data.OrderNo;
                 }
             }
@@ -294,7 +294,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderNo == orderNo);
+                    return _DbContext.Orders.AsNoTracking().FirstOrDefault(s => s.OrderNo == orderNo);
                 }
             }
             catch (Exception ex)
@@ -309,7 +309,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.Order.Update(order);
+                    _DbContext.Orders.Update(order);
                     await _DbContext.SaveChangesAsync();
                     var OrderId = order.OrderId;
                     return OrderId;
@@ -382,7 +382,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderId == OrderId);
+                    var data = _DbContext.Orders.AsNoTracking().FirstOrDefault(s => s.OrderId == OrderId);
                     double amount = 0;
                     double price = 0;
                     double discount = 0;
@@ -400,17 +400,17 @@ namespace DAL
                             amount -= (data.Discount == null ? 0 : (double)data.Discount);
                         }
                         var order_status_old = data.OrderStatus;
-                        var list_other_booking_all = await _DbContext.OtherBooking.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
-                        var vinWonderBookings_all = await _DbContext.VinWonderBooking.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
-                        var list_tour_booking_all = await _DbContext.Tour.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
-                        var list_flybooking_all = await _DbContext.FlyBookingDetail.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
-                        var list_hotel_booking_all = await _DbContext.HotelBooking.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
-                        var list_watersport = await _DbContext.OtherBooking.AsNoTracking().Where(s => s.OrderId == OrderId && s.ServiceType > 0 && s.ServiceType == (int)ServiceOtherType.WaterSport).ToListAsync();
+                        var list_other_booking_all = await _DbContext.OtherBookings.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
+                        var vinWonderBookings_all = await _DbContext.VinWonderBookings.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
+                        var list_tour_booking_all = await _DbContext.Tours.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
+                        var list_flybooking_all = await _DbContext.FlyBookingDetails.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
+                        var list_hotel_booking_all = await _DbContext.HotelBookings.AsNoTracking().Where(s => s.OrderId == OrderId).ToListAsync();
+                        var list_watersport = await _DbContext.OtherBookings.AsNoTracking().Where(s => s.OrderId == OrderId && s.ServiceType > 0 && s.ServiceType == (int)ServiceOtherType.WaterSport).ToListAsync();
 
 
                         var list_flybooking = list_flybooking_all.Where(s => s.Status != (int)ServiceStatus.Cancel).ToList();
                         var list_flybooking_id = list_flybooking.Select(x => x.Id);
-                        var list_flybooking_optional = await _DbContext.FlyBookingPackagesOptional.AsNoTracking().Where(s => list_flybooking_id.Contains(s.BookingId) && s.Status != 1).ToListAsync();
+                        var list_flybooking_optional = await _DbContext.FlyBookingPackagesOptionals.AsNoTracking().Where(s => list_flybooking_id.Contains(s.BookingId) && s.Status != 1).ToListAsync();
                         if (list_flybooking != null && list_flybooking.Count > 0)
                         {
                             amount += list_flybooking.Sum(x => x.Amount);
@@ -436,7 +436,7 @@ namespace DAL
 
                         var list_hotel_booking = list_hotel_booking_all.Where(s => s.Status != (int)ServiceStatus.Cancel).ToList();
                         var list_hotel_booking_id = list_hotel_booking.Select(x => x.Id);
-                        var list_hotel_optional = await _DbContext.HotelBookingRoomsOptional.AsNoTracking().Where(s => list_hotel_booking_id.Contains(s.HotelBookingId) && s.Status != 1).ToListAsync();
+                        var list_hotel_optional = await _DbContext.HotelBookingRoomsOptionals.AsNoTracking().Where(s => list_hotel_booking_id.Contains(s.HotelBookingId) && s.Status != 1).ToListAsync();
                         if (list_hotel_booking != null && list_hotel_booking.Count > 0)
                         {
                             amount += list_hotel_booking.Sum(x => x.TotalAmount);
@@ -468,7 +468,7 @@ namespace DAL
 
                         var list_tour_booking = list_tour_booking_all.Where(s => s.Status != (int)ServiceStatus.Cancel).ToList();
                         var list_tour_id = list_tour_booking.Select(x => x.Id);
-                        var list_tour_optional = await _DbContext.TourPackagesOptional.AsNoTracking().Where(s => list_tour_id.Contains(s.TourId != null ? (long)s.TourId : 0) && s.Status != 1).ToListAsync();
+                        var list_tour_optional = await _DbContext.TourPackagesOptionals.AsNoTracking().Where(s => list_tour_id.Contains(s.TourId != null ? (long)s.TourId : 0) && s.Status != 1).ToListAsync();
                         if (list_tour_booking != null && list_tour_booking.Count > 0)
                         {
                             amount += list_tour_booking.Sum(x => x.Amount != null ? (double)x.Amount : 0);
@@ -505,8 +505,8 @@ namespace DAL
                             product_service.Add((int)ServicesType.VinWonder);
                             var min_date = vinWonderBookings.OrderBy(x => x.CreatedDate).FirstOrDefault();
                             var max_date = vinWonderBookings.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
-                            var VinWonderBooking_Ticket_min_date = await _DbContext.VinWonderBookingTicket.FirstOrDefaultAsync(s => s.BookingId == min_date.Id);
-                            var VinWonderBooking_Ticket_max_date = await _DbContext.VinWonderBookingTicket.FirstOrDefaultAsync(s => s.BookingId == max_date.Id);
+                            var VinWonderBooking_Ticket_min_date = await _DbContext.VinWonderBookingTickets.FirstOrDefaultAsync(s => s.BookingId == min_date.Id);
+                            var VinWonderBooking_Ticket_max_date = await _DbContext.VinWonderBookingTickets.FirstOrDefaultAsync(s => s.BookingId == max_date.Id);
 
                             if (data.StartDate == null || data.StartDate > min_date.CreatedDate) data.StartDate = VinWonderBooking_Ticket_min_date.DateUsed;
                             if (data.EndDate == null || data.EndDate < max_date.CreatedDate) data.EndDate = VinWonderBooking_Ticket_max_date.DateUsed;
@@ -517,7 +517,7 @@ namespace DAL
                         }
                         var list_other_booking = list_other_booking_all.Where(s => s.Status != (int)ServiceStatus.Cancel).ToList();
                         var list_other_id = list_other_booking.Select(x => x.Id);
-                        var list_other_optional = await _DbContext.OtherBookingPackagesOptional.AsNoTracking().Where(s => list_other_id.Contains(s.BookingId) && s.Status != 1).ToListAsync();
+                        var list_other_optional = await _DbContext.OtherBookingPackagesOptionals.AsNoTracking().Where(s => list_other_id.Contains(s.BookingId) && s.Status != 1).ToListAsync();
                         if (list_other_booking != null && list_other_booking.Count > 0)
                         {
                             amount += list_other_booking.Sum(x => x.Amount);
@@ -611,7 +611,7 @@ namespace DAL
                             }
                         }
 
-                        _DbContext.Order.Update(data);
+                        _DbContext.Orders.Update(data);
                         await _DbContext.SaveChangesAsync();
                         UpdateOrderOperator(OrderId);
                         var ListOrderBookClosing = await GetListOrderBookClosingByOrderId(OrderId);
@@ -801,7 +801,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderId == order_id);
+                    var exists = _DbContext.Orders.AsNoTracking().FirstOrDefault(s => s.OrderId == order_id);
                     if (exists != null && exists.OrderId > 0)
                     {
                         exists.UpdateLast = DateTime.Now;
@@ -811,7 +811,7 @@ namespace DAL
                         {
                             exists.OrderStatus = (int)OrderStatus.CONFIRMED_SALE;
                         }
-                        _DbContext.Order.Update(exists);
+                        _DbContext.Orders.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -874,11 +874,11 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderId == order_id);
-                    var list_tour_booking_all = await _DbContext.Tour.AsNoTracking().Where(s => s.OrderId == order_id).ToListAsync();
+                    var data = _DbContext.Orders.AsNoTracking().FirstOrDefault(s => s.OrderId == order_id);
+                    var list_tour_booking_all = await _DbContext.Tours.AsNoTracking().Where(s => s.OrderId == order_id).ToListAsync();
                     var list_tour_booking = list_tour_booking_all.Where(s => s.Status != (int)ServiceStatus.Cancel).ToList();
                     data.TotalFundCustomerCare = list_tour_booking != null && list_tour_booking.Count > 0 ? list_tour_booking.Sum(s => s.FundCustomerCare) : 0;
-                    _DbContext.Order.Update(data);
+                    _DbContext.Orders.Update(data);
                     await _DbContext.SaveChangesAsync();
                     return order_id;
                 }
@@ -1003,7 +1003,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Order.AsNoTracking().Select(x => x.OrderId).ToList();
+                    return _DbContext.Orders.AsNoTracking().Select(x => x.OrderId).ToList();
                 }
             }
             catch (Exception ex)
@@ -1181,13 +1181,13 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = _DbContext.Order.AsNoTracking().FirstOrDefault(s => s.OrderId == order_id);
+                    var exists = _DbContext.Orders.AsNoTracking().FirstOrDefault(s => s.OrderId == order_id);
                     if (exists != null && exists.OrderId > 0)
                     {
                         exists.UpdateLast = DateTime.Now;
                         exists.UserUpdateId = user_commit;
                         exists.CutOffDate = CheckDate(CutOffDate);
-                        _DbContext.Order.Update(exists);
+                        _DbContext.Orders.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;

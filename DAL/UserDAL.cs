@@ -56,7 +56,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.AsNoTracking().FirstOrDefaultAsync(s => s.UserName.Equals(input));
+                    return await _DbContext.Users.AsNoTracking().FirstOrDefaultAsync(s => s.UserName.Equals(input));
                 }
             }
             catch (Exception ex)
@@ -72,7 +72,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.AsNoTracking().Where(s => userIds.Contains(s.Id)).ToListAsync();
+                    return await _DbContext.Users.AsNoTracking().Where(s => userIds.Contains(s.Id)).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -88,7 +88,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.AsNoTracking().FirstOrDefaultAsync(s => userIds == s.Id);
+                    return await _DbContext.Users.AsNoTracking().FirstOrDefaultAsync(s => userIds == s.Id);
                 }
             }
             catch (Exception ex)
@@ -106,7 +106,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.AsNoTracking().FirstOrDefaultAsync(s => s.Email.Equals(input));
+                    return await _DbContext.Users.AsNoTracking().FirstOrDefaultAsync(s => s.Email.Equals(input));
                 }
             }
             catch (Exception ex)
@@ -124,7 +124,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.User.AsNoTracking().FirstOrDefault(s => s.Id == Id);
+                    return _DbContext.Users.AsNoTracking().FirstOrDefault(s => s.Id == Id);
                 }
             }
             catch (Exception ex)
@@ -141,7 +141,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    return _DbContext.User.AsNoTracking().ToList();
+                    return _DbContext.Users.AsNoTracking().ToList();
                 }
             }
             catch (Exception ex)
@@ -156,7 +156,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.AsNoTracking().Where(s => s.UserName.ToLower().Contains(txt_search.ToLower())).ToListAsync();
+                    return await _DbContext.Users.AsNoTracking().Where(s => s.UserName.ToLower().Contains(txt_search.ToLower())).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -197,7 +197,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var user_department_model = await _DbContext.UserDepart.Where(s => s.UserId == model.Id)
+                    var user_department_model = await _DbContext.UserDeparts.Where(s => s.UserId == model.Id)
                         .OrderByDescending(s => s.Id)
                         .FirstOrDefaultAsync();
 
@@ -208,7 +208,7 @@ namespace DAL
                         dataJoinTime = user_department_model.LeaveDate;
                     }
 
-                    _DbContext.UserDepart.Add(new UserDepart
+                    _DbContext.UserDeparts.Add(new UserDepart
                     {
                         UserId = model.Id,
                         DepartmentId = model.DepartmentId,
@@ -257,10 +257,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var user_role = await _DbContext.UserRole.Where(s => s.RoleId == role_id).FirstOrDefaultAsync();
+                    var user_role = await _DbContext.UserRoles.Where(s => s.RoleId == role_id).FirstOrDefaultAsync();
                     if (user_role != null && user_role.Id > 0)
                     {
-                        return await _DbContext.User.AsNoTracking().Where(s => s.Id == user_role.UserId && s.Status == 0).FirstOrDefaultAsync();
+                        return await _DbContext.Users.AsNoTracking().Where(s => s.Id == user_role.UserId && s.Status == 0).FirstOrDefaultAsync();
                     }
                 }
             }
@@ -277,11 +277,11 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var user_role = _DbContext.UserRole.Where(s => s.RoleId == role_id).ToList();
+                    var user_role = _DbContext.UserRoles.Where(s => s.RoleId == role_id).ToList();
                     var listUserId = user_role.Select(n => n.UserId).ToList();
                     if (listUserId.Count > 0)
                     {
-                        return await _DbContext.User.AsNoTracking().Where(s => listUserId.Contains(s.Id) && s.Status == 0).ToListAsync();
+                        return await _DbContext.Users.AsNoTracking().Where(s => listUserId.Contains(s.Id) && s.Status == 0).ToListAsync();
                     }
                 }
             }
@@ -298,11 +298,11 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var user_role = _DbContext.UserRole.Where(s => role_ids.Contains(s.RoleId)).ToList();
+                    var user_role = _DbContext.UserRoles.Where(s => role_ids.Contains(s.RoleId)).ToList();
                     var listUserId = user_role.Select(n => n.UserId).ToList();
                     if (listUserId.Count > 0)
                     {
-                        return await _DbContext.User.AsNoTracking().Where(s => listUserId.Contains(s.Id) && s.Status == 0).ToListAsync();
+                        return await _DbContext.Users.AsNoTracking().Where(s => listUserId.Contains(s.Id) && s.Status == 0).ToListAsync();
                     }
                 }
             }
@@ -319,7 +319,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.AsNoTracking().Where(s => s.UserName.ToLower().Contains(txt_search.ToLower()) && ids.Contains(s.Id)).ToListAsync();
+                    return await _DbContext.Users.AsNoTracking().Where(s => s.UserName.ToLower().Contains(txt_search.ToLower()) && ids.Contains(s.Id)).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -334,7 +334,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.AsNoTracking().Where(s => ids.Contains(s.DepartmentId)).ToListAsync();
+                    return await _DbContext.Users.AsNoTracking().Where(s => ids.Contains(s.DepartmentId)).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -385,7 +385,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
                     var arrRoleId = strRoleId.Split(',').Select(s => int.Parse(s)).ToArray();
-                    return _DbContext.UserRole.Where(s => arrRoleId.Contains(s.RoleId)).Select(s => s.UserId).ToList();
+                    return _DbContext.UserRoles.Where(s => arrRoleId.Contains(s.RoleId)).Select(s => s.UserId).ToList();
                 }
             }
             catch (Exception ex)
@@ -401,7 +401,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.User.AsNoTracking().FirstOrDefaultAsync(s => s.UserName.Equals(user_name) && s.Id!=id);
+                    return await _DbContext.Users.AsNoTracking().FirstOrDefaultAsync(s => s.UserName.Equals(user_name) && s.Id!=id);
                 }
             }
             catch (Exception ex)

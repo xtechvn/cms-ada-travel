@@ -7,8 +7,8 @@ namespace Entities.Models
     {
         public Permission()
         {
-            Action = new HashSet<Action>();
-            RolePermission = new HashSet<RolePermission>();
+            Actions = new HashSet<Action>();
+            RolePermissions = new HashSet<RolePermission>();
         }
 
         public int Id { get; set; }
@@ -18,7 +18,7 @@ namespace Entities.Models
         public DateTime? CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }
 
-        public virtual ICollection<Action> Action { get; set; }
-        public virtual ICollection<RolePermission> RolePermission { get; set; }
+        public virtual ICollection<Action> Actions { get; set; }
+        public virtual ICollection<RolePermission> RolePermissions { get; set; }
     }
 }

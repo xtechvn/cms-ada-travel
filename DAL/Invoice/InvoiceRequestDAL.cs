@@ -28,7 +28,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.InvoiceRequest.AsNoTracking().FirstOrDefault(x => x.Id == InvoiceRequestId);
+                    var detail = _DbContext.InvoiceRequests.AsNoTracking().FirstOrDefault(x => x.Id == InvoiceRequestId);
                     if (detail != null)
                     {
                         return detail;
@@ -49,7 +49,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.InvoiceRequest.AsNoTracking().FirstOrDefault(x => x.InvoiceRequestNo == InvoiceRequestNo);
+                    var detail = _DbContext.InvoiceRequests.AsNoTracking().FirstOrDefault(x => x.InvoiceRequestNo == InvoiceRequestNo);
                     if (detail != null)
                     {
                         return detail;
@@ -347,12 +347,12 @@ namespace DAL.Invoice
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var entity = _DbContext.InvoiceRequest.Find(id);
-                _DbContext.InvoiceRequest.Remove(entity);
+                var entity = _DbContext.InvoiceRequests.Find(id);
+                _DbContext.InvoiceRequests.Remove(entity);
                 foreach (var idDetail in detailIds)
                 {
-                    var detail = _DbContext.InvoiceRequestDetail.Find(idDetail);
-                    _DbContext.InvoiceRequestDetail.Remove(detail);
+                    var detail = _DbContext.InvoiceRequestDetails.Find(idDetail);
+                    _DbContext.InvoiceRequestDetails.Remove(detail);
                 }
                 _DbContext.SaveChanges();
             }
@@ -362,7 +362,7 @@ namespace DAL.Invoice
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var entity = _DbContext.InvoiceRequestHistory.Add(invoiceRequestHistory);
+                var entity = _DbContext.InvoiceRequestHistories.Add(invoiceRequestHistory);
                 _DbContext.SaveChanges();
             }
         }
@@ -519,7 +519,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.InvoiceRequestDetail.Remove(model);
+                    _DbContext.InvoiceRequestDetails.Remove(model);
                     _DbContext.SaveChanges();
                     return 1;
                 }
@@ -537,7 +537,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var contractPays = _DbContext.InvoiceRequestDetail.Where(x => x.InvoiceRequestId == requestId).ToList();
+                    var contractPays = _DbContext.InvoiceRequestDetails.Where(x => x.InvoiceRequestId == requestId).ToList();
                     if (contractPays != null)
                     {
                         return contractPays;
@@ -581,18 +581,18 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.InvoiceRequest.Find(requestId);
+                    var model = _DbContext.InvoiceRequests.Find(requestId);
                     model.Status = (int)INVOICE_REQUEST_STATUS.TU_CHOI;
                     model.DeclineReason = note;
                     model.UpdatedDate = DateTime.Now;
                     model.UpdatedBy = userDelete;
-                    _DbContext.InvoiceRequest.Update(model);
+                    _DbContext.InvoiceRequests.Update(model);
                     InvoiceRequestHistory invoiceRequestHistory = new InvoiceRequestHistory();
                     invoiceRequestHistory.InvoiceRequestId = (int)requestId;
                     invoiceRequestHistory.CreatedBy = userDelete;
                     invoiceRequestHistory.CreatedDate = DateTime.Now;
                     invoiceRequestHistory.Actioin = "Từ chối [" + note + "]";
-                    _DbContext.InvoiceRequestHistory.Add(invoiceRequestHistory);
+                    _DbContext.InvoiceRequestHistories.Add(invoiceRequestHistory);
                     _DbContext.SaveChanges();
                 }
                 return 1;
@@ -610,11 +610,11 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.InvoiceRequest.Find(requestId);
+                    var model = _DbContext.InvoiceRequests.Find(requestId);
                     model.IsDelete = true;
                     model.UpdatedDate = DateTime.Now;
                     model.UpdatedBy = userDelete;
-                    _DbContext.InvoiceRequest.Update(model);
+                    _DbContext.InvoiceRequests.Update(model);
                     _DbContext.SaveChanges();
                 }
                 return 1;
@@ -692,7 +692,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var requests = _DbContext.InvoiceRequest.AsNoTracking().Where(x => invoiceRequestNos.Contains(x.InvoiceRequestNo)).ToList();
+                    var requests = _DbContext.InvoiceRequests.AsNoTracking().Where(x => invoiceRequestNos.Contains(x.InvoiceRequestNo)).ToList();
                     if (requests != null)
                     {
                         return requests;
@@ -713,7 +713,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var details = _DbContext.InvoiceRequestDetail.AsNoTracking().Where(x => invoiceRequestIds.Contains(x.InvoiceRequestId.Value)).ToList();
+                    var details = _DbContext.InvoiceRequestDetails.AsNoTracking().Where(x => invoiceRequestIds.Contains(x.InvoiceRequestId.Value)).ToList();
                     if (details != null)
                     {
                         return details;
@@ -734,7 +734,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var histories = _DbContext.InvoiceRequestHistory.AsNoTracking().Where(x => x.InvoiceRequestId == requestId).ToList();
+                    var histories = _DbContext.InvoiceRequestHistories.AsNoTracking().Where(x => x.InvoiceRequestId == requestId).ToList();
                     if (histories != null)
                     {
                         return histories;

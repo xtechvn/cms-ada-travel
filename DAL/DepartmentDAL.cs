@@ -307,7 +307,7 @@ namespace DAL
                 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var department_child = await _DbContext.Department.AsNoTracking().Where(s => s.FullParent.Trim().Contains(department_id.ToString())).ToListAsync() ;
+                    var department_child = await _DbContext.Departments.AsNoTracking().Where(s => s.FullParent.Trim().Contains(department_id.ToString())).ToListAsync() ;
                     if(department_child!=null && department_child.Count > 0)
                     {
                         foreach(var de in department_child)
@@ -418,7 +418,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Department.AsNoTracking().FirstOrDefaultAsync(s => id == s.Id);
+                    return await _DbContext.Departments.AsNoTracking().FirstOrDefaultAsync(s => id == s.Id);
                 }
             }
             catch (Exception ex)

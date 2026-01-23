@@ -28,7 +28,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.National.AsNoTracking().ToListAsync();
+                    return await _DbContext.Nationals.AsNoTracking().ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -44,7 +44,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Province.AsNoTracking().ToListAsync();
+                    return await _DbContext.Provinces.AsNoTracking().ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -59,7 +59,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Province.Where(s => s.Id == id).FirstOrDefaultAsync();
+                    return await _DbContext.Provinces.Where(s => s.Id == id).FirstOrDefaultAsync();
                 }
             }
             catch (Exception ex)
@@ -74,7 +74,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.District.Where(s => s.ProvinceId == ProvinceId).ToListAsync();
+                    return await _DbContext.Districts.Where(s => s.ProvinceId == ProvinceId).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Supplier.FindAsync(id);
+                    return await _DbContext.Suppliers.FindAsync(id);
                 }
             }
             catch (Exception ex)
@@ -104,7 +104,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.District.Where(s => s.ProvinceId == provinceId).ToListAsync();
+                    return await _DbContext.Districts.Where(s => s.ProvinceId == provinceId).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -120,7 +120,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Ward.Where(s => s.DistrictId == districtId).ToListAsync();
+                    return await _DbContext.Wards.Where(s => s.DistrictId == districtId).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -136,7 +136,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.AllCode.Where(s => s.Type == type).ToListAsync();
+                    return await _DbContext.AllCodes.Where(s => s.Type == type).ToListAsync();
                 }
             }
             catch (Exception ex)

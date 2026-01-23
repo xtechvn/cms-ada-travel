@@ -24,8 +24,8 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = await (from _payment in _DbContext.Payment.AsNoTracking()
-                                      join a in _DbContext.AllCode.Where(s => s.Type == AllCodeType.PAYMENT_TYPE) on _payment.PaymentType equals a.CodeValue into af
+                    var data = await (from _payment in _DbContext.Payments.AsNoTracking()
+                                      join a in _DbContext.AllCodes.Where(s => s.Type == AllCodeType.PAYMENT_TYPE) on _payment.PaymentType equals a.CodeValue into af
                                       from _paymentType in af.DefaultIfEmpty()
                                       where _payment.OrderId == OrderId
                                       select new PaymentViewModel
@@ -59,7 +59,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Payment.Where(s => s.OrderId == orderId).SumAsync(s => s.Amount);
+                    return await _DbContext.Payments.Where(s => s.OrderId == orderId).SumAsync(s => s.Amount);
                 }
             }
             catch (Exception ex)
@@ -75,7 +75,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Payment.Where(s => s.OrderId == orderId).FirstOrDefaultAsync();
+                    return await _DbContext.Payments.Where(s => s.OrderId == orderId).FirstOrDefaultAsync();
                 }
             }
             catch (Exception ex)
@@ -91,7 +91,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Payment.Where(s => depositHistoryIds.Contains((int)s.OrderId) && s.DepositPaymentType == (int)DepositHistoryConstant.DEPOSIT_PAYMENT_TYPE.NAP_QUY).ToListAsync();
+                    return await _DbContext.Payments.Where(s => depositHistoryIds.Contains((int)s.OrderId) && s.DepositPaymentType == (int)DepositHistoryConstant.DEPOSIT_PAYMENT_TYPE.NAP_QUY).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -106,7 +106,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = _DbContext.Payment.Where(s => s.ClientId == cilentId).ToList();
+                    var data = _DbContext.Payments.Where(s => s.ClientId == cilentId).ToList();
                     return data;
                 }
             }
@@ -122,7 +122,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = _DbContext.Payment.OrderByDescending(x => x.CreatedOn).ToList();
+                    var data = _DbContext.Payments.OrderByDescending(x => x.CreatedOn).ToList();
                     return data[0];
                 }
             }

@@ -30,10 +30,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var list_role_id = await _DbContext.UserRole.Where(s => s.UserId == user_id).ToListAsync();
+                    var list_role_id = await _DbContext.UserRoles.Where(s => s.UserId == user_id).ToListAsync();
                     if (list_role_id != null && list_role_id.Count > 0)
                     {
-                        return await _DbContext.Role.Where(s => list_role_id.Select(x => x.RoleId).Contains(s.Id)).ToListAsync();
+                        return await _DbContext.Roles.Where(s => list_role_id.Select(x => x.RoleId).Contains(s.Id)).ToListAsync();
                     }
                     return null;
                 }
@@ -121,7 +121,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.UserRole.Where(x => x.UserId == userId).Select(s => s.RoleId).ToListAsync();
+                    return await _DbContext.UserRoles.Where(x => x.UserId == userId).Select(s => s.RoleId).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -137,11 +137,11 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var user_role = _DbContext.UserRole.Where(s => s.RoleId == role_id).ToList();
+                    var user_role = _DbContext.UserRoles.Where(s => s.RoleId == role_id).ToList();
                     var userRoleIds = user_role.Select(n => n.UserId).ToList();
                     if (userRoleIds.Count > 0)
                     {
-                        return _DbContext.User.Where(s => userRoleIds.Contains(s.Id) && s.Status == 0).ToList();
+                        return _DbContext.Users.Where(s => userRoleIds.Contains(s.Id) && s.Status == 0).ToList();
                     }
                 }
             }

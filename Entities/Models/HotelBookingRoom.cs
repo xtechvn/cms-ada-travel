@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Entities.Models
 {
-    public partial class HotelBookingRoom
+    public partial class HotelBookingRooms
     {
         public long Id { get; set; }
         public long HotelBookingId { get; set; }

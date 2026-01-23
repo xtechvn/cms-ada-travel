@@ -33,7 +33,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.TourProduct.FindAsync(id);
+                    return await _DbContext.TourProducts.FindAsync(id);
                 }
             }
             catch (Exception ex)

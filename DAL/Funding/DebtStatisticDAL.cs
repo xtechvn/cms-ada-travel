@@ -185,7 +185,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.DebtStatistic.Update(model);
+                    _DbContext.DebtStatistics.Update(model);
                     _DbContext.SaveChanges();
                 }
                 return 1;
@@ -218,7 +218,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.DebtStatistic.Remove(model);
+                    _DbContext.DebtStatistics.Remove(model);
                     _DbContext.SaveChanges();
                 }
                 return 1;
@@ -236,7 +236,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.DebtStatistic.AsNoTracking().FirstOrDefault(x => x.Id == requestId);
+                    var detail = _DbContext.DebtStatistics.AsNoTracking().FirstOrDefault(x => x.Id == requestId);
                     if (detail != null)
                     {
                         return detail;
@@ -257,7 +257,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.DebtStatistic.AsNoTracking().FirstOrDefault(x => x.Code == code);
+                    var detail = _DbContext.DebtStatistics.AsNoTracking().FirstOrDefault(x => x.Code == code);
                     if (detail != null)
                     {
                         return detail;

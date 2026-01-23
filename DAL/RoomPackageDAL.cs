@@ -26,7 +26,7 @@ namespace DAL
                 }
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var find = _DbContext.RoomPackage.FirstOrDefault(x => x.PackageId == package_id);
+                    var find = _DbContext.RoomPackages.FirstOrDefault(x => x.PackageId == package_id);
                     if (find != null && find.Id > 0)
                     {
                         return find.Description;
@@ -44,7 +44,7 @@ namespace DAL
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var find = _DbContext.RoomPackage.FirstOrDefault(x => x.PackageId == package_id);
+                var find = _DbContext.RoomPackages.FirstOrDefault(x => x.PackageId == package_id);
                 if (find != null && find.Id > 0)
                 {
                     return find.Code;
@@ -58,7 +58,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.RoomPackage.Where(x => roomfun_ids.Contains((int)x.RoomFunId)).ToList();
+                    return _DbContext.RoomPackages.Where(x => roomfun_ids.Contains((int)x.RoomFunId)).ToList();
 
                 }
             }

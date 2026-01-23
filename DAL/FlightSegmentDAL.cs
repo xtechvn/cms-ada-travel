@@ -24,7 +24,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.FlightSegment.AsNoTracking().FirstOrDefault(s => s.FlyBookingId == flyBookingDetailId);
+                    return _DbContext.FlightSegments.AsNoTracking().FirstOrDefault(s => s.FlyBookingId == flyBookingDetailId);
                 }
             }
             catch (Exception ex)
@@ -40,7 +40,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.FlightSegment.AsNoTracking().Where(s => flyBookingDetailIds.Contains(s.FlyBookingId)).ToList();
+                    return _DbContext.FlightSegments.AsNoTracking().Where(s => flyBookingDetailIds.Contains(s.FlyBookingId)).ToList();
                 }
             }
             catch (Exception ex)

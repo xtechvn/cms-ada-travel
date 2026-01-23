@@ -7,8 +7,8 @@ namespace Entities.Models
     {
         public Role()
         {
-            RolePermission = new HashSet<RolePermission>();
-            UserRole = new HashSet<UserRole>();
+            RolePermissions = new HashSet<RolePermission>();
+            UserRoles = new HashSet<UserRole>();
         }
 
         public int Id { get; set; }
@@ -19,7 +19,7 @@ namespace Entities.Models
         public DateTime? CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }
 
-        public virtual ICollection<RolePermission> RolePermission { get; set; }
-        public virtual ICollection<UserRole> UserRole { get; set; }
+        public virtual ICollection<RolePermission> RolePermissions { get; set; }
+        public virtual ICollection<UserRole> UserRoles { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var find = _DbContext.ProductRoomService.Where(x=>x.CampaignId==campaign_id).ToList();
+                    var find = _DbContext.ProductRoomServices.Where(x=>x.CampaignId==campaign_id).ToList();
                     return find;
                 }
             }
@@ -184,7 +184,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var add = _DbContext.ProductRoomService.Add(model);
+                    var add = _DbContext.ProductRoomServices.Add(model);
                     await _DbContext.SaveChangesAsync();
                     return model.Id;
                 }
@@ -201,7 +201,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var add = _DbContext.ProductRoomService.Update(model);
+                    var add = _DbContext.ProductRoomServices.Update(model);
                     await _DbContext.SaveChangesAsync();
                     return model.Id;
                 }
@@ -218,24 +218,24 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var list = await _DbContext.ProductRoomService.Where(x => x.CampaignId == campaign_id  && !list_productserviceroom_exists.Contains(x.Id)).ToListAsync();
+                    var list = await _DbContext.ProductRoomServices.Where(x => x.CampaignId == campaign_id  && !list_productserviceroom_exists.Contains(x.Id)).ToListAsync();
                     if (list != null && list.Count > 0)
                     {
                         foreach (var item in list)
                         {
-                            var list_detail = await _DbContext.PriceDetail.Where(x => x.ProductServiceId == item.Id ).ToListAsync();
+                            var list_detail = await _DbContext.PriceDetails.Where(x => x.ProductServiceId == item.Id ).ToListAsync();
                             if (list != null && list.Count > 0)
                             {
                                 foreach (var item_2 in list_detail)
                                 {
                                     item_2.ProductServiceId *= -1;
-                                    var add_2 = _DbContext.PriceDetail.Update(item_2);
+                                    var add_2 = _DbContext.PriceDetails.Update(item_2);
                                     await _DbContext.SaveChangesAsync();
                                 }
                             }
                             item.CampaignId *= -1;
                             item.HotelId *= -1;
-                            var add = _DbContext.ProductRoomService.Update(item);
+                            var add = _DbContext.ProductRoomServices.Update(item);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -254,13 +254,13 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var list = await _DbContext.PriceDetail.Where(x=>x.ProductServiceId==room_service_id && x.ServiceType==(int)ServiceType.BOOK_HOTEL_ROOM_VIN && !price_detail_id.Contains(x.Id)).ToListAsync();
+                    var list = await _DbContext.PriceDetails.Where(x=>x.ProductServiceId==room_service_id && x.ServiceType==(int)ServiceType.BOOK_HOTEL_ROOM_VIN && !price_detail_id.Contains(x.Id)).ToListAsync();
                     if(list!=null && list.Count > 0)
                     {
                         foreach(var item in list)
                         {
                             item.ProductServiceId *= -1;
-                            var add = _DbContext.PriceDetail.Update(item);
+                            var add = _DbContext.PriceDetails.Update(item);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -279,7 +279,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var add = _DbContext.PriceDetail.Add(model);
+                    var add = _DbContext.PriceDetails.Add(model);
                     await _DbContext.SaveChangesAsync();
                     return model.Id;
                 }
@@ -296,7 +296,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = _DbContext.PriceDetail.FirstOrDefault(n => n.Id == model.Id);
+                    var exists = _DbContext.PriceDetails.FirstOrDefault(n => n.Id == model.Id);
                     if (exists != null && exists.Id > 0)
                     {
                         exists. AmountLast=model.AmountLast;
@@ -310,7 +310,7 @@ namespace DAL
                         exists.ServiceType =model.ServiceType;
                         exists.UnitId =model.UnitId;
  
-                        var add = _DbContext.PriceDetail.Update(exists);
+                        var add = _DbContext.PriceDetails.Update(exists);
                         await _DbContext.SaveChangesAsync();
 
                     }

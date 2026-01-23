@@ -7,7 +7,8 @@ namespace Entities.Models
     {
         public Menu()
         {
-            Action = new HashSet<Action>();
+            Actions = new HashSet<Action>();
+            RolePermissions = new HashSet<RolePermission>();
         }
 
         public int Id { get; set; }
@@ -24,6 +25,7 @@ namespace Entities.Models
         public int? OrderNo { get; set; }
         public string FullParent { get; set; }
 
-        public virtual ICollection<Action> Action { get; set; }
+        public virtual ICollection<Action> Actions { get; set; }
+        public virtual ICollection<RolePermission> RolePermissions { get; set; }
     }
 }

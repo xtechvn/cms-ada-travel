@@ -28,7 +28,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.OtherBookingPackagesOptional.Where(x => x.BookingId == booking_id).ToList();
+                    return _DbContext.OtherBookingPackagesOptionals.Where(x => x.BookingId == booking_id).ToList();
                 }
             }
             catch (Exception ex)
@@ -43,7 +43,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = _DbContext.FlyBookingPackagesOptional.AsNoTracking().FirstOrDefault(s => s.Id == packages.Id);
+                    var exists = _DbContext.FlyBookingPackagesOptionals.AsNoTracking().FirstOrDefault(s => s.Id == packages.Id);
                     if (exists != null && exists.Id > 0)
                     {
                         return UpdateOtherBookingPackagesOptional(packages);
@@ -68,10 +68,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var delete_list= await _DbContext.OtherBookingPackagesOptional.Where(x => x.BookingId == booking_id && !remain_list.Contains(x.Id)).ToListAsync();
+                    var delete_list= await _DbContext.OtherBookingPackagesOptionals.Where(x => x.BookingId == booking_id && !remain_list.Contains(x.Id)).ToListAsync();
                     if(delete_list!=null && delete_list.Count > 0)
                     {
-                        _DbContext.OtherBookingPackagesOptional.RemoveRange(delete_list);
+                        _DbContext.OtherBookingPackagesOptionals.RemoveRange(delete_list);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;

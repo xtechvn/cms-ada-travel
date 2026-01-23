@@ -24,7 +24,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
                     var arrUserId = strUserId.Split(',').Select(s => int.Parse(s)).ToArray();
-                    return _DbContext.UserRole.Where(s => arrUserId.Contains(s.UserId)).Select(s => s.RoleId).ToList();
+                    return _DbContext.UserRoles.Where(s => arrUserId.Contains(s.UserId)).Select(s => s.RoleId).ToList();
                 }
             }
             catch (Exception ex)
@@ -41,7 +41,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var datalist = _DbContext.Role.AsQueryable();
+                    var datalist = _DbContext.Roles.AsQueryable();
 
                     if (!string.IsNullOrEmpty(roleName))
                     {
@@ -61,7 +61,7 @@ namespace DAL
                         Name = a.Name,
                         Description = a.Description,
                         Status = a.Status,
-                        CountUser = _DbContext.UserRole.Where(s => s.RoleId == a.Id).Count()
+                        CountUser = _DbContext.UserRoles.Where(s => s.RoleId == a.Id).Count()
                     }).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
                     return data;
                 }
@@ -88,15 +88,15 @@ namespace DAL
                             MenuId = menuid,
                             PermissionId = permissionid
                         };
-                        _DbContext.RolePermission.Add(entity);
+                        _DbContext.RolePermissions.Add(entity);
                         await _DbContext.SaveChangesAsync();
                     }
                     else // Remove Permission
                     {
-                        var entity = await _DbContext.RolePermission.Where(s => s.RoleId == roleid && s.MenuId == menuid && s.PermissionId == permissionid).FirstOrDefaultAsync();
+                        var entity = await _DbContext.RolePermissions.Where(s => s.RoleId == roleid && s.MenuId == menuid && s.PermissionId == permissionid).FirstOrDefaultAsync();
                         if (entity != null)
                         {
-                            _DbContext.RolePermission.Remove(entity);
+                            _DbContext.RolePermissions.Remove(entity);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -129,8 +129,8 @@ namespace DAL
                 {
                     if (type == 0)
                     {
-                        var entity = await _DbContext.UserRole.Where(s => s.UserId == userid && s.RoleId == roleid).FirstOrDefaultAsync();
-                        _DbContext.UserRole.Remove(entity);
+                        var entity = await _DbContext.UserRoles.Where(s => s.UserId == userid && s.RoleId == roleid).FirstOrDefaultAsync();
+                        _DbContext.UserRoles.Remove(entity);
                         await _DbContext.SaveChangesAsync();
                         rs = roleid;
                     }
@@ -141,7 +141,7 @@ namespace DAL
                             RoleId = roleid,
                             UserId = userid
                         };
-                        _DbContext.UserRole.Add(entity);
+                        _DbContext.UserRoles.Add(entity);
                         await _DbContext.SaveChangesAsync();
                         rs = entity.Id;
                     }
@@ -161,7 +161,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    rslist = await _DbContext.RolePermission.Where(s => s.RoleId == roleid).ToListAsync();
+                    rslist = await _DbContext.RolePermissions.Where(s => s.RoleId == roleid).ToListAsync();
                 }
             }
             catch(Exception ex)
@@ -187,8 +187,8 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
                     var IsUsed = false;
-                    var IsUseForUser = _DbContext.UserRole.Any(s => s.RoleId == Id);
-                    var IsUseForPermission = _DbContext.RolePermission.Any(s => s.RoleId == Id);
+                    var IsUseForUser = _DbContext.UserRoles.Any(s => s.RoleId == Id);
+                    var IsUseForPermission = _DbContext.RolePermissions.Any(s => s.RoleId == Id);
 
                     if (IsUseForUser || IsUseForPermission)
                     {
@@ -201,7 +201,7 @@ namespace DAL
                     }
 
                     var entity = await FindAsync(Id);
-                    _DbContext.Role.Remove(entity);
+                    _DbContext.Roles.Remove(entity);
                     await _DbContext.SaveChangesAsync();
                     return Id;
                 }
@@ -221,7 +221,7 @@ namespace DAL
                 var _RoleIdList = GetListRoleIdByUser(userId.ToString());
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    rsList = await _DbContext.Role.Where(s => _RoleIdList.Contains(s.Id)).ToListAsync();
+                    rsList = await _DbContext.Roles.Where(s => _RoleIdList.Contains(s.Id)).ToListAsync();
                 }
             }
             catch(Exception ex)

@@ -26,21 +26,21 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = _DbContext.RoomFun.FirstOrDefault(x => x.AllotmentId == detail.contract.AllotmentId && x.HotelId == detail.contract.HotelId);
+                    var exists = _DbContext.RoomFuns.FirstOrDefault(x => x.AllotmentId == detail.contract.AllotmentId && x.HotelId == detail.contract.HotelId);
                     if (exists != null && exists.Id > 0)
                     {
                         detail.contract.Id = exists.Id;
                     }
                     else
                     {
-                        _DbContext.RoomFun.Add(detail.contract);
+                        _DbContext.RoomFuns.Add(detail.contract);
                         _DbContext.SaveChanges();
                     }
                     if (detail.contract.Id > 0 && detail.packages_list != null && detail.packages_list.Count > 0)
                     {
                         foreach (var package in detail.packages_list)
                         {
-                            var exists_package = _DbContext.RoomPackage.FirstOrDefault(x => x.PackageId == package.package.PackageId && x.Code == package.package.Code && x.RoomFunId == detail.contract.Id);
+                            var exists_package = _DbContext.RoomPackages.FirstOrDefault(x => x.PackageId == package.package.PackageId && x.Code == package.package.Code && x.RoomFunId == detail.contract.Id);
                             if (exists_package != null && exists_package.Id > 0)
                             {
                                 package.package.Id = exists_package.Id;
@@ -48,7 +48,7 @@ namespace DAL
                             else
                             {
                                 package.package.RoomFunId = detail.contract.Id;
-                                _DbContext.RoomPackage.Add(package.package);
+                                _DbContext.RoomPackages.Add(package.package);
                                 _DbContext.SaveChanges();
                             }
                             if (package.package.Id > 0 && package.room_list != null && package.room_list.Count > 0)
@@ -56,16 +56,16 @@ namespace DAL
                                 foreach (var room in package.room_list)
                                 {
                                     room.RoomPackageId = package.package.Id;
-                                    var exists_room = _DbContext.ServicePiceRoom.FirstOrDefault(x => x.RoomId == room.RoomId && x.RoomPackageId == package.package.Id);
+                                    var exists_room = _DbContext.ServicePiceRooms.FirstOrDefault(x => x.RoomId == room.RoomId && x.RoomPackageId == package.package.Id);
                                     if (exists_room != null && exists_room.Id > 0)
                                     {
                                         exists_room.RoomName = room.RoomName;
-                                        _DbContext.ServicePiceRoom.Update(exists_room);
+                                        _DbContext.ServicePiceRooms.Update(exists_room);
                                     }
                                     else
                                     {
                                         room.RoomPackageId = package.package.Id;
-                                        _DbContext.ServicePiceRoom.Add(room);
+                                        _DbContext.ServicePiceRooms.Add(room);
                                     }
                                 }
                                 _DbContext.SaveChanges();
@@ -89,7 +89,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    result = _DbContext.RoomFun.Where(x => x.ContractType == contract_type && x.HotelId == hotel_id).ToList();
+                    result = _DbContext.RoomFuns.Where(x => x.ContractType == contract_type && x.HotelId == hotel_id).ToList();
 
                 }
 
@@ -104,7 +104,7 @@ namespace DAL
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var find = _DbContext.RoomFun.FirstOrDefault(x => x.AllotmentId == allotment_id);
+                var find = _DbContext.RoomFuns.FirstOrDefault(x => x.AllotmentId == allotment_id);
                 if (find != null && find.Id > 0)
                 {
                     return find.AllotmentName;

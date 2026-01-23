@@ -31,7 +31,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.AccountClient.AsNoTracking().FirstOrDefaultAsync(x => x.Id == clientId);
+                    var detail = await _DbContext.AccountClients.AsNoTracking().FirstOrDefaultAsync(x => x.Id == clientId);
                     if (detail != null)
                     {
                         return detail;
@@ -51,7 +51,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.AccountClient.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == clientId);
+                    var detail = await _DbContext.AccountClients.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == clientId);
                     if (detail != null)
                     {
                         return detail;
@@ -72,7 +72,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.AccountClient.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var detail = await _DbContext.AccountClients.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (detail != null)
                     {
                         return detail;
@@ -92,7 +92,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.AccountClient.AsNoTracking().ToListAsync();
+                    return await _DbContext.AccountClients.AsNoTracking().ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -108,7 +108,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.Client.AsNoTracking().FirstOrDefaultAsync(x => x.Id == clientId);
+                    var detail = await _DbContext.Clients.AsNoTracking().FirstOrDefaultAsync(x => x.Id == clientId);
                     if (detail != null)
                     {
                         return detail;
@@ -129,7 +129,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var clients = _DbContext.Client.AsNoTracking().Where(x => clientIds.Contains(x.Id)).ToList();
+                    var clients = _DbContext.Clients.AsNoTracking().Where(x => clientIds.Contains(x.Id)).ToList();
                     if (clients != null)
                     {
                         return clients;
@@ -150,7 +150,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var clients = _DbContext.Client.AsNoTracking().Where(x => x.ClientType == Type).ToList();
+                    var clients = _DbContext.Clients.AsNoTracking().Where(x => x.ClientType == Type).ToList();
                     if (clients != null)
                     {
                         return clients;
@@ -170,7 +170,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var clients = _DbContext.Client.AsNoTracking().OrderByDescending(s => s.JoinDate).ToList();
+                    var clients = _DbContext.Clients.AsNoTracking().OrderByDescending(s => s.JoinDate).ToList();
                     if (clients != null)
                     {
                         return clients;
@@ -191,9 +191,9 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var listAccountClient = _DbContext.AccountClient.AsNoTracking().Where(n => listIdAccountClient.Contains(n.Id)).ToList();
+                    var listAccountClient = _DbContext.AccountClients.AsNoTracking().Where(n => listIdAccountClient.Contains(n.Id)).ToList();
                     var listClientId = listAccountClient.Select(n => n.ClientId).ToList();
-                    var listClient = _DbContext.Client.AsNoTracking().Where(n => listClientId.Contains(n.Id)).ToList();
+                    var listClient = _DbContext.Clients.AsNoTracking().Where(n => listClientId.Contains(n.Id)).ToList();
                     foreach (var item in listClient)
                     {
                         var accountClient = listAccountClient.FirstOrDefault(n => n.ClientId == item.Id);
@@ -214,15 +214,15 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var deta = (from a in _DbContext.UserAgent.AsNoTracking().Where(s => s.ClientId == ClientId)
-                                join b in _DbContext.Client.AsNoTracking() on a.ClientId equals b.Id
-                                join h in _DbContext.User.AsNoTracking() on a.UserId equals h.Id
-                                join k in _DbContext.User.AsNoTracking() on a.CreatedBy equals k.Id
-                                join i in _DbContext.User.AsNoTracking() on a.UpdatedBy equals i.Id
-                                join c in _DbContext.AllCode.AsNoTracking().Where(s => s.Type == AllCodeType.CLIENT_TYPE) on b.ClientType equals c.CodeValue
-                                join d in _DbContext.AllCode.AsNoTracking().Where(s => s.Type == AllCodeType.AGENCY_TYPE) on b.AgencyType equals d.CodeValue
-                                join e in _DbContext.AllCode.AsNoTracking().Where(s => s.Type == AllCodeType.PERMISION_TYPE) on b.PermisionType equals e.CodeValue
-                                join g in _DbContext.AllCode.AsNoTracking().Where(s => s.Type == AllCodeType.VERIFY_STATUS) on a.VerifyStatus equals g.CodeValue
+                    var deta = (from a in _DbContext.UserAgents.AsNoTracking().Where(s => s.ClientId == ClientId)
+                                join b in _DbContext.Clients.AsNoTracking() on a.ClientId equals b.Id
+                                join h in _DbContext.Users.AsNoTracking() on a.UserId equals h.Id
+                                join k in _DbContext.Users.AsNoTracking() on a.CreatedBy equals k.Id
+                                join i in _DbContext.Users.AsNoTracking() on a.UpdatedBy equals i.Id
+                                join c in _DbContext.AllCodes.AsNoTracking().Where(s => s.Type == AllCodeType.CLIENT_TYPE) on b.ClientType equals c.CodeValue
+                                join d in _DbContext.AllCodes.AsNoTracking().Where(s => s.Type == AllCodeType.AGENCY_TYPE) on b.AgencyType equals d.CodeValue
+                                join e in _DbContext.AllCodes.AsNoTracking().Where(s => s.Type == AllCodeType.PERMISION_TYPE) on b.PermisionType equals e.CodeValue
+                                join g in _DbContext.AllCodes.AsNoTracking().Where(s => s.Type == AllCodeType.VERIFY_STATUS) on a.VerifyStatus equals g.CodeValue
                                 select new CustomerManagerViewModel
                                 {
                                     UserId_name = h.FullName,
@@ -260,28 +260,28 @@ namespace DAL
                 {
                     if (model.Id == 0)
                     {
-                        var check = _DbContext.Client.Where(s => s.ClientCode == model.ClientCode).ToList();
+                        var check = _DbContext.Clients.Where(s => s.ClientCode == model.ClientCode).ToList();
                         if (check != null && check.Count > 0)
                         {
                             return 2;
                         }
                         else
                         {
-                            var deta = _DbContext.Client.Add(model);
+                            var deta = _DbContext.Clients.Add(model);
                             _DbContext.SaveChanges();
                         }
 
                     }
                     else
                     {
-                        var data2 = _DbContext.Client.Where(s => s.Email.Equals(model.Email) && s.Id != model.Id).ToList();
+                        var data2 = _DbContext.Clients.Where(s => s.Email.Equals(model.Email) && s.Id != model.Id).ToList();
 
 
                         if (data2.Count == 0 && data2 != null)
                         {
 
 
-                            var deta = _DbContext.Client.Update(model);
+                            var deta = _DbContext.Clients.Update(model);
                             _DbContext.SaveChanges();
                             return 1;
 
@@ -309,7 +309,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data2 = _DbContext.Client.AsQueryable();
+                    var data2 = _DbContext.Clients.AsQueryable();
                     var a = data2.FirstOrDefault(s => s.Email.Equals(email));
                     return a;
                 }
@@ -326,7 +326,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data2 = _DbContext.Client.AsQueryable();
+                    var data2 = _DbContext.Clients.AsQueryable();
                     var a = data2.FirstOrDefault(s => s.TaxNo.Equals(TaxNo));
                     return a;
                 }
@@ -391,12 +391,12 @@ namespace DAL
                 {
                     if (txt_search == null || txt_search.Trim() == "")
                     {
-                        result = await _DbContext.Client.AsNoTracking().OrderByDescending(x => x.JoinDate).Take(20).ToListAsync();
+                        result = await _DbContext.Clients.AsNoTracking().OrderByDescending(x => x.JoinDate).Take(20).ToListAsync();
                     }
                     else
                     {
                         txt_search = txt_search.Trim();
-                        result = await _DbContext.Client.AsNoTracking().Where(x => x.Email.Contains(txt_search) || x.ClientName.Contains(txt_search) || x.Phone.Contains(txt_search)).OrderByDescending(x => x.JoinDate).Take(20).ToListAsync();
+                        result = await _DbContext.Clients.AsNoTracking().Where(x => x.Email.Contains(txt_search) || x.ClientName.Contains(txt_search) || x.Phone.Contains(txt_search)).OrderByDescending(x => x.JoinDate).Take(20).ToListAsync();
                     }
 
                 }
@@ -447,7 +447,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Client.AsNoTracking().FirstOrDefaultAsync(x => x.ClientCode.ToLower() == client_code);
+                    return await _DbContext.Clients.AsNoTracking().FirstOrDefaultAsync(x => x.ClientCode.ToLower() == client_code);
                 }
             }
             catch (Exception ex)
@@ -483,9 +483,9 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.Client.FirstOrDefault(s => s.Id == id);
+                    var model = _DbContext.Clients.FirstOrDefault(s => s.Id == id);
                     model.Status = status;
-                    var Update = _DbContext.Client.Update(model);
+                    var Update = _DbContext.Clients.Update(model);
                     _DbContext.SaveChanges();
                     return 1;
 
@@ -505,7 +505,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Client.AsNoTracking().Where(x => x.Phone == Phone).ToListAsync();
+                    return await _DbContext.Clients.AsNoTracking().Where(x => x.Phone == Phone).ToListAsync();
                 }
 
             }
@@ -521,14 +521,14 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var check = _DbContext.Client.Where(s => s.ClientCode == model.ClientCode).ToList();
+                    var check = _DbContext.Clients.Where(s => s.ClientCode == model.ClientCode).ToList();
                     if (check != null && check.Count > 0)
                     {
                         return -1;
                     }
                     else
                     {
-                        var deta = _DbContext.Client.Add(model);
+                        var deta = _DbContext.Clients.Add(model);
                         _DbContext.SaveChanges();
                     }
                 }

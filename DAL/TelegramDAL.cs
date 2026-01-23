@@ -29,7 +29,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var datalist = _DbContext.TelegramDetail.AsQueryable();
+                    var datalist = _DbContext.TelegramDetails.AsQueryable();
                     datalist = datalist.OrderByDescending(x => x.CreateDate);
                     if (!string.IsNullOrEmpty(TokenName))
                     {
@@ -82,7 +82,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var a = _DbContext.TelegramDetail.Where(s => s.Id != 0).ToList();
+                    var a = _DbContext.TelegramDetails.Where(s => s.Id != 0).ToList();
                     return a;
                 }
             }
@@ -100,7 +100,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = _DbContext.TelegramDetail.Where(s => s.Id == id).FirstOrDefault();
+                    var data = _DbContext.TelegramDetails.Where(s => s.Id == id).FirstOrDefault();
 
                     return data;
                 }
@@ -118,19 +118,19 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var datalist = _DbContext.TelegramDetail.AsQueryable();
+                    var datalist = _DbContext.TelegramDetails.AsQueryable();
                     datalist = datalist.Where(s => s.GroupChatId == telegrammodel.GroupChatId);                   
                     var a = datalist.Count();
                     if (telegrammodel.Id == 0 && a == 0)
                     {
-                        var add = _DbContext.TelegramDetail.Add(telegrammodel);
+                        var add = _DbContext.TelegramDetails.Add(telegrammodel);
                         await _DbContext.SaveChangesAsync();
                         return 0;
                     }
                     var data = GetTelegrambyid(telegrammodel.Id);
                     if ((telegrammodel.Id!=0 && a == 0)||(a==1 &&data.GroupChatId==telegrammodel.GroupChatId) )
                     {
-                        var add = _DbContext.TelegramDetail.Update(telegrammodel);
+                        var add = _DbContext.TelegramDetails.Update(telegrammodel);
                         await _DbContext.SaveChangesAsync();
                         return 0;
                     }

@@ -75,7 +75,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.HotelBookingRoomsOptional.AsNoTracking().FirstOrDefaultAsync(x => x.Id == hotel_booking_room_optional);
+                    var detail = await _DbContext.HotelBookingRoomsOptionals.AsNoTracking().FirstOrDefaultAsync(x => x.Id == hotel_booking_room_optional);
                     return detail;
                 }
             }
@@ -91,7 +91,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.HotelBookingRoomsOptional.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id).ToListAsync();
+                    var detail = await _DbContext.HotelBookingRoomsOptionals.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id).ToListAsync();
                     return detail;
                 }
             }

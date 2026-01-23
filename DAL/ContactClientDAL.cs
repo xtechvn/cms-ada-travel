@@ -25,7 +25,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.ContactClient.AsNoTracking().FirstOrDefault(s => s.ClientId == clientId);
+                    return _DbContext.ContactClients.AsNoTracking().FirstOrDefault(s => s.ClientId == clientId);
                 }
             }
             catch (Exception ex)
@@ -40,11 +40,11 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var booking= await _DbContext.ContactClient.AsNoTracking().FirstOrDefaultAsync(s => s.Id == hotel_booking_id);
+                    var booking= await _DbContext.ContactClients.AsNoTracking().FirstOrDefaultAsync(s => s.Id == hotel_booking_id);
                     if(booking !=null && booking.Id > 0)
                     {
-                        var order = await _DbContext.Order.AsNoTracking().FirstOrDefaultAsync(s => s.OrderId == booking.OrderId);
-                        return _DbContext.ContactClient.AsNoTracking().FirstOrDefault(s => s.ClientId == order.ContactClientId);
+                        var order = await _DbContext.Orders.AsNoTracking().FirstOrDefaultAsync(s => s.OrderId == booking.OrderId);
+                        return _DbContext.ContactClients.AsNoTracking().FirstOrDefault(s => s.ClientId == order.ContactClientId);
                     }
                     return null;
                 }
@@ -64,17 +64,17 @@ namespace DAL
                     //---- Contact Client:
                     if (client.Id > 0)
                     {
-                        var contact_client = await _DbContext.ContactClient.AsNoTracking().FirstOrDefaultAsync(x => x.Id == client.Id);
+                        var contact_client = await _DbContext.ContactClients.AsNoTracking().FirstOrDefaultAsync(x => x.Id == client.Id);
                         if (contact_client != null && contact_client.Id > 0)
                         {
                             client.Id = contact_client.Id;
-                            _DbContext.ContactClient.Update(client);
+                            _DbContext.ContactClients.Update(client);
                             await _DbContext.SaveChangesAsync();
                         }
                        
                         return client.Id;
                     }
-                    var client_exists = await _DbContext.AccountClient.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == client.ClientId);
+                    var client_exists = await _DbContext.AccountClients.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == client.ClientId);
                     if (client_exists != null)
                     {
                         CreateContactClients(client, client_exists.Id);
@@ -118,7 +118,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.ContactClient.AsNoTracking().FirstOrDefault(s => s.Id == Id);
+                    return _DbContext.ContactClients.AsNoTracking().FirstOrDefault(s => s.Id == Id);
                 }
             }
             catch (Exception ex)

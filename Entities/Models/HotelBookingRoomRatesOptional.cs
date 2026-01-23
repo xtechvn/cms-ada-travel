@@ -15,6 +15,9 @@ namespace Entities.Models
         public DateTime? CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        /// <summary>
+        /// Giá điều hành nhập 1 phòng/1 đêm
+        /// </summary>
         public double? OperatorPrice { get; set; }
     }
 }

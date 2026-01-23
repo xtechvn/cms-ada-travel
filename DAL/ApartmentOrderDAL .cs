@@ -95,7 +95,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var query = _DbContext.Hotel
+                    var query = _DbContext.Hotels
                         .AsNoTracking()
                         .Where(x => x.IsApartment == true); // chỉ lấy căn hộ
 
@@ -289,7 +289,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Hotel
+                    return await _DbContext.Hotels
                         .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.Id == apartmentId && x.IsApartment == true);
                 }

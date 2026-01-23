@@ -7,9 +7,9 @@ namespace Entities.Models
     {
         public Campaign()
         {
-            ProductFlyTicketService = new HashSet<ProductFlyTicketService>();
-            RunningScheduleService = new HashSet<RunningScheduleService>();
-            VinWonderPricePolicy = new HashSet<VinWonderPricePolicy>();
+            ProductFlyTicketServices = new HashSet<ProductFlyTicketService>();
+            RunningScheduleServices = new HashSet<RunningScheduleService>();
+            VinWonderPricePolicies = new HashSet<VinWonderPricePolicy>();
         }
 
         public int Id { get; set; }
@@ -20,13 +20,13 @@ namespace Entities.Models
         public string Description { get; set; }
         public byte Status { get; set; }
         public DateTime CreateDate { get; set; }
-        public DateTime? UpdateLast { get; set; }
-        public long? UserUpdateId { get; set; }
+        public DateTime UpdateLast { get; set; }
+        public long UserUpdateId { get; set; }
         public int UserCreateId { get; set; }
         public short? ContractType { get; set; }
 
-        public virtual ICollection<ProductFlyTicketService> ProductFlyTicketService { get; set; }
-        public virtual ICollection<RunningScheduleService> RunningScheduleService { get; set; }
-        public virtual ICollection<VinWonderPricePolicy> VinWonderPricePolicy { get; set; }
+        public virtual ICollection<ProductFlyTicketService> ProductFlyTicketServices { get; set; }
+        public virtual ICollection<RunningScheduleService> RunningScheduleServices { get; set; }
+        public virtual ICollection<VinWonderPricePolicy> VinWonderPricePolicies { get; set; }
     }
 }

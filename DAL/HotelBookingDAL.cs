@@ -52,7 +52,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.HotelBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var detail = await _DbContext.HotelBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     return detail;
                 }
             }
@@ -70,7 +70,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
                     //-- Update Order:
-                    var order = await _DbContext.Order.AsNoTracking().FirstOrDefaultAsync(x => x.OrderId == model.order_id);
+                    var order = await _DbContext.Orders.AsNoTracking().FirstOrDefaultAsync(x => x.OrderId == model.order_id);
                     if (order == null || order.OrderId <= 0)
                     {
                         //return -1;
@@ -151,7 +151,7 @@ namespace DAL
                     else
                     {
                         //--Update Amount Order
-                        var hotel_booking = await _DbContext.HotelBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.detail.Id);
+                        var hotel_booking = await _DbContext.HotelBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.detail.Id);
                         if (hotel_booking == null || hotel_booking.Id <= 0)
                         {
                             return -1;
@@ -167,7 +167,7 @@ namespace DAL
                         model.detail.OrderId = hotel_booking.OrderId;
                         model.detail.CreatedBy = hotel_booking.CreatedBy;
                         model.detail.StatusOld = hotel_booking.StatusOld;
-                        _DbContext.HotelBooking.Update(model.detail);
+                        _DbContext.HotelBookings.Update(model.detail);
                         await _DbContext.SaveChangesAsync();
                         //--Update HotelBookingRoom
                         foreach (var room in model.rooms)
@@ -239,7 +239,7 @@ namespace DAL
                 {
                     var ids_bookings = new List<long>() { hotel_booking_id };
 
-                    var del_bookings = await _DbContext.HotelBooking.AsNoTracking().Where(x => x.OrderId == order_id && x.Id != hotel_booking_id).ToListAsync();
+                    var del_bookings = await _DbContext.HotelBookings.AsNoTracking().Where(x => x.OrderId == order_id && x.Id != hotel_booking_id).ToListAsync();
                     //--delete all room not exists after update:
                     var booking_room_del = await _DbContext.HotelBookingRooms.AsNoTracking().Where(x => ids_bookings.Contains(x.HotelBookingId) && !booking_room_ids.Contains(x.Id)).ToListAsync();
                     if (booking_room_del != null && booking_room_del.Count > 0)
@@ -258,10 +258,10 @@ namespace DAL
                             _DbContext.HotelBookingRoomRates.RemoveRange(ids_rate_del);
                             await _DbContext.SaveChangesAsync();
                         }
-                        var ids_guest_del = await _DbContext.HotelGuest.AsNoTracking().Where(x => ids_booking_room_del.Contains(x.HotelBookingRoomsId)).ToListAsync();
+                        var ids_guest_del = await _DbContext.HotelGuests.AsNoTracking().Where(x => ids_booking_room_del.Contains(x.HotelBookingRoomsId)).ToListAsync();
                         if (ids_guest_del != null && ids_guest_del.Count > 0)
                         {
-                            _DbContext.HotelGuest.RemoveRange(ids_guest_del);
+                            _DbContext.HotelGuests.RemoveRange(ids_guest_del);
                             await _DbContext.SaveChangesAsync();
                         }
                         _DbContext.HotelBookingRooms.RemoveRange(booking_room_del);
@@ -283,10 +283,10 @@ namespace DAL
                         await _DbContext.SaveChangesAsync();
                     }
                     //--Delete guest not exists after update
-                    var ids_booking_guest_del = await _DbContext.HotelGuest.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id && !booking_room_guest_ids.Contains(x.Id)).ToListAsync();
+                    var ids_booking_guest_del = await _DbContext.HotelGuests.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id && !booking_room_guest_ids.Contains(x.Id)).ToListAsync();
                     if (ids_booking_guest_del != null && ids_booking_guest_del.Count > 0)
                     {
-                        _DbContext.HotelGuest.RemoveRange(ids_booking_guest_del);
+                        _DbContext.HotelGuests.RemoveRange(ids_booking_guest_del);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 0;
@@ -365,11 +365,11 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var hotel_guest = await _DbContext.HotelGuest.AsNoTracking().FirstOrDefaultAsync(x => x.Id == guest.Id);
+                    var hotel_guest = await _DbContext.HotelGuests.AsNoTracking().FirstOrDefaultAsync(x => x.Id == guest.Id);
                     if (hotel_guest != null && hotel_guest.Id > 0)
                     {
                         guest.Id = hotel_guest.Id;
-                        _DbContext.HotelGuest.Update(guest);
+                        _DbContext.HotelGuests.Update(guest);
                         await _DbContext.SaveChangesAsync();
                     }
                     else
@@ -391,7 +391,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var booking = await _DbContext.HotelBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var booking = await _DbContext.HotelBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (booking != null && booking.Id > 0)
                     {
                         var booking_room = await _DbContext.HotelBookingRooms.AsNoTracking().Where(x => x.HotelBookingId == id).ToListAsync();
@@ -416,14 +416,14 @@ namespace DAL
                                 await _DbContext.SaveChangesAsync();
                             }
 
-                            var room_guest = await _DbContext.HotelGuest.AsNoTracking().Where(x => x.HotelBookingId == id).ToListAsync();
+                            var room_guest = await _DbContext.HotelGuests.AsNoTracking().Where(x => x.HotelBookingId == id).ToListAsync();
                             if (room_guest != null && room_guest.Count > 0)
                             {
-                                _DbContext.HotelGuest.RemoveRange(room_guest);
+                                _DbContext.HotelGuests.RemoveRange(room_guest);
                                 await _DbContext.SaveChangesAsync();
                             }
                         }
-                        _DbContext.HotelBooking.Remove(booking);
+                        _DbContext.HotelBookings.Remove(booking);
                         await _DbContext.SaveChangesAsync();
 
                     }
@@ -442,7 +442,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var booking = await _DbContext.HotelBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var booking = await _DbContext.HotelBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (booking != null && booking.Id > 0)
                     {
                         if (booking.Status == (int)ServiceStatus.Decline)
@@ -450,7 +450,7 @@ namespace DAL
                             booking.Status = (int)ServiceStatus.Cancel;
                             booking.UpdatedBy = user_id;
                             booking.UpdatedDate = DateTime.Now;
-                            _DbContext.HotelBooking.Update(booking);
+                            _DbContext.HotelBookings.Update(booking);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -1091,7 +1091,7 @@ namespace DAL
                             UpdatedBy = user_id,
                             UpdatedDate = DateTime.Now
                         };
-                        var exists = await _DbContext.HotelBookingRoomsOptional.AsNoTracking().FirstOrDefaultAsync(x => x.HotelBookingId == room_optional.HotelBookingId && x.HotelBookingRoomId == room_optional.HotelBookingRoomId);
+                        var exists = await _DbContext.HotelBookingRoomsOptionals.AsNoTracking().FirstOrDefaultAsync(x => x.HotelBookingId == room_optional.HotelBookingId && x.HotelBookingRoomId == room_optional.HotelBookingRoomId);
                         if (exists != null && exists.Id > 0)
                         {
                             room_optional.Id = exists.Id;
@@ -1121,7 +1121,7 @@ namespace DAL
                                     HotelBookingRoomRatesId = rate.Id,
                                     OperatorPrice = rate.OperatorPrice
                                 };
-                                var exists_rate_optional = await _DbContext.HotelBookingRoomRatesOptional.AsNoTracking().FirstOrDefaultAsync(x => x.HotelBookingRoomRatesId == rate.Id);
+                                var exists_rate_optional = await _DbContext.HotelBookingRoomRatesOptionals.AsNoTracking().FirstOrDefaultAsync(x => x.HotelBookingRoomRatesId == rate.Id);
                                 if (exists_rate_optional != null && exists_rate_optional.Id > 0)
                                 {
                                     exists_rate_optional.CreatedBy = rate_optional.CreatedBy;
@@ -1350,14 +1350,14 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var hotel_room = await _DbContext.HotelBookingRoomsOptional.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id && !remain_room.Contains(x.Id)).ToListAsync();
+                    var hotel_room = await _DbContext.HotelBookingRoomsOptionals.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id && !remain_room.Contains(x.Id)).ToListAsync();
                     if (hotel_room != null && hotel_room.Count > 0)
                     {
                         foreach (var guest in hotel_room)
                         {
                             guest.HotelBookingId = guest.HotelBookingId * -1;
                             guest.UpdatedBy = updated_user;
-                            var delete_packages = await _DbContext.HotelBookingRoomRatesOptional.AsNoTracking().Where(x => x.HotelBookingRoomOptionalId == guest.Id && !remain_rate.Contains(x.Id)).ToListAsync();
+                            var delete_packages = await _DbContext.HotelBookingRoomRatesOptionals.AsNoTracking().Where(x => x.HotelBookingRoomOptionalId == guest.Id && !remain_rate.Contains(x.Id)).ToListAsync();
                             if (delete_packages != null && delete_packages.Count > 0)
                             {
                                 foreach (var package in delete_packages)

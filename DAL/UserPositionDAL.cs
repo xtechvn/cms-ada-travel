@@ -23,7 +23,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.UserPosition.FirstOrDefaultAsync(s => s.Id == id);
+                    return await _DbContext.UserPositions.FirstOrDefaultAsync(s => s.Id == id);
                 }
             }
             catch (Exception ex)

@@ -27,7 +27,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.Invoice.AsNoTracking().FirstOrDefault(x => x.Id == invoiceId);
+                    var detail = _DbContext.Invoices.AsNoTracking().FirstOrDefault(x => x.Id == invoiceId);
                     if (detail != null)
                     {
                         return detail;
@@ -48,7 +48,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.Invoice.AsNoTracking().FirstOrDefault(x => x.InvoiceCode == invoiceCode);
+                    var detail = _DbContext.Invoices.AsNoTracking().FirstOrDefault(x => x.InvoiceCode == invoiceCode);
                     if (detail != null)
                     {
                         return detail;
@@ -219,11 +219,11 @@ namespace DAL.Invoice
                     {
                         foreach (var item in model.InvoiceDetails)
                         {
-                            var entity = _DbContext.InvoiceRequest.Find(item.Id);
+                            var entity = _DbContext.InvoiceRequests.Find(item.Id);
                             entity.Status = (int)INVOICE_REQUEST_STATUS.HOAN_THANH;
                             entity.UpdatedDate = DateTime.Now;
                             entity.UpdatedBy = model.CreatedBy;
-                            _DbContext.InvoiceRequest.Update(entity);
+                            _DbContext.InvoiceRequests.Update(entity);
                             _DbContext.SaveChanges();
                         }
                     }
@@ -242,16 +242,16 @@ namespace DAL.Invoice
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var entity = _DbContext.Invoice.Find(invoiceId);
-                _DbContext.Invoice.Remove(entity);
-                var invoiceFormNo = _DbContext.InvoiceFormNo.Find(invoiceFromId);
-                _DbContext.InvoiceFormNo.Remove(invoiceFormNo);
-                var invoiceSign = _DbContext.InvoiceSign.Find(invoiceSignId);
-                _DbContext.InvoiceSign.Remove(invoiceSign);
+                var entity = _DbContext.Invoices.Find(invoiceId);
+                _DbContext.Invoices.Remove(entity);
+                //var invoiceFormNo = _DbContext.InvoiceFormNos.Find(invoiceFromId);
+                //_DbContext.InvoiceFormNos.Remove(invoiceFormNo);
+                //var invoiceSign = _DbContext.InvoiceSigns.Find(invoiceSignId);
+                //_DbContext.InvoiceSign.Remove(invoiceSign);
                 foreach (var idDetail in detailIds)
                 {
-                    var detail = _DbContext.InvoiceDetail.Find(idDetail);
-                    _DbContext.InvoiceDetail.Remove(detail);
+                    var detail = _DbContext.InvoiceDetails.Find(idDetail);
+                    _DbContext.InvoiceDetails.Remove(detail);
                 }
                 _DbContext.SaveChanges();
             }
@@ -338,11 +338,11 @@ namespace DAL.Invoice
                     {
                         foreach (var item in model.InvoiceDetails)
                         {
-                            var entity = _DbContext.InvoiceRequest.Find(item.Id);
+                            var entity = _DbContext.InvoiceRequests.Find(item.Id);
                             entity.Status = (int)INVOICE_REQUEST_STATUS.HOAN_THANH;
                             entity.UpdatedDate = DateTime.Now;
                             entity.UpdatedBy = model.UpdatedBy;
-                            _DbContext.InvoiceRequest.Update(entity);
+                            _DbContext.InvoiceRequests.Update(entity);
                             _DbContext.SaveChanges();
                         }
                     }
@@ -362,14 +362,14 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.InvoiceDetail.Remove(model);
-                    var entity = _DbContext.InvoiceRequest.Find(model.InvoiceRequestId);
+                    _DbContext.InvoiceDetails.Remove(model);
+                    var entity = _DbContext.InvoiceRequests.Find(model.InvoiceRequestId);
                     if (entity != null)
                     {
                         entity.Status = (int)INVOICE_REQUEST_STATUS.DA_DUYET;
                         entity.UpdatedDate = DateTime.Now;
                         entity.UpdatedBy = model.UpdatedBy;
-                        _DbContext.InvoiceRequest.Update(entity);
+                        _DbContext.InvoiceRequests.Update(entity);
                     }
                     _DbContext.SaveChanges();
                     return 1;
@@ -388,7 +388,7 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var details = _DbContext.InvoiceDetail.Where(x => x.InvoiceId == invoiceId).ToList();
+                    var details = _DbContext.InvoiceDetails.Where(x => x.InvoiceId == invoiceId).ToList();
                     if (details != null)
                     {
                         return details;
@@ -424,14 +424,14 @@ namespace DAL.Invoice
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.Invoice.Find(invoiceId);
+                    var model = _DbContext.Invoices.Find(invoiceId);
                     model.IsDelete = true;
                     model.UpdatedDate = DateTime.Now;
                     model.UpdatedBy = userDelete;
-                    _DbContext.Invoice.Update(model);
-                    var listDetail = _DbContext.InvoiceDetail.Where(n => n.InvoiceId == invoiceId).ToList();
+                    _DbContext.Invoices.Update(model);
+                    var listDetail = _DbContext.InvoiceDetails.Where(n => n.InvoiceId == invoiceId).ToList();
                     var requestIds = listDetail.Select(n => n.InvoiceRequestId).ToList();
-                    var listInvoiceRequest = _DbContext.InvoiceRequest.Where(n => requestIds.Contains(n.Id)).ToList();
+                    var listInvoiceRequest = _DbContext.InvoiceRequests.Where(n => requestIds.Contains(n.Id)).ToList();
                     foreach (var item in listInvoiceRequest)
                     {
                         item.Status = (int)INVOICE_REQUEST_STATUS.DA_DUYET;

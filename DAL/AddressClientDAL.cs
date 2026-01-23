@@ -23,7 +23,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.AddressClient.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == clientId);
+                    var detail = _DbContext.AddressClients.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == clientId);
                     if (detail != null)
                     {
                         return await detail;

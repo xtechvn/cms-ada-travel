@@ -33,7 +33,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var IsHasChild = _DbContext.GroupProduct.Any(s => s.ParentId == Id);
+                    var IsHasChild = _DbContext.GroupProducts.Any(s => s.ParentId == Id);
 
                    
                     if (IsHasChild)
@@ -42,7 +42,7 @@ namespace DAL
                     }
 
                     var entity = await FindAsync(Id);
-                    _DbContext.GroupProduct.Remove(entity);
+                    _DbContext.GroupProducts.Remove(entity);
                     await _DbContext.SaveChangesAsync();
                     return Id;
                 }
@@ -62,7 +62,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var group_product = _DbContext.GroupProduct.AsNoTracking().Where(s => category_id.Contains(s.Id)).ToListAsync();
+                    var group_product = _DbContext.GroupProducts.AsNoTracking().Where(s => category_id.Contains(s.Id)).ToListAsync();
 
                     return await group_product;
                 }
@@ -90,7 +90,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var group_product = _DbContext.GroupProduct.AsNoTracking().Where(s => s.Status == (int)StatusType.BINH_THUONG).ToListAsync();
+                    var group_product = _DbContext.GroupProducts.AsNoTracking().Where(s => s.Status == (int)StatusType.BINH_THUONG).ToListAsync();
 
                     return await group_product;
                 }
@@ -113,7 +113,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var group_product = await _DbContext.GroupProduct.AsNoTracking().FirstOrDefaultAsync(s => s.Status == (int)StatusType.BINH_THUONG && s.Path == path.Trim());
+                    var group_product = await _DbContext.GroupProducts.AsNoTracking().FirstOrDefaultAsync(s => s.Status == (int)StatusType.BINH_THUONG && s.Path == path.Trim());
                     return group_product;
                 }
             }
@@ -130,7 +130,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var group_product = await _DbContext.GroupProduct.AsNoTracking().Where(s => s.Status == (int)StatusType.BINH_THUONG && groups.Contains(s.Id) && s.IsShowFooter==true).ToListAsync();
+                    var group_product = await _DbContext.GroupProducts.AsNoTracking().Where(s => s.Status == (int)StatusType.BINH_THUONG && groups.Contains(s.Id) && s.IsShowFooter==true).ToListAsync();
                     if (group_product != null && group_product.Count > 0)
                     {
                         return false;
@@ -150,7 +150,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.GroupProduct.Where(s => s.ParentId == parent_id && s.Status == (int)ArticleStatus.PUBLISH).ToList();
+                    return _DbContext.GroupProducts.Where(s => s.ParentId == parent_id && s.Status == (int)ArticleStatus.PUBLISH).ToList();
                 }
             }
             catch (Exception ex)

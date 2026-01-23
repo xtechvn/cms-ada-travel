@@ -26,8 +26,8 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var Policy = _DbContext.Policy.Where(n => (DateTime)n.EffectiveDate <= DateTime.Now && n.PermissionType == PermisionType && n.IsPrivate==false && n.IsDelete == false).OrderByDescending(s=>s.CreatedDate).FirstOrDefault();
-                    var Policy_Detail = _DbContext.PolicyDetail.FirstOrDefault(n => n.PolicyId == Policy.PolicyId && n.ClientType == ClientType);
+                    var Policy = _DbContext.Policies.Where(n => (DateTime)n.EffectiveDate <= DateTime.Now && n.PermissionType == PermisionType && n.IsPrivate==false && n.IsDelete == false).OrderByDescending(s=>s.CreatedDate).FirstOrDefault();
+                    var Policy_Detail = _DbContext.PolicyDetails.FirstOrDefault(n => n.PolicyId == Policy.PolicyId && n.ClientType == ClientType);
 
                     if (Policy_Detail != null)
                     {

@@ -20,7 +20,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
                   
-                        var deta = _DbContext.PaymentAccount.Add(model);
+                        var deta = _DbContext.PaymentAccounts.Add(model);
                         _DbContext.SaveChanges();
                    
 
@@ -40,7 +40,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var deta = _DbContext.PaymentAccount.AsNoTracking().Where(s=>s.ClientId==clientID).ToList();
+                    var deta = _DbContext.PaymentAccounts.AsNoTracking().Where(s=>s.ClientId==clientID).ToList();
 
                     return deta;
                 }
@@ -59,11 +59,11 @@ namespace DAL
                 {
                     if (model.Id == 0)
                     {
-                        var deta = _DbContext.PaymentAccount.Add(model);
+                        var deta = _DbContext.PaymentAccounts.Add(model);
                         _DbContext.SaveChanges();
                     }else
                     {
-                        var deta = _DbContext.PaymentAccount.Update(model);
+                        var deta = _DbContext.PaymentAccounts.Update(model);
                         _DbContext.SaveChanges();
                     }
                 }
@@ -83,8 +83,8 @@ namespace DAL
                 {
                     if (Id != 0)
                     {
-                        var deleteModel =  _DbContext.PaymentAccount.FirstOrDefault(s=>s.Id == Id);
-                        _DbContext.PaymentAccount.Remove(deleteModel);
+                        var deleteModel =  _DbContext.PaymentAccounts.FirstOrDefault(s=>s.Id == Id);
+                        _DbContext.PaymentAccounts.Remove(deleteModel);
                         _DbContext.SaveChanges();
                     }
                     
@@ -103,7 +103,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data =await _DbContext.PaymentAccount.FirstOrDefaultAsync(s => s.Id == Id);
+                    var data =await _DbContext.PaymentAccounts.FirstOrDefaultAsync(s => s.Id == Id);
                     return data;
                 }
             }

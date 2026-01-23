@@ -32,7 +32,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.FlyBookingDetail.AsNoTracking().FirstOrDefault(s => s.OrderId == orderId);
+                    return _DbContext.FlyBookingDetails.AsNoTracking().FirstOrDefault(s => s.OrderId == orderId);
                 }
             }
             catch (Exception ex)
@@ -48,7 +48,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.FlyBookingDetail.AsNoTracking().FirstOrDefault(s => s.OrderId == orderId && s.GroupBookingId == group_fly.Trim() && s.Leg == leg);
+                    return _DbContext.FlyBookingDetails.AsNoTracking().FirstOrDefault(s => s.OrderId == orderId && s.GroupBookingId == group_fly.Trim() && s.Leg == leg);
                 }
             }
             catch (Exception ex)
@@ -63,7 +63,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.FlyBookingDetail.AsNoTracking().Where(s => s.OrderId == orderId).ToList();
+                    return _DbContext.FlyBookingDetails.AsNoTracking().Where(s => s.OrderId == orderId).ToList();
                 }
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.FlyBookingDetail.AsNoTracking().Where(s => s.OrderId == orderId && s.GroupBookingId.Trim() == group_fly.Trim()).ToListAsync();
+                    return await _DbContext.FlyBookingDetails.AsNoTracking().Where(s => s.OrderId == orderId && s.GroupBookingId.Trim() == group_fly.Trim()).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.FlyBookingDetail.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                    return await _DbContext.FlyBookingDetails.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
                 }
             }
             catch (Exception ex)
@@ -108,7 +108,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.FlyBookingDetail.AsNoTracking().Where(s => s.GroupBookingId.Trim() == group_fly.Trim()).ToListAsync();
+                    return await _DbContext.FlyBookingDetails.AsNoTracking().Where(s => s.GroupBookingId.Trim() == group_fly.Trim()).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -123,14 +123,14 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.FlyBookingDetail.AsNoTracking().Where(s => s.GroupBookingId.Trim() == group_booking_id.Trim()).ToListAsync();
+                    var exists = await _DbContext.FlyBookingDetails.AsNoTracking().Where(s => s.GroupBookingId.Trim() == group_booking_id.Trim()).ToListAsync();
                     if (exists != null && exists.Count > 0)
                     {
                         foreach (var item in exists)
                         {
                             item.ServiceCode = service_code;
                             item.UpdatedDate = DateTime.Now;
-                            _DbContext.FlyBookingDetail.Update(item);
+                            _DbContext.FlyBookingDetails.Update(item);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -151,12 +151,12 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var listbooking = (from a in _DbContext.FlyBookingDetail.AsNoTracking().OrderByDescending(s => s.ExpiryDate).Where(s => s.OrderId == orderId)
-                                       join g in _DbContext.User.AsNoTracking() on a.SalerId equals g.Id
+                    var listbooking = (from a in _DbContext.FlyBookingDetails.AsNoTracking().OrderByDescending(s => s.ExpiryDate).Where(s => s.OrderId == orderId)
+                                       join g in _DbContext.Users.AsNoTracking() on a.SalerId equals g.Id
                                        join c in _DbContext.Airlines.AsNoTracking() on a.Airline equals c.Code
-                                       join d in _DbContext.AirPortCode.AsNoTracking() on a.StartPoint equals d.Code
-                                       join e in _DbContext.AirPortCode.AsNoTracking() on a.EndPoint equals e.Code
-                                       join f in _DbContext.Order.AsNoTracking().Where(s => s.OrderId == orderId) on a.OrderId equals f.OrderId
+                                       join d in _DbContext.AirPortCodes.AsNoTracking() on a.StartPoint equals d.Code
+                                       join e in _DbContext.AirPortCodes.AsNoTracking() on a.EndPoint equals e.Code
+                                       join f in _DbContext.Orders.AsNoTracking().Where(s => s.OrderId == orderId) on a.OrderId equals f.OrderId
                                        select new Bookingdetail
                                        {
                                            Id = a.Id,
@@ -191,11 +191,11 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var order = await _DbContext.Order.AsNoTracking().FirstOrDefaultAsync(x => x.OrderId == model.order_id);
-                    var exists_go = _DbContext.FlyBookingDetail.AsNoTracking().FirstOrDefault(x => x.Id == model.go.Id);
+                    var order = await _DbContext.Orders.AsNoTracking().FirstOrDefaultAsync(x => x.OrderId == model.order_id);
+                    var exists_go = _DbContext.FlyBookingDetails.AsNoTracking().FirstOrDefault(x => x.Id == model.go.Id);
                     if (exists_go != null)
                     {
-                        _DbContext.FlyBookingDetail.Update(model.go);
+                        _DbContext.FlyBookingDetails.Update(model.go);
                         await _DbContext.SaveChangesAsync();
                     }
                     else
@@ -204,7 +204,7 @@ namespace DAL
                     }
                     if (model.back != null)
                     {
-                        var exists_back = _DbContext.FlyBookingDetail.AsNoTracking().FirstOrDefault(x => x.Id == model.back.Id);
+                        var exists_back = _DbContext.FlyBookingDetails.AsNoTracking().FirstOrDefault(x => x.Id == model.back.Id);
                         if (exists_back != null)
                         {
                             UpdateFlyBookingDetail(model.back);
@@ -221,7 +221,7 @@ namespace DAL
                                 order.Profit = order.Profit - exists_back.Amount + model.profit / (double)2;
                             }
                             order.Price = order.Amount;
-                            _DbContext.Order.Update(order);
+                            _DbContext.Orders.Update(order);
                             await _DbContext.SaveChangesAsync();
                         }
                         else
@@ -240,16 +240,16 @@ namespace DAL
                                 order.Profit += model.profit / (double)2;
                             }
                             order.Price = order.Amount;
-                            _DbContext.Order.Update(order);
+                            _DbContext.Orders.Update(order);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
                     else
                     {
-                        var exists_back = _DbContext.FlyBookingDetail.AsNoTracking().FirstOrDefault(x => x.GroupBookingId == model.go.GroupBookingId && x.Leg == 1);
+                        var exists_back = _DbContext.FlyBookingDetails.AsNoTracking().FirstOrDefault(x => x.GroupBookingId == model.go.GroupBookingId && x.Leg == 1);
                         if (exists_back != null && exists_back.Id > 0)
                         {
-                            _DbContext.FlyBookingDetail.Remove(exists_back);
+                            _DbContext.FlyBookingDetails.Remove(exists_back);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -260,7 +260,7 @@ namespace DAL
                         group_id = model.go.Id + "," + model.back.Id;
                         model.back.GroupBookingId = group_id;
                         model.back.Note = (model.back.Note != null && model.back.Note.Trim() != "" && model.back.Note.Length >= 500 ? model.back.Note.Substring(0, 499) : model.back.Note);
-                        _DbContext.FlyBookingDetail.Update(model.back);
+                        _DbContext.FlyBookingDetails.Update(model.back);
                         await _DbContext.SaveChangesAsync();
                         fly_booking_ids.Add((int?)model.back.Id);
                     }
@@ -304,24 +304,24 @@ namespace DAL
                         foreach (var passengers in model.passengers)
                         {
                             passengers.GroupBookingId = group_id;
-                            var exists_package = await _DbContext.Passenger.AsNoTracking().FirstOrDefaultAsync(x => x.Id == passengers.Id);
+                            var exists_package = await _DbContext.Passengers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == passengers.Id);
                             if (exists_package != null)
                             {
-                                _DbContext.Passenger.Update(passengers);
+                                _DbContext.Passengers.Update(passengers);
                                 await _DbContext.SaveChangesAsync();
                             }
                             else
                             {
-                                _DbContext.Passenger.Add(passengers);
+                                _DbContext.Passengers.Add(passengers);
                                 await _DbContext.SaveChangesAsync();
                             }
                             ids_new.Add(passengers.Id);
                         }
                     }
-                    var delete_passengers = _DbContext.Passenger.AsNoTracking().Where(x => x.OrderId == model.order_id && x.GroupBookingId == group_id && !ids_new.Contains(x.Id));
+                    var delete_passengers = _DbContext.Passengers.AsNoTracking().Where(x => x.OrderId == model.order_id && x.GroupBookingId == group_id && !ids_new.Contains(x.Id));
                     if (delete_passengers != null && delete_passengers.Count() > 0)
                     {
-                        _DbContext.Passenger.RemoveRange(delete_passengers);
+                        _DbContext.Passengers.RemoveRange(delete_passengers);
                         await _DbContext.SaveChangesAsync();
                     }
 
@@ -340,15 +340,15 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var list = await _DbContext.FlyBookingDetail.AsNoTracking().Where(x => x.GroupBookingId == group_booking_id).ToListAsync();
+                    var list = await _DbContext.FlyBookingDetails.AsNoTracking().Where(x => x.GroupBookingId == group_booking_id).ToListAsync();
                     if (list != null && list.Count > 0)
                     {
                         foreach (var booking in list)
                         {
-                            var flight_segment = await _DbContext.FlightSegment.AsNoTracking().Where(x => x.FlyBookingId == booking.Id).ToListAsync();
+                            var flight_segment = await _DbContext.FlightSegments.AsNoTracking().Where(x => x.FlyBookingId == booking.Id).ToListAsync();
                             if (flight_segment != null && flight_segment.Count > 0)
                             {
-                                _DbContext.FlightSegment.RemoveRange(flight_segment);
+                                _DbContext.FlightSegments.RemoveRange(flight_segment);
                                 await _DbContext.SaveChangesAsync();
                             }
 
@@ -360,13 +360,13 @@ namespace DAL
                             await _DbContext.SaveChangesAsync();
                         }
 
-                        var passengers = await _DbContext.Passenger.AsNoTracking().Where(x => x.GroupBookingId == group_booking_id).ToListAsync();
+                        var passengers = await _DbContext.Passengers.AsNoTracking().Where(x => x.GroupBookingId == group_booking_id).ToListAsync();
                         if (passengers != null && passengers.Count > 0)
                         {
-                            _DbContext.Passenger.RemoveRange(passengers);
+                            _DbContext.Passengers.RemoveRange(passengers);
                             await _DbContext.SaveChangesAsync();
                         }
-                        _DbContext.FlyBookingDetail.RemoveRange(list);
+                        _DbContext.FlyBookingDetails.RemoveRange(list);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -384,7 +384,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var list = await _DbContext.FlyBookingDetail.AsNoTracking().Where(x => x.GroupBookingId == group_booking_id).ToListAsync();
+                    var list = await _DbContext.FlyBookingDetails.AsNoTracking().Where(x => x.GroupBookingId == group_booking_id).ToListAsync();
                     if (list != null && list.Count > 0)
                     {
                         foreach (var booking in list)
@@ -394,7 +394,7 @@ namespace DAL
                                 booking.Status = (int)ServiceStatus.Cancel;
                                 booking.UpdatedBy = user_id;
                                 booking.UpdatedDate = DateTime.Now;
-                                _DbContext.FlyBookingDetail.Update(booking);
+                                _DbContext.FlyBookingDetails.Update(booking);
                                 await _DbContext.SaveChangesAsync();
                             }
 
@@ -807,7 +807,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.FlyBookingDetail.AsNoTracking().Where(s => s.GroupBookingId.Trim() == group_booking_id.Trim()).ToListAsync();
+                    var exists = await _DbContext.FlyBookingDetails.AsNoTracking().Where(s => s.GroupBookingId.Trim() == group_booking_id.Trim()).ToListAsync();
                     if (exists != null && exists.Count > 0)
                     {
                         foreach (var item in exists)
@@ -816,7 +816,7 @@ namespace DAL
                             item.UpdatedDate = DateTime.Now;
                             item.UpdatedBy = user_id;
                             item.Status = status;
-                            _DbContext.FlyBookingDetail.Update(item);
+                            _DbContext.FlyBookingDetails.Update(item);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -835,7 +835,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.FlyBookingDetail.AsNoTracking().Where(s => s.GroupBookingId.Trim() == group_booking_id.Trim()).ToListAsync();
+                    var exists = await _DbContext.FlyBookingDetails.AsNoTracking().Where(s => s.GroupBookingId.Trim() == group_booking_id.Trim()).ToListAsync();
                     if (exists != null && exists.Count > 0)
                     {
                         foreach (var item in exists)
@@ -843,7 +843,7 @@ namespace DAL
                             item.UpdatedDate = DateTime.Now;
                             item.UpdatedBy = user_commit;
                             item.SalerId = user_id;
-                            _DbContext.FlyBookingDetail.Update(item);
+                            _DbContext.FlyBookingDetails.Update(item);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -862,7 +862,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var list = await _DbContext.FlyBookingDetail.AsNoTracking().Where(x => x.GroupBookingId == group_booking_id).ToListAsync();
+                    var list = await _DbContext.FlyBookingDetails.AsNoTracking().Where(x => x.GroupBookingId == group_booking_id).ToListAsync();
                     if (list != null && list.Count > 0)
                     {
                         double unit_price = 0;
@@ -875,7 +875,7 @@ namespace DAL
                         foreach (var detail in list)
                         {
                             detail.Price = Math.Round(unit_price / (double)list.Count, 0);
-                            _DbContext.FlyBookingDetail.Update(detail);
+                            _DbContext.FlyBookingDetails.Update(detail);
                             await _DbContext.SaveChangesAsync();
                         }
 
@@ -895,7 +895,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.FlyBookingDetail.AsNoTracking().Where(s => serviceCodes.Contains(s.ServiceCode)).ToList();
+                    return _DbContext.FlyBookingDetails.AsNoTracking().Where(s => serviceCodes.Contains(s.ServiceCode)).ToList();
                 }
             }
             catch (Exception ex)
@@ -911,14 +911,14 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var del_bookings = await _DbContext.FlyBookingPackagesOptional.AsNoTracking().Where(x => x.BookingId == booking_id && !remain_optional_id.Contains(x.Id)).ToListAsync();
+                    var del_bookings = await _DbContext.FlyBookingPackagesOptionals.AsNoTracking().Where(x => x.BookingId == booking_id && !remain_optional_id.Contains(x.Id)).ToListAsync();
                     if (del_bookings != null && del_bookings.Count > 0)
                     {
                         foreach (var del_item in del_bookings)
                         {
                             del_item.BookingId = -1 * del_item.BookingId;
                             del_item.SuplierId = -1 * del_item.SuplierId;
-                            _DbContext.FlyBookingPackagesOptional.Update(del_item);
+                            _DbContext.FlyBookingPackagesOptionals.Update(del_item);
                             await _DbContext.SaveChangesAsync();
                         }
 

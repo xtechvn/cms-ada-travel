@@ -28,17 +28,10 @@ namespace Entities.Models
         public DateTime? UpdatedDate { get; set; }
         public string RoomAvatar { get; set; }
         public string Avatar { get; set; }
-        public int Status { get; set; }
-
-
-        // ==== THÊM CÁC FIELD DÙNG CHO PACKAGES CĂN HỘ ====
-        public decimal TotalMustPay { get; set; }   // Tổng phải thu
-        public decimal TotalPaid { get; set; }      // Tổng đã thu
-        public decimal TotalCost { get; set; }      // Tổng chi
-        public decimal Profit                      // Lợi nhuận
-            => TotalMustPay - TotalCost;
-
         public long? LockId { get; set; }
-
+        public string LockAdminPwdEnc { get; set; }
+        public DateTime? LockAdminPwdUpdatedAt { get; set; }
+        public DateTime? LockResetCheckoutAt { get; set; }
+        public bool LockResetCheckoutSent { get; set; }
     }
 }

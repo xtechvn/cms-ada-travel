@@ -34,7 +34,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.Supplier.FirstOrDefault(x => x.SupplierId == supplierId);
+                    var detail = _DbContext.Suppliers.FirstOrDefault(x => x.SupplierId == supplierId);
                     if (detail != null)
                     {
                         return detail;
@@ -217,7 +217,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.Supplier.FirstOrDefault(x => x.SupplierId != id && taxCode == x.TaxCode);
+                    var detail = _DbContext.Suppliers.FirstOrDefault(x => x.SupplierId != id && taxCode == x.TaxCode);
                     return detail;
                 }
             }
@@ -234,7 +234,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.Supplier.FirstOrDefault(x => x.SupplierId != id && name.ToLower() == x.FullName.ToLower());
+                    var detail = _DbContext.Suppliers.FirstOrDefault(x => x.SupplierId != id && name.ToLower() == x.FullName.ToLower());
                     return detail;
                 }
             }
@@ -271,7 +271,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.SupplierContact.Find(Id);
+                    return _DbContext.SupplierContacts.Find(Id);
                 }
             }
             catch
@@ -286,10 +286,10 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.SupplierContact.Find(Id);
+                    var model = _DbContext.SupplierContacts.Find(Id);
                     if (model != null)
                     {
-                        _DbContext.SupplierContact.Remove(model);
+                        _DbContext.SupplierContacts.Remove(model);
                         _DbContext.SaveChanges();
                     }
                     return Id;

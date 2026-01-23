@@ -20,7 +20,7 @@ namespace DAL
             try
             {
                 var _DbContext = new EntityDataContext(_connection);
-                lastest_item = await _DbContext.National.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                lastest_item = await _DbContext.Nationals.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             }
             catch (Exception e)
             {

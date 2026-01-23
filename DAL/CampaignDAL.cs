@@ -74,7 +74,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Campaign.AsNoTracking().FirstOrDefaultAsync(s => s.CampaignCode == campaign_code);
+                    return await _DbContext.Campaigns.AsNoTracking().FirstOrDefaultAsync(s => s.CampaignCode == campaign_code);
                 }
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Campaign.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                    return await _DbContext.Campaigns.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
                 }
             }
             catch (Exception ex)
@@ -105,7 +105,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var add = _DbContext.Campaign.Add(campaign);
+                    var add = _DbContext.Campaigns.Add(campaign);
                     await _DbContext.SaveChangesAsync();
                     return campaign.Id;
                 }
@@ -122,7 +122,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists= _DbContext.Campaign.FirstOrDefault(n => n.Id == campaign.Id);
+                    var exists= _DbContext.Campaigns.FirstOrDefault(n => n.Id == campaign.Id);
                     if(exists!=null && exists.Id > 0)
                     {
 
@@ -135,7 +135,7 @@ namespace DAL
                         exists.Status =campaign.Status;
                         exists.ToDate =campaign.ToDate;
                         exists.UserUpdateId =campaign.UserUpdateId;
-                        var add = _DbContext.Campaign.Update(exists);
+                        var add = _DbContext.Campaigns.Update(exists);
                         await _DbContext.SaveChangesAsync();
                         return campaign.Id;
 
@@ -155,8 +155,8 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var entity = _DbContext.Campaign.FirstOrDefault(n => n.Id == campaignId);
-                    _DbContext.Campaign.Remove(entity);
+                    var entity = _DbContext.Campaigns.FirstOrDefault(n => n.Id == campaignId);
+                    _DbContext.Campaigns.Remove(entity);
                     _DbContext.SaveChanges();
                     return 0;
                 }

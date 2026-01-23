@@ -285,13 +285,13 @@ namespace DAL
                     {
                         try
                         {
-                            var ExistList = await _DbContext.RecruitmentCategory.Where(s => s.ArticleId == ArticleId).ToListAsync();
+                            var ExistList = await _DbContext.RecruitmentCategories.Where(s => s.ArticleId == ArticleId).ToListAsync();
                             if (ExistList != null && ExistList.Count > 0)
                             {
                                 foreach (var item in ExistList)
                                 {
-                                    var deleteModel = await _DbContext.RecruitmentCategory.FindAsync(item.Id);
-                                    _DbContext.RecruitmentCategory.Remove(deleteModel);
+                                    var deleteModel = await _DbContext.RecruitmentCategories.FindAsync(item.Id);
+                                    _DbContext.RecruitmentCategories.Remove(deleteModel);
                                     await _DbContext.SaveChangesAsync();
                                 }
                             }
@@ -305,7 +305,7 @@ namespace DAL
                                         CategoryId = item,
                                         ArticleId = ArticleId
                                     };
-                                    await _DbContext.RecruitmentCategory.AddAsync(model);
+                                    await _DbContext.RecruitmentCategories.AddAsync(model);
                                     await _DbContext.SaveChangesAsync();
                                 }
                             }
@@ -341,13 +341,13 @@ namespace DAL
                     {
                         try
                         {
-                            var ExistCategory = await _DbContext.RecruitmentCategory.Where(s => s.ArticleId == Id).ToListAsync();
+                            var ExistCategory = await _DbContext.RecruitmentCategories.Where(s => s.ArticleId == Id).ToListAsync();
                             if (ExistCategory != null && ExistCategory.Count > 0)
                             {
                                 foreach (var item in ExistCategory)
                                 {
-                                    var deleteModel = await _DbContext.RecruitmentCategory.FindAsync(item.Id);
-                                    _DbContext.RecruitmentCategory.Remove(deleteModel);
+                                    var deleteModel = await _DbContext.RecruitmentCategories.FindAsync(item.Id);
+                                    _DbContext.RecruitmentCategories.Remove(deleteModel);
                                     await _DbContext.SaveChangesAsync();
                                 }
                             }
@@ -355,8 +355,8 @@ namespace DAL
                       
 
 
-                            var article = await _DbContext.Recruitment.FindAsync(Id);
-                            _DbContext.Recruitment.Remove(article);
+                            var article = await _DbContext.Recruitments.FindAsync(Id);
+                            _DbContext.Recruitments.Remove(article);
                             await _DbContext.SaveChangesAsync();
 
                             transaction.Commit();
@@ -397,8 +397,8 @@ namespace DAL
                         {
 
 
-                            var list_article = await (from _article in _DbContext.Recruitment.AsNoTracking()
-                                                      join a in _DbContext.RecruitmentCategory.AsNoTracking() on _article.Id equals a.ArticleId into af
+                            var list_article = await (from _article in _DbContext.Recruitments.AsNoTracking()
+                                                      join a in _DbContext.RecruitmentCategories.AsNoTracking() on _article.Id equals a.ArticleId into af
                                                       from detail in af.DefaultIfEmpty()
                                                       where detail.CategoryId == cate_id && _article.Status == ArticleStatus.PUBLISH
                                                       select new ArticleViewModel
@@ -448,7 +448,7 @@ namespace DAL
                     {
                         try
                         {
-                            var article = await _DbContext.Recruitment.FirstOrDefaultAsync(x => x.Status == ArticleStatus.PUBLISH && x.Id == article_id);
+                            var article = await _DbContext.Recruitments.FirstOrDefaultAsync(x => x.Status == ArticleStatus.PUBLISH && x.Id == article_id);
                             model = new ArticleModel
                             {
                                 Id = article.Id,
@@ -498,8 +498,8 @@ namespace DAL
                 {
                     using (var transaction = _DbContext.Database.BeginTransaction())
                     {
-                        list_article = await (from article in _DbContext.Recruitment.AsNoTracking()
-                                              join a in _DbContext.RecruitmentCategory on article.Id equals a.ArticleId into af
+                        list_article = await (from article in _DbContext.Recruitments.AsNoTracking()
+                                              join a in _DbContext.RecruitmentCategories on article.Id equals a.ArticleId into af
                                               from detail in af.DefaultIfEmpty()
                                               where article.Status == ArticleStatus.PUBLISH && article.Title.ToUpper().Contains(title.ToUpper())
                                               select new ArticleViewModel
@@ -528,7 +528,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    ListRs = await _DbContext.RecruitmentCategory.Where(s => s.ArticleId == ArticleId).Select(s => (int)s.CategoryId).ToListAsync();
+                    ListRs = await _DbContext.RecruitmentCategories.Where(s => s.ArticleId == ArticleId).Select(s => (int)s.CategoryId).ToListAsync();
                 }
             }
             catch
@@ -556,8 +556,8 @@ namespace DAL
                         try
                         {
 
-                            var list_article = await (from _article in _DbContext.Recruitment.AsNoTracking()
-                                                      join a in _DbContext.RecruitmentCategory.AsNoTracking() on _article.Id equals a.ArticleId into af
+                            var list_article = await (from _article in _DbContext.Recruitments.AsNoTracking()
+                                                      join a in _DbContext.RecruitmentCategories.AsNoTracking() on _article.Id equals a.ArticleId into af
                                                       from detail in af.DefaultIfEmpty()
                                                       where detail.CategoryId == cate_id && _article.Status == ArticleStatus.PUBLISH
                                                       orderby _article.PublishDate descending
@@ -573,8 +573,8 @@ namespace DAL
                                                           link = CommonHelper.genLinkNews(_article.Title, _article.Id.ToString())
                                                       }
                                                      ).ToListAsync();
-                            var list_pinned = await (from _article in _DbContext.Recruitment.AsNoTracking()
-                                                     join a in _DbContext.RecruitmentCategory.AsNoTracking() on _article.Id equals a.ArticleId into af
+                            var list_pinned = await (from _article in _DbContext.Recruitments.AsNoTracking()
+                                                     join a in _DbContext.RecruitmentCategories.AsNoTracking() on _article.Id equals a.ArticleId into af
                                                      from detail in af.DefaultIfEmpty()
                                                      where detail.CategoryId == cate_id && _article.Status == ArticleStatus.PUBLISH && _article.PublishDate <= DateTime.Now && _article.DownTime > DateTime.Now && list_postion_pinned.Contains(_article.Position)
                                                      orderby _article.Position ascending
@@ -643,8 +643,8 @@ namespace DAL
                         try
                         {
 
-                            var article = await (from _article in _DbContext.Recruitment.AsNoTracking()
-                                                 join a in _DbContext.RecruitmentCategory.AsNoTracking() on _article.Id equals a.ArticleId into af
+                            var article = await (from _article in _DbContext.Recruitments.AsNoTracking()
+                                                 join a in _DbContext.RecruitmentCategories.AsNoTracking() on _article.Id equals a.ArticleId into af
                                                  from detail in af.DefaultIfEmpty()
                                                  where detail.CategoryId == cate_id && _article.Status == ArticleStatus.PUBLISH && _article.UpTime <= DateTime.Now && DateTime.Now < _article.DownTime && _article.Position == position
                                                  select new ArticleFeModel

@@ -7,8 +7,8 @@ namespace Entities.Models
     {
         public AllotmentFund()
         {
-            AllotmentHistory = new HashSet<AllotmentHistory>();
-            AllotmentUse = new HashSet<AllotmentUse>();
+            AllotmentHistories = new HashSet<AllotmentHistory>();
+            AllotmentUses = new HashSet<AllotmentUse>();
         }
 
         public int Id { get; set; }
@@ -18,7 +18,7 @@ namespace Entities.Models
         public DateTime? CreateDate { get; set; }
         public DateTime? UpdateTime { get; set; }
 
-        public virtual ICollection<AllotmentHistory> AllotmentHistory { get; set; }
-        public virtual ICollection<AllotmentUse> AllotmentUse { get; set; }
+        public virtual ICollection<AllotmentHistory> AllotmentHistories { get; set; }
+        public virtual ICollection<AllotmentUse> AllotmentUses { get; set; }
     }
 }

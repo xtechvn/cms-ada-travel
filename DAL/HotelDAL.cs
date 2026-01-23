@@ -33,7 +33,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Hotel.AsNoTracking().FirstOrDefault(s => s.HotelId.Trim().ToLower() == hotel_id.Trim().ToLower());
+                    return _DbContext.Hotels.AsNoTracking().FirstOrDefault(s => s.HotelId.Trim().ToLower() == hotel_id.Trim().ToLower());
                 }
             }
             catch (Exception ex)
@@ -48,7 +48,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Hotel.Find(id);
+                    return _DbContext.Hotels.Find(id);
                 }
             }
             catch (Exception ex)
@@ -81,7 +81,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.Hotel.AsNoTracking().FirstOrDefault(s => s.Name.Trim().ToLower() == name.Trim().ToLower());
+                    return _DbContext.Hotels.AsNoTracking().FirstOrDefault(s => s.Name.Trim().ToLower() == name.Trim().ToLower());
                 }
             }
             catch (Exception ex)
@@ -97,7 +97,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var add = _DbContext.Hotel.Update(model);
+                    var add = _DbContext.Hotels.Update(model);
                     await _DbContext.SaveChangesAsync();
                     return 1;
                 }
@@ -266,7 +266,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = _DbContext.Hotel.AsNoTracking().FirstOrDefault(s => s.Id == id);
+                    var exists = _DbContext.Hotels.AsNoTracking().FirstOrDefault(s => s.Id == id);
                     if (exists != null && exists.Id > 0)
                     {
                         exists.OtherSurcharge = body;
@@ -308,7 +308,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.HotelBankingAccount.AsNoTracking().Where(x => x.AccountName.Trim().ToLower() == account_name.ToLower() && x.HotelId == hotel_id).FirstOrDefault();
+                    return _DbContext.HotelBankingAccounts.AsNoTracking().Where(x => x.AccountName.Trim().ToLower() == account_name.ToLower() && x.HotelId == hotel_id).FirstOrDefault();
                 }
             }
             catch
@@ -322,7 +322,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.HotelBankingAccount.Find(Id);
+                    return _DbContext.HotelBankingAccounts.Find(Id);
                 }
             }
             catch
@@ -384,10 +384,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.HotelBankingAccount.Find(Id);
+                    var model = _DbContext.HotelBankingAccounts.Find(Id);
                     if (model != null)
                     {
-                        _DbContext.HotelBankingAccount.Remove(model);
+                        _DbContext.HotelBankingAccounts.Remove(model);
                         _DbContext.SaveChanges();
                     }
                     return Id;
@@ -426,8 +426,8 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
                     var data = (
-                        from sh in _DbContext.HotelShareHolder
-                        join u in _DbContext.User on sh.UserId equals u.Id
+                        from sh in _DbContext.HotelShareHolders
+                        join u in _DbContext.Users on sh.UserId equals u.Id
                         where sh.Id == id && sh.IsDeleted == false
                         select new HotelShareHolder
                         {
@@ -466,7 +466,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.HotelShareHolder.Find(id);
+                    var model = _DbContext.HotelShareHolders.Find(id);
                     if (model != null)
                     {
                         model.IsDeleted = true;
@@ -553,7 +553,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.HotelContact.Find(Id);
+                    return _DbContext.HotelContacts.Find(Id);
                 }
             }
             catch
@@ -568,10 +568,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.HotelContact.Find(Id);
+                    var model = _DbContext.HotelContacts.Find(Id);
                     if (model != null)
                     {
-                        _DbContext.HotelContact.Remove(model);
+                        _DbContext.HotelContacts.Remove(model);
                         _DbContext.SaveChanges();
                     }
                     return Id;
@@ -671,7 +671,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.HotelSurcharge.Find(Id);
+                    return _DbContext.HotelSurcharges.Find(Id);
                 }
             }
             catch
@@ -686,10 +686,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.HotelSurcharge.Find(Id);
+                    var model = _DbContext.HotelSurcharges.Find(Id);
                     if (model != null)
                     {
-                        _DbContext.HotelSurcharge.Remove(model);
+                        _DbContext.HotelSurcharges.Remove(model);
                         _DbContext.SaveChanges();
                     }
                     return Id;
@@ -1178,7 +1178,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.HotelPosition.FirstOrDefault(s=>s.Position == Position && s.PositionType== PositionType);
+                    var model = _DbContext.HotelPositions.FirstOrDefault(s=>s.Position == Position && s.PositionType== PositionType);
                     
                     return model;
                 }
@@ -1195,7 +1195,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.HotelPosition.Where(s => s.HotelId == HotelId && s.Status == PositionStatus.HD).ToList();
+                    var model = _DbContext.HotelPositions.Where(s => s.HotelId == HotelId && s.Status == PositionStatus.HD).ToList();
 
                     return model;
                 }
@@ -1212,7 +1212,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.HotelPosition.Where(s => s.Position == Position && s.Status == PositionStatus.HD && s.PositionType == PositionType).ToList();
+                    var model = _DbContext.HotelPositions.Where(s => s.Position == Position && s.Status == PositionStatus.HD && s.PositionType == PositionType).ToList();
 
                     return model;
                 }

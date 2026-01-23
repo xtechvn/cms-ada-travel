@@ -24,7 +24,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var datalist = _DbContext.Permission.AsQueryable();
+                    var datalist = _DbContext.Permissions.AsQueryable();
                     if (!string.IsNullOrEmpty(permissionName))
                     {
                         datalist = datalist.Where(s => s.Name.Contains(permissionName));

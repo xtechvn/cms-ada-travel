@@ -406,10 +406,10 @@ namespace Repositories.Repositories
                 {
                     if (map.TryGetValue(r.Id, out var lg))
                     {
-                        r.TotalMustPay = lg.TotalMustPay;
-                        r.TotalPaid = lg.TotalPaid;
-                        r.TotalCost = lg.TotalCost;
-                        r.Status = lg.Status;
+                        //r.TotalMustPay = lg.TotalMustPay;
+                        //r.TotalPaid = lg.TotalPaid;
+                        //r.TotalCost = lg.TotalCost;
+                        //r.Status = lg.Status;
                         // Profit auto → get;
                     }
                 }

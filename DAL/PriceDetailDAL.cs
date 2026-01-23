@@ -24,7 +24,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var find = _DbContext.PriceDetail.FirstOrDefault(x => x.Id == price_detail_id);
+                    var find = _DbContext.PriceDetails.FirstOrDefault(x => x.Id == price_detail_id);
                     return find;
                 }
             }
@@ -40,7 +40,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var find = _DbContext.PriceDetail.FirstOrDefault(x => x.ProductServiceId == productServiceId);
+                    var find = _DbContext.PriceDetails.FirstOrDefault(x => x.ProductServiceId == productServiceId);
                     return find;
                 }
             }
@@ -61,13 +61,13 @@ namespace DAL
                     var update_service = productRoomService;
                     var update_detail = detail;
                     //-- Check campaign
-                    Campaign campaign = _DbContext.Campaign.Where(x => x.Id == productRoomService.CampaignId).FirstOrDefault();
+                    Campaign campaign = _DbContext.Campaigns.Where(x => x.Id == productRoomService.CampaignId).FirstOrDefault();
                     if(campaign==null || campaign.Id <= 0)
                     {
                         return "Campaign not found";
                     }
                     //-- check & add product_room_service:
-                    var productRoomServiceExists = _DbContext.ProductRoomService.Where(x => x.Id == update_service.Id).FirstOrDefault();
+                    var productRoomServiceExists = _DbContext.ProductRoomServices.Where(x => x.Id == update_service.Id).FirstOrDefault();
                     if(productRoomServiceExists!=null && productRoomServiceExists.Id > 0)
                     {
                         update_detail.ProductServiceId = productRoomServiceExists.Id;
@@ -75,7 +75,7 @@ namespace DAL
                     }
                     else
                     {
-                        productRoomServiceExists = _DbContext.ProductRoomService.Where(x => x.CampaignId == update_service.CampaignId && x.ProgramId == update_service.ProgramId && x.ProgramPackageId == update_service.ProgramPackageId && x.RoomId == update_service.RoomId).FirstOrDefault();
+                        productRoomServiceExists = _DbContext.ProductRoomServices.Where(x => x.CampaignId == update_service.CampaignId && x.ProgramId == update_service.ProgramId && x.ProgramPackageId == update_service.ProgramPackageId && x.RoomId == update_service.RoomId).FirstOrDefault();
                         if (productRoomServiceExists != null && productRoomServiceExists.Id > 0)
                         {
                             update_detail.ProductServiceId = productRoomServiceExists.Id;
@@ -83,12 +83,12 @@ namespace DAL
                         }
                         else
                         {
-                            var result = _DbContext.ProductRoomService.Add(update_service);
+                            var result = _DbContext.ProductRoomServices.Add(update_service);
                             _DbContext.SaveChanges();
                         }
                     }
                     // Check & add/update PriceDetail
-                    PriceDetail priceDetail_exists = _DbContext.PriceDetail.Where(x => x.Id == update_detail.Id).FirstOrDefault();
+                    PriceDetail priceDetail_exists = _DbContext.PriceDetails.Where(x => x.Id == update_detail.Id).FirstOrDefault();
                     if(priceDetail_exists!=null && priceDetail_exists.Id > 0)
                     {
                         update_detail = priceDetail_exists;
@@ -103,7 +103,7 @@ namespace DAL
                         update_detail.ToDate = detail.ToDate;
                         update_detail.ProductServiceId = detail.ProductServiceId;
                         update_detail.ServiceType = detail.ServiceType;
-                        _DbContext.PriceDetail.Update(update_detail);
+                        _DbContext.PriceDetails.Update(update_detail);
                         _DbContext.SaveChanges();
                         detail.Id = update_detail.Id;
                     }
@@ -124,7 +124,7 @@ namespace DAL
                             UnitId = update_detail.UnitId,
                             UserCreateId = user_id
                         };
-                        var result = _DbContext.PriceDetail.Add(add_detail);
+                        var result = _DbContext.PriceDetails.Add(add_detail);
                         _DbContext.SaveChanges();
                         detail.Id = add_detail.Id;
                     }
@@ -144,11 +144,11 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var find = _DbContext.PriceDetail.FirstOrDefault(x=>x.Id==id);
+                    var find = _DbContext.PriceDetails.FirstOrDefault(x=>x.Id==id);
                     if(find!=null && find.Id > 0)
                     {
                         find.ProductServiceId *= -1;
-                        var remove = _DbContext.PriceDetail.Update(find);
+                        var remove = _DbContext.PriceDetails.Update(find);
                         await _DbContext.SaveChangesAsync();
                         return (int)ResponseType.SUCCESS;
                     }
@@ -168,9 +168,9 @@ namespace DAL
                 List<int> client_b2b = new List<int>() { ClientType.DALC1, ClientType.DALC2, ClientType.DLC3,ClientType.DL };
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var price_detail = await (from p in _DbContext.PriceDetail.AsNoTracking()
-                                       join b in _DbContext.ProductFlyTicketService.AsNoTracking() on p.ProductServiceId equals b.Id
-                                       join a in _DbContext.Campaign.AsNoTracking().OrderByDescending(x=>x.UpdateLast).Where(s => s.Status == (int)Status.HOAT_DONG ) on b.CampaignId equals a.Id
+                    var price_detail = await (from p in _DbContext.PriceDetails.AsNoTracking()
+                                       join b in _DbContext.ProductFlyTicketServices.AsNoTracking() on p.ProductServiceId equals b.Id
+                                       join a in _DbContext.Campaigns.AsNoTracking().OrderByDescending(x=>x.UpdateLast).Where(s => s.Status == (int)Status.HOAT_DONG ) on b.CampaignId equals a.Id
                                        where a.ClientTypeId == client_type 
                                        select new PriceDetail
                                        {
@@ -183,9 +183,9 @@ namespace DAL
                                        }).FirstOrDefaultAsync();
                         if (price_detail == null && client_b2b.Contains(client_type))
                         {
-                            price_detail = await (from p in _DbContext.PriceDetail.AsNoTracking()
-                                                  join b in _DbContext.ProductFlyTicketService.AsNoTracking() on p.ProductServiceId equals b.Id
-                                                  join a in _DbContext.Campaign.AsNoTracking().OrderByDescending(x => x.UpdateLast).Where(s => s.Status == (int)Status.HOAT_DONG) on b.CampaignId equals a.Id
+                            price_detail = await (from p in _DbContext.PriceDetails.AsNoTracking()
+                                                  join b in _DbContext.ProductFlyTicketServices.AsNoTracking() on p.ProductServiceId equals b.Id
+                                                  join a in _DbContext.Campaigns.AsNoTracking().OrderByDescending(x => x.UpdateLast).Where(s => s.Status == (int)Status.HOAT_DONG) on b.CampaignId equals a.Id
                                                   where a.ClientTypeId == ClientType.DL
                                                   select new PriceDetail
                                                   {
@@ -212,7 +212,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.PriceDetail.Where(x => packages_id.Contains(x.ProductServiceId) && x.ServiceType==service_type).ToListAsync();
+                    return await _DbContext.PriceDetails.Where(x => packages_id.Contains(x.ProductServiceId) && x.ServiceType==service_type).ToListAsync();
                    
                 
                 }

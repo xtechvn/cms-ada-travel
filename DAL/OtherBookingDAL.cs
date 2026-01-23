@@ -32,7 +32,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.OtherBooking.FirstOrDefault(x => x.Id == booking_id);
+                    return _DbContext.OtherBookings.FirstOrDefault(x => x.Id == booking_id);
                 }
             }
             catch (Exception ex)
@@ -53,7 +53,7 @@ namespace DAL
                 {
                     if (model.booking.Id <= 0)
                     {
-                        _DbContext.OtherBooking.Add(model.booking);
+                        _DbContext.OtherBookings.Add(model.booking);
                         await _DbContext.SaveChangesAsync();
                         if (model.packages != null && model.packages.Count > 0)
                         {
@@ -82,7 +82,7 @@ namespace DAL
                     else
                     {
                         List<long> keep_ids = new List<long>();
-                        var exists_booking = _DbContext.OtherBooking.FirstOrDefault(x => x.Id == model.booking.Id);
+                        var exists_booking = _DbContext.OtherBookings.FirstOrDefault(x => x.Id == model.booking.Id);
                         if (exists_booking != null && exists_booking.Id > 0)
                         {
                             exists_booking.Amount = model.booking.Amount;
@@ -101,7 +101,7 @@ namespace DAL
                             exists_booking.RoomNo = model.booking.RoomNo;
                             exists_booking.SerialNo = model.booking.SerialNo;
                             exists_booking.ConfNo = model.booking.ConfNo;
-                            _DbContext.OtherBooking.Update(exists_booking);
+                            _DbContext.OtherBookings.Update(exists_booking);
                             await _DbContext.SaveChangesAsync();
                             model.booking.Id = exists_booking.Id;
                             if (model.packages != null && model.packages.Count > 0)
@@ -306,7 +306,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var other = await _DbContext.OtherBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var other = await _DbContext.OtherBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (other != null && other.Id > 0)
                     {
                         var other_packages = await _DbContext.OtherBookingPackages.AsNoTracking().Where(x => x.BookingId == other.Id).ToListAsync();
@@ -317,7 +317,7 @@ namespace DAL
 
                         }
 
-                        _DbContext.OtherBooking.Remove(other);
+                        _DbContext.OtherBookings.Remove(other);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -335,7 +335,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var other = await _DbContext.OtherBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var other = await _DbContext.OtherBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (other != null && other.Id > 0)
                     {
                         if (other.Status == (int)ServiceStatus.Decline)
@@ -343,7 +343,7 @@ namespace DAL
                             other.Status = (int)ServiceStatus.Cancel;
                             other.UpdatedBy = user_id;
                             other.UpdatedDate = DateTime.Now;
-                            _DbContext.OtherBooking.Update(other);
+                            _DbContext.OtherBookings.Update(other);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -362,13 +362,13 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.OtherBooking.AsNoTracking().FirstOrDefaultAsync(s => s.Id == booking_id);
+                    var exists = await _DbContext.OtherBookings.AsNoTracking().FirstOrDefaultAsync(s => s.Id == booking_id);
                     if (exists != null && exists.Id > 0)
                     {
                         exists.UpdatedDate = DateTime.Now;
                         exists.UpdatedBy = user_commit;
                         exists.OperatorId = user_id;
-                        _DbContext.OtherBooking.Update(exists);
+                        _DbContext.OtherBookings.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -386,13 +386,13 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = _DbContext.OtherBooking.FirstOrDefault(x => x.Id == booking_id);
+                    var exists = _DbContext.OtherBookings.FirstOrDefault(x => x.Id == booking_id);
                     if (exists != null && exists.Id > 0)
                     {
                         exists.Price = price;
                         exists.UpdatedBy = user_summit;
                         exists.UpdatedDate = DateTime.Now;
-                        _DbContext.OtherBooking.Update(exists);
+                        _DbContext.OtherBookings.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -425,14 +425,14 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.OtherBooking.AsNoTracking().Where(s => s.Id == booking_id).FirstOrDefaultAsync();
+                    var exists = await _DbContext.OtherBookings.AsNoTracking().Where(s => s.Id == booking_id).FirstOrDefaultAsync();
                     if (exists != null && exists.Id > 0 && exists.Status == (int)ServiceStatus.WaitingExcution)
                     {
                         exists.UpdatedDate = DateTime.Now;
                         exists.UpdatedBy = user_id;
                         exists.OperatorId = user_id;
                         exists.Status = (int)ServiceStatus.OnExcution;
-                        _DbContext.OtherBooking.Update(exists);
+                        _DbContext.OtherBookings.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -450,14 +450,14 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.OtherBooking.AsNoTracking().Where(s => s.Id == booking_id).FirstOrDefaultAsync();
+                    var exists = await _DbContext.OtherBookings.AsNoTracking().Where(s => s.Id == booking_id).FirstOrDefaultAsync();
                     if (exists != null && exists.Id > 0)
                     {
                         exists.StatusOld = exists.Status;
                         exists.UpdatedDate = DateTime.Now;
                         exists.UpdatedBy = user_id;
                         exists.Status = status;
-                        _DbContext.OtherBooking.Update(exists);
+                        _DbContext.OtherBookings.Update(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -492,7 +492,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.OtherBooking.AsNoTracking().Where(x => x.ServiceCode.ToLower().Contains(txt_search.ToLower())).Skip(0).Take(30).ToListAsync();
+                    return await _DbContext.OtherBookings.AsNoTracking().Where(x => x.ServiceCode.ToLower().Contains(txt_search.ToLower())).Skip(0).Take(30).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -507,7 +507,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.OtherBooking.AsNoTracking().Where(x => x.OrderId== OrderId).ToListAsync();
+                    return await _DbContext.OtherBookings.AsNoTracking().Where(x => x.OrderId== OrderId).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -522,10 +522,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var ws_servicetype= _DbContext.AllCode.AsNoTracking().FirstOrDefault(x =>  x.Type == AllCodeType.SERVICE_TYPE_OTHER_MAIN);
+                    var ws_servicetype= _DbContext.AllCodes.AsNoTracking().FirstOrDefault(x =>  x.Type == AllCodeType.SERVICE_TYPE_OTHER_MAIN);
                     if(ws_servicetype!=null && ws_servicetype.Id > 0)
                     {
-                        return await _DbContext.OtherBooking.AsNoTracking().FirstOrDefaultAsync(x => x.Id == booking_id && x.ServiceType == ws_servicetype.CodeValue);
+                        return await _DbContext.OtherBookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == booking_id && x.ServiceType == ws_servicetype.CodeValue);
                     }
                 }
             }
@@ -593,7 +593,7 @@ namespace DAL
                     }
                     else
                     {
-                        _DbContext.OtherBooking.Add(booking);
+                        _DbContext.OtherBookings.Add(booking);
                         await _DbContext.SaveChangesAsync();
                         return booking.Id;
                     }
@@ -619,7 +619,7 @@ namespace DAL
                     }
                     else
                     {
-                        _DbContext.OtherBooking.Update(booking);
+                        _DbContext.OtherBookings.Update(booking);
                         await _DbContext.SaveChangesAsync();
                         return booking.Id;
                     }

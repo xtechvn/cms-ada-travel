@@ -26,7 +26,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.AttachFile.Where(s => s.DataId == DataId && s.Type == Type).ToListAsync();
+                    return await _DbContext.AttachFiles.Where(s => s.DataId == DataId && s.Type == Type).ToListAsync();
                 }
             }
             catch(Exception ex)
@@ -41,7 +41,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var deta = _DbContext.AttachFile.Update(attachFile);
+                    var deta = _DbContext.AttachFiles.Update(attachFile);
                     _DbContext.SaveChanges();
                     return 1;
                 }
@@ -58,7 +58,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = await _DbContext.AttachFile.AsNoTracking().FirstOrDefaultAsync(s => s.Path == attachFile.Path && s.Type ==attachFile.Type && s.DataId==attachFile.DataId && s.Ext==attachFile.Ext);
+                    var data = await _DbContext.AttachFiles.AsNoTracking().FirstOrDefaultAsync(s => s.Path == attachFile.Path && s.Type ==attachFile.Type && s.DataId==attachFile.DataId && s.Ext==attachFile.Ext);
                     if(data!=null && data.Id > 0)
                     {
                         return data.Id;
@@ -78,7 +78,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.AttachFile.AsNoTracking().Where(s => s.DataId == dataId && s.Type == type).ToListAsync();
+                    return await _DbContext.AttachFiles.AsNoTracking().Where(s => s.DataId == dataId && s.Type == type).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -93,7 +93,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists= await _DbContext.AttachFile.Where(s => s.Id==attachFile.Id && s.DataId == attachFile.DataId && s.Type == attachFile.Type && s.Path==attachFile.Path).FirstOrDefaultAsync();
+                    var exists= await _DbContext.AttachFiles.Where(s => s.Id==attachFile.Id && s.DataId == attachFile.DataId && s.Type == attachFile.Type && s.Path==attachFile.Path).FirstOrDefaultAsync();
                     if(exists!=null && exists.Id > 0)
                     {
                         return exists.Id;
@@ -110,7 +110,7 @@ namespace DAL
                             Type=attachFile.Type,
                             UserId=attachFile.UserId
                         };
-                        _DbContext.AttachFile.Add(new_attach);
+                        _DbContext.AttachFiles.Add(new_attach);
 
                         await _DbContext.SaveChangesAsync();
                         return new_attach.Id;
@@ -129,10 +129,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var exists = await _DbContext.AttachFile.Where(s =>  s.DataId == data_id && s.Type == service_type && !remain_ids.Contains(s.Id)).ToListAsync();
+                    var exists = await _DbContext.AttachFiles.Where(s =>  s.DataId == data_id && s.Type == service_type && !remain_ids.Contains(s.Id)).ToListAsync();
                     if (exists != null && exists.Count > 0)
                     {
-                        _DbContext.AttachFile.RemoveRange(exists);
+                        _DbContext.AttachFiles.RemoveRange(exists);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;

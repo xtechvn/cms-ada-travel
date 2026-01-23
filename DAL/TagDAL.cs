@@ -34,7 +34,7 @@ namespace DAL
                             {
                                 foreach (var item in TagList)
                                 {
-                                    var tagItemModel = await _DbContext.Tag.FirstOrDefaultAsync(s => s.TagName == item.Trim());
+                                    var tagItemModel = await _DbContext.Tags.FirstOrDefaultAsync(s => s.TagName == item.Trim());
                                     if (tagItemModel == null)
                                     {
                                         var tagModel = new Tag()
@@ -42,7 +42,7 @@ namespace DAL
                                             TagName = item,
                                             CreatedOn = DateTime.Now
                                         };
-                                        await _DbContext.Tag.AddAsync(tagModel);
+                                        await _DbContext.Tags.AddAsync(tagModel);
                                         await _DbContext.SaveChangesAsync();
                                         ListResult.Add(tagModel.Id);
                                     }
@@ -76,7 +76,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Tag.Where(s => s.TagName.Trim().ToLower().Contains(name.ToLower())).Select(s => s.TagName).Take(10).ToListAsync();
+                    return await _DbContext.Tags.Where(s => s.TagName.Trim().ToLower().Contains(name.ToLower())).Select(s => s.TagName).Take(10).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -91,7 +91,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Tag.Where(s => tag_id_list.Contains(s.Id)).Select(s=>s.TagName).ToListAsync();
+                    return await _DbContext.Tags.Where(s => tag_id_list.Contains(s.Id)).Select(s=>s.TagName).ToListAsync();
                 }
             }
             catch (Exception ex)

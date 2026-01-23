@@ -34,7 +34,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.ContractPay.AsNoTracking().FirstOrDefault(x => x.PayId == contractPayId);
+                    var detail = _DbContext.ContractPays.AsNoTracking().FirstOrDefault(x => x.PayId == contractPayId);
                     if (detail != null)
                     {
                         return detail;
@@ -55,7 +55,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.ContractPay.AsNoTracking().FirstOrDefault(x => x.BillNo == billNo);
+                    var detail = _DbContext.ContractPays.AsNoTracking().FirstOrDefault(x => x.BillNo == billNo);
                     if (detail != null)
                     {
                         return detail;
@@ -77,7 +77,7 @@ namespace DAL
 
         //        using (var _DbContext = new EntityDataContext(_connection))
         //        {
-        //            var detail = _DbContext.ContractPay.Where(x => x.PayId == PayId).ToList();
+        //            var detail = _DbContext.ContractPays.Where(x => x.PayId == PayId).ToList();
         //            if (detail != null)
         //            {
         //                return detail;
@@ -99,7 +99,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.ContractPay.AsNoTracking().FirstOrDefault(x => x.PayId == id);
+                    var detail = _DbContext.ContractPays.AsNoTracking().FirstOrDefault(x => x.PayId == id);
                     if (detail != null)
                     {
                         detail.PayStatus = (int)DepositHistoryConstant.CONTRACT_PAY_STATUS.HUY;
@@ -123,7 +123,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.ContractPay.AsNoTracking().ToList(); ;
+                    return _DbContext.ContractPays.AsNoTracking().ToList(); ;
                 }
             }
             catch (Exception ex)
@@ -140,9 +140,9 @@ namespace DAL
                 var listContractPayDetail = new List<ContractPayDetailViewModel>();
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var contractPayDetails = _DbContext.ContractPayDetail.AsNoTracking().Where(n => dataIds.Contains((int)n.DataId)).OrderByDescending(n => n.CreatedDate).ToList();
+                    var contractPayDetails = _DbContext.ContractPayDetails.AsNoTracking().Where(n => dataIds.Contains((int)n.DataId)).OrderByDescending(n => n.CreatedDate).ToList();
                     var listId = contractPayDetails.Select(n => n.PayId).ToList();
-                    var contractPays = _DbContext.ContractPay.AsNoTracking().Where(n => listId.Contains((int)n.PayId)).OrderByDescending(n => n.CreatedDate).ToList();
+                    var contractPays = _DbContext.ContractPays.AsNoTracking().Where(n => listId.Contains((int)n.PayId)).OrderByDescending(n => n.CreatedDate).ToList();
                     foreach (var item in contractPayDetails)
                     {
                         ContractPayDetailViewModel model = new ContractPayDetailViewModel();
@@ -167,7 +167,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var contractPays = _DbContext.ContractPayDetail.AsNoTracking().Where(x => contractPayIds.Contains(x.PayId)
+                    var contractPays = _DbContext.ContractPayDetails.AsNoTracking().Where(x => contractPayIds.Contains(x.PayId)
                     && (x.ServiceId == 0 || x.ServiceId == null)).ToList();
                     if (contractPays != null)
                     {
@@ -190,7 +190,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var contractPays = _DbContext.ContractPay.AsNoTracking().Where(x => contractPayIds.Contains(x.PayId)).ToList();
+                    var contractPays = _DbContext.ContractPays.AsNoTracking().Where(x => contractPayIds.Contains(x.PayId)).ToList();
                     if (contractPays != null)
                     {
                         return contractPays;
@@ -212,7 +212,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var contractPays = _DbContext.ContractPayDetail.AsNoTracking().Where(x => x.PayId == contractPayId).ToList();
+                    var contractPays = _DbContext.ContractPayDetails.AsNoTracking().Where(x => x.PayId == contractPayId).ToList();
                     if (contractPays != null)
                     {
                         return contractPays;
@@ -234,7 +234,7 @@ namespace DAL
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.ContractPayDetail.AsNoTracking().Where(x => x.DataId != null
+                    var detail = _DbContext.ContractPayDetails.AsNoTracking().Where(x => x.DataId != null
                     && dataIds.Contains(x.DataId.Value) && (x.ServiceId == 0 || x.ServiceId == null)).ToList();
                     if (detail != null)
                     {
@@ -504,12 +504,12 @@ namespace DAL
                         {
                             using (var _DbContext = new EntityDataContext(_connection))
                             {
-                                var entity = _DbContext.ContractPay.Find(id);
-                                _DbContext.ContractPay.Remove(entity);
+                                var entity = _DbContext.ContractPays.Find(id);
+                                _DbContext.ContractPays.Remove(entity);
                                 foreach (var idDetail in detailIds)
                                 {
-                                    var detail = _DbContext.ContractPayDetail.Find(idDetail);
-                                    _DbContext.ContractPayDetail.Remove(detail);
+                                    var detail = _DbContext.ContractPayDetails.Find(idDetail);
+                                    _DbContext.ContractPayDetails.Remove(detail);
                                 }
                                 _DbContext.SaveChanges();
                             }
@@ -581,12 +581,12 @@ namespace DAL
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var entity = _DbContext.ContractPay.Find(id);
-                _DbContext.ContractPay.Remove(entity);
+                var entity = _DbContext.ContractPays.Find(id);
+                _DbContext.ContractPays.Remove(entity);
                 foreach (var idDetail in detailIds)
                 {
-                    var detail = _DbContext.ContractPayDetail.Find(idDetail);
-                    _DbContext.ContractPayDetail.Remove(detail);
+                    var detail = _DbContext.ContractPayDetails.Find(idDetail);
+                    _DbContext.ContractPayDetails.Remove(detail);
                 }
                 _DbContext.SaveChanges();
             }
@@ -598,8 +598,8 @@ namespace DAL
             {
                 foreach (var idDetail in detailIds)
                 {
-                    var detail = _DbContext.ContractPayDetail.Find(idDetail);
-                    _DbContext.ContractPayDetail.Remove(detail);
+                    var detail = _DbContext.ContractPayDetails.Find(idDetail);
+                    _DbContext.ContractPayDetails.Remove(detail);
                 }
                 _DbContext.SaveChanges();
             }
@@ -820,7 +820,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.ContractPay.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year).Count();
+                    return _DbContext.ContractPays.AsNoTracking().Where(x => ((DateTime)x.CreatedDate).Year == DateTime.Now.Year).Count();
                 }
             }
             catch (Exception ex)
@@ -837,7 +837,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var data = _DbContext.ContractPay.AsNoTracking().FirstOrDefault(s => s.BillNo == bill_no);
+                    var data = _DbContext.ContractPays.AsNoTracking().FirstOrDefault(s => s.BillNo == bill_no);
                     return data == null ? "" : data.BillNo;
                 }
             }
@@ -871,7 +871,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.ContractPayDetail.Remove(model);
+                    _DbContext.ContractPayDetails.Remove(model);
                     _DbContext.SaveChanges();
                     return 1;
                 }
@@ -889,7 +889,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = _DbContext.ContractPay.AsNoTracking().Where(s => s.ClientId == clientId && s.IsDelete == false).ToList();
+                    var data = _DbContext.ContractPays.AsNoTracking().Where(s => s.ClientId == clientId && s.IsDelete == false).ToList();
                     return data;
                 }
             }
@@ -906,7 +906,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = _DbContext.ContractPayDetail.AsNoTracking().Where(s => s.PayId == payId &&
+                    var data = _DbContext.ContractPayDetails.AsNoTracking().Where(s => s.PayId == payId &&
                     s.DataId == dataId).FirstOrDefault();
                     return data;
                 }
@@ -1038,9 +1038,9 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var contractPayDetails = _DbContext.ContractPayDetail.AsNoTracking().Where(x => orderId == x.DataId.Value).ToList();
+                    var contractPayDetails = _DbContext.ContractPayDetails.AsNoTracking().Where(x => orderId == x.DataId.Value).ToList();
                     var listPayIds = contractPayDetails.Select(n => n.PayId).ToList();
-                    var contractPays = _DbContext.ContractPay.AsNoTracking().Where(x => listPayIds.Contains(x.PayId)).ToList();
+                    var contractPays = _DbContext.ContractPays.AsNoTracking().Where(x => listPayIds.Contains(x.PayId)).ToList();
                     return contractPays;
                 }
             }
@@ -1175,8 +1175,8 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var paymentRequest = (from request in _DbContext.ContractPay.ToList()
-                                          join detail in _DbContext.ContractPayDetail.ToList() on request.PayId equals detail.PayId
+                    var paymentRequest = (from request in _DbContext.ContractPays.ToList()
+                                          join detail in _DbContext.ContractPayDetails.ToList() on request.PayId equals detail.PayId
                                           where (request.IsDelete == null || request.IsDelete.Value == false)
                                           && (detail.ServiceId != null && dataIds.Contains(detail.ServiceId.Value))
                                           select new PaymentRequestDetailViewModel
@@ -1247,7 +1247,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.PaymentRequest.AsNoTracking().Count();
+                    return  _DbContext.PaymentRequests.AsNoTracking().Count();
                 }
             }
             catch (Exception ex)

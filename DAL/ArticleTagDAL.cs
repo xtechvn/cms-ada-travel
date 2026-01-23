@@ -23,7 +23,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var a= _DbContext.ArticleTag.Where(s => s.ArticleId == articleID).Select(s => s.TagId);
+                    var a= _DbContext.ArticleTags.Where(s => s.ArticleId == articleID).Select(s => s.TagId);
                     if(a!=null && a.Count() > 0)
                     {
                        var json = JsonConvert.SerializeObject(a.Distinct().ToList());

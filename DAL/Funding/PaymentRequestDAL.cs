@@ -30,7 +30,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.PaymentRequest.AsNoTracking().FirstOrDefault(x => x.Id == paymentRequestId);
+                    var detail =  _DbContext.PaymentRequests.AsNoTracking().FirstOrDefault(x => x.Id == paymentRequestId);
                     if (detail != null)
                     {
                         return detail;
@@ -51,7 +51,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.PaymentRequest.AsNoTracking().FirstOrDefault(x => x.PaymentCode == paymentRequestNo);
+                    var detail =  _DbContext.PaymentRequests.AsNoTracking().FirstOrDefault(x => x.PaymentCode == paymentRequestNo);
                     if (detail != null)
                     {
                         return detail;
@@ -72,7 +72,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.PaymentRequest.AsNoTracking().FirstOrDefault(x => x.PaymentCode == paymentCode);
+                    var detail =  _DbContext.PaymentRequests.AsNoTracking().FirstOrDefault(x => x.PaymentCode == paymentCode);
                     if (detail != null)
                     {
                         return detail;
@@ -93,7 +93,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var requests = _DbContext.PaymentRequest.AsNoTracking().Where(x => paymentCodes.Contains(x.PaymentCode)).ToList();
+                    var requests =  _DbContext.PaymentRequests.AsNoTracking().Where(x => paymentCodes.Contains(x.PaymentCode)).ToList();
                     if (requests != null)
                     {
                         return requests;
@@ -467,12 +467,12 @@ namespace DAL.Funding
         {
             using (var _DbContext = new EntityDataContext(_connection))
             {
-                var entity = _DbContext.PaymentRequest.Find(id);
-                _DbContext.PaymentRequest.Remove(entity);
+                var entity =  _DbContext.PaymentRequests.Find(id);
+                 _DbContext.PaymentRequests.Remove(entity);
                 foreach (var idDetail in detailIds)
                 {
-                    var detail = _DbContext.PaymentRequestDetail.Find(idDetail);
-                    _DbContext.PaymentRequestDetail.Remove(detail);
+                    var detail =  _DbContext.PaymentRequestDetails.Find(idDetail);
+                     _DbContext.PaymentRequestDetails.Remove(detail);
                 }
                 _DbContext.SaveChanges();
             }
@@ -606,7 +606,7 @@ namespace DAL.Funding
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var contractPays = _DbContext.PaymentRequestDetail.Where(x => x.RequestId == requestId).ToList();
+                    var contractPays =  _DbContext.PaymentRequestDetails.Where(x => x.RequestId == requestId).ToList();
                     if (contractPays != null)
                     {
                         return contractPays;
@@ -628,7 +628,7 @@ namespace DAL.Funding
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var requests = _DbContext.PaymentRequest.Where(x => ids.Contains(x.Id)).ToList();
+                    var requests =  _DbContext.PaymentRequests.Where(x => ids.Contains(x.Id)).ToList();
                     return requests;
                 }
             }
@@ -645,7 +645,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.PaymentRequestDetail.Remove(model);
+                     _DbContext.PaymentRequestDetails.Remove(model);
                     _DbContext.SaveChanges();
                     return 1;
                 }
@@ -663,7 +663,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.PaymentRequest.Update(model);
+                     _DbContext.PaymentRequests.Update(model);
                     _DbContext.SaveChanges();
                 }
                 return 1;
@@ -681,7 +681,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    _DbContext.PaymentRequestDetail.Update(model);
+                     _DbContext.PaymentRequestDetails.Update(model);
                     _DbContext.SaveChanges();
                 }
                 return 1;
@@ -736,13 +736,13 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    //var requestDetails = _DbContext.PaymentRequestDetail.Where(x => dataIds.Contains(x.OrderId)).ToList();
+                    //var requestDetails =  _DbContext.PaymentRequestDetails.Where(x => dataIds.Contains(x.OrderId)).ToList();
                     //if (requestDetails != null)
                     //{
                     //    return requestDetails;
                     //}
-                    var paymentRequest = (from request in _DbContext.PaymentRequest.ToList()
-                                          join detail in _DbContext.PaymentRequestDetail.ToList() on request.Id equals detail.RequestId
+                    var paymentRequest = (from request in  _DbContext.PaymentRequests.ToList()
+                                          join detail in  _DbContext.PaymentRequestDetails.ToList() on request.Id equals detail.RequestId
                                           where (request.IsDelete == null || request.IsDelete.Value == false)
                                           && (detail.ServiceId != null && dataIds.Contains(detail.ServiceId.Value))
                                           select new PaymentRequestDetailViewModel
@@ -771,7 +771,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var requestDetails = _DbContext.PaymentRequestDetail.Where(x => x.RequestId == paymentRequestId).ToList();
+                    var requestDetails =  _DbContext.PaymentRequestDetails.Where(x => x.RequestId == paymentRequestId).ToList();
                     return requestDetails;
                 }
             }
@@ -804,7 +804,7 @@ namespace DAL.Funding
 
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var contractPays = _DbContext.PaymentRequestDetail.Where(x => requestIds.Contains(x.RequestId)).ToList();
+                    var contractPays =  _DbContext.PaymentRequestDetails.Where(x => requestIds.Contains(x.RequestId)).ToList();
                     if (contractPays != null)
                     {
                         return contractPays;

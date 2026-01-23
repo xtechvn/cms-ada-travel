@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-// Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
-// If you have enabled NRTs for your project, then un-comment the following line:
-// #nullable disable
-
 namespace Entities.Models
 {
     public partial class Hotel
@@ -50,10 +46,8 @@ namespace Entities.Models
         public bool? IsVinHotel { get; set; }
         public string OtherSurcharge { get; set; }
         public bool? IsCommitFund { get; set; }
+        public int? Position { get; set; }
         public bool? IsApartment { get; set; }
         public bool? IsFlashSale { get; set; }
-
-
-        public int? Position { get; set; }
     }
 }

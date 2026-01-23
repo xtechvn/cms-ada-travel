@@ -23,8 +23,8 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var data = await (from _cashback in _DbContext.Cashback.AsNoTracking()
-                                      join a in _DbContext.User.AsNoTracking() on _cashback.UserId equals a.Id into af
+                    var data = await (from _cashback in _DbContext.Cashbacks.AsNoTracking()
+                                      join a in _DbContext.Users.AsNoTracking() on _cashback.UserId equals a.Id into af
                                       from _user in af.DefaultIfEmpty()
                                       where _cashback.OrderId == OrderId
                                       select new CashbackViewModel
@@ -55,7 +55,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Cashback.Where(s => s.OrderId == orderId).SumAsync(s => s.Amount);
+                    return await _DbContext.Cashbacks.Where(s => s.OrderId == orderId).SumAsync(s => s.Amount);
                 }
             }
             catch(Exception ex)

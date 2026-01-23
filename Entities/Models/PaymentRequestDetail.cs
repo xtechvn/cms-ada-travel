@@ -9,12 +9,12 @@ namespace Entities.Models
         public long RequestId { get; set; }
         public long OrderId { get; set; }
         public long? ServiceId { get; set; }
-        public string ServiceCode { get; set; }
         public int? Type { get; set; }
         public decimal Amount { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public string ServiceCode { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
                     // _DbContext.Product.AsNoTracking().FirstOrDefaultAsync(x => x.ProductMapId == id);
-                    var detail = await  _DbContext.Mfauser.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == user_id);
+                    var detail = await  _DbContext.Mfausers.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == user_id);
                     if (detail != null)
                     {
                         return detail;

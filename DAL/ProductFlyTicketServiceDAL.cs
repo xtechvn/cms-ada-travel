@@ -26,7 +26,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var flyTicket = _DbContext.ProductFlyTicketService.FirstOrDefault(x => x.CampaignId == campaign_id);
+                    var flyTicket = _DbContext.ProductFlyTicketServices.FirstOrDefault(x => x.CampaignId == campaign_id);
                     return flyTicket;
                 }
             }
@@ -43,7 +43,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
                     //save Campaign
-                    Campaign campaign = _DbContext.Campaign.FirstOrDefault(n => n.CampaignCode == pricePolicyModel.CampaignCode);
+                    Campaign campaign = _DbContext.Campaigns.FirstOrDefault(n => n.CampaignCode == pricePolicyModel.CampaignCode);
                     if (campaign != null && campaign.Id > 0)
                     {
                         campaign.FromDate = pricePolicyModel.FromDate;
@@ -54,7 +54,7 @@ namespace DAL
                         campaign.UpdateLast = DateTime.Now;
                         campaign.UserUpdateId = userId;
                         campaign.ContractType = (int)ServiceType.PRODUCT_FLY_TICKET;
-                        var result = _DbContext.Campaign.Update(campaign).Entity;
+                        var result = _DbContext.Campaigns.Update(campaign).Entity;
                     }
                     else
                     {
@@ -70,32 +70,32 @@ namespace DAL
                         campaign.UpdateLast = DateTime.Now;
                         campaign.ContractType = (int)ServiceType.PRODUCT_FLY_TICKET;
                         campaign.UserUpdateId = userId;
-                        var result = _DbContext.Campaign.Add(campaign);
+                        var result = _DbContext.Campaigns.Add(campaign);
                     }
                     _DbContext.SaveChanges();
 
                     //save ProductFlyTicketService
-                    var flyTickerService = _DbContext.ProductFlyTicketService.FirstOrDefault(n => n.CampaignId == campaign.Id);
-                    var groupProviderType = _DbContext.AllCode.FirstOrDefault(n => n.Type == AllCodeType.GROUP_PROVIDER_TYPE
+                    var flyTickerService = _DbContext.ProductFlyTicketServices.FirstOrDefault(n => n.CampaignId == campaign.Id);
+                    var groupProviderType = _DbContext.AllCodes.FirstOrDefault(n => n.Type == AllCodeType.GROUP_PROVIDER_TYPE
                     && n.CodeValue == 3);
                     int flyTickerServiceId = 0;
                     if (flyTickerService != null)
                     {
                         flyTickerService.CampaignId = campaign.Id;
                         flyTickerService.GroupProviderType = groupProviderType != null ? groupProviderType.CodeValue.ToString() : "0";
-                        _DbContext.ProductFlyTicketService.Update(flyTickerService);
+                        _DbContext.ProductFlyTicketServices.Update(flyTickerService);
                     }
                     else
                     {
                         flyTickerService = new ProductFlyTicketService();
                         flyTickerService.CampaignId = campaign.Id;
                         flyTickerService.GroupProviderType = groupProviderType != null ? groupProviderType.CodeValue.ToString() : "0";
-                        var result = _DbContext.ProductFlyTicketService.Add(flyTickerService);
+                        var result = _DbContext.ProductFlyTicketServices.Add(flyTickerService);
                     }
                     _DbContext.SaveChanges();
                     flyTickerServiceId = flyTickerService.Id;
                     //save ProductDetail
-                    PriceDetail priceDetail = _DbContext.PriceDetail.FirstOrDefault(n => n.ProductServiceId == flyTickerServiceId);
+                    PriceDetail priceDetail = _DbContext.PriceDetails.FirstOrDefault(n => n.ProductServiceId == flyTickerServiceId);
                     if (priceDetail == null)
                     {
                         priceDetail = new PriceDetail();
@@ -115,11 +115,11 @@ namespace DAL
                         }));
                     if (priceDetail != null)
                     {
-                        _DbContext.PriceDetail.Update(priceDetail);
+                        _DbContext.PriceDetails.Update(priceDetail);
                     }
                     else
                     {
-                        _DbContext.PriceDetail.Add(priceDetail);
+                        _DbContext.PriceDetails.Add(priceDetail);
                     }
                     _DbContext.SaveChanges();
                     return campaign.Id;
@@ -137,7 +137,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var add = _DbContext.ProductFlyTicketService.Update(model);
+                    var add = _DbContext.ProductFlyTicketServices.Update(model);
                     _DbContext.SaveChangesAsync();
                     return model.Id;
                 }

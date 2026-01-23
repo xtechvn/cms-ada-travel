@@ -30,7 +30,7 @@ namespace DAL
                 {
                   //  var detail_room = await _DbContext.HotelBookingRooms.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id).ToListAsync();
                   //  var detail_room_ids = detail_room.Select(x => x.Id);
-                    var detail = await _DbContext.HotelGuest.AsNoTracking().Where(x => x.HotelBookingId==hotel_booking_id).ToListAsync();
+                    var detail = await _DbContext.HotelGuests.AsNoTracking().Where(x => x.HotelBookingId==hotel_booking_id).ToListAsync();
                     return detail;
                 }
             }

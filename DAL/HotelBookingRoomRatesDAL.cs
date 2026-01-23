@@ -111,9 +111,9 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail_room = await _DbContext.HotelBookingRoomsOptional.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id).ToListAsync();
+                    var detail_room = await _DbContext.HotelBookingRoomsOptionals.AsNoTracking().Where(x => x.HotelBookingId == hotel_booking_id).ToListAsync();
                     var detail_room_ids = detail_room.Select(x => x.Id);
-                    var detail = await _DbContext.HotelBookingRoomRatesOptional.AsNoTracking().Where(x => detail_room_ids.Contains(x.HotelBookingRoomOptionalId)).ToListAsync();
+                    var detail = await _DbContext.HotelBookingRoomRatesOptionals.AsNoTracking().Where(x => detail_room_ids.Contains(x.HotelBookingRoomOptionalId)).ToListAsync();
                     return detail;
                 }
             }
@@ -129,7 +129,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = await _DbContext.HotelBookingRoomRatesOptional.AsNoTracking().Where(x => x.Id == id && x.HotelBookingRoomOptionalId == hotel_booking_room_optional_id).FirstOrDefaultAsync();
+                    var detail = await _DbContext.HotelBookingRoomRatesOptionals.AsNoTracking().Where(x => x.Id == id && x.HotelBookingRoomOptionalId == hotel_booking_room_optional_id).FirstOrDefaultAsync();
                     return detail;
                 }
             }

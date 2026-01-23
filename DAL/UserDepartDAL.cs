@@ -23,7 +23,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.UserDepart.Where(s => ids.Contains(s.DepartmentId)).ToListAsync();
+                    return await _DbContext.UserDeparts.Where(s => ids.Contains(s.DepartmentId)).ToListAsync();
                 }
             }
             catch (Exception ex)

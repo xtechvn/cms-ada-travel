@@ -8,6 +8,9 @@ namespace Entities.Models
         public long Id { get; set; }
         public long ClientId { get; set; }
         public string ReceiverName { get; set; }
+        /// <summary>
+        /// Đây là số điện thoại nhận hàng
+        /// </summary>
         public string Phone { get; set; }
         public string ProvinceId { get; set; }
         public string DistrictId { get; set; }

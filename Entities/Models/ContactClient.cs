@@ -7,17 +7,17 @@ namespace Entities.Models
     {
         public ContactClient()
         {
-            Order = new HashSet<Order>();
+            Orders = new HashSet<Order>();
         }
 
         public long Id { get; set; }
         public string Name { get; set; }
         public string Mobile { get; set; }
         public string Email { get; set; }
+        public DateTime CreateDate { get; set; }
         public long ClientId { get; set; }
         public long? OrderId { get; set; }
-        public DateTime CreateDate { get; set; }
 
-        public virtual ICollection<Order> Order { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

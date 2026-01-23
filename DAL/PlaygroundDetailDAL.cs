@@ -99,7 +99,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail =_DbContext.PlaygroundDetail.AsNoTracking().Where(x => x.Code == Code).ToList();
+                    var detail =_DbContext.PlaygroundDetails.AsNoTracking().Where(x => x.Code == Code).ToList();
                    
                     if (detail != null)
                     {
@@ -120,8 +120,8 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail =await _DbContext.PlaygroundDetail.FirstOrDefaultAsync(x => x.Id == id);
-                    _DbContext.PlaygroundDetail.Remove(detail);
+                    var detail =await _DbContext.PlaygroundDetails.FirstOrDefaultAsync(x => x.Id == id);
+                    _DbContext.PlaygroundDetails.Remove(detail);
                     await _DbContext.SaveChangesAsync();
                     if (detail != null)
                     {

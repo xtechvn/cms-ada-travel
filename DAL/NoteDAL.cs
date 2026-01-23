@@ -24,8 +24,8 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await (from n in _DbContext.Note.AsNoTracking()
-                                  join u in _DbContext.User.AsNoTracking() on n.UserId equals u.Id
+                    return await (from n in _DbContext.Notes.AsNoTracking()
+                                  join u in _DbContext.Users.AsNoTracking() on n.UserId equals u.Id
                                   where n.DataId == DataId && n.Type == Type
                                   select new NoteViewModel
                                   {
@@ -60,12 +60,12 @@ namespace DAL
                         {
                             foreach (var item in notes)
                             {
-                                var noteModel = await _DbContext.Note.FirstOrDefaultAsync(s => s.NoteMapId == item.NoteMapId && s.Type == item.Type);
+                                var noteModel = await _DbContext.Notes.FirstOrDefaultAsync(s => s.NoteMapId == item.NoteMapId && s.Type == item.Type);
                                 if (noteModel != null)
                                 {
                                     noteModel.Comment = item.Comment;
                                     noteModel.UpdateTime = item.UpdateTime;
-                                    _DbContext.Note.Update(noteModel);
+                                    _DbContext.Notes.Update(noteModel);
                                     await _DbContext.SaveChangesAsync();
                                 }
                                 else
@@ -88,7 +88,7 @@ namespace DAL
                                     /*
                                     if (item.Type == (int)Constants.NoteType.ORDER_ITEM)
                                     {
-                                        var OrderItemModel = await _DbContext.OrderItem.FirstOrDefaultAsync(s => s.OrderItempMapId == item.OrderItemMapId);
+                                        var OrderItemModel = await _DbContext.OrdersItem.FirstOrDefaultAsync(s => s.OrderItempMapId == item.OrderItemMapId);
                                         if (OrderItemModel != null)
                                         {
                                             noteItem.DataId = OrderItemModel.Id;
@@ -97,7 +97,7 @@ namespace DAL
 
                                     if (noteItem.DataId != 0)
                                     {
-                                        await _DbContext.Note.AddAsync(noteItem);
+                                        await _DbContext.Notes.AddAsync(noteItem);
                                         await _DbContext.SaveChangesAsync();
                                     }
                                 }

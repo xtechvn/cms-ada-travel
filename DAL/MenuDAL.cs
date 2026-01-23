@@ -69,7 +69,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.MenuPermissions.ToListAsync();
+                    return (IEnumerable<MenuPermissions>)await _DbContext.MenuPermissions.ToListAsync();
                 }
             }
             catch
@@ -98,7 +98,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Menu.AsNoTracking().Where(x=>x.Status==0).ToListAsync();
+                    return await _DbContext.Menus.AsNoTracking().Where(x=>x.Status==0).ToListAsync();
                 }
             }
             catch

@@ -34,7 +34,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Tour.Where(x => x.Id == tour_id).FirstOrDefaultAsync();
+                    return await _DbContext.Tours.Where(x => x.Id == tour_id).FirstOrDefaultAsync();
                 }
             }
             catch (Exception ex)
@@ -52,7 +52,7 @@ namespace DAL
                 {
                     List<long> tour_guest_new_id = new List<long>();
                     List<long> tour_packages_new_id = new List<long>();
-                    var order = await _DbContext.Order.AsNoTracking().FirstOrDefaultAsync(x => x.OrderId == model.detail.OrderId);
+                    var order = await _DbContext.Orders.AsNoTracking().FirstOrDefaultAsync(x => x.OrderId == model.detail.OrderId);
                     if (order == null || order.OrderId <= 0)
                     {
                         return -1;
@@ -70,7 +70,7 @@ namespace DAL
                     else if (model.product.IsSelfDesigned == true)
                     {
                         var tour_product_id = UpdateTourProduct(model.product);
-                        var exists_destination_list = _DbContext.TourDestination.AsNoTracking().Where(x => x.TourId == model.product.Id);
+                        var exists_destination_list = _DbContext.TourDestinations.AsNoTracking().Where(x => x.TourId == model.product.Id);
                         if (exists_destination_list != null && exists_destination_list.Count() > 0)
                         {
                             var remain_destination_ids = new List<long>();
@@ -101,7 +101,7 @@ namespace DAL
                             }
                         }
                     }
-                    var exists_tour = await _DbContext.Tour.AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.detail.Id);
+                    var exists_tour = await _DbContext.Tours.AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.detail.Id);
                     if (exists_tour != null && exists_tour.Id > 0)
                     {
                         model.detail.CreatedBy = exists_tour.CreatedBy;
@@ -219,10 +219,10 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var delete_destination = await _DbContext.TourDestination.AsNoTracking().Where(x => x.TourId == tour_id && !remain_destination.Contains(x.Id)).ToListAsync();
+                    var delete_destination = await _DbContext.TourDestinations.AsNoTracking().Where(x => x.TourId == tour_id && !remain_destination.Contains(x.Id)).ToListAsync();
                     if (delete_destination != null && delete_destination.Count > 0)
                     {
-                        _DbContext.TourDestination.RemoveRange(delete_destination);
+                        _DbContext.TourDestinations.RemoveRange(delete_destination);
                         await _DbContext.SaveChangesAsync();
 
                     }
@@ -241,28 +241,28 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var tour = await _DbContext.Tour.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var tour = await _DbContext.Tours.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (tour != null && tour.Id > 0)
                     {
-                        var tour_product = await _DbContext.TourProduct.AsNoTracking().FirstOrDefaultAsync(x => x.Id == tour.TourProductId);
-                        var another_tour_same_tour_product = await _DbContext.Tour.AsNoTracking().FirstOrDefaultAsync(x => x.TourProductId == tour.TourProductId && x.Id != tour.Id);
+                        var tour_product = await _DbContext.TourProducts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == tour.TourProductId);
+                        var another_tour_same_tour_product = await _DbContext.Tours.AsNoTracking().FirstOrDefaultAsync(x => x.TourProductId == tour.TourProductId && x.Id != tour.Id);
                         if (tour_product != null && tour_product.Id > 0 && (tour_product.IsSelfDesigned == null || (bool)tour_product.IsSelfDesigned) && (another_tour_same_tour_product == null || another_tour_same_tour_product.Id <= 0))
                         {
-                            var tour_product_destination = await _DbContext.TourDestination.AsNoTracking().Where(x => x.TourId == tour.TourProductId).ToListAsync();
+                            var tour_product_destination = await _DbContext.TourDestinations.AsNoTracking().Where(x => x.TourId == tour.TourProductId).ToListAsync();
                             if (tour_product_destination != null && tour_product_destination.Count > 0)
                             {
                                 foreach (var destination in tour_product_destination)
                                 {
                                     destination.TourId *= -1;
-                                    _DbContext.TourDestination.Update(destination);
+                                    _DbContext.TourDestinations.Update(destination);
                                     await _DbContext.SaveChangesAsync();
                                 }
-                                //_DbContext.TourDestination.RemoveRange(tour_product_destination);
+                                //_DbContext.TourDestinations.RemoveRange(tour_product_destination);
                                 //await _DbContext.SaveChangesAsync();
                             }
                             tour_product.IsDelete =true;
-                            //_DbContext.TourProduct.Remove(tour_product);
-                            _DbContext.TourProduct.Update(tour_product);
+                            //_DbContext.TourProducts.Remove(tour_product);
+                            _DbContext.TourProducts.Update(tour_product);
                             await _DbContext.SaveChangesAsync();
                         }
 
@@ -292,8 +292,8 @@ namespace DAL
                         }
                         tour.OrderId *= -1;
                         tour.TourProductId *= -1;
-                        _DbContext.Tour.Update(tour);
-                        //_DbContext.Tour.Remove(tour);
+                        _DbContext.Tours.Update(tour);
+                        //_DbContext.Tours.Remove(tour);
                         await _DbContext.SaveChangesAsync();
                     }
                     return 1;
@@ -311,7 +311,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var tour = await _DbContext.Tour.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                    var tour = await _DbContext.Tours.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
                     if (tour != null && tour.Id > 0)
                     {
                         if (tour.Status == (int)ServiceStatus.Decline)
@@ -319,7 +319,7 @@ namespace DAL
                             tour.Status = (int)ServiceStatus.Cancel;
                             tour.UpdatedBy = user_id;
                             tour.UpdatedDate = DateTime.Now;
-                            _DbContext.Tour.Update(tour);
+                            _DbContext.Tours.Update(tour);
                             await _DbContext.SaveChangesAsync();
                         }
                     }
@@ -749,7 +749,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.Tour.AsNoTracking().ToListAsync();
+                    return await _DbContext.Tours.AsNoTracking().ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -1111,7 +1111,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.TourPosition.Where(s => s.TourId == TourId).ToList();
+                    var model = _DbContext.TourPositions.Where(s => s.TourId == TourId).ToList();
 
                     return model;
                 }
@@ -1128,7 +1128,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var model = _DbContext.TourPosition.Where(s => s.Position == Position && s.Status== PositionStatus.HD && s.PositionType== PositionType).ToList();
+                    var model = _DbContext.TourPositions.Where(s => s.Position == Position && s.Status== PositionStatus.HD && s.PositionType== PositionType).ToList();
 
                     return model;
                 }

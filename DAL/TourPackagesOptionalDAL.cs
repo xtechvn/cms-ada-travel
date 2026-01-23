@@ -45,7 +45,7 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var data = _DbContext.TourPackagesOptional.FirstOrDefault(x => x.Id == model[0].TourId);
+                    var data = _DbContext.TourPackagesOptionals.FirstOrDefault(x => x.Id == model[0].TourId);
                     if(data!=null && data.Id > 0)
                     {
                         return -2;
@@ -135,11 +135,11 @@ namespace DAL
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
 
-                    var data = _DbContext.TourPackagesOptional.FirstOrDefault(x => x.Id == Id);
+                    var data = _DbContext.TourPackagesOptionals.FirstOrDefault(x => x.Id == Id);
 
                     if(data!=null && data.Id > 0)
                     {
-                        var data2 = _DbContext.TourPackagesOptional.Remove(data);
+                        var data2 = _DbContext.TourPackagesOptionals.Remove(data);
                         _DbContext.SaveChanges();
                     }
                     return 1;
@@ -160,7 +160,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.TourPackagesOptional.AsNoTracking().Where(s => s.TourId == booking_id).ToListAsync();
+                    return await _DbContext.TourPackagesOptionals.AsNoTracking().Where(s => s.TourId == booking_id).ToListAsync();
 
                 }
             }

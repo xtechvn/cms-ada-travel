@@ -24,7 +24,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.AirPortCode.Where(x => x.Code.ToLower().Contains(txt_search.ToLower()) || x.Description.ToLower().Contains(txt_search.ToLower()) || x.DistrictEn.ToLower().Contains(txt_search.ToLower())).ToListAsync();
+                    return await _DbContext.AirPortCodes.Where(x => x.Code.ToLower().Contains(txt_search.ToLower()) || x.Description.ToLower().Contains(txt_search.ToLower()) || x.DistrictEn.ToLower().Contains(txt_search.ToLower())).ToListAsync();
                 }
             }
             catch (Exception ex)
@@ -39,7 +39,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.AirPortCode.Where(x => x.Code.ToLower()==air_port_code.ToLower()).FirstOrDefaultAsync();
+                    return await _DbContext.AirPortCodes.Where(x => x.Code.ToLower()==air_port_code.ToLower()).FirstOrDefaultAsync();
                 }
             }
             catch (Exception ex)
@@ -55,7 +55,7 @@ namespace DAL
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return await _DbContext.AirPortCode.AsNoTracking().ToListAsync();
+                    return await _DbContext.AirPortCodes.AsNoTracking().ToListAsync();
                 }
             }
             catch (Exception ex)

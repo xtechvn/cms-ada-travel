@@ -34,7 +34,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.PaymentVoucher.AsNoTracking().FirstOrDefault(x => x.Id == PaymentVoucherId);
+                    var detail = _DbContext.PaymentVouchers.AsNoTracking().FirstOrDefault(x => x.Id == PaymentVoucherId);
                     if (detail != null)
                     {
                         return detail;
@@ -55,7 +55,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.PaymentVoucher.AsNoTracking().FirstOrDefault(x => x.PaymentCode == paymentCode);
+                    var detail = _DbContext.PaymentVouchers.AsNoTracking().FirstOrDefault(x => x.PaymentCode == paymentCode);
                     if (detail != null)
                     {
                         return detail;
@@ -76,7 +76,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var detail = _DbContext.PaymentVoucher.AsNoTracking().Where(x => paymentCodes.Contains(x.PaymentCode)).ToList();
+                    var detail = _DbContext.PaymentVouchers.AsNoTracking().Where(x => paymentCodes.Contains(x.PaymentCode)).ToList();
                     return detail;
                 }
             }
@@ -298,7 +298,7 @@ namespace DAL.Funding
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var entities = _DbContext.PaymentRequest.Where(n => requestIds.Contains(n.Id)).ToList();
+                    var entities =  _DbContext.PaymentRequests.Where(n => requestIds.Contains(n.Id)).ToList();
                     foreach (var item in entities)
                     {
                         item.Status = status;

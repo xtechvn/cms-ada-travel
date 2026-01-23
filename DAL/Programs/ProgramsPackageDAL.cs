@@ -90,7 +90,7 @@ namespace DAL.Programs
 
                     if (type2 == 0)
                     {
-                        var data3 = _DbContext.ProgramPackage.Where(s => s.PackageCode.Equals(Model.PackageCode) && s.ProgramId == Model.ProgramId).ToList();
+                        var data3 = _DbContext.ProgramPackages.Where(s => s.PackageCode.Equals(Model.PackageCode) && s.ProgramId == Model.ProgramId).ToList();
                         if (data3.Count > 0)
                         {
                             return -1;
@@ -98,7 +98,7 @@ namespace DAL.Programs
                     }
                     if (type2 == 1)
                     {
-                        var data3 = _DbContext.ProgramPackage.Where(s => s.PackageCode.Equals(Model.PackageCode) && s.RoomType == Model.RoomType && s.ProgramId == Model.ProgramId && s.ApplyDate == Model.ApplyDate).ToList();
+                        var data3 = _DbContext.ProgramPackages.Where(s => s.PackageCode.Equals(Model.PackageCode) && s.RoomType == Model.RoomType && s.ProgramId == Model.ProgramId && s.ApplyDate == Model.ApplyDate).ToList();
                         if (data3.Count > 0)
                         {
                             return -1;
@@ -200,7 +200,7 @@ namespace DAL.Programs
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    var ProgramsBK = _DbContext.ProgramPackage.Where(s => s.Id == id).FirstOrDefault();
+                    var ProgramsBK = _DbContext.ProgramPackages.Where(s => s.Id == id).FirstOrDefault();
                     if (ProgramsBK != null)
                     {
                         return ProgramsBK;
@@ -248,7 +248,7 @@ namespace DAL.Programs
             {
                 using (var _DbContext = new EntityDataContext(_connection))
                 {
-                    return _DbContext.ProgramPackage.Where(s => ids.Contains((long)s.ProgramId)).ToList();
+                    return _DbContext.ProgramPackages.Where(s => ids.Contains((long)s.ProgramId)).ToList();
 
                 }
                 return null;

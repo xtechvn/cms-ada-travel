@@ -7,7 +7,7 @@ namespace Entities.Models
     {
         public Voucher()
         {
-            VoucherLogActivity = new HashSet<VoucherLogActivity>();
+            VoucherLogActivities = new HashSet<VoucherLogActivity>();
         }
 
         public int Id { get; set; }
@@ -39,6 +39,6 @@ namespace Entities.Models
         public int? CampaignId { get; set; }
         public short? ProjectType { get; set; }
 
-        public virtual ICollection<VoucherLogActivity> VoucherLogActivity { get; set; }
+        public virtual ICollection<VoucherLogActivity> VoucherLogActivities { get; set; }
     }
 }
