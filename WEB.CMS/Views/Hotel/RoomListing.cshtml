@@ -17,6 +17,8 @@
                 <th>Số lượng</th>
                 <th>Trạng thái</th>
                 <th>Hiển thị Website</th>
+                <th style="min-width: 140px;">Lock</th>
+
                 <th style="min-width: 100px;">Tác vụ</th>
             </tr>
         </thead>
@@ -43,6 +45,24 @@
                         <td>
                             @((item.IsDisplayWebsite ?? false) ? "Có" : "Không")
                         </td>
+                        <td style="min-width: 200px;">
+                            @if (item.LockId.HasValue)
+                            {
+                                <div>
+                                    <div class="blue" style="font-weight:600">@item.LockId</div>
+                                   
+                                </div>
+                            }
+                            else
+                            {
+                                <div>
+                                    <div class="gray">Chưa gán</div>
+                                   
+                                </div>
+                            }
+                        </td>
+
+
                         <td>
                             <a href="#" class="blue" title="Chỉnh sửa"
                        onclick="hotel_room.OnAddOrUpdate('@item.Id')">

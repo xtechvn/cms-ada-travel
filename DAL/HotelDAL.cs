@@ -582,6 +582,21 @@ namespace DAL
                 throw;
             }
         }
+        public int UpdateRoomLockAdminPwd(int hotelRoomId, long lockId, string pwdEnc)
+        {
+            SqlParameter[] objParam = new SqlParameter[]
+            {
+        new SqlParameter("@HotelRoomId", hotelRoomId),
+        new SqlParameter("@LockId", lockId),
+        new SqlParameter("@PwdEnc", pwdEnc),
+            };
+
+            var dt = _DbWorker.GetDataTable(StoreProcedureConstant.SP_HotelRoom_UpdateLockAdminPwd, objParam);
+            if (dt != null && dt.Rows.Count > 0)
+                return Convert.ToInt32(dt.Rows[0]["Affected"]);
+            return 0;
+        }
+
 
         public int InsertHotelContact(HotelContact model)
         {
@@ -750,6 +765,8 @@ namespace DAL
                 {
                     new SqlParameter("@HotelId", model.HotelId),
                     new SqlParameter("@RoomId", model.RoomId ?? String.Empty),
+                    new SqlParameter("@LockId", model.LockId ),
+
                     new SqlParameter("@Name", model.Name ?? model.Name),
                     new SqlParameter("@Code", model.Code ?? String.Empty),
                     new SqlParameter("@Avatar", model.Avatar ?? (object)DBNull.Value),
@@ -804,7 +821,8 @@ namespace DAL
                      new SqlParameter("@RoomAvatar", model.RoomAvatar ?? (object)DBNull.Value),
                      new SqlParameter("@IsActive", model.IsActive),
                      new SqlParameter("@IsDisplayWebsite", model.IsDisplayWebsite ),
-                     new SqlParameter("@UpdatedBy", model.UpdatedBy)
+                     new SqlParameter("@UpdatedBy", model.UpdatedBy),
+                      new SqlParameter("@LockId", (object)model.LockId ?? DBNull.Value), // << thêm
                 };
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_UpdateHotelRoom, objParam);
@@ -833,6 +851,91 @@ namespace DAL
                 throw;
             }
         }
+        // KHÓA KHÁCH SẠN
+        public DataTable GetAvailableLocksByHotel(int hotelId)
+        {
+            SqlParameter[] objParam = new SqlParameter[]
+            {
+        new SqlParameter("@HotelId", hotelId),
+            };
+            return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetAvailableLocksByHotel, objParam);
+        }
+        public DataTable GetLockByLockId(long lockId)
+        {
+            SqlParameter[] objParam = new SqlParameter[]
+            {
+        new SqlParameter("@LockId", lockId),
+            };
+            return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetLockByLockId, objParam);
+        }
+        public DataTable GetGatewayIdsByHotel(long hotelId)
+        {
+            SqlParameter[] objParam = new SqlParameter[]
+            {
+        new SqlParameter("@HotelId", hotelId)
+            };
+            return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetGatewayIdsByHotel, objParam);
+        }
+        public DataTable GetAssignedLockIdsByHotel(long hotelId)
+        {
+            SqlParameter[] objParam = new SqlParameter[]
+            {
+        new SqlParameter("@HotelId", hotelId)
+            };
+            return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetAssignedLockIdsByHotel, objParam);
+        }
+
+        public DataTable IsLockResetDoneForCheckout(long hotelId, long lockId, DateTime checkoutDate)
+        {
+            SqlParameter[] objParam = new SqlParameter[]
+            {
+            new SqlParameter("@HotelId", hotelId),
+            new SqlParameter("@LockId", lockId),
+            new SqlParameter("@CheckoutDate", checkoutDate.Date)
+            };
+
+            return _DbWorker.GetDataTable(StoreProcedureConstant.SP_IsLockResetDoneForCheckout, objParam);
+        }
+
+        public DataTable InsertLockResetHistory(long hotelId, int roomId, long lockId, long? bookingId,
+            byte resetType, string passwordEnc, bool sentTele, bool sentEmail)
+        {
+            SqlParameter[] objParam = new SqlParameter[]
+            {
+            new SqlParameter("@HotelId", hotelId),
+            new SqlParameter("@RoomId", roomId),
+            new SqlParameter("@LockId", lockId),
+            new SqlParameter("@BookingId", (object)bookingId ?? DBNull.Value),
+            new SqlParameter("@ResetType", resetType),
+            new SqlParameter("@PasswordEnc", passwordEnc ?? (object)DBNull.Value),
+            new SqlParameter("@SentTele", sentTele),
+            new SqlParameter("@SentEmail", sentEmail),
+            };
+
+            return _DbWorker.GetDataTable(StoreProcedureConstant.SP_InsertLockResetHistory, objParam);
+        }
+
+        public DataTable GetLatestCheckedOutBooking(long hotelId)
+        {
+            SqlParameter[] objParam = new SqlParameter[]
+            {
+            new SqlParameter("@HotelId", hotelId),
+            };
+
+            return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetLatestCheckedOutBooking, objParam);
+        }
+
+
+        //public DataTable CheckLockIdUsed(long lockId, int roomId)
+        //{
+        //    SqlParameter[] objParam = new SqlParameter[]
+        //    {
+        //new SqlParameter("@LockId", lockId),
+        //new SqlParameter("@RoomId", roomId),
+        //    };
+        //    return _DbWorker.GetDataTable(StoreProcedureConstant.SP_CheckLockIdUsed, objParam);
+        //}
+
         public List<RoomLedgerSummaryModel> GetRoomLedgerSummaryByHotel(int hotelId)
         {
             var param = new[]

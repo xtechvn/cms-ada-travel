@@ -97,6 +97,13 @@ namespace Entities.ViewModels.Hotel
     {
         public IEnumerable<string> OtherImages { get; set; }
     }
+    public class LockDropdownModel
+    {
+        public long LockId { get; set; }
+        public string LockName { get; set; }
+        public string LockMac { get; set; }
+    }
+
     public class VietQRBankDetail
     {
         public int id { get; set; }

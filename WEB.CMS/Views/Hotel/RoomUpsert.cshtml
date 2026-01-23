@@ -14,10 +14,13 @@
     var package_types = (List<AllCode>)ViewBag.RoomPackageTypes;
 
     var selected_packages = new List<int>();
-    if (!string.IsNullOrEmpty(Model.Extends))
-    {
-        selected_packages = Model.Extends.Split(',').Select(s => int.Parse(s)).ToList();
-    }
+    // if (!string.IsNullOrEmpty(Model.Extends))
+    // {
+    //     selected_packages = Model.Extends.Split(',').Select(s => int.Parse(s)).ToList();
+    // }
+    var locks = ViewBag.AvailableLocks as List<LockDropdownModel>;
+    var hasLock = Model.LockId.HasValue;
+
 }
 <form id="form_hotel_room">
     <div class="tab-default nav nav-tabs">
@@ -104,6 +107,141 @@
                             <input type="text" class="form-control" asp-for="@Model.RoomArea">
                         </div>
                     </div>
+                    <!-- ✅ LOCK DROPDOWN (Redis realtime) -->
+                    <!-- ✅ LOCK DROPDOWN (Redis realtime) -->
+                    <div class="form-group col-6">
+                        <label class="lbl">
+                            Khóa (LockId)
+                            @if (hasLock)
+                            {
+                                <span class="text-warning" style="font-size:12px;">(Đã gán)</span>
+                            }
+                        </label>
+
+                        <div class="wrap_input" style="display:flex; gap:8px; align-items:center;">
+
+                            @* ✅ Render 2 select riêng biệt để tránh C# trong attribute của TagHelper *@
+                            @if (hasLock)
+                            {
+                                <select class="form-control select2_modal"
+                                        asp-for="LockId"
+                                        style="width:100%"
+                                        disabled="disabled">
+                                    <option value="">Chưa gán khóa</option>
+
+                                    @if (locks != null && locks.Any())
+                                    {
+                                        foreach (var l in locks)
+                                        {
+                                            <option value="@l.LockId">
+                                                @l.LockId - @l.LockName (@l.LockMac)
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            }
+                            else
+                            {
+                                <select class="form-control select2_modal"
+                                        asp-for="LockId"
+                                        style="width:100%">
+                                    <option value="">Chưa gán khóa</option>
+
+                                    @if (locks != null && locks.Any())
+                                    {
+                                        foreach (var l in locks)
+                                        {
+                                            <option value="@l.LockId">
+                                                @l.LockId - @l.LockName (@l.LockMac)
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            }
+
+                            <!-- ✅ Refresh -->
+                            @* @if (!hasLock) *@
+                            @* { *@
+                            @*     <button type="button" class="btn btn-default btn-sm" *@
+                            @*             onclick="hotel_room.RefreshLocks(@Model.HotelId, @Model.Id)"> *@
+                            @*         Refresh *@
+                            @*     </button> *@
+                            @* } *@
+                            @* else *@
+                            @* { *@
+                            @*     <button type="button" class="btn btn-default btn-sm" disabled *@
+                            @*             title="Phòng đã có khóa, không thể đổi tại đây"> *@
+                            @*         Refresh *@
+                            @*     </button> *@
+                            @* } *@
+                        </div>
+
+                        @if (hasLock)
+                        {
+                            <small class="gray" style="display:block;margin-top:6px;">
+                                * Phòng đã được gán khóa. Không thể thay đổi tại đây.
+                                Vui lòng liên hệ quản trị để đổi khóa.
+                            </small>
+                        }
+                        else
+                        {
+                            <small class="gray" style="display:block;margin-top:6px;">
+                                * Danh sách khóa lấy realtime từ Redis/TTLock. Refresh để sync lại.
+                            </small>
+                        }
+                    </div>
+
+                    @if (Model.Id > 0 && Model.LockId.HasValue )
+                    {
+                        <div class="form-group col-12">
+                            <div class="border mb20">
+                                <div class="lb-form">Reset mật khẩu khóa</div>
+                                <div class="pd10">
+                                    <div class="row pd10" style="align-items:center;">
+                                        <div class="col-md-3">
+                                            <span>Mã khóa:</span> <b class="blue">@Model.LockId</b>
+                                        </div>
+
+                                        <div class="col-md-9">
+                                            <button type="button" class="btn btn-warning btn-sm"
+                                                    onclick="hotel_room.ToggleResetPassInModal()">
+                                                Reset pass
+                                            </button>
+
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                    onclick="hotel_room.TestCheckoutReset(@Model.Id)">
+                                                Test Checkout Reset
+                                            </button>
+
+
+                                            <div id="reset_pass_panel" class="d-none"
+                                                 style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+                                                <input type="password" id="reset_pass_value" class="form-control"
+                                                       style="max-width:220px; height:32px;"
+                                                       placeholder="Nhập mật khẩu mới" maxlength="20" />
+
+                                                <button type="button" class="btn btn-primary btn-sm"
+                                                        onclick="hotel_room.SaveResetPassInModal(@Model.Id, @Model.LockId)">
+                                                    Lưu
+                                                </button>
+
+
+                                                <button type="button" class="btn btn-default btn-sm"
+                                                        onclick="hotel_room.ToggleResetPassInModal(true)">
+                                                    Hủy
+                                                </button>
+                                            </div>
+
+                                            <small class="gray" style="display:block;margin-top:6px;">
+                                                * Chỉ người có quyền mới thao tác Reset pass.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
                     <div class="form-group col-12">
                         <label class="lbl">Mô tả</label>
                         <div class="wrap_input">
@@ -228,3 +366,56 @@
         </button>
     </div>
 </form>
+
+<script>
+    if (!window.hotel_room) window.hotel_room = {};
+
+    hotel_room.SaveResetPassInModal = function(roomId, lockId) {
+        var pass = $('#reset_pass_value').val();
+
+        if (!roomId || roomId <= 0) { alert('RoomId không hợp lệ'); return; }
+        if (!lockId || lockId <= 0) { alert('LockId không hợp lệ'); return; }
+        if (!pass || pass.length < 4) { alert('Mật khẩu tối thiểu 4 ký tự'); return; }
+
+        $.ajax({
+            url: '/Hotel/ResetRoomLockAdminPass',
+            type: 'POST',
+            data: { roomId: roomId, lockId: lockId, newPassword: pass },
+            success: function(res) {
+                if (res && res.isSuccess) {
+                    alert(res.message || 'Thành công');
+                    $('#reset_pass_panel').addClass('d-none');
+                    $('#reset_pass_value').val('');
+                } else {
+                    alert(res.message || 'Thất bại');
+                }
+            },
+            error: function() { alert('Có lỗi khi gọi server'); }
+        });
+    };
+</script>
+<script>
+    if (!window.hotel_room) window.hotel_room = {};
+
+    hotel_room.TestCheckoutReset = function(roomId) {
+        if (!roomId || roomId <= 0) { alert('RoomId không hợp lệ'); return; }
+
+        if (!confirm('Bạn chắc muốn test reset theo checkout? (Hành động này sẽ đổi pass TTLock)')) return;
+
+        $.ajax({
+            url: '/Hotel/TestCheckoutReset',
+            type: 'POST',
+            data: { roomId: roomId },
+            success: function(res) {
+                if (res && res.isSuccess) {
+                    alert(res.message || 'Thành công');
+                } else {
+                    alert(res.message || 'Thất bại');
+                }
+            },
+            error: function() { alert('Có lỗi khi gọi server'); }
+        });
+    };
+</script>
+
+

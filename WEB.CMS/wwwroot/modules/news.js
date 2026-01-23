@@ -91,23 +91,24 @@ var _news = {
     },
 
     OnSave: function () {
+a        debugger;
 
         // 🧩 Thu thập dữ liệu từ form
         const data = {
-            Id: parseInt($('#Id').val()) || 0, // vẫn lấy Id từ view chính
-            CampaignName: $('#modal-CampaignName').val(), // giờ là Keyword
+            Id: parseInt($('#Id').val()) || 0,
+            CampaignName: ($('#modal-CampaignName').val() || "").trim(),  // keyword chính
             PlatForm: parseInt($('input[name="PlatForm"]:checked', _news.modal_element).val()),
-            AiContent: $('#modal-AiContent').val(),
+            AiContent: ($('#modal-AiContent').val() || "").trim(),        // ngữ cảnh / keyword phụ / yêu cầu thêm
             AimodelType: 1
         };
 
-        // ⚠️ Bắt buộc phải có nội dung
+        // ⚠️ Bắt buộc phải có nội dung (ngữ cảnh / yêu cầu)
         if (!data.AiContent) {
             alert("Bạn cần nhập nội dung để gửi lên AI.");
             return;
         }
 
-        // ⚠️ Nếu là Web hoặc Web2 thì phải có keyword
+        // ⚠️ Nếu là Web hoặc Web2 thì phải có keyword chính
         if ((data.PlatForm === 0 || data.PlatForm === 2) && !data.CampaignName) {
             alert("Bạn cần nhập Keyword cho nền tảng Website.");
             return;
@@ -117,53 +118,89 @@ var _news = {
         let platformText = "web";
         if (data.PlatForm === 1) platformText = "facebook";
         if (data.PlatForm === 2) platformText = "web2";
-        // 🧠 Tạo system_message (gộp keyword hoặc cấu hình riêng của hệ thống)
-        // Ví dụ: "Viết bài cho lĩnh vực du lịch, keyword: tour Hà Nội"
+
+        // 🧠 SYSTEM MESSAGE: quy định vai trò + format output + SEO rules
         const system_message = `
-        Bạn là chuyên gia SEO và Content Marketing trong lĩnh vực du lịch.
-        Hãy viết một bài blog chuẩn SEO cho website Adavigo.com với các thông tin sau:
-        - Từ khóa chính: ${data.CampaignName}
-        - Từ khóa phụ (LSI): [liệt kê 3–5 keyword phụ liên quan]
-        - Độ dài: khoảng 1000–1800 từ
-        - Mục tiêu SEO: Informational
-        - Đối tượng khách hàng: khách du lịch tự túc, nhóm bạn, gia đình
-        - Giọng văn: thân thiện, truyền cảm hứng
-        - Ngôn ngữ: tiếng Việt
+Bạn là chuyên gia SEO & Content Marketing chuyên viết blog cho website doanh nghiệp B2C.
 
-        Cấu trúc bài viết:
-        - Title (chuẩn SEO, dưới 60 ký tự, có từ khóa chính)
-        - Meta description (140–160 ký tự, có keyword, có CTA)
-        - Mở bài (intro)
-        - Thân bài (gồm H2 – H3 logic, chia đoạn, có bullet)
-        - Kết bài (CTA, tổng kết, nhấn mạnh thương hiệu Adavigo)
-        - FAQ (3–5 câu hỏi, trả lời ngắn gọn, thân thiện, schema-friendly)
+Nhiệm vụ:
+Viết 1 bài blog chuẩn SEO cho website Adavigo.com dựa trên keyword người dùng cung cấp.
 
-        Yêu cầu SEO kỹ thuật:
-        - Chèn keyword chính 3–5 lần tự nhiên.
-        - Không đoạn nào dài quá 120 từ.
-        - Heading theo chuẩn H1 – H2 – H3.
-        - Có yếu tố “E-E-A-T” (kinh nghiệm, chuyên môn, độ tin cậy).
+SEO INPUT:
+- Từ khóa chính (MAIN KEYWORD): "${data.CampaignName}"
+- Search Intent: Informational
+- Độ dài toàn bài: 1000–1800 từ
+- Đối tượng: khách lẻ, khách đoàn, khách doanh nghiệp
+- Giọng văn: thân thiện, truyền cảm hứng, dễ đọc
+- Ngôn ngữ: tiếng Việt
 
-       Bạn luôn tuân thủ format output là JSON với cấu trúc:
-        {
-          "title": "string",
-          
-          "lead": "string",
-          "content": "HTML content hoặc markdown",
-          "keywords": ["keyword1", "keyword2"],
-          "img_lst": ["url1", "url2"]
-        }
-        `;
+YÊU CẦU NỘI DUNG:
+- Title: dưới 60 ký tự, BẮT BUỘC chứa keyword chính, hấp dẫn
+- Meta description: 140–160 ký tự, có keyword + CTA
+- Intro: dẫn dắt vấn đề, chèn keyword chính 1 lần tự nhiên
+- Thân bài:
+  - Chia tối đa 3–4 H2
+  - Mỗi H2 có 2–3 H3
+  - Độ dài:
+    + H2: ~300–400 từ
+    + H3: ~150–200 từ
+  - Có bullet points, ví dụ thực tế, gợi ý triển khai
+- Kết bài:
+  - Tổng kết giá trị chính
+  - Nhấn mạnh vai trò & uy tín của Adavigo
+  - CTA: “Liên hệ Adavigo để triển khai ${data.CampaignName} hiệu quả!”
 
-        // 🧠 Ghép nội dung yêu cầu + keyword thành prompt hoàn chỉnh
-        const fullPrompt = `${data.AiContent.trim()}. Keyword trong bài: ${data.CampaignName}`;
+FAQ:
+- 3–5 câu hỏi
+- Trả lời ngắn gọn, tự nhiên, schema-friendly
 
+SEO KỸ THUẬT:
+- Từ khóa chính xuất hiện 3–5 lần, phân bố tự nhiên
+- Tự sinh 3–5 keyword phụ (LSI) liên quan chặt chẽ đến keyword chính
+- Mỗi đoạn không quá 120 từ
+- Heading theo chuẩn H1 – H2 – H3
+- Tối ưu semantic, không nhồi keyword
+- Có yếu tố E-E-A-T (kinh nghiệm thực tế, chuyên môn, lời khuyên đáng tin)
+
+QUY ƯỚC KEYWORD (BẮT BUỘC):
+- "${data.CampaignName}" là TỪ KHÓA CHÍNH DUY NHẤT
+- Nội dung KHÔNG được xây dựng xoay quanh keyword phụ
+- Nếu keyword phụ có chữ "concept" thì chỉ được dùng để hỗ trợ cho hoạt động "${data.CampaignName}"
+- Mọi tiêu đề H2 phải liên quan trực tiếp đến "${data.CampaignName}"
+
+OUTPUT FORMAT (BẮT BUỘC):
+- CHỈ trả về JSON, KHÔNG thêm bất kỳ text nào bên ngoài
+- Content sử dụng HTML
+- Chỉ dùng các thẻ: <h2>, <h3>, <p>, <ul>, <li>, <strong>
+
+Cấu trúc JSON:
+{
+  "title": "string",
+  "lead": "string",
+  "content": "HTML content",
+  "keywords": ["keyword1", "keyword2", "keyword3"],
+  "img_lst": ["suggested image keyword 1", "suggested image keyword 2"]
+}
+`.trim();
+
+        // 🧠 FULL PROMPT: ép rõ keyword chính vs ngữ cảnh (FIX RỜI RẠC)
+        const fullPrompt = `
+Viết bài với TỪ KHÓA CHÍNH là: "${data.CampaignName}"
+
+Yêu cầu:
+- Lấy "${data.CampaignName}" làm trọng tâm xuyên suốt bài viết
+- Nội dung dưới đây chỉ là ngữ cảnh / keyword phụ / yêu cầu thêm, KHÔNG được làm trọng tâm
+- KHÔNG viết kiểu liệt kê outline sơ sài; viết thành bài blog mạch lạc, có dẫn dắt, có ví dụ thực tế
+
+Ngữ cảnh / yêu cầu thêm:
+${data.AiContent}
+`.trim();
 
         // 🔥 Chuẩn bị payload gửi lên n8n
         const payload = {
-            chatInput: fullPrompt, // nội dung chính Câu lệnh Ai
-            platform: platformText,    // web / facebook / web2
-            system_message: system_message // keyword người nhập (phẩy cách nhau)
+            chatInput: fullPrompt,
+            platform: platformText,
+            system_message: system_message
         };
 
         console.log("🚀 Payload gửi lên N8n:", payload);
@@ -178,17 +215,37 @@ var _news = {
             contentType: "application/json",
             data: JSON.stringify(payload),
             success: function (res) {
-               
+                debugger;
                 $('#loadingOverlay').hide();
 
                 console.log("✅ Phản hồi từ N8n:", res);
 
-                // ✅ Gán kết quả AI trả về
-                data.AiResult = res.content;
-                data.Title = res.title || "";
-                data.Lead = res.lead || "";
-                data.Images = (res.img_lst || []).slice(0, 10);
-                data.Keywords = res.keyword || [];
+                // ✅ Một số webhook trả về string JSON -> parse để tránh vỡ
+                let parsed = res;
+                try {
+                    if (typeof res === "string") parsed = JSON.parse(res);
+                    // trường hợp n8n trả { content: "....json...." }
+                    if (parsed && typeof parsed.content === "string") {
+                        const trimmed = parsed.content.trim();
+                        if ((trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+                            (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+                            parsed = JSON.parse(trimmed);
+                        }
+                    }
+                } catch (e) {
+                    // ignore parse error, fallback dùng res như cũ
+                }
+
+                // ✅ Gán kết quả AI trả về (ưu tiên parsed)
+                const ai = parsed || res;
+
+                data.AiResult = ai.content || ai.Content || "";
+                data.Title = ai.title || ai.Title || "";
+                data.Lead = ai.lead || ai.Lead || "";
+                data.Images = (ai.img_lst || ai.Images || []).slice(0, 10);
+
+                // ✅ Fix mapping keywords (tránh res.keyword sai key)
+                data.Keywords = ai.keywords || ai.keyword || [];
 
                 // ✅ Lưu localStorage
                 let aiArticles = JSON.parse(localStorage.getItem('aiArticles') || '[]');
@@ -201,11 +258,12 @@ var _news = {
             },
             error: function (xhr, status, err) {
                 $('#loadingOverlay').hide();
-                console.error("❌ Gửi thất bại:", err);
+                console.error("❌ Gửi thất bại:", err, xhr?.responseText);
                 alert("❌ Lỗi khi gửi lên AI. Kiểm tra console để xem chi tiết.");
             }
         });
     },
+
 
     GetFormData: function ($form) {
         var unindexed_array = $form.serializeArray();

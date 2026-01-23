@@ -226,6 +226,7 @@ var _groupProduct = {
     },
 
     OnSave: function () {
+        debugger
         let valid = true;
         let formvalid = $('#form-group-product');
         formvalid.validate({
@@ -286,6 +287,7 @@ var _groupProduct = {
                     processData: false,
                     contentType: false,
                     success: function (result) {
+                        debugger
                         if (result.isSuccess) {
                             _msgalert.success(result.message);
                             _groupProduct.ReLoadElement(result.modelId, _modelStatus, _modelName, _modelParentId, result.isHasLink);

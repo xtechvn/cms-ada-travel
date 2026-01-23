@@ -6,6 +6,11 @@ namespace Utilities.Contants
 {
     public struct CacheName
     {
+      
+            public const string TTLOCK_GATEWAY_LIST = "TTLOCK_GATEWAY_LIST";
+            public const string TTLOCK_GATEWAY_LOCKS = "TTLOCK_GATEWAY_LOCKS";
+      
+
         public const string PROVIDER_LIST = "PROVIDER_LIST";
         public const string HOTEL_ROOM = "HOTEL_ROOM";
         public const string ROOM_PACKAGES = "ROOM_PACKAGE";

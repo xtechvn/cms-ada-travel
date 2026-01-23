@@ -635,6 +635,49 @@ var hotel_room = {
         });
     },
 
+    ToggleResetPassInModal: function (forceHide) {
+        debugger
+        let panel = $('#reset_pass_panel');
+        let input = $('#reset_pass_value');
+
+        if (forceHide === true) {
+            panel.addClass('d-none');
+            input.val('');
+            return;
+        }
+
+        if (panel.hasClass('d-none')) {
+            panel.removeClass('d-none');
+            setTimeout(function () { input.focus(); }, 50);
+        } else {
+            panel.addClass('d-none');
+            input.val('');
+        }
+    },
+
+    SaveResetPassInModal: function (roomId) {
+        debugger
+        let pass = ($('#reset_pass_value').val() || '').trim();
+        if (pass.length < 4) {
+            _msgalert.error('Mật khẩu tối thiểu 4 ký tự.');
+            return;
+        }
+
+        // Optional: chỉ cho nhập số
+        // if (!/^\d+$/.test(pass)) { _msgalert.error('Mật khẩu chỉ gồm số.'); return; }
+
+        _ajax_caller.post('/Hotel/RoomResetPass', { room_id: roomId, new_password: pass }, function (result) {
+            if (result.isSuccess) {
+                _msgalert.success(result.message);
+                hotel_room.ToggleResetPassInModal(true);
+            } else {
+                _msgalert.error(result.message);
+            }
+        });
+    },
+
+
+
     OnCopyRoom: function (id) {
 
         let title = `Thêm mới phòng`;

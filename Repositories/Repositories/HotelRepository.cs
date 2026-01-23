@@ -2,6 +2,7 @@
 using Entities.ConfigModels;
 using Entities.Models;
 using Entities.ViewModels.Hotel;
+using Entities.ViewModels.Lock;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -9,6 +10,7 @@ using Repositories.IRepositories;
 using Repositories.Repositories.BaseRepos;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +31,120 @@ namespace Repositories.Repositories
         }
 
         #region ShareHolder
+
+        public IEnumerable<LockDropdownModel> GetAvailableLocksByHotel(int hotelId)
+        {
+            var dt = _HotelDAL.GetAvailableLocksByHotel(hotelId);
+            return dt.ToList<LockDropdownModel>();
+        }
+
+        public LockDropdownModel GetLockByLockId(long lockId)
+        {
+            var dt = _HotelDAL.GetLockByLockId(lockId);
+            return dt.ToList<LockDropdownModel>().FirstOrDefault();
+        }
+        public List<long> GetGatewayIdsByHotel(long hotelId)
+        {
+            var dt = _HotelDAL.GetGatewayIdsByHotel(hotelId);
+            var result = new List<long>();
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row["GatewayId"] != DBNull.Value)
+                        result.Add(Convert.ToInt64(row["GatewayId"]));
+                }
+            }
+            return result;
+        }
+        public List<long> GetAssignedLockIdsByHotel(long hotelId)
+        {
+            var dt = _HotelDAL.GetAssignedLockIdsByHotel(hotelId);
+            var result = new List<long>();
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row["LockId"] != DBNull.Value)
+                        result.Add(Convert.ToInt64(row["LockId"]));
+                }
+            }
+            return result;
+        }
+        public bool IsLockResetDoneForCheckout(long hotelId, long lockId, DateTime checkoutDate)
+        {
+            try
+            {
+                var dt = _HotelDAL.IsLockResetDoneForCheckout(hotelId, lockId, checkoutDate);
+                if (dt == null || dt.Rows.Count == 0) return false;
+
+                // dt có cột IsDone (0/1)
+                var val = dt.Rows[0]["IsDone"];
+                if (val == null || val == DBNull.Value) return false;
+
+                return Convert.ToInt32(val) == 1;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("IsLockResetDoneForCheckout: " + ex);
+                return false;
+            }
+        }
+
+        public int InsertLockResetHistory(long hotelId, int roomId, long lockId, long? bookingId,
+            byte resetType, string passwordEnc, bool sentTele, bool sentEmail)
+        {
+            try
+            {
+                var dt = _HotelDAL.InsertLockResetHistory(hotelId, roomId, lockId, bookingId, resetType, passwordEnc, sentTele, sentEmail);
+                if (dt == null || dt.Rows.Count == 0) return 0;
+
+                var val = dt.Rows[0]["Id"];
+                if (val == null || val == DBNull.Value) return 0;
+
+                return Convert.ToInt32(val);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("InsertLockResetHistory: " + ex);
+                return 0;
+            }
+        }
+
+        public CheckoutBookingInfo GetLatestCheckedOutBooking(long hotelId)
+        {
+            try
+            {
+                var dt = _HotelDAL.GetLatestCheckedOutBooking(hotelId);
+                var row = dt?.Rows?.Count > 0 ? dt.Rows[0] : null;
+                if (row == null) return null;
+
+                return new CheckoutBookingInfo
+                {
+                    BookingId = row["BookingId"] == DBNull.Value ? 0 : Convert.ToInt64(row["BookingId"]),
+                    HotelId = row["HotelId"] == DBNull.Value ? 0 : Convert.ToInt64(row["HotelId"]),
+                    ArrivalDate = row["ArrivalDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(row["ArrivalDate"]),
+                    DepartureDate = row["DepartureDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(row["DepartureDate"]),
+                    CheckoutTime = row["CheckoutTime"] == DBNull.Value ? "14:00" : row["CheckoutTime"].ToString(),
+                    CheckoutDateTime = row["CheckoutDateTime"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(row["CheckoutDateTime"]),
+                };
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetLatestCheckedOutBooking: " + ex);
+                return null;
+            }
+        }
+
+
+
+        //public bool CheckLockIdUsed(long lockId, int roomId)
+        //{
+        //    var dt = _HotelDAL.CheckLockIdUsed(lockId, roomId);
+        //    return dt != null && dt.Rows.Count > 0;
+        //}
 
         public int UpsertHotelShareHolder(HotelShareHolder model)
         {
@@ -259,6 +375,7 @@ namespace Repositories.Repositories
                 throw;
             }
         }
+
 
         public IEnumerable<HotelRoomGridModel> GetHotelRoomList(int hotel_id, int page_index, int page_size)
         {
@@ -597,6 +714,19 @@ namespace Repositories.Repositories
                 throw;
             }
         }
+        public int UpdateRoomLockAdminPwd(int hotelRoomId, long lockId, string pwdEnc)
+        {
+            try
+            {
+                return _HotelDAL.UpdateRoomLockAdminPwd(hotelRoomId, lockId, pwdEnc);
+            }
+            catch
+            {
+                throw;
+            }
+           
+        }
+
 
         public int UpsertHotelRoom(HotelRoomUpsertModel model)
         {

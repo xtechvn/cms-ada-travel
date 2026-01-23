@@ -8,6 +8,7 @@ using Repositories.Repositories;
 using WEB.Adavigo.CMS.Service;
 using WEB.Adavigo.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
+using WEB.CMS.Service.Look;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,15 @@ ConfigurationManager configuration = builder.Configuration; // allows both to ac
 //        options.JsonSerializerOptions.PropertyNamingPolicy = null;
 //    });
 // Get config to instance model
+builder.Services.AddHttpClient("TTLock", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["TTLock:BaseUrl"]!);
+});
+builder.Services.AddScoped<LockService>();
+builder.Services.AddScoped<TTLockCacheService>();
+
+
+
 builder.Services.Configure<DataBaseConfig>(configuration.GetSection("DataBaseConfig"));
 builder.Services.Configure<MailConfig>(configuration.GetSection("MailConfig"));
 builder.Services.Configure<DomainConfig>(configuration.GetSection("DomainConfig"));

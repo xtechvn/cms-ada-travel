@@ -154,6 +154,22 @@ namespace Utilities.Contants
         public static string SP_InsertHotelRoom = "SP_InsertHotelRoom";
         public static string SP_UpdateHotelRoom = "SP_UpdateHotelRoom";
         public static string SP_DeleteHotelRoom = "SP_DeleteHotelRoom";
+        public const string SP_GetAvailableLocksByHotel = "SP_GetAvailableLocksByHotel";
+        public const string SP_GetGatewayIdsByHotel = "SP_GetGatewayIdsByHotel";
+        public const string SP_GetAssignedLockIdsByHotel = "SP_GetAssignedLockIdsByHotel";
+        public const string SP_HotelRoom_UpdateLockAdminPwd = "SP_HotelRoom_UpdateLockAdminPwd";
+        public const string SP_IsLockResetDoneForCheckout = "SP_IsLockResetDoneForCheckout";
+        public const string SP_InsertLockResetHistory = "SP_InsertLockResetHistory";
+        public const string SP_GetLatestCheckedOutBooking = "SP_GetLatestCheckedOutBooking";
+
+
+
+        public const string SP_GetLockByLockId = "SP_GetLockByLockId";
+        public const string SP_CheckLockIdUsed = "SP_CheckLockIdUsed";
+
+
+
+
         public static string SP_CheckExistHotelRoomNameUsing = "SP_CheckExistHotelRoomNameUsing";
         public static string SP_CheckExistHotelRoomUsing = "SP_CheckExistHotelRoomUsing";
         public static string SP_CheckExistHotelRoomName = "SP_CheckExistHotelRoomName";

@@ -1,5 +1,6 @@
 ﻿using Entities.Models;
 using Entities.ViewModels.Hotel;
+using Entities.ViewModels.Lock;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,23 @@ namespace Repositories.IRepositories
 {
     public interface IHotelRepository
     {
+        int UpdateRoomLockAdminPwd(int hotelRoomId, long lockId, string pwdEnc);
+        IEnumerable<LockDropdownModel> GetAvailableLocksByHotel(int hotelId);
+        LockDropdownModel GetLockByLockId(long lockId);
+        //bool CheckLockIdUsed(long lockId, int roomId);
+        List<long> GetGatewayIdsByHotel(long hotelId);
+        List<long> GetAssignedLockIdsByHotel(long  hotelId);
+
+        bool IsLockResetDoneForCheckout(long hotelId, long lockId, DateTime checkoutDate);
+        int InsertLockResetHistory(long hotelId, int roomId, long lockId, long? bookingId, byte resetType, string passwordEnc, bool sentTele, bool sentEmail);
+        CheckoutBookingInfo GetLatestCheckedOutBooking(long hotelId);
+
+
+        //===============================================
+
+
+
+
         IEnumerable<HotelGridModel> GetHotelPagingList(HotelFilterModel model);
 
         IEnumerable<HotelViewModel> GetSuggestionHotelList(string name, int size);

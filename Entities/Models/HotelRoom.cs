@@ -37,5 +37,8 @@ namespace Entities.Models
         public decimal TotalCost { get; set; }      // Tổng chi
         public decimal Profit                      // Lợi nhuận
             => TotalMustPay - TotalCost;
+
+        public long? LockId { get; set; }
+
     }
 }
