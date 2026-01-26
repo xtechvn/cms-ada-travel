@@ -91,6 +91,11 @@ namespace Entities.ViewModels.Hotel
     {
         public string BedRoomTypeName { get; set; }
         public int TotalRow { get; set; }
+        public int TotalMustPay { get; set; }
+        public int TotalPaid { get; set; }
+        public int TotalCost { get; set; }
+        public int Profit { get; set; }
+        public int Status { get; set; }
     }
 
     public class HotelRoomUpsertModel : HotelRoom

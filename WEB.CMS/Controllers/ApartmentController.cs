@@ -184,7 +184,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 // ======================================================================
                 // 1. CHỈ XỬ LÝ ĐƠN CĂN HỘ
                 // ======================================================================
-                if (dataOrder.IsApartmentOrder)   // bool flag trên bảng Order
+                if ((bool)dataOrder.IsApartmentOrder)   // bool flag trên bảng Order
                 {
                     int hotelId = dataOrder.HotelId ?? 0;
                     ViewBag.HotelId = hotelId;
@@ -656,7 +656,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 string hotelName = string.Empty;
                 string apartmentAddress = dataOrder.Label; // địa chỉ lưu khi tạo đơn căn hộ
 
-                if (dataOrder.IsApartmentOrder && dataOrder.HotelId.HasValue && dataOrder.HotelId.Value > 0)
+                if ((bool)dataOrder.IsApartmentOrder && dataOrder.HotelId.HasValue && dataOrder.HotelId.Value > 0)
                 {
                     try
                     {
@@ -1151,7 +1151,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 ViewBag.IsApartmentOrder = dataOrder.IsApartmentOrder;
 
                 // 🔹 CASE 1: ĐƠN CĂN HỘ → ưu tiên lấy thông tin Hotel
-                if (dataOrder.IsApartmentOrder && dataOrder.HotelId.HasValue && dataOrder.HotelId.Value > 0)
+                if ((bool)dataOrder.IsApartmentOrder && dataOrder.HotelId.HasValue && dataOrder.HotelId.Value > 0)
                 {
                     try
                     {
