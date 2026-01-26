@@ -2329,7 +2329,17 @@ namespace WEB.Adavigo.CMS.Service
                                     //var model = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.ServiceId));
                                     var hotel = await _hotelBookingRepositories.GetHotelBookingByID(Convert.ToInt32(item.ServiceId));
                                     var datahotelbookingroomextrapackage = await _hotelBookingRoomExtraPackageRepository.Gethotelbookingroomextrapackagebyhotelbookingid(Convert.ToInt32(item.ServiceId));
-
+                                    var LockAdminPwdEnc = "";
+                                    var BookingRoom = await _hotelBookingRoomRepository.GetByHotelBookingID(hotel.Id);
+                                    foreach (var detail_BookingRoom in BookingRoom)
+                                    {
+                                        var detail_room = await _hotelBookingRoomRepository.GetHotelRoomByServiceName(hotel.Id.ToString(), detail_BookingRoom.RoomTypeName);
+                                        if (detail_room != null)
+                                        {
+                                            LockAdminPwdEnc += "Phòng " + detail_room.Id + "-" + detail_room.Name + "(" + detail_room.LockAdminPwdEnc + ").";
+                                        }
+                                    }
+                                    
 
                                     foreach (var item2 in datahotelbookingroomextrapackage)
                                     {
@@ -2563,6 +2573,10 @@ namespace WEB.Adavigo.CMS.Service
                                     "<tr>" +
                                         "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
                                         "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' ><input id='hotelAmount' class='currency'type='text' value=" + item.Hotel[0].TotalAmount.ToString("N0") + "></td>" +
+                                   "</tr>"
+                                   + "<tr>" +
+                                        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Mật khẩu phòng:</td>" +
+                                        "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >"+LockAdminPwdEnc + "</td>" +
                                    "</tr>";
 
                                     Packagesdetail = "<table class='Hotel-row' role='presentation' border='0' width='100%' style='border: 0; border-spacing: 0; text-indent: 0; border-collapse: collapse; font-size: 13px; width: 100%;'>" +
@@ -3158,7 +3172,16 @@ namespace WEB.Adavigo.CMS.Service
                                 datatabledvkhac = "";
                             }
                             var hotedetail = await _hotelBookingRepositories.GetHotelBookingById(Convert.ToInt32(item.HotelId));
-
+                            var LockAdminPwdEnc = "";
+                            var BookingRoom = await _hotelBookingRoomRepository.GetByHotelBookingID(hotel.Id);
+                            foreach (var detail_BookingRoom in BookingRoom)
+                            {
+                                var detail_room = await _hotelBookingRoomRepository.GetHotelRoomByServiceName(hotel.Id.ToString(), detail_BookingRoom.RoomTypeName);
+                                if (detail_room != null)
+                                {
+                                    LockAdminPwdEnc += "Phòng " + detail_room.Id + "-" + detail_room.Name + "(" + detail_room.LockAdminPwdEnc + ").";
+                                }
+                            }
                             note += "<tr>" +
                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Ngày nhận phòng:</td>" +
                                 "<td style='border: 1px solid #999; padding: 5px;' >" + item.hotelArrivalDate + " </td> " +
@@ -3180,7 +3203,11 @@ namespace WEB.Adavigo.CMS.Service
                             "<tr>" +
                                 "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Tổng tiền phòng:</td>" +
                                 "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + item.hotelAmount + "</td>" +
-                           "</tr>";
+                           "</tr>"
+                            + "<tr>" +
+                                        "<td style='border: 1px solid #999; padding: 5px; font-weight: bold;'>Mật khẩu phòng:</td>" +
+                                        "<td colspan= '3' style = 'border: 1px solid #999; padding: 5px;' >" + LockAdminPwdEnc + "</td>" +
+                                   "</tr>"; 
 
 
 
