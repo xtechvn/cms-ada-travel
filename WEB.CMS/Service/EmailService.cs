@@ -2333,7 +2333,7 @@ namespace WEB.Adavigo.CMS.Service
                                     var BookingRoom = await _hotelBookingRoomRepository.GetByHotelBookingID(hotel.Id);
                                     foreach (var detail_BookingRoom in BookingRoom)
                                     {
-                                        var detail_room = await _hotelBookingRoomRepository.GetHotelRoomByServiceName(hotel.Id.ToString(), detail_BookingRoom.RoomTypeName);
+                                        var detail_room = await _hotelBookingRoomRepository.GetHotelRoomByServiceName(hotel.PropertyId.ToString(), detail_BookingRoom.RoomTypeName);
                                         if (detail_room != null)
                                         {
                                             LockAdminPwdEnc += "Phòng " + detail_room.Id + "-" + detail_room.Name + "(" + detail_room.LockAdminPwdEnc + ").";
@@ -3176,7 +3176,7 @@ namespace WEB.Adavigo.CMS.Service
                             var BookingRoom = await _hotelBookingRoomRepository.GetByHotelBookingID(hotel.Id);
                             foreach (var detail_BookingRoom in BookingRoom)
                             {
-                                var detail_room = await _hotelBookingRoomRepository.GetHotelRoomByServiceName(hotel.Id.ToString(), detail_BookingRoom.RoomTypeName);
+                                var detail_room = await _hotelBookingRoomRepository.GetHotelRoomByServiceName(hotel.PropertyId.ToString(), detail_BookingRoom.RoomTypeName);
                                 if (detail_room != null)
                                 {
                                     LockAdminPwdEnc += "Phòng " + detail_room.Id + "-" + detail_room.Name + "(" + detail_room.LockAdminPwdEnc + ").";

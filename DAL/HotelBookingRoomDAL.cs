@@ -123,7 +123,7 @@ namespace DAL
             {
 
                 SqlParameter[] objParam = new SqlParameter[2];
-                objParam[0] = new SqlParameter("@HotelBookingID", HotelBookingId);
+                objParam[0] = new SqlParameter("@HotelId", HotelBookingId);
                 objParam[1] = new SqlParameter("@ServiceName", ServiceName);
                 return dbWorker.GetDataTable(StoreProcedureConstant.SP_GetHotelRoomByServiceName, objParam);
             }
