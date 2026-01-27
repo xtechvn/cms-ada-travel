@@ -46,10 +46,11 @@
                             @((item.IsDisplayWebsite ?? false) ? "Có" : "Không")
                         </td>
                         <td style="min-width: 200px;">
-                            @if (item.LockId.HasValue)
+                            @* @if (item.LockAdminPwdEnc.HasValue) *@
+                            @if (!string.IsNullOrEmpty(item.LockAdminPwdEnc))
                             {
                                 <div>
-                                    <div class="blue" style="font-weight:600">@item.LockId</div>
+                                    <div class="blue" style="font-weight:600">@item.LockAdminPwdEnc</div>
                                    
                                 </div>
                             }

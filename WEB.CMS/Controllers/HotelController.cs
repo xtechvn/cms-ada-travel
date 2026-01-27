@@ -968,7 +968,7 @@ namespace WEB.Adavigo.CMS.Controllers
         {
             try
             {
-                // optional validate: lockId có tồn tại trong redis/api theo hotel không?
+                // ========== VALIDATE LOCK tồn tại + chưa bị gán ==========
                 if (model.LockId.HasValue)
                 {
                     var gatewayIds = _HotelRepository.GetGatewayIdsByHotel(model.HotelId) ?? new List<long>();
@@ -982,53 +982,92 @@ namespace WEB.Adavigo.CMS.Controllers
 
                     if (!lockList.Any(x => x.LockId == model.LockId.Value))
                     {
-                        return new JsonResult(new
+                        return Json(new
                         {
                             isSuccess = false,
                             message = "Khóa không tồn tại (chưa sync từ TTLock). Vui lòng Refresh locks và thử lại."
                         });
                     }
 
-                    // validate: lock đã gán cho phòng khác trong hotel chưa?
+                    // check lock đã gán cho phòng khác chưa (khi tạo mới)
                     var assigned = _HotelRepository.GetAssignedLockIdsByHotel(model.HotelId) ?? new List<long>();
-                    // nếu update chính phòng đó thì bạn cần repo trả lock mapping theo roomId để loại ra (tùy bạn)
                     if (assigned.Contains(model.LockId.Value) && model.Id == 0)
                     {
-                        return new JsonResult(new
-                        {
-                            isSuccess = false,
-                            message = "Khóa này đã được gán cho phòng khác."
-                        });
+                        return Json(new { isSuccess = false, message = "Khóa này đã được gán cho phòng khác." });
                     }
                 }
 
-                var result = _HotelRepository.UpsertHotelRoom(model);
-
-                if (result > 0)
+                // ========== XÁC ĐỊNH MAP LẦN ĐẦU ==========
+                long? oldLockId = null;
+                if (model.Id > 0)
                 {
-                    return new JsonResult(new
-                    {
-                        isSuccess = true,
-                        message = "Lưu thông tin thành công"
-                    });
+                    var oldRoom = _HotelRepository.GetHotelRoomById(model.Id);
+                    if (oldRoom == null)
+                        return Json(new { isSuccess = false, message = "Không tìm thấy phòng để cập nhật" });
+
+                    oldLockId = oldRoom.LockId;
                 }
 
-                return new JsonResult(new
+                bool isFirstTimeMapping =
+                    model.LockId.HasValue &&
+                    (
+                        model.Id == 0                 // tạo mới có lock
+                        || !oldLockId.HasValue        // room cũ chưa có lock
+                    );
+
+                // ========== UPSERT ROOM ==========
+                var result = _HotelRepository.UpsertHotelRoom(model);
+                if (result <= 0)
+                    return Json(new { isSuccess = false, message = "Lưu thông tin thất bại" });
+
+                // Nếu repo trả về roomId mới khi insert thì dùng result, còn nếu Upsert trả số dòng ảnh hưởng
+                // thì phải lấy lại roomId theo Code hoặc cách khác.
+                var roomId = model.Id > 0 ? model.Id : result;
+
+                // ========== MAP LẦN ĐẦU -> TẠO PASS RANDOM + SET TTLOCK + LƯU DB ==========
+                if (isFirstTimeMapping)
                 {
-                    isSuccess = false,
-                    message = "Lưu thông tin thất bại"
-                });
+                    // random pass (ví dụ 6 số)
+                    var newPwd = PasswordHelper.GenerateNumeric(6);
+
+                    // khuyến nghị: set lên TTLock để đồng bộ
+                    var apiRes = await _ttlockService.ChangeAdminKeyboardPwdAsync(model.LockId.Value, newPwd, changeType: 2);
+                    if (apiRes == null || apiRes.errcode != 0)
+                    {
+                        // lúc này Room đã upsert xong nhưng set pass lock fail -> bạn quyết định rollback hay báo lỗi
+                        return Json(new
+                        {
+                            isSuccess = false,
+                            message = $"Lưu phòng OK nhưng set pass TTLock lỗi: {apiRes?.errmsg ?? "unknown"}"
+                        });
+                    }
+
+                    // lưu DB (nên encrypt/protect)
+                    // var enc = _lockSecretProtector.Protect(newPwd);
+                    _HotelRepository.UpdateRoomLockAdminPwd(roomId, model.LockId.Value, newPwd);
+
+                    // optional: log lịch sử
+                    _HotelRepository.InsertLockResetHistory(
+                        hotelId: model.HotelId,
+                        roomId: roomId,
+                        lockId: model.LockId.Value,
+                        bookingId: 0,        // map lần đầu không có booking
+                        resetType: 1,        // 1 = first map (tuỳ bạn định nghĩa)
+                        passwordEnc: newPwd, // nên encrypt
+                        sentTele: false,
+                        sentEmail: false
+                    );
+                }
+
+                return Json(new { isSuccess = true, message = "Lưu thông tin thành công" });
             }
             catch (Exception ex)
             {
-                LogHelper.InsertLogTelegram("RoomUpsert(POST): " + ex.Message);
-                return new JsonResult(new
-                {
-                    isSuccess = false,
-                    message = ex.Message
-                });
+                LogHelper.InsertLogTelegram("RoomUpsert(POST): " + ex);
+                return Json(new { isSuccess = false, message = "Có lỗi xảy ra" });
             }
         }
+
 
         [HttpPost]
         public IActionResult RoomDelete(int id)
