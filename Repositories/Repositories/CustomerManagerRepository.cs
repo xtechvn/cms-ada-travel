@@ -86,7 +86,7 @@ namespace Repositories.Repositories
 
                     };
                     var CreateClient = _ClientDAL.SetUpClient(Client);
-                    var data2 = _ClientDAL.GetClientByClientCode(model.ClientCode);
+                    var data2 = _ClientDAL.GetClientByClientCode(model.ClientCode).Result;
                     if (CreateClient > 0 && CreateClient != 2)
                     {
                         if (data2 != null)
