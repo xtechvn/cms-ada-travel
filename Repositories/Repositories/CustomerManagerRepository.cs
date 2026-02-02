@@ -86,7 +86,7 @@ namespace Repositories.Repositories
 
                     };
                     var CreateClient = _ClientDAL.SetUpClient(Client);
-                    var data2 = _ClientDAL.GetClientByEmail(model.email);
+                    var data2 = _ClientDAL.GetClientByClientCode(model.ClientCode);
                     if (CreateClient > 0 && CreateClient != 2)
                     {
                         if (data2 != null)
@@ -95,7 +95,7 @@ namespace Repositories.Repositories
                             {
                                 ClientId = data2.Id,
                                 ClientType = Convert.ToInt32(model.id_ClientType),
-                                UserName = model.email,
+                                UserName = model.email!=null && model.email!=""? model.email: model.phone,
                                 Password = EncodeHelpers.MD5Hash("123456"),
                                 PasswordBackup = EncodeHelpers.MD5Hash("123456"),
                                 Status = 0,
