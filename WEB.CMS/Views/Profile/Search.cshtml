@@ -1,0 +1,85 @@
+@using Entities.Models
+@using Entities.ViewModels
+@model List<Document>
+
+<div class="table-responsive table-default">
+    <table class="table table-nowrap">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên hồ sơ</th>
+                <th>Danh mục</th>
+                <th>Người tạo</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                var stt = ((int)ViewBag.PageIndex - 1) * (int)ViewBag.PageSize;
+                foreach (var item in Model)
+                {
+                    stt++;
+                    <tr>
+                        <td>@stt</td>
+                        <td>
+                            <a href="/Profile/Detail/@item.Id" class="color-main">@item.DocumentName</a>
+                        </td>
+                        <td>@item.Category</td>
+                        <td>@item.CreatedBy</td>
+                        <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @switch (item.Status)
+                            {
+                                case 0:
+                                    <span class="label label-default">Nháp</span>
+                                    break;
+                                case 1:
+                                    <span class="label label-warning">Chờ duyệt</span>
+                                    break;
+                                case 2:
+                                    <span class="label label-danger" title="@item.Notes">Từ chối</span>
+                                    break;
+                                case 3:
+                                    <span class="label label-success">Hoàn thành</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            @if (item.Status == 0 || item.Status == 2)
+                            {
+                                <a class="cur-pointer mr-2" onclick="_profile.ShowUpsert(@item.Id)">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            }
+                            <a href="/Profile/Detail/@item.Id" class="cur-pointer">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center">Không có dữ liệu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@await Component.InvokeAsync("Paging", new
+{
+    pageModel = new Paging()
+    {
+        TotalRecord = (int)ViewBag.TotalCount,
+        TotalPage = (int)Math.Ceiling((double)ViewBag.TotalCount / (int)ViewBag.PageSize),
+        CurrentPage = (int)ViewBag.PageIndex,
+        PageSize = (int)ViewBag.PageSize,
+        RecordName = "hồ sơ",
+        PageAction = "_profile.OnPaging"
+    }
+})

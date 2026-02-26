@@ -1,0 +1,165 @@
+@using Entities.Models
+@model Document
+
+
+
+<div class="row-main container">
+    <div class="flex row-main-head">
+        <h2 class="title_page">Chi tiết hồ sơ: @Model.DocumentName</h2>
+        <div class="btn-right text-right">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="wrap_bg mb20">
+                <h3 class="title-detail mb15">Xem trước hồ sơ</h3>
+                <div class="preview-pdf" style="height: 800px; border: 1px solid #ccc;">
+                    @{
+                        var filePath = Model.FilePath;
+                        if (!string.IsNullOrEmpty(filePath) && !filePath.Contains("https://static-image.adavigo.com"))
+                        {
+                            if (filePath.StartsWith("/"))
+                            {
+                                filePath = "https://static-image.adavigo.com" + filePath;
+                            }
+                            else
+                            {
+                                filePath = "https://static-image.adavigo.com/" + filePath;
+                            }
+                        }
+                    }
+                    @if (!string.IsNullOrEmpty(filePath))
+                    {
+                        <iframe src="@filePath" style="width: 100%; height: 100%; border: none;"></iframe>
+                    }
+                    else
+                    {
+                        <div class="text-center mt20">Không có file đính kèm</div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="wrap_bg mb20">
+                <h3 class="title-detail mb15">Thông tin chung</h3>
+                <div class="form-default">
+                    <div class="form-group mb10">
+                        <label class="lbl">Tên hồ sơ:</label>
+                        <div class="wrap_input"><strong>@Model.DocumentName</strong></div>
+                    </div>
+                    <div class="form-group mb10">
+                        <label class="lbl">Danh mục:</label>
+                        <div class="wrap_input">@Model.Category</div>
+                    </div>
+                    <div class="form-group mb10">
+                        <label class="lbl">Trạng thái:</label>
+                        <div class="wrap_input">
+                            @switch (Model.Status)
+                            {
+                                case 0: <span class="label label-default">Nháp</span> break;
+                                case 1: <span class="label label-warning">Chờ duyệt</span> break;
+                                case 2: <span class="label label-danger">Từ chối</span> break;
+                                case 3: <span class="label label-success">Hoàn thành</span> break;
+                            }
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="form-group mb10">
+                            <label class="lbl">Ghi chú/Lý do:</label>
+                            <div class="wrap_input red">@Model.Notes</div>
+                        </div>
+                    }
+                    <div class="form-group mb10">
+                        <label class="lbl">Mô tả:</label>
+                        <div class="wrap_input">@Model.Description</div>
+                    </div>
+                    @if (Model.Status == 3 && !string.IsNullOrEmpty(Model.ImgLocation))
+                    {
+                        <div class="form-group mb10">
+                            <label class="lbl">File đã ký:</label>
+                            <div class="wrap_input">
+                                @{
+                                    var imgLocation = Model.ImgLocation;
+                                    if (!string.IsNullOrEmpty(imgLocation) && !imgLocation.Contains("https://static-image.adavigo.com"))
+                                    {
+                                        if (imgLocation.StartsWith("/"))
+                                        {
+                                            imgLocation = "https://static-image.adavigo.com" + imgLocation;
+                                        }
+                                        else
+                                        {
+                                            imgLocation = "https://static-image.adavigo.com/" + imgLocation;
+                                        }
+                                    }
+                                }
+                                <a href="@imgLocation" target="_blank">
+                                    <iframe src="@imgLocation" style="width: 100%; height: 500px; border: 1px solid #ccc; cursor: pointer;"></iframe>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+        .approval-bottom-bar {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            left: 230px;
+            background: #f8f9fa;
+            border-top: 2px solid #ddd;
+            padding: 15px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            text-align: center;
+            transition: 0.2s all;
+        }
+
+        .section-main.full .approval-bottom-bar {
+            left: 66px;
+        }
+
+        .row-main.container {
+            padding-bottom: 100px;
+        }
+
+        @@media (max-width: 768px) {
+            .approval-bottom-bar {
+                left: 0;
+            }
+        }
+    </style>
+    <div class="approval-bottom-bar">
+        <div class="container">
+            <a href="/Profile/Index" class="btn btn-default btn-lg mr-2" style="min-width: 150px;"><i class="fa fa-arrow-left"></i> Quay lại</a>
+
+            @if (Model.Status == 0 || Model.Status == 2)
+            {
+                <button type="button" class="btn btn-warning btn-lg" onclick="_profile.ShowUpsert(@Model.Id)" style="min-width: 150px;">
+                    <i class="fa fa-edit"></i> Chỉnh sửa
+                </button>
+            }
+
+            @if (Model.Status == 1)
+            {
+                <button type="button" class="btn btn-danger btn-lg mr-2" onclick="_profile.Reject(@Model.Id)" style="min-width: 150px;">Từ chối</button>
+                <button type="button" class="btn btn-success btn-lg" onclick="_profile.OnApprove(@Model.Id)" style="min-width: 150px;">Duyệt & Ký tên</button>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="~/modules/profile.js"></script>
+    <script>
+        $(document).ready(function () {
+        });
+    </script>
+}

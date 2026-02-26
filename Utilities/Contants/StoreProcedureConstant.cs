@@ -330,6 +330,12 @@ namespace Utilities.Contants
         public static string SP_GetHotelRoomByServiceName = "SP_GetHotelRoomByServiceName";
 
 
+        //test hồ sơ
+        public static string SP_Documents_GetList = "SP_Documents_GetList";
+        public static string SP_Documents_GetCount = "SP_Documents_GetCount";
+        public static string SP_Documents_Insert = "SP_Documents_Insert";
+        public static string SP_Documents_Update = "SP_Documents_Update";
+        public static string SP_Documents_GetById = "SP_Documents_GetById";
 
         #region vin wonder
         public static string sp_InsertCampaign = "sp_InsertCampaign";

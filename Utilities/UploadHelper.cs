@@ -272,6 +272,46 @@ namespace Utilities
             }
         }
 
+        public static async Task<string> UploadFileByBytes(byte[] fileBytes, string fileName, long dataId, int type)
+        {
+            if (fileBytes == null || fileBytes.Length <= 0)
+                throw new Exception("File không hợp lệ.");
+
+            try
+            {
+                byte[] AESKey = EncryptService.Get_AESKey(EncryptService.ConvertBase64StringToByte(AES_KEY));
+                byte[] AESIV = EncryptService.Get_AESIV(EncryptService.ConvertBase64StringToByte(AES_IV));
+
+                string token = GenerateToken(AESKey, AESIV);
+
+                using var formData = new MultipartFormDataContent();
+
+                formData.Add(new ByteArrayContent(fileBytes), "data", fileName);
+                formData.Add(new StringContent(fileName), "name");
+                formData.Add(new StringContent(dataId.ToString()), "data_id");
+                formData.Add(new StringContent(type.ToString()), "type");
+                formData.Add(new StringContent(token), "token");
+
+                using var httpClient = new HttpClient();
+                var response = await httpClient.PostAsync(apiUploadFile, formData);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                dynamic jsonResponse = JsonConvert.DeserializeObject(responseContent);
+                if (response.IsSuccessStatusCode && jsonResponse?.status == 0)
+                {
+                    return $"https://static-image.adavigo.com{jsonResponse.url}";
+                }
+
+                LogHelper.InsertLogTelegram($"UploadFileByBytes Failed: {jsonResponse?.msg}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram($"UploadFileByBytes Exception: {ex.Message}");
+                throw;
+            }
+        }
+
 
         private static string GenerateToken(byte[] AESKey, byte[] AESIV)
         {

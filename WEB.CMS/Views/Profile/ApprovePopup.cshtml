@@ -1,0 +1,37 @@
+@model Entities.Models.Document
+@{
+    Layout = null;
+}
+
+<div class="form-default">
+    <div class="wrap_bg mb20">
+        <h3 class="title-detail mb15">Xác nhận duyệt & ký tên</h3>
+        <div class="form-group mb10">
+            <label class="lbl">Ký tên vào khung bên dưới:</label>
+            <div class="wrap_input">
+                <div class="signature-wrapper" style="border: 1px solid #ccc; width: 100%; height: 200px; position: relative; background: #fff;">
+                    <canvas id="signature-pad-popup" style="width: 100%; height: 100%; cursor: crosshair;"></canvas>
+                </div>
+                <div class="text-right mt10">
+                    <button type="button" class="btn btn-default btn-sm" id="clear-signature-popup">
+                        <i class="fa fa-eraser"></i> Xóa chữ ký
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group align-right mt20 block">
+        <button type="button" class="btn btn-success btn-lg mr-2" id="btn-approve-signed-popup" style="min-width: 150px;">
+            <i class="fa fa-check"></i> Xác nhận duyệt
+        </button>
+        <button type="button" class="btn btn-default btn-lg" onclick="$.magnificPopup.close();" style="min-width: 150px;">
+            <i class="fa fa-times"></i> Đóng
+        </button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        _profile.InitApprovePopup(@Model.Id);
+    });
+</script>

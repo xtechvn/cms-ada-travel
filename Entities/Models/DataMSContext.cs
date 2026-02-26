@@ -49,6 +49,7 @@ namespace Entities.Models
         public virtual DbSet<DebtGuarantee> DebtGuarantees { get; set; }
         public virtual DbSet<DebtStatistic> DebtStatistics { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<Document> Documents { get; set; }
         public virtual DbSet<DepositHistory> DepositHistories { get; set; }
         public virtual DbSet<District> Districts { get; set; }
         public virtual DbSet<FanpageArticleImage> FanpageArticleImages { get; set; }

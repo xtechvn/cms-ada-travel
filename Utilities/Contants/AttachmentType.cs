@@ -49,6 +49,7 @@ namespace Utilities.Contants
         SetService_WaterSport = 34,
         Addservice_Comment = 35,
         YCC_Comment = 36,
+        Document = 37
 
     }
 }

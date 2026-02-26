@@ -4,6 +4,7 @@ using ENTITIES.ViewModels.AttachFiles;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 using Newtonsoft.Json;
 using Repositories.IRepositories;
 using System;
@@ -16,6 +17,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Utilities;
+using Utilities.Common;
 using Utilities.Contants;
 using WEB.CMS.Models;
 

@@ -1,0 +1,55 @@
+@using Entities.Models
+@using Utilities.Contants
+@model Document
+
+<form id="form-upsert">
+    <input type="hidden" id="Id" value="@Model.Id" />
+    <input type="hidden" id="FilePath" value="@Model.FilePath" />
+
+    <div class="row row_min">
+        <div class="col-12 form-group mb15">
+            <label class="lbl">Tên hồ sơ <sup class="red">*</sup></label>
+            <div class="wrap_input">
+                <input type="text" class="form-control" id="DocumentName" name="DocumentName" value="@Model.DocumentName" required />
+            </div>
+        </div>
+
+        <div class="col-12 form-group mb15">
+            <label class="lbl">Danh mục <sup class="red">*</sup></label>
+            <div class="wrap_input">
+                <select class="form-control" id="Category" name="Category" required>
+                    <option value="">Chọn danh mục</option>
+                    <option value="Hợp đồng" selected="@(Model.Category == "Hợp đồng")">Hợp đồng</option>
+                    <option value="Hồ sơ chi" selected="@(Model.Category == "Hồ sơ chi")">Hồ sơ chi</option>
+                    <option value="Khác" selected="@(Model.Category == "Khác")">Khác</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-12 form-group mb15">
+            <label class="lbl">Mô tả</label>
+            <div class="wrap_input">
+                <textarea class="form-control" id="Description" name="Description" style="height: 90px;">@Model.Description</textarea>
+            </div>
+        </div>
+
+        <div class="col-12 form-group mb15 attachment-addnew">
+            @* _global_function.RenderFileAttachment will be called here *@
+        </div>
+    </div>
+    
+    <div id="validate-file" class="red" style="display:none; margin-bottom: 10px;">Vui lòng đính kèm file PDF</div>
+
+    <div class="text-right mt20 border-top pt-3">
+        <button type="button" class="btn btn-default cancel mr-2" onclick="$.magnificPopup.close();">Bỏ qua</button>
+        <button type="button" class="btn btn-warning mr-2 background-button" onclick="_profile.OnSave(0)">Lưu nháp</button>
+        <button type="button" class="btn btn-success background-button" onclick="_profile.OnSave(1)">Gửi duyệt</button>
+    </div>
+</form>
+
+
+<script>
+    $(document).ready(function () {
+        _profile.InitUpsert($('#Id').val(), @((int)AttachmentType.Document));
+    });
+</script>
