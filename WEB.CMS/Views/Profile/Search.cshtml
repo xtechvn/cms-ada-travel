@@ -31,21 +31,24 @@
                         <td>@item.CreatedBy</td>
                         <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>
-                            @switch (item.Status)
-                            {
-                                case 0:
-                                    <span class="label label-default">Nháp</span>
-                                    break;
-                                case 1:
-                                    <span class="label label-warning">Chờ duyệt</span>
-                                    break;
-                                case 2:
-                                    <span class="label label-danger" title="@item.Notes">Từ chối</span>
-                                    break;
-                                case 3:
-                                    <span class="label label-success">Hoàn thành</span>
-                                    break;
-                            }
+                                @switch (item.Status)
+                                {
+                                    case 0:
+                                        <span class="label label-default">Nháp</span>
+                                        break;
+                                    case 1:
+                                        <span class="label label-warning">Chờ duyệt</span>
+                                        break;
+                                    case 2:
+                                        <span class="label label-danger" title="@item.Notes">Từ chối</span>
+                                        break;
+                                    case 3:
+                                        <span class="label label-success">Đã duyệt</span>
+                                        break;
+                                    case 4:
+                                        <span class="label label-info">Hoàn thành</span>
+                                        break;
+                                }
                         </td>
                         <td>
                             @if (item.Status == 0 || item.Status == 2)

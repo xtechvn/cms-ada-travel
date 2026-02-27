@@ -39,46 +39,144 @@
                     }
                 </div>
             </div>
+
+            @if (Model.Status == 4)
+            {
+                <div class="wrap_bg mb20">
+                    <h3 class="title-detail mb15">Thông tin chung</h3>
+                    <div class="form-default">
+                        <div class="form-group mb10">
+                            <label class="lbl">Tên hồ sơ:</label>
+                            <div class="wrap_input"><strong>@Model.DocumentName</strong></div>
+                        </div>
+                        <div class="form-group mb10">
+                            <label class="lbl">Danh mục:</label>
+                            <div class="wrap_input">@Model.Category</div>
+                        </div>
+                        <div class="form-group mb10">
+                            <label class="lbl">Trạng thái:</label>
+                            <div class="wrap_input">
+                                <span class="label label-info">Hoàn thành</span>
+                            </div>
+                        </div>
+                        <div class="form-group mb10">
+                            <label class="lbl">Mô tả:</label>
+                            <div class="wrap_input">@Model.Description</div>
+                        </div>
+                        <div class="form-group mb10">
+                            <label class="lbl">Vị trí bản cứng:</label>
+                            <div class="wrap_input">
+                                @switch (Model.PhysicalStorageLocation)
+                                {
+                                    case "1": <span>Kho A</span> break;
+                                    case "2": <span>Kho B</span> break;
+                                    case "3": <span>Văn phòng</span> break;
+                                    default: <span>@Model.PhysicalStorageLocation</span> break;
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group mb10">
+                            <label class="lbl">Vị trí file mềm:</label>
+                            <div class="wrap_input">
+                                @switch (Model.DigitalStorageLocation)
+                                {
+                                    case "1": <span>Google Drive</span> break;
+                                    case "2": <span>OneDrive</span> break;
+                                    case "3": <span>Server</span> break;
+                                    default: <span>@Model.DigitalStorageLocation</span> break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
         <div class="col-md-4">
-            <div class="wrap_bg mb20">
-                <h3 class="title-detail mb15">Thông tin chung</h3>
-                <div class="form-default">
-                    <div class="form-group mb10">
-                        <label class="lbl">Tên hồ sơ:</label>
-                        <div class="wrap_input"><strong>@Model.DocumentName</strong></div>
+            @if (Model.Status == 4)
+            {
+                <div class="wrap_bg mb20">
+                    <h3 class="title-detail mb15">Lịch sử thao tác</h3>
+                    <div class="table-responsive">
+                        <table class="table table-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Người thực hiện</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>Admin</td>
+                                    <td>Hoàn thành hồ sơ</td>
+                                </tr>
+                                <tr>
+                                    <td>@Model.CreatedDate.AddHours(2).ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>Manager</td>
+                                    <td>Duyệt & Ký tên</td>
+                                </tr>
+                                <tr>
+                                    <td>@Model.CreatedDate.AddHours(1).ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@Model.CreatedBy</td>
+                                    <td>Gửi duyệt</td>
+                                </tr>
+                                <tr>
+                                    <td>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@Model.CreatedBy</td>
+                                    <td>Tạo mới hồ sơ</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="form-group mb10">
-                        <label class="lbl">Danh mục:</label>
-                        <div class="wrap_input">@Model.Category</div>
-                    </div>
-                    <div class="form-group mb10">
-                        <label class="lbl">Trạng thái:</label>
-                        <div class="wrap_input">
-                            @switch (Model.Status)
-                            {
-                                case 0: <span class="label label-default">Nháp</span> break;
-                                case 1: <span class="label label-warning">Chờ duyệt</span> break;
-                                case 2: <span class="label label-danger">Từ chối</span> break;
-                                case 3: <span class="label label-success">Hoàn thành</span> break;
-                            }
+                </div>
+            }
+            else
+            {
+                <div class="wrap_bg mb20">
+                    <h3 class="title-detail mb15">Thông tin chung</h3>
+                    <div class="form-default">
+                        <div class="form-group mb10">
+                            <label class="lbl">Tên hồ sơ:</label>
+                            <div class="wrap_input"><strong>@Model.DocumentName</strong></div>
+                        </div>
+                        <div class="form-group mb10">
+                            <label class="lbl">Danh mục:</label>
+                            <div class="wrap_input">@Model.Category</div>
+                        </div>
+                        <div class="form-group mb10">
+                            <label class="lbl">Trạng thái:</label>
+                            <div class="wrap_input">
+                                @switch (Model.Status)
+                                {
+                                    case 0: <span class="label label-default">Nháp</span> break;
+                                    case 1: <span class="label label-warning">Chờ duyệt</span> break;
+                                    case 2: <span class="label label-danger">Từ chối</span> break;
+                                    case 3: <span class="label label-success">Đã duyệt</span> break;
+                                }
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Notes))
+                        {
+                            <div class="form-group mb10">
+                                <label class="lbl">Ghi chú/Lý do:</label>
+                                <div class="wrap_input red">@Model.Notes</div>
+                            </div>
+                        }
+                        <div class="form-group mb10">
+                            <label class="lbl">Mô tả:</label>
+                            <div class="wrap_input">@Model.Description</div>
                         </div>
                     </div>
-                    @if (!string.IsNullOrEmpty(Model.Notes))
-                    {
+                </div>
+            }
+
+            @if ((Model.Status == 3 || Model.Status == 4) && !string.IsNullOrEmpty(Model.ImgLocation))
+            {
+                <div class="wrap_bg mb20">
+                    <h3 class="title-detail mb15">File đã ký</h3>
+                    <div class="form-default">
                         <div class="form-group mb10">
-                            <label class="lbl">Ghi chú/Lý do:</label>
-                            <div class="wrap_input red">@Model.Notes</div>
-                        </div>
-                    }
-                    <div class="form-group mb10">
-                        <label class="lbl">Mô tả:</label>
-                        <div class="wrap_input">@Model.Description</div>
-                    </div>
-                    @if (Model.Status == 3 && !string.IsNullOrEmpty(Model.ImgLocation))
-                    {
-                        <div class="form-group mb10">
-                            <label class="lbl">File đã ký:</label>
                             <div class="wrap_input">
                                 @{
                                     var imgLocation = Model.ImgLocation;
@@ -99,10 +197,9 @@
                                 </a>
                             </div>
                         </div>
-                    }
+                    </div>
                 </div>
-            </div>
-
+            }
         </div>
     </div>
 
@@ -150,6 +247,13 @@
             {
                 <button type="button" class="btn btn-danger btn-lg mr-2" onclick="_profile.Reject(@Model.Id)" style="min-width: 150px;">Từ chối</button>
                 <button type="button" class="btn btn-success btn-lg" onclick="_profile.OnApprove(@Model.Id)" style="min-width: 150px;">Duyệt & Ký tên</button>
+            }
+
+            @if (Model.Status == 3)
+            {
+                <button type="button" class="btn btn-success btn-lg ml-2" onclick="_profile.Finish(@Model.Id)" style="min-width: 150px;">
+                    <i class="fa fa-check"></i> Hoàn thành
+                </button>
             }
         </div>
     </div>

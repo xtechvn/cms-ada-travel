@@ -149,6 +149,34 @@ var _profile = {
             }
         });
     },
+    Finish: function (id) {
+        let title = "Hoàn thành hồ sơ";
+        let url = '/Profile/FinishPopup';
+        var param = {
+            id: id
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    InitFinishPopup: function (id) {
+        $('#btn-finish-submit-popup').on('click', function () {
+            let physicalLocation = $('#PhysicalStorageLocation').val();
+            let digitalLocation = $('#DigitalStorageLocation').val();
+
+            _profile.FinishSubmit(id, physicalLocation, digitalLocation);
+        });
+    },
+    FinishSubmit: function (id, physicalLocation, digitalLocation) {
+        _global_function.AddLoading();
+        _ajax_caller.post("/Profile/Finish", { id: id, physicalLocation: physicalLocation, digitalLocation: digitalLocation }, function (result) {
+            _global_function.RemoveLoading();
+            if (result.status == 0) {
+                _msgalert.success(result.msg);
+                location.reload();
+            } else {
+                _msgalert.error(result.msg);
+            }
+        });
+    },
     ClosePopup: function () {
         $.magnificPopup.close();
     }

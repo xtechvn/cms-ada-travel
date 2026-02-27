@@ -26,7 +26,7 @@ namespace Utilities
                 // Perform the merge using iText
                 pdfBytes = RebuildPdf(pdfBytes);
 
-                return AddImageToPdf(pdfBytes, signatureBytes, 400, 700, 150, 75); 
+                return AddImageToPdf(pdfBytes, signatureBytes, 350, 100, 150, 75); 
                
             }
             catch (Exception ex)
@@ -36,38 +36,31 @@ namespace Utilities
             }
         }
 
-        public static byte[] AddImageToPdf(byte[] pdfBytes, byte[] imageBytes,
-                          float x, float y, float width, float height)
+        public static byte[] AddImageToPdf(byte[] pdfBytes, byte[] imageBytes,float x, float y, float width, float height)
         {
             try
             {
                 using var input = new MemoryStream(pdfBytes);
                 using var output = new MemoryStream();
 
-                var readerProperties = new iText.Kernel.Pdf.ReaderProperties();
-
-                var reader = new iText.Kernel.Pdf.PdfReader(input, readerProperties);
-
-                // QUAN TR?NG: fix Unknown PdfException
+                var reader = new PdfReader(input);
                 reader.SetUnethicalReading(true);
 
-                var writer = new iText.Kernel.Pdf.PdfWriter(output,
-                    new iText.Kernel.Pdf.WriterProperties()
-                        .SetFullCompressionMode(true));
+                var writer = new PdfWriter(output);
 
-                using var pdf = new iText.Kernel.Pdf.PdfDocument(reader, writer);
+                using var pdf = new PdfDocument(reader, writer);
 
-                var document = new iText.Layout.Document(pdf);
+                var page = pdf.GetPage(1);
+
+                var pdfCanvas = new iText.Kernel.Pdf.Canvas.PdfCanvas(page);
 
                 var imageData = iText.IO.Image.ImageDataFactory.Create(imageBytes);
 
-                var image = new iText.Layout.Element.Image(imageData)
-                    .SetFixedPosition(1, x, y)
-                    .ScaleToFit(width, height);
+                var rect = new iText.Kernel.Geom.Rectangle(x, y, width, height);
 
-                document.Add(image);
+                pdfCanvas.AddImageFittedIntoRectangle(imageData, rect, false);
 
-                document.Close();
+                pdf.Close();
 
                 return output.ToArray();
             }

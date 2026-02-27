@@ -207,8 +207,38 @@ namespace WEB.CMS.Controllers
         [HttpPost]
         public async Task<IActionResult> RejectPopup(int id)
         {
-            var model =await _documentRepository.GetById(id);
+            var model = await _documentRepository.GetById(id);
             return PartialView(model);
+        }
+
+        [CustomAuthorize]
+        [HttpPost]
+        public async Task<IActionResult> FinishPopup(int id)
+        {
+            var model = await _documentRepository.GetById(id);
+            return PartialView(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Finish(int id, string physicalLocation, string digitalLocation)
+        {
+            try
+            {
+                var doc = await _documentRepository.GetById(id);
+                if (doc != null)
+                {
+                    doc.Status = 4;
+                    doc.PhysicalStorageLocation = physicalLocation;
+                    doc.DigitalStorageLocation = digitalLocation;
+                    var result = await _documentRepository.Update(doc);
+                    return Ok(new { status = (int)ResponseType.SUCCESS, msg = "Hoàn thành hồ sơ thành công" });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Finish - ProfileController: " + ex);
+            }
+            return Ok(new { status = (int)ResponseType.FAILED, msg = "Thất bại" });
         }
     }
 }
