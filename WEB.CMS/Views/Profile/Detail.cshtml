@@ -11,7 +11,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-9">
             <div class="wrap_bg mb20">
                 <h3 class="title-detail mb15">Xem trước hồ sơ</h3>
                 <div class="preview-pdf" style="height: 800px; border: 1px solid #ccc;">
@@ -91,7 +91,7 @@
                 </div>
             }
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             @if (Model.Status == 4)
             {
                 <div class="wrap_bg mb20">
@@ -107,31 +107,51 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td>Admin</td>
-                                    <td>Hoàn thành hồ sơ</td>
-                                </tr>
-                                <tr>
-                                    <td>@Model.CreatedDate.AddHours(2).ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td>Manager</td>
-                                    <td>Duyệt & Ký tên</td>
-                                </tr>
-                                <tr>
-                                    <td>@Model.CreatedDate.AddHours(1).ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td>@Model.CreatedBy</td>
-                                    <td>Gửi duyệt</td>
-                                </tr>
-                                <tr>
                                     <td>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
                                     <td>@Model.CreatedBy</td>
                                     <td>Tạo mới hồ sơ</td>
                                 </tr>
+                                @if (Model.Status >= 1)
+                                {
+                                    <tr>
+                                        <td>@Model.CreatedDate.AddMinutes(5).ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@Model.CreatedBy</td>
+                                        <td>Gửi duyệt</td>
+                                    </tr>
+                                }
+                                @if (Model.Status >= 1)
+                                {
+                                    <tr class="bg-light-danger">
+                                        <td>@Model.CreatedDate.AddHours(1).ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>Manager</td>
+                                        <td>
+                                            <div class="red"><strong>Từ chối</strong></div>
+                                            <div class="small text-muted">Lý do: @Model.Notes</div>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (Model.Status >= 3)
+                                {
+                                    <tr>
+                                        <td>@Model.CreatedDate.AddHours(2).ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>Manager</td>
+                                        <td>Duyệt & Ký tên</td>
+                                    </tr>
+                                }
+                                @if (Model.Status == 4)
+                                {
+                                    <tr>
+                                        <td>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>Admin</td>
+                                        <td>Hoàn thành hồ sơ</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
                 </div>
             }
-            else
+            @if (Model.Status < 4)
             {
                 <div class="wrap_bg mb20">
                     <h3 class="title-detail mb15">Thông tin chung</h3>
