@@ -1242,7 +1242,7 @@ namespace WEB.Adavigo.CMS.Controllers
                             {
                                 var data = await _contractPayRepository.GetContractPayByOrderId(OrderId);
                                 var sumAmonunt = data.Sum(a => a.AmountPay);
-                                if (sumAmonunt != order.Amount)
+                                if (sumAmonunt < order.Amount)
                                 {
                                     sst_status = (int)ResponseType.FAILED;
                                     smg = "Đơn hàng chưa được thanh toán đủ";

@@ -14,7 +14,7 @@ namespace Entities.Models
         public string BankName { get; set; }
         public string OrderNo { get; set; }
         //public DateTime? ReceiveTime { get; set; }
-        [BsonDateTimeOptions(Kind = DateTimeKind.Local)] public DateTime? ReceiveTime { get; set; }
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)] public DateTime? ReceiveTime { get; set; }
         [BsonIgnore]
         public string ReceiveTimeStr
         {
@@ -29,7 +29,7 @@ namespace Entities.Models
         }
         public string MessageContent { get; set; }
         //public DateTime? CreatedTime { get; set; }
-        [BsonDateTimeOptions(Kind = DateTimeKind.Local)] public DateTime? CreatedTime { get; set; }
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)] public DateTime? CreatedTime { get; set; }
         [BsonIgnore]
         public string CreatedTimeStr
         {

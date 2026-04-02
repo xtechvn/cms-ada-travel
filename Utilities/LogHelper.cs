@@ -61,7 +61,7 @@ namespace Utilities
             var rs = 1;
             try
             {
-                InsertLogDiscord(message);
+      
                 LoadConfig();
                 TelegramBotClient alertMsgBot = new TelegramBotClient(botToken);
                 var rs_push=  alertMsgBot.SendTextMessageAsync(group_Id, "[" + enviromment + "-"+CompanyType+"] - " + message).Result;
