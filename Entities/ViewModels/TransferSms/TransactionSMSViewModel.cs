@@ -9,7 +9,7 @@ namespace Entities.ViewModels.TransferSms
     {
         public string BankId { get; set; }
         public string AccountNumber { get; set; }
-        public double SumAmount { get; set; }
+        public double SumAmount { get; set; } = 0;
         public string logo { get; set; }
         public int BankTransferType { get; set; }
    

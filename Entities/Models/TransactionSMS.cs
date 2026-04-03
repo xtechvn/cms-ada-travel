@@ -10,7 +10,7 @@ namespace Entities.Models
     public class TransactionSMS
     {
         public ObjectId _id { get; set; }
-        public double Amount { get; set; }
+        public double Amount { get; set; } = 0;
         public string BankName { get; set; }
         public string OrderNo { get; set; }
         //public DateTime? ReceiveTime { get; set; }

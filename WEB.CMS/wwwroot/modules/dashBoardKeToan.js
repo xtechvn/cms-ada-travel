@@ -117,9 +117,10 @@ let _dashBoard = {
     },
     GetPaymentVoucherByDate: function () {
         $('#revenuChart').hide();
-        var newdate = new Date();
+        var newdate = new Date(_global_function.ParseDateTostring(new Date().toLocaleDateString("en-GB")));
         newdate.setDate(01);
         newdate.setMonth(00);
+
         var searchModel = {
             FromDateStr: newdate.toLocaleDateString("en-GB"),
             ToDateStr: new Date().toLocaleDateString("en-GB"),
@@ -133,6 +134,30 @@ let _dashBoard = {
             var amountTransaction = [];
             data.forEach(function (item) {
                 date.push('Tháng '+ item.month);
+                amount.push(item.amount);
+                amountTransaction.push(item.amountTransaction);
+                Balance.push(item.balance);
+            });
+            chart.LoadChartRevenu(date, amountTransaction, amount, Balance);
+
+        });
+    },
+    GetPaymentVoucherByDate2: function () {
+        $('#revenuChart').hide();
+     
+        var searchModel = {
+            FromDateStr: $('#fromDate').val(),
+            ToDateStr: $('#toDate').val(),
+        };
+        _dashBoard.GetListPaymentVoucherByDate(searchModel, function (data) {
+
+            $('#revenuChart').show();
+            var date = [];
+            var amount = [];
+            var Balance = [];
+            var amountTransaction = [];
+            data.forEach(function (item) {
+                date.push('Tháng ' + item.month);
                 amount.push(item.amount);
                 amountTransaction.push(item.amountTransaction);
                 Balance.push(item.balance);
@@ -441,4 +466,16 @@ $('.btn_change_chart').click(function () {
 
 $(document).ready(function () {
     _dashBoard.Init();
+    var today = new Date()
+    let yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1;
+    let dd = today.getDate();
+    const toDateFormat = (dd < 10 ? '0' + dd : dd) + '/' + (mm < 10 ? '0' + mm : mm) + '/' + yyyy;
+    $('#toDate').val(toDateFormat)
+    today.setDate(today.getDate() - 3);
+    yyyy = today.getFullYear();
+    mm = today.getMonth() + 1;
+    dd = today.getDate();
+    const fromDateFormat = (dd < 10 ? '0' + dd : dd) + '/' + (mm < 10 ? '0' + mm : mm) + '/' + yyyy;
+    $('#fromDate').val(fromDateFormat)
 });

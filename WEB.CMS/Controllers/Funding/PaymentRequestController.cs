@@ -607,7 +607,11 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                     ViewBag.KTT_DUYET_YEU_CAU_CHI = 1;
                 bool isHeadOfAccountant = _userRepository.IsHeadOfAccountant(current_user.Id);
                 if (isHeadOfAccountant)
+                {
                     ViewBag.KTT_DUYET_YEU_CAU_CHI = 1;
+                    ViewBag.isAdmin = isAdmin;
+                }
+
 
                 bool IsAccountant = _userRepository.IsAccountant(current_user.Id);
                 if (IsAccountant)
@@ -1248,7 +1252,7 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                 //    });
                 //}
                 var listPaymentRequest = _paymentRequestRepository.GetByServiceId(serviceId, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
-                
+
                 if (listPaymentRequest.Count > 0)
                 {
 
@@ -1257,9 +1261,9 @@ namespace WEB.Adavigo.CMS.Controllers.Funding
                     {
                         var paymentRequests = listPaymentRequest.Where(n => (n.IsDelete == null || n.IsDelete.Value == false)
                             && n.Status != (int)PAYMENT_REQUEST_STATUS.TU_CHOI && n.SupplierId == item.SupplierId).ToList();
-                       
+
                         item.TotalAmountPay = paymentRequests.Sum(n => n.Amount);
-                        
+
                     }
                 }
                 return Ok(new

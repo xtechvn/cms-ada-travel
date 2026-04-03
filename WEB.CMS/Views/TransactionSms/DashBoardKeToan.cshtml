@@ -12,7 +12,17 @@
         <div class="head-title-new">
             <h2 class="title-cate bold mb20">Tổng quan</h2>
             <div class="flex gap10 mb20">
-               
+                <div>
+                    <div class="trang-thai row">
+                        <div class="form-group no-line" style="max-width:200px!important">
+                            <input class="form-control datepicker input" type="text" name="fromDate" id="fromDate" placeholder="Từ ngày">
+                        </div>
+                        <div class="form-group no-line" style="max-width: 200px !important; padding: 0 10px 0 10px;">
+                            <input class="form-control datepicker input" type="text" name="toDate" id="toDate" placeholder="Đến ngày">
+                        </div>
+
+                    </div>
+                </div>
                 <div class="relative down-up right">
                     <a href="javascript:;" class="btn btn-default onclick btn-default2" id="btn_check_radio">
                         <svg class="icon-svg mr-1">
@@ -93,7 +103,7 @@
                         <div class="tooltip-content">Là số dư còn lại</div>
                     </span>
                 </div>
-                
+
                 <div class="money"> <span id="totalAmount_BankingAccount_TransferSms">0</span> đ </div>
             </div>
             <div class="item bg-white pd15 radius-10">
@@ -107,7 +117,7 @@
                     </span>
                 </div>
                 <div class="money"> <span id="total_Amount_TransactionSMs">0</span> đ </div>
-                
+
             </div>
             <div class="item bg-white pd15 radius-10">
                 <div class="bold color-gray">
@@ -120,7 +130,7 @@
                     </span>
                 </div>
                 <div class="money"><span id="total_Amount_Payment">0</span> đ</div>
-                
+
             </div>
             <div class="item bg-white pd15 radius-10">
                 <div class="bold color-gray">
@@ -133,7 +143,7 @@
                     </span>
                 </div>
                 <div class="money"> <span id="total_Amount">0</span> đ </div>
-          
+
             </div>
 
         </div>
@@ -142,7 +152,7 @@
                 <div class="bg-white pd15 radius-10">
                     <h2 class="txt_16 mb15">Dòng tiền hàng tháng</h2>
                     <div class="col-xl-12">
-                        <canvas id="revenuChart" class="chartjs-render-monitor" ></canvas>
+                        <canvas id="revenuChart" class="chartjs-render-monitor"></canvas>
                     </div>
                 </div>
             </div>
@@ -152,7 +162,7 @@
                         <h2 class="txt_16 mb15">Giao dịch gần đây</h2>
                         <a href="/TransactionSms" class="blue mb15">Xem thêm</a>
                     </div>
-                    <ul class="list-status scroll-inner" id="list_TransactionSms" style="max-height: 510px !important">                       
+                    <ul class="list-status scroll-inner" id="list_TransactionSms" style="max-height: 510px !important">
                     </ul>
                 </div>
             </div>
@@ -188,17 +198,17 @@
                             <div class="money txt_20 bold" id="count_Payment_thang">191</div>
                         </div>
                         @*<div class="item">
-                            <div class="bold color-gray">
-                                Số dư hiện tại
-                                <span class="tooltip-new">
-                                    <svg class="icon-svg">
-                                        <use xlink:href="#Question"></use>
-                                    </svg>
-                                    <div class="tooltip-content">Là số dư còn lại</div>
-                                </span>
-                            </div>
-                            <div class="money txt_20 bold">191</div>
-                        </div>*@
+                                <div class="bold color-gray">
+                                    Số dư hiện tại
+                                    <span class="tooltip-new">
+                                        <svg class="icon-svg">
+                                            <use xlink:href="#Question"></use>
+                                        </svg>
+                                        <div class="tooltip-content">Là số dư còn lại</div>
+                                    </span>
+                                </div>
+                                <div class="money txt_20 bold">191</div>
+                            </div>*@
                     </div>
                 </div>
             </div>
@@ -207,8 +217,35 @@
     </div>
 </section>
 @section scripts {
-
+    <script type="text/javascript" src="~/js/zebra_datepicker.min.js"></script>
     <script type="text/javascript" src="/lib/Chart/Chart.js"></script>
     <script type="text/javascript" src="/lib/Chart/Chart.PieceLabel.js"></script>
     <script src="/modules/dashBoardKeToan.js"></script>
+    <script>
+        $('.datepicker').Zebra_DatePicker({
+            format: 'd/m/Y'
+        }).removeAttr('readonly');
+        $("#fromDate").Zebra_DatePicker({
+            onSelect: function () {
+                var fromDate = $("#fromDate").val()
+                var lstFromDate = fromDate.split('-')
+                $("#fromDate").val(lstFromDate[2] + '/' + lstFromDate[1] + '/' + lstFromDate[0])
+                _dashBoard.GetPaymentVoucherByDate2()
+            },
+            onClear: function () {
+                _dashBoard.GetPaymentVoucherByDate2()
+            }
+        });
+        $("#toDate").Zebra_DatePicker({
+            onSelect: function () {
+                var toDate = $("#toDate").val()
+                var lstFromDate = toDate.split('-')
+                $("#toDate").val(lstFromDate[2] + '/' + lstFromDate[1] + '/' + lstFromDate[0])
+                _dashBoard.GetPaymentVoucherByDate2()
+            },
+            onClear: function () {
+                _dashBoard.GetPaymentVoucherByDate2()
+            }
+        });
+    </script>
 }
