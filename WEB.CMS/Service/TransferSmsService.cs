@@ -216,21 +216,7 @@ namespace WEB.Adavigo.CMS.Service
                         filter &= Builders<TransactionSMSViewModel>.Filter.Eq(n => n.StatusPush, true);
                     }
                 }
-                if (searchModel.AmountSuccess && searchModel.AmountFail)
-                {
-                    filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.Amount > 0 || n.Amount < 0);
-                }
-                else
-                {
-                    if (searchModel.AmountSuccess)
-                    {
-                        filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.Amount > 0);
-                    }
-                    if (searchModel.AmountFail)
-                    {
-                        filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.Amount < 0);
-                    }
-                }
+                filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.Amount > 0 || n.Amount < 0);
                 //filter &= Builders<TransactionSMSViewModel>.Filter.Where(n => n.BankTransferType != 3);
                 var S = Builders<TransactionSMSViewModel>.Sort.Descending("_id");
 

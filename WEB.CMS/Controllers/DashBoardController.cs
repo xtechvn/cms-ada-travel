@@ -309,7 +309,7 @@ namespace WEB.CMS.Controllers
                 long total = 0;
                 var total2 = DateTime.Now.Month;
                 var ListTransactionSMs = transferSmsService.ListTransactionSMs(searchModel);
-                for (var item = 1; item <= 12; item++)
+                for (var item = 1; item <= total2; item++)
                 {
                     var data = new TransferSmsTotalModel();
                     data.AmountTransaction = ListTransactionSMs.Where(s => s.Amount > 0 && Convert.ToDateTime(s.ReceiveTime).Month == item).Sum(s => s.Amount);
