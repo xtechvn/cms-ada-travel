@@ -572,20 +572,21 @@ namespace Repositories.IRepositories
                                     Cells cell = ws.Cells;
 
                                     var range = ws.Cells.CreateRange(0, 0, 1, 1);
+                                    
                                     StyleFlag st = new StyleFlag();
                                     st.All = true;
                                     int Index = 1;
                                     Style style = ws.Cells["A1"].GetStyle();
-
+                                  
                                     #region Header
                                     range = cell.CreateRange(0, 0, 1, 15);
                                     style = ws.Cells["A1"].GetStyle();
                                     style.Font.IsBold = true;
                                     style.IsTextWrapped = true;
-                                    //style.ForegroundColor = Color.FromArgb(33, 88, 103);
-                                    //style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style.BackgroundColor = Color.FromArgb(33, 88, 103);
                                     style.Pattern = BackgroundType.Solid;
-                                    //style.Font.Color = Color.White;
+                                    style.Font.Color = Color.White;
                                     style.VerticalAlignment = TextAlignmentType.Center;
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -597,6 +598,25 @@ namespace Repositories.IRepositories
                                     style.Borders[BorderType.RightBorder].Color = Color.Black;
                                     range.ApplyStyle(style, st);
 
+                                    var range2 = ws.Cells.CreateRange(1, 0, 1, 16);
+                                    Style style2 = ws.Cells["A2"].GetStyle();
+                                    style2 = ws.Cells["A2"].GetStyle();
+                                    style2.Font.IsBold = true;
+                                    style2.IsTextWrapped = true;
+                                    style2.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.Pattern = BackgroundType.Solid;
+                                    style2.Font.Color = Color.White;
+                                    style2.VerticalAlignment = TextAlignmentType.Center;
+                                    style2.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.TopBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.RightBorder].Color = Color.Black;
+                                    range2.ApplyStyle(style2, st);
                                     // Set column width
                                     cell.SetColumnWidth(0, 8);
                                     cell.SetColumnWidth(1, 20);
@@ -645,7 +665,7 @@ namespace Repositories.IRepositories
 
                                     #region Body
 
-                                    range = cell.CreateRange(1, 0, data.Count + 2, 15);
+                                    range = cell.CreateRange(2, 0, data.Count + 2, 15);
                                     style = ws.Cells["A3"].GetStyle();
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -661,7 +681,7 @@ namespace Repositories.IRepositories
                                     Style alignCenterStyle = ws.Cells["A3"].GetStyle();
                                     alignCenterStyle.HorizontalAlignment = TextAlignmentType.Center;
 
-                                    Style numberStyle = ws.Cells["A2"].GetStyle();
+                                    Style numberStyle = ws.Cells["A3"].GetStyle();
                                     numberStyle.Number = 3;
                                     numberStyle.HorizontalAlignment = TextAlignmentType.Right;
                                     numberStyle.VerticalAlignment = TextAlignmentType.Center;
@@ -786,10 +806,10 @@ namespace Repositories.IRepositories
                                     style = ws.Cells["A1"].GetStyle();
                                     style.Font.IsBold = true;
                                     style.IsTextWrapped = true;
-                                    /*  style.ForegroundColor = Color.FromArgb(33, 88, 103);
-                                      style.BackgroundColor = Color.FromArgb(33, 88, 103);*/
+                                    style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style.BackgroundColor = Color.FromArgb(33, 88, 103);
                                     style.Pattern = BackgroundType.Solid;
-                                    /*style.Font.Color = Color.White;*/
+                                    style.Font.Color = Color.White;
                                     style.VerticalAlignment = TextAlignmentType.Center;
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -800,6 +820,25 @@ namespace Repositories.IRepositories
                                     style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.RightBorder].Color = Color.Black;
                                     range.ApplyStyle(style, st);
+                                    var range2 = ws.Cells.CreateRange(1, 0, 1, 16);
+                                    Style style2 = ws.Cells["A2"].GetStyle();
+                                    style2 = ws.Cells["A2"].GetStyle();
+                                    style2.Font.IsBold = true;
+                                    style2.IsTextWrapped = true;
+                                    style2.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.Pattern = BackgroundType.Solid;
+                                    style2.Font.Color = Color.White;
+                                    style2.VerticalAlignment = TextAlignmentType.Center;
+                                    style2.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.TopBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.RightBorder].Color = Color.Black;
+                                    range2.ApplyStyle(style2, st);
 
                                     // Set column width
                                     cell.SetColumnWidth(0, 8);
@@ -846,7 +885,7 @@ namespace Repositories.IRepositories
 
                                     #region Body
 
-                                    range = cell.CreateRange(1, 0, List_ReportDepartment.Sum(s => s.listReportDepartment.Count()) + data.Count + 2, 16);
+                                    range = cell.CreateRange(2, 0, List_ReportDepartment.Sum(s => s.listReportDepartment.Count()) + data.Count + 2, 16);
                                     style = ws.Cells["A3"].GetStyle();
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -978,10 +1017,10 @@ namespace Repositories.IRepositories
                                     style = ws.Cells["A1"].GetStyle();
                                     style.Font.IsBold = true;
                                     style.IsTextWrapped = true;
-                                    /*    style.ForegroundColor = Color.FromArgb(33, 88, 103);
-                                        style.BackgroundColor = Color.FromArgb(33, 88, 103);*/
+                                    style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style.BackgroundColor = Color.FromArgb(33, 88, 103);
                                     style.Pattern = BackgroundType.Solid;
-                                    /*   style.Font.Color = Color.White;*/
+                                    style.Font.Color = Color.White;
                                     style.VerticalAlignment = TextAlignmentType.Center;
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -992,7 +1031,25 @@ namespace Repositories.IRepositories
                                     style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.RightBorder].Color = Color.Black;
                                     range.ApplyStyle(style, st);
-
+                                    var range2 = ws.Cells.CreateRange(1, 0, 1, 6);
+                                    Style style2 = ws.Cells["A2"].GetStyle();
+                                    style2 = ws.Cells["A2"].GetStyle();
+                                    style2.Font.IsBold = true;
+                                    style2.IsTextWrapped = true;
+                                    style2.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.Pattern = BackgroundType.Solid;
+                                    style2.Font.Color = Color.White;
+                                    style2.VerticalAlignment = TextAlignmentType.Center;
+                                    style2.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.TopBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.RightBorder].Color = Color.Black;
+                                    range2.ApplyStyle(style2, st);
                                     // Set column width
                                     cell.SetColumnWidth(0, 8);
                                     cell.SetColumnWidth(1, 20);
@@ -1021,7 +1078,7 @@ namespace Repositories.IRepositories
 
                                     #region Body
 
-                                    range = cell.CreateRange(1, 0, data.Count + 2, 11);
+                                    range = cell.CreateRange(2, 0, data.Count + 2, 11);
                                     style = ws.Cells["A3"].GetStyle();
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -1096,10 +1153,10 @@ namespace Repositories.IRepositories
                                     style = ws.Cells["A1"].GetStyle();
                                     style.Font.IsBold = true;
                                     style.IsTextWrapped = true;
-                                    /*  style.ForegroundColor = Color.FromArgb(33, 88, 103);
-                                      style.BackgroundColor = Color.FromArgb(33, 88, 103);*/
+                                    style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style.BackgroundColor = Color.FromArgb(33, 88, 103);
                                     style.Pattern = BackgroundType.Solid;
-                                    /*    style.Font.Color = Color.White;*/
+                                    style.Font.Color = Color.White;
                                     style.VerticalAlignment = TextAlignmentType.Center;
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -1110,7 +1167,25 @@ namespace Repositories.IRepositories
                                     style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.RightBorder].Color = Color.Black;
                                     range.ApplyStyle(style, st);
-
+                                    var range2 = ws.Cells.CreateRange(1, 0, 1, 12);
+                                    Style style2 = ws.Cells["A2"].GetStyle();
+                                    style2 = ws.Cells["A2"].GetStyle();
+                                    style2.Font.IsBold = true;
+                                    style2.IsTextWrapped = true;
+                                    style2.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.Pattern = BackgroundType.Solid;
+                                    style2.Font.Color = Color.White;
+                                    style2.VerticalAlignment = TextAlignmentType.Center;
+                                    style2.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.TopBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.RightBorder].Color = Color.Black;
+                                    range2.ApplyStyle(style2, st);
                                     // Set column width
                                     cell.SetColumnWidth(0, 8);
                                     cell.SetColumnWidth(1, 20);
@@ -1145,7 +1220,7 @@ namespace Repositories.IRepositories
 
                                     #region Body
 
-                                    range = cell.CreateRange(1, 0, data.Count, 10);
+                                    range = cell.CreateRange(2, 0, data.Count, 10);
                                     style = ws.Cells["A3"].GetStyle();
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -1228,10 +1303,10 @@ namespace Repositories.IRepositories
                                     style = ws.Cells["A1"].GetStyle();
                                     style.Font.IsBold = true;
                                     style.IsTextWrapped = true;
-                                    //style.ForegroundColor = Color.FromArgb(33, 88, 103);
-                                    //style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style.BackgroundColor = Color.FromArgb(33, 88, 103);
                                     style.Pattern = BackgroundType.Solid;
-                                    //style.Font.Color = Color.White;
+                                    style.Font.Color = Color.White;
                                     style.VerticalAlignment = TextAlignmentType.Center;
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -1242,7 +1317,25 @@ namespace Repositories.IRepositories
                                     style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.RightBorder].Color = Color.Black;
                                     range.ApplyStyle(style, st);
-
+                                    var range2 = ws.Cells.CreateRange(1, 0, 1, 31);
+                                    Style style2 = ws.Cells["A2"].GetStyle();
+                                    style2 = ws.Cells["A2"].GetStyle();
+                                    style2.Font.IsBold = true;
+                                    style2.IsTextWrapped = true;
+                                    style2.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.Pattern = BackgroundType.Solid;
+                                    style2.Font.Color = Color.White;
+                                    style2.VerticalAlignment = TextAlignmentType.Center;
+                                    style2.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.TopBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.RightBorder].Color = Color.Black;
+                                    range2.ApplyStyle(style2, st);
                                     // Set column width
                                     cell.SetColumnWidth(0, 8);
                                     cell.SetColumnWidth(1, 20);
@@ -1335,7 +1428,7 @@ namespace Repositories.IRepositories
 
                                     #region Body
 
-                                    range = cell.CreateRange(1, 0, data.Count + 1, 30);
+                                    range = cell.CreateRange(2, 0, data.Count + 1, 30);
                                     style = ws.Cells["A3"].GetStyle();
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -1506,10 +1599,10 @@ namespace Repositories.IRepositories
                                     style = ws.Cells["A1"].GetStyle();
                                     style.Font.IsBold = true;
                                     style.IsTextWrapped = true;
-                                    //style.ForegroundColor = Color.FromArgb(33, 88, 103);
-                                    //style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style.BackgroundColor = Color.FromArgb(33, 88, 103);
                                     style.Pattern = BackgroundType.Solid;
-                                    //style.Font.Color = Color.White;
+                                    style.Font.Color = Color.White;
                                     style.VerticalAlignment = TextAlignmentType.Center;
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -1520,6 +1613,25 @@ namespace Repositories.IRepositories
                                     style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.RightBorder].Color = Color.Black;
                                     range.ApplyStyle(style, st);
+                                    var range2 = ws.Cells.CreateRange(1, 0, 1, 31);
+                                    Style style2 = ws.Cells["A2"].GetStyle();
+                                    style2 = ws.Cells["A2"].GetStyle();
+                                    style2.Font.IsBold = true;
+                                    style2.IsTextWrapped = true;
+                                    style2.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.Pattern = BackgroundType.Solid;
+                                    style2.Font.Color = Color.White;
+                                    style2.VerticalAlignment = TextAlignmentType.Center;
+                                    style2.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.TopBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.RightBorder].Color = Color.Black;
+                                    range2.ApplyStyle(style2, st);
 
                                     cell.SetColumnWidth(0, 8);
                                     cell.SetColumnWidth(1, 20);
@@ -1611,7 +1723,7 @@ namespace Repositories.IRepositories
 
                                     #region Body
 
-                                    range = cell.CreateRange(1, 0, List_ReportDepartment.Sum(s => s.listReportDepartment.Count()) + data.Count() + 2, 30);
+                                    range = cell.CreateRange(2, 0, List_ReportDepartment.Sum(s => s.listReportDepartment.Count()) + data.Count() + 2, 30);
                                     style = ws.Cells["A3"].GetStyle();
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -1958,10 +2070,10 @@ namespace Repositories.IRepositories
                                     style = ws.Cells["A1"].GetStyle();
                                     style.Font.IsBold = true;
                                     style.IsTextWrapped = true;
-                                    /* style.ForegroundColor = Color.FromArgb(33, 88, 103);
-                                     style.BackgroundColor = Color.FromArgb(33, 88, 103);*/
+                                    style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style.BackgroundColor = Color.FromArgb(33, 88, 103);
                                     style.Pattern = BackgroundType.Solid;
-                                    /*style.Font.Color = Color.White;*/
+                                    style.Font.Color = Color.White;
                                     style.VerticalAlignment = TextAlignmentType.Center;
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
@@ -1972,7 +2084,25 @@ namespace Repositories.IRepositories
                                     style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.RightBorder].Color = Color.Black;
                                     range.ApplyStyle(style, st);
-
+                                    var range2 = ws.Cells.CreateRange(1, 0, 1, 29);
+                                    Style style2 = ws.Cells["A2"].GetStyle();
+                                    style2 = ws.Cells["A2"].GetStyle();
+                                    style2.Font.IsBold = true;
+                                    style2.IsTextWrapped = true;
+                                    style2.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    style2.Pattern = BackgroundType.Solid;
+                                    style2.Font.Color = Color.White;
+                                    style2.VerticalAlignment = TextAlignmentType.Center;
+                                    style2.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.TopBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                    style2.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                    style2.Borders[BorderType.RightBorder].Color = Color.Black;
+                                    range2.ApplyStyle(style2, st);
                                     cell.SetColumnWidth(0, 8);
                                     cell.SetColumnWidth(1, 20);
                                     cell.SetColumnWidth(2, 40);
@@ -2054,7 +2184,7 @@ namespace Repositories.IRepositories
 
                                     #region Body
 
-                                    range = cell.CreateRange(1, 0, data.Count + 2, 27);
+                                    range = cell.CreateRange(2, 0, data.Count + 2, 27);
                                     style = ws.Cells["A3"].GetStyle();
                                     style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
                                     style.Borders[BorderType.TopBorder].Color = Color.Black;
