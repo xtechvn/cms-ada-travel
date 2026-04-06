@@ -901,7 +901,7 @@ namespace Repositories.IRepositories
                                     Style alignCenterStyle = ws.Cells["A3"].GetStyle();
                                     alignCenterStyle.HorizontalAlignment = TextAlignmentType.Center;
 
-                                    Style numberStyle = ws.Cells["A2"].GetStyle();
+                                    Style numberStyle = ws.Cells["A3"].GetStyle();
                                     numberStyle.Number = 3;
                                     numberStyle.HorizontalAlignment = TextAlignmentType.Right;
                                     numberStyle.VerticalAlignment = TextAlignmentType.Center;
