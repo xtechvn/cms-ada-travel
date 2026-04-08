@@ -160,6 +160,8 @@ namespace Entities.Models
         public virtual DbSet<RecruitmentCategory> RecruitmentCategory { get; set; }
         public virtual DbSet<FlashSale> FlashSales { get; set; }
         public virtual DbSet<FlashSaleProduct> FlashSaleProducts { get; set; }
+        public virtual DbSet<HotelRoomFund> HotelRoomFunds { get; set; }
+        public virtual DbSet<HotelRoomFundDetail> HotelRoomFundDetails { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -3007,6 +3009,42 @@ namespace Entities.Models
 
                 entity.Property(e => e.UpTime).HasColumnType("datetime");
             });
+            modelBuilder.Entity<HotelRoomFund>(entity =>
+            {
+                entity.ToTable("HotelRoomFund");
+
+                entity.Property(e => e.CreateBy).HasMaxLength(100);
+
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.TotalAmount)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.UpdateBy).HasMaxLength(100);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<HotelRoomFundDetail>(entity =>
+            {
+                entity.ToTable("HotelRoomFundDetail");
+
+                entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.HasOne(d => d.HotelRoomFund)
+                    .WithMany(p => p.HotelRoomFundDetails)
+                    .HasForeignKey(d => d.HotelRoomFundId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_FundDetail_Fund");
+            });
+
             modelBuilder.Entity<FlashSale>(entity =>
             {
                 entity.ToTable("FlashSale");

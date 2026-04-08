@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Quỹ phòng khách sạn";
+}
+<style>
+  .white-popup{
+        max-width: 1200px!important;
+        min-height: 500px!important;
+    }
+</style>
+  
+</style>
+<section class="main-container">
+    <div class="row-main container">
+        <h2 class="title_page">Quỹ phòng khách sạn</h2>
+        <div class="bg_white filter-search">
+            <div class="row">
+                <div class="col-md-3 mb10">
+                    <select class="select2 form-control" id="token-input-supplier" style="width:100% !important">
+                        <option value="0">Tất cả nhà cung cấp</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb10">
+                    <select class="select2 form-control" id="token-input-hotel" style="width:100% !important">
+                        <option value="0">Tất cả khách sạn</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb10">
+                    <button class="btn btn-default" onclick="hotelRoomFund.Search()">Tìm kiếm</button>
+                    <button class="btn btn-success" onclick="hotelRoomFund.AddOrUpdate(0)">Thêm mới</button>
+                </div>
+            </div>
+        </div>
+        <div id="grid-data">
+
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script src="~/modules/hotel_room_fund.js"></script>
+}

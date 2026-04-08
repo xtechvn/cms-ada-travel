@@ -1,0 +1,105 @@
+@using Entities.ViewModels
+@model HotelRoomFundModel
+
+<div class="modal-dialog" style="max-width: 100%">
+    <div class="modal-content">
+        <div class="modal-body">
+            <style>
+                .room-type-group { border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px; background: #f9f9f9; }
+                .room-type-name { 
+                    font-weight: 700; 
+                    margin-bottom: 15px; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: space-between;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 10px;
+                }
+                .quick-add-section { background: #fff; padding: 10px; border: 1px dashed #ccc; margin-bottom: 15px; }
+                .quick-add-section .title { font-weight: 600; margin-bottom: 10px; display: block; }
+                .special-date-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+                #room-fund-details-container .detail-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-bottom: 8px;
+                    flex-wrap: wrap;
+                    background: #fff;
+                    padding: 5px;
+                    border-radius: 3px;
+                }
+                #room-fund-details-container .detail-row input[name="Amount"] { width: 140px; }
+                #room-fund-details-container .detail-row input[name="StartDate"],
+                #room-fund-details-container .detail-row input[name="EndDate"] { width: 160px; }
+                #room-fund-details-container .detail-row .remove-detail-btn { color: #fff; cursor: pointer; }
+                .select-room-type-container { margin-bottom: 20px; display: none; }
+            </style>
+            <form id="form-hotel-room-fund">
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <div class="row">
+                    <div class="col-md-6 mb10">
+                        <label>Nhà cung cấp <span class="text-danger">*</span></label>
+                        <select class="select2 form-control" name="SupplierId" id="upsert-supplier-id" style="width:100% !important" @(Model.Id > 0 ? "disabled" : "") data-edit-mode="@(Model.Id > 0 ? "1" : "0")">
+                            @if (Model.SupplierId > 0)
+                            {
+                                <option value="@Model.SupplierId" selected>@Model.SupplierName</option>
+                            }
+                        </select>
+                        @if (Model.Id > 0 && Model.SupplierId > 0)
+                        {
+                            <input type="hidden" name="SupplierId" value="@Model.SupplierId" />
+                        }
+                    </div>
+                    <div class="col-md-6 mb10" id="div-upsert-hotel" style="@(Model.SupplierId > 0 ? "" : "display:none;")">
+                        <label>Khách sạn <span class="text-danger">*</span></label>
+                        <select class="select2 form-control" name="HotelId" id="upsert-hotel-id" style="width:100% !important" @(Model.Id > 0 ? "disabled" : "") data-edit-mode="@(Model.Id > 0 ? "1" : "0")">
+                            @if (Model.HotelId > 0)
+                            {
+                                <option value="@Model.HotelId" selected>@Model.HotelName</option>
+                            }
+                        </select>
+                        @if (Model.Id > 0 && Model.HotelId > 0)
+                        {
+                            <input type="hidden" name="HotelId" value="@Model.HotelId" />
+                        }
+                    </div>
+
+                    <div class="col-md-12 select-room-type-container" id="div-select-room-type">
+                        <label>Chọn hạng phòng để thêm quỹ <span class="text-danger">*</span></label>
+                        <select class="form-control select2" id="select-room-type-dropdown" style="width:100% !important">
+                            <option value="">-- Chọn hạng phòng --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-12 mb10">
+                        <label>Chi tiết quỹ phòng</label>
+                        <div id="room-fund-details-container">
+                            @if (Model.HotelRoomFundDetails != null && Model.HotelRoomFundDetails.Any())
+                            {
+                                var groupedDetails = Model.HotelRoomFundDetails.GroupBy(d => d.HotelRoomId);
+                                foreach (var group in groupedDetails)
+                                {
+                                    // Sẽ được nạp lại bằng JS để đồng bộ logic Quick Add và Xóa
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" onclick="$.magnificPopup.close()">Hủy</button>
+    <button type="button" class="btn btn-primary" onclick="hotelRoomFund.Save()">Lưu</button>
+</div>
+
+
+<script>
+    window.hotelRoomFundExisting = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+        Model.HotelRoomFundDetails != null ? 
+        Model.HotelRoomFundDetails.Select(d => new { HotelRoomId = d.HotelRoomId, Amount = d.Amount, StartDate = d.StartDate.ToString("dd/MM/yyyy"), EndDate = d.EndDate.ToString("dd/MM/yyyy") }) : 
+        new object[0]
+    ));
+    hotelRoomFund.InitUpsert();
+</script>

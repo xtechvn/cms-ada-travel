@@ -317,6 +317,17 @@ namespace Utilities.Contants
         public static string SP_GetListFlashSale = "SP_GetListFlashSale";
         public static string SP_GetListSuggestSupplier = "SP_GetListSuggestSupplier";
 
+        public static string sp_InsertHotelRoomFund = "sp_InsertHotelRoomFund";
+        public static string sp_UpdateHotelRoomFund = "sp_UpdateHotelRoomFund";
+        public static string sp_GetListHotelRoomFund = "sp_GetListHotelRoomFund";
+        public static string sp_GetDetailHotelRoomFund = "sp_GetDetailHotelRoomFund";
+        public static string sp_GetHotelRoomFundByHotelAndSupplier = "sp_GetHotelRoomFundByHotelAndSupplier";
+
+        public static string sp_InsertHotelRoomFundDetail = "sp_InsertHotelRoomFundDetail";
+        public static string sp_UpdateHotelRoomFundDetail = "sp_UpdateHotelRoomFundDetail";
+        public static string sp_GetListHotelRoomFundDetail = "sp_GetListHotelRoomFundDetail";
+        public static string SP_DeleteHotelRoomFundDetailByHotelRoomFundIdAndHotelRoomId = "SP_DeleteHotelRoomFundDetailByHotelRoomFundIdAndHotelRoomId";
+
 
 
 
