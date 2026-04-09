@@ -32,7 +32,7 @@ namespace DAL
 
                 objParam[0] = new SqlParameter("@HotelRoomFundId", Model.HotelRoomFundId);
                 objParam[1] = new SqlParameter("@HotelRoomId", Model.HotelRoomId);
-                objParam[2] = new SqlParameter("@Amount", Model.Amount);
+                objParam[2] = new SqlParameter("@NumberOfRooms", Model.NumberOfRooms);
                 objParam[3] = new SqlParameter("@StartDate", Model.StartDate);
                 objParam[4] = new SqlParameter("@EndDate", Model.EndDate);
 
@@ -55,7 +55,7 @@ namespace DAL
                 objParam[0] = new SqlParameter("@Id", Model.Id);
                 objParam[0] = new SqlParameter("@HotelRoomFundId", Model.HotelRoomFundId);
                 objParam[0] = new SqlParameter("@HotelRoomId", Model.HotelRoomId);
-                objParam[0] = new SqlParameter("@Amount", Model.Amount);
+                objParam[0] = new SqlParameter("@NumberOfRooms", Model.NumberOfRooms);
                 objParam[0] = new SqlParameter("@StartDate", Model.StartDate);
                 objParam[0] = new SqlParameter("@EndDate", Model.EndDate);               
 
@@ -67,7 +67,7 @@ namespace DAL
             }
             return 0;
         }
-        public async Task<List<HotelRoomFundDetail>> GetListHotelRoomFundDetail(int HotelRoomFundId)
+        public async Task<List<HotelRoomFundDetailModel>> GetListHotelRoomFundDetail(int HotelRoomFundId)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace DAL
                 var dt = _DbWorker.GetDataTable(StoreProcedureConstant.sp_GetListHotelRoomFundDetail, objParam);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    var data = dt.ToList<HotelRoomFundDetail>();
+                    var data = dt.ToList<HotelRoomFundDetailModel>();
                     return data;
                 }
             }
@@ -108,6 +108,29 @@ namespace DAL
                 LogHelper.InsertLogTelegram("DeleteByHotelRoomFundId - HotelRoomFundDetailDAL: " + ex);
                 return -1;
             }
+        }
+        public async Task<List<HotelRoomFundDetail>> GetListHotelRoomFundDetail2(int HotelRoomFundId)
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[1];
+
+                objParam[0] = new SqlParameter("@HotelRoomFundId", HotelRoomFundId);
+
+
+                var dt = _DbWorker.GetDataTable(StoreProcedureConstant.sp_GetListHotelRoomFundDetail, objParam);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<HotelRoomFundDetail>();
+                    return data;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetPagingList - ClientDAL: " + ex);
+            }
+            return null;
         }
     }
 }

@@ -10,5 +10,8 @@ namespace Entities.ViewModels
     public class HotelRoomFundDetailModel: HotelRoomFundDetail
     {
         public string RoomName { get; set; }
+        public int TotalRoomNights { get; set; }
+        public int TotalBookedRooms { get; set; }
+        public int NumberOfRoomsAvailable { get; set; }
     }
 }

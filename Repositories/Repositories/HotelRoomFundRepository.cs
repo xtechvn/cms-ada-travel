@@ -40,9 +40,13 @@ namespace Repositories.Repositories
             return await _hotelRoomFundDetailDAL.InsertHotelRoomFundDetail(model);
         }
 
-        public async Task<List<HotelRoomFundDetail>> GetListHotelRoomFundDetail(int hotelRoomFundId)
+        public async Task<List<HotelRoomFundDetailModel>> GetListHotelRoomFundDetail(int hotelRoomFundId)
         {
             return await _hotelRoomFundDetailDAL.GetListHotelRoomFundDetail(hotelRoomFundId);
+        }
+        public async Task<List<HotelRoomFundDetail>> GetListHotelRoomFundDetail2(int hotelRoomFundId)
+        {
+            return await _hotelRoomFundDetailDAL.GetListHotelRoomFundDetail2(hotelRoomFundId);
         }
 
         public async Task<int> DeleteHotelRoomFundDetailByFundId(int hotelRoomFundId, int HotelRoomId)

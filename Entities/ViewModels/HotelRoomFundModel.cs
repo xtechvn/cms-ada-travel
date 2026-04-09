@@ -13,6 +13,8 @@ namespace Entities.ViewModels
         public string UpdateName { get; set; }
         public string HotelName { get; set; }
         public string SupplierName { get; set; }
+        public int TotalBookedRooms { get; set; }
+        public int NumberOfRoomsAvailable { get; set; }
         public int TotalRow { get; set; }
     }
 }

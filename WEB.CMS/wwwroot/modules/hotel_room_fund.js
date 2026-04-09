@@ -75,7 +75,7 @@ var hotelRoomFund = {
     },
     InitUpsert: function () {
         var elPopup = $('#magnific-popup-small');
-        
+
         $("#upsert-supplier-id").select2({
             placeholder: "Chọn nhà cung cấp",
             dropdownParent: elPopup,
@@ -229,7 +229,7 @@ var hotelRoomFund = {
             </div>
         `;
         $('#room-fund-details-container').append(groupHtml);
-        
+
         var lastGroup = $('#room-fund-details-container .room-type-group:last');
         lastGroup.find('.qa-date-range').daterangepicker({
             autoApply: true,
@@ -252,11 +252,11 @@ var hotelRoomFund = {
         });
     },
     RemoveRoomTypeGroup: function (btn, id, name) {
-        _msgconfirm.openDialog("Xác nhận?", "Bạn có chắc muốn xóa hạng phòng này?" , function () {
-             $(btn).closest('.room-type-group').remove();
+        _msgconfirm.openDialog("Xác nhận?", "Bạn có chắc muốn xóa hạng phòng này?", function () {
+            $(btn).closest('.room-type-group').remove();
             var option = new Option(name, id, false, false);
             $('#select-room-type-dropdown').append(option).trigger('change');
-         });
+        });
     },
     QuickAdd: function (btn) {
         var group = $(btn).closest('.room-type-group');
@@ -299,7 +299,7 @@ var hotelRoomFund = {
             if (sdAmount && sdRange) {
                 var sdStart = moment(sdRange.split(' - ')[0], 'DD/MM/YYYY');
                 var sdEnd = moment(sdRange.split(' - ')[1], 'DD/MM/YYYY');
-                
+
                 // Kiểm tra xem Ngày đặc biệt có nằm ngoài khoảng thời gian chung không
                 if (sdStart.isBefore(startGeneral) || sdEnd.isAfter(endGeneral)) {
                     _msgalert.error("Ngày đặc biệt phải nằm trong khoảng thời gian chung.");
@@ -367,7 +367,7 @@ var hotelRoomFund = {
             var rowHtml = `
                 <div class="detail-row">
                     <input type="hidden" name="HotelRoomId" value="${roomTypeId}" />
-                    <input type="number" class="form-control" name="Amount" value="${range.amount}" />
+                    <input type="number" class="form-control" name="NumberOfRooms" value="${range.amount}" />
                     <input type="text" class="form-control datepicker" name="StartDate" value="${range.start.format('DD/MM/YYYY')}" />
                     <input type="text" class="form-control datepicker" name="EndDate" value="${range.end.format('DD/MM/YYYY')}" />
                     <button type="button" class="btn btn-xs btn-danger remove-detail-btn" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>
@@ -395,7 +395,7 @@ var hotelRoomFund = {
             var d = details[i];
             var rowHtml = '<div class="detail-row">' +
                 '<input type="hidden" name="HotelRoomId" value="' + roomTypeId + '" />' +
-                '<input type="number" class="form-control" name="Amount" value="' + d.Amount + '" />' +
+                '<input type="number" class="form-control" name="NumberOfRooms" value="' + d.NumberOfRooms + '" />' +
                 '<input type="text" class="form-control datepicker" name="StartDate" value="' + d.StartDate + '" />' +
                 '<input type="text" class="form-control datepicker" name="EndDate" value="' + d.EndDate + '" />' +
                 '<button type="button" class="btn btn-xs btn-danger remove-detail-btn" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>' +
@@ -419,17 +419,17 @@ var hotelRoomFund = {
         var roomTypeGroup = $(btn).closest('.room-type-group');
         var roomTypeId = roomTypeGroup.data('room-type-id');
         var detailsList = roomTypeGroup.find('.room-fund-details-list');
-        
+
         var newRowHtml = `
             <div class="detail-row">
                 <input type="hidden" name="HotelRoomId" value="${roomTypeId}" />
-                <input type="number" class="form-control" name="Amount" value="0" />
+                <input type="number" class="form-control" name="NumberOfRooms" value="0" />
                 <input type="text" class="form-control datepicker" name="StartDate" />
                 <input type="text" class="form-control datepicker" name="EndDate" />
                 <button type="button" class="btn btn-xs btn-danger remove-detail-btn" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>
             </div>
         `;
-        
+
         detailsList.append(newRowHtml);
         var newRow = detailsList.find('.detail-row:last');
 
@@ -450,15 +450,15 @@ var hotelRoomFund = {
         var ranges = [];
         var isOverlap = false;
         var group = $('.room-type-group[data-room-type-id="' + roomTypeId + '"]');
-        
+
         group.find('.detail-row').each(function () {
             var startStr = $(this).find('input[name="StartDate"]').val();
             var endStr = $(this).find('input[name="EndDate"]').val();
-            
+
             if (startStr && endStr) {
                 var start = moment(startStr, 'DD/MM/YYYY');
                 var end = moment(endStr, 'DD/MM/YYYY');
-                
+
                 for (var r of ranges) {
                     if (start.isSameOrBefore(r.end) && end.isSameOrAfter(r.start)) {
                         isOverlap = true;
@@ -468,7 +468,7 @@ var hotelRoomFund = {
                 ranges.push({ start: start, end: end });
             }
         });
-        
+
         return isOverlap;
     },
     Save: function () {
@@ -477,12 +477,12 @@ var hotelRoomFund = {
 
         var details = [];
         var hasOverlap = false;
-        
+
         $('#room-fund-details-container .room-type-group').each(function () {
             var roomTypeGroup = $(this);
             var roomTypeId = roomTypeGroup.data('room-type-id');
             var roomTypeName = roomTypeGroup.find('.room-type-name span').text();
-            
+
             if (hotelRoomFund.CheckOverlap(roomTypeId)) {
                 _msgalert.error("Hạng phòng '" + roomTypeName + "' có khoảng thời gian bị chồng lấn. Vui lòng kiểm tra lại.");
                 hasOverlap = true;
@@ -493,7 +493,7 @@ var hotelRoomFund = {
                 var row = $(this);
                 details.push({
                     HotelRoomId: row.find('input[name="HotelRoomId"]').val(),
-                    Amount: row.find('input[name="Amount"]').val(),
+                    NumberOfRooms: row.find('input[name="NumberOfRooms"]').val(),
                     StartDate: row.find('input[name="StartDate"]').val(),
                     EndDate: row.find('input[name="EndDate"]').val()
                 });
@@ -514,19 +514,20 @@ var hotelRoomFund = {
             Details: details
         };
 
+        var btnSave = $('.modal-footer .btn-primary');
+        btnSave.attr('disabled', 'disabled').addClass('disabled');
+
         _ajax_caller.post('/HotelRoomFund/Save', { model: model, details: details }, function (result) {
             if (result.status == 0) {
                 _msgalert.success(result.msg);
                 $.magnificPopup.close();
-                hotelRoomFund.Search();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             } else {
                 _msgalert.error(result.msg);
+                btnSave.removeAttr('disabled').removeClass('disabled');
             }
         });
     }
 };
-
-$(document).ready(function () {
-    hotelRoomFund.InitIndex();
-    hotelRoomFund.Search();
-});

@@ -28,7 +28,7 @@
                     padding: 5px;
                     border-radius: 3px;
                 }
-                #room-fund-details-container .detail-row input[name="Amount"] { width: 140px; }
+                #room-fund-details-container .detail-row input[name="NumberOfRooms"] { width: 140px; }
                 #room-fund-details-container .detail-row input[name="StartDate"],
                 #room-fund-details-container .detail-row input[name="EndDate"] { width: 160px; }
                 #room-fund-details-container .detail-row .remove-detail-btn { color: #fff; cursor: pointer; }
@@ -98,7 +98,7 @@
 <script>
     window.hotelRoomFundExisting = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
         Model.HotelRoomFundDetails != null ? 
-        Model.HotelRoomFundDetails.Select(d => new { HotelRoomId = d.HotelRoomId, Amount = d.Amount, StartDate = d.StartDate.ToString("dd/MM/yyyy"), EndDate = d.EndDate.ToString("dd/MM/yyyy") }) : 
+        Model.HotelRoomFundDetails.Select(d => new { HotelRoomId = d.HotelRoomId, NumberOfRooms = d.NumberOfRooms, StartDate = d.StartDate.ToString("dd/MM/yyyy"), EndDate = d.EndDate.ToString("dd/MM/yyyy") }) : 
         new object[0]
     ));
     hotelRoomFund.InitUpsert();

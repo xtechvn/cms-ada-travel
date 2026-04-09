@@ -3019,7 +3019,7 @@ namespace Entities.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.TotalAmount)
+                entity.Property(e => e.TotalRooms)
                     .HasColumnType("decimal(18, 2)")
                     .HasDefaultValueSql("((0))");
 
@@ -3032,7 +3032,7 @@ namespace Entities.Models
             {
                 entity.ToTable("HotelRoomFundDetail");
 
-                entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.NumberOfRooms).HasColumnType("decimal(18, 2)");
 
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
 

@@ -64,7 +64,7 @@ namespace WEB.Adavigo.CMS.Controllers
                 model = await _hotelRoomFundRepository.GetById(id);
                 if (model != null)
                 {
-                    model.HotelRoomFundDetails = await _hotelRoomFundRepository.GetListHotelRoomFundDetail(id);
+                    model.HotelRoomFundDetails = await _hotelRoomFundRepository.GetListHotelRoomFundDetail2(id);
                 }
             }
             return PartialView(model);
@@ -107,6 +107,177 @@ namespace WEB.Adavigo.CMS.Controllers
             {
                 LogHelper.InsertLogTelegram("Save - HotelRoomFundController: " + ex);
                 return Json(new { status = 1, msg = "Thất bại" });
+            }
+        }
+
+        public async Task<IActionResult> Detail(int id)
+        {
+            var viewModel = new HotelRoomFundDetailViewModel();
+            try
+            {
+                var model = await _hotelRoomFundRepository.GetById(id);
+                if (model == null)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                viewModel.Id = model.Id;
+                viewModel.SupplierName = model.SupplierName;
+                viewModel.HotelName = model.HotelName;
+                viewModel.TotalRooms = model.TotalRooms;
+
+                // Lấy danh sách chi tiết quỹ phòng
+                var details = await _hotelRoomFundRepository.GetListHotelRoomFundDetail(id);
+
+
+
+                // Thiết lập 7 ngày bắt đầu từ hôm nay
+                var startDate = DateTime.Today;
+                for (int i = 0; i < 7; i++)
+                {
+                    viewModel.DisplayDates.Add(startDate.AddDays(i));
+                }
+
+                // Nhóm details theo HotelRoomId
+                if (details != null && details.Any())
+                {
+                    // Lấy danh sách mỗi Hạng phòng 1 bản ghi đại diện (unique categories)
+                    var uniqueCategories = details.GroupBy(d => d.HotelRoomId).Select(i => i.First()).ToList();
+                    
+                    foreach (var category in uniqueCategories)
+                    {
+                        // Lấy tất cả các chi tiết (dải ngày) thuộc về hạng phòng này
+                        var categoryDetails = details.Where(d => d.HotelRoomId == category.HotelRoomId).ToList();
+
+                        var row = new RoomCategoryRow
+                        {
+                            HotelRoomId = category.HotelRoomId,
+                            RoomName = category.RoomName,
+                            TotalCapacity = categoryDetails.Sum(s => s.TotalRoomNights)
+                        };
+
+                        // Tính số phòng đã phân bổ và đã đặt cho mỗi ngày dựa trên danh sách chi tiết của hạng phòng này
+                        foreach (var date in viewModel.DisplayDates)
+                        {
+                            decimal allocated = 0;
+                            decimal booked = 0;
+                            foreach (var detail in categoryDetails)
+                            {
+                                if (date >= detail.StartDate.Date && date <= detail.EndDate.Date)
+                                {
+                                    allocated += detail.NumberOfRooms;
+                                    booked += detail.TotalBookedRooms;
+                                }
+                            }
+                            row.DailyAllocations[date] = allocated;
+                            row.DailyBooked[date] = booked;
+                        }
+
+                        viewModel.RoomCategories.Add(row);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("Detail - HotelRoomFundController: " + ex);
+            }
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetDetailData(int id, string startDateStr, string endDateStr)
+        {
+            try
+            {
+                var model = await _hotelRoomFundRepository.GetById(id);
+                if (model == null)
+                    return Json(new { status = 1, msg = "Không tìm thấy dữ liệu" });
+
+                var details = await _hotelRoomFundRepository.GetListHotelRoomFundDetail(id);
+
+                DateTime startDate, endDate;
+                if (!string.IsNullOrEmpty(startDateStr) && !string.IsNullOrEmpty(endDateStr))
+                {
+                    startDate = DateTime.ParseExact(startDateStr, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    endDate = DateTime.ParseExact(endDateStr, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    startDate = DateTime.Today;
+                    endDate = startDate.AddDays(6);
+                }
+
+                // Giới hạn hiển thị tối đa 45 ngày để đảm bảo hiệu năng
+                if ((endDate - startDate).TotalDays > 45)
+                {
+                    endDate = startDate.AddDays(45);
+                }
+
+                var displayDates = new List<DateTime>();
+                for (var d = startDate; d <= endDate; d = d.AddDays(1))
+                {
+                    displayDates.Add(d);
+                }
+
+                var categories = new List<object>();
+                if (details != null && details.Any())
+                {
+                    // Lấy danh sách mỗi Hạng phòng 1 bản ghi đại diện (unique categories)
+                    var uniqueCategories = details.GroupBy(d => d.HotelRoomId).Select(i => i.First()).ToList();
+
+                    foreach (var category in uniqueCategories)
+                    {
+                        // Lấy tất cả các chi tiết (dải ngày) thuộc về hạng phòng này
+                        var categoryDetails = details.Where(d => d.HotelRoomId == category.HotelRoomId).ToList();
+
+                        var dailyData = new List<object>();
+                        foreach (var date in displayDates)
+                        {
+                            decimal allocated = 0;
+                            decimal booked = 0;
+                            foreach (var detail in categoryDetails)
+                            {
+                                if (date >= detail.StartDate.Date && date <= detail.EndDate.Date)
+                                {
+                                    allocated += detail.NumberOfRooms;
+                                    booked += detail.TotalBookedRooms;
+                                }
+                            }
+                            dailyData.Add(new
+                            {
+                                date = date.ToString("dd/MM/yyyy"),
+                                dayOfWeek = date.ToString("ddd", new System.Globalization.CultureInfo("vi-VN")).ToUpper(),
+                                day = date.Day,
+                                isToday = date.Date == DateTime.Today,
+                                allocated = allocated,
+                                booked = booked,
+                                percentage = allocated > 0 ? Math.Round((booked / allocated) * 100, 0) : 0
+                            });
+                        }
+                        categories.Add(new
+                        {
+                            hotelRoomId = category.HotelRoomId,
+                            roomName = category.RoomName,
+                            totalCapacity = categoryDetails.Sum(s => s.TotalRoomNights),
+                            dailyData = dailyData
+                        });
+                    }
+                }
+
+                var dates = displayDates.Select(d => new
+                {
+                    date = d.ToString("dd/MM/yyyy"),
+                    dayOfWeek = d.ToString("ddd", new System.Globalization.CultureInfo("vi-VN")).ToUpper(),
+                    day = d.Day,
+                    isToday = d.Date == DateTime.Today
+                }).ToList();
+
+                return Json(new { status = 0, dates = dates, categories = categories });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetDetailData - HotelRoomFundController: " + ex);
+                return Json(new { status = 1, msg = ex.Message });
             }
         }
 

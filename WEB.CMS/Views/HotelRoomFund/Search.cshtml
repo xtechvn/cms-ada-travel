@@ -9,6 +9,8 @@
                 <th>Nhà cung cấp</th>
                 <th>Khách sạn</th>
                 <th>Tổng số phòng</th>
+                <th>Tổng số phòng đã đặt</th>
+                <th>Tổng số phòng còn lại</th>
                 <th>Người tạo</th>
                 <th>Ngày tạo</th>
                 <th>Thao tác</th>
@@ -25,10 +27,13 @@
                         <td>@stt</td>
                         <td>@item.SupplierName</td>
                         <td>@item.HotelName</td>
-                        <td>@item.TotalAmount?.ToString("N0")</td>
+                        <td>@(((decimal)item.TotalRooms).ToString("N0"))</td>
+                        <td>@item.TotalBookedRooms.ToString("N0")</td>
+                        <td>@item.NumberOfRoomsAvailable.ToString("N0")</td>
                         <td>@item.CreateName</td>
                         <td>@item.CreateDate?.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>
+                            <a class="btn btn-sm btn-info" href="/HotelRoomFund/Detail/@item.Id"><i class="fa fa-eye"></i> Xem</a>
                             <a class="btn btn-sm btn-primary" onclick="hotelRoomFund.AddOrUpdate(@item.Id)"><i class="fa fa-edit"></i> Sửa</a>
                         </td>
                     </tr>
@@ -37,7 +42,7 @@
             else
             {
                 <tr>
-                    <td colspan="7" class="text-center">Không có dữ liệu</td>
+                    <td colspan="9" class="text-center">Không có dữ liệu</td>
                 </tr>
             }
         </tbody>

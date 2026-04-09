@@ -13,7 +13,7 @@ namespace Entities.Models
         public int Id { get; set; }
         public int HotelId { get; set; }
         public int? SupplierId { get; set; }
-        public decimal? TotalAmount { get; set; }
+        public decimal? TotalRooms { get; set; }
         public DateTime? CreateDate { get; set; }
         public DateTime? UpdateDate { get; set; }
         public string CreateBy { get; set; }
