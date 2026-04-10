@@ -1,0 +1,64 @@
+@using Entities.ViewModels
+@model GenericViewModel<UserReserveHotelRoomFundViewModel>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Nhà cung cấp</th>
+                <th>Khách sạn</th>
+                <th>Hạng phòng</th>
+                <th>Số phòng</th>
+                <th>Từ ngày</th>
+                <th>Đến ngày</th>
+                <th>Người đặt</th>
+                <th>Ngày tạo</th>
+                <th>Giữ phòng đến</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.ListData != null && Model.ListData.Any())
+            {
+                int stt = (Model.CurrentPage - 1) * Model.PageSize + 1;
+                foreach (var item in Model.ListData)
+                {
+                    <tr>
+                        <td>@(stt++)</td>
+                        <td>@item.SupplierName</td>
+                        <td>@item.HotelName</td>
+                        <td>@item.RoomName</td>
+                        <td>@item.NumberOfRooms</td>
+                        <td>@item.StartDate.ToString("dd/MM/yyyy")</td>
+                        <td>@item.EndDate.ToString("dd/MM/yyyy")</td>
+                        <td>@item.UserName</td>
+                        <td>@item.CreatedDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@item.CreatedDate?.AddHours(1).ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center">Không có dữ liệu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@await Component.InvokeAsync("PagingNew", new
+    {
+
+            pageModel = new Paging()
+            {
+                TotalRecord = Model.TotalRecord,
+                TotalPage = Model.TotalPage,
+                CurrentPage = Model.CurrentPage,
+                PageSize = Model.PageSize,
+                RecordName = "Giữ phòng từ quỹ",
+                PageAction = "userReserveHotelRoomFund.ClientOnPaging({0})",
+                PageSelectPageSize = "userReserveHotelRoomFund.onSelectPageSize()"
+            }
+        })
+    </div>

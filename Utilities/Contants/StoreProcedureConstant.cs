@@ -328,6 +328,11 @@ namespace Utilities.Contants
         public static string sp_GetListHotelRoomFundDetail = "sp_GetListHotelRoomFundDetail";
         public static string SP_DeleteHotelRoomFundDetailByHotelRoomFundIdAndHotelRoomId = "SP_DeleteHotelRoomFundDetailByHotelRoomFundIdAndHotelRoomId";
 
+        public static string sp_InsertUserReserveHotelRoomFund = "sp_InsertUserReserveHotelRoomFund";
+        public static string sp_UpdateUserReserveHotelRoomFund = "sp_UpdateUserReserveHotelRoomFund";
+        public static string sp_GetListUserReserveHotelRoomFund = "sp_GetListUserReserveHotelRoomFund";
+        public static string sp_GetDetailUserReserveHotelRoomFund = "sp_GetDetailUserReserveHotelRoomFund";
+
 
 
 

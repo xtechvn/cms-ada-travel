@@ -13,6 +13,15 @@ var fundDetailPage = {
                 fundDetailPage.loadData();
             };
         }
+
+        // Auto-load reservations for this fund
+        if (typeof userReserveHotelRoomFund !== 'undefined') {
+            var hotelId = $('#detail-hotel-id').val();
+            var supplierId = $('#detail-supplier-id').val();
+            
+            // We need to pass these to Search to filter the results
+            userReserveHotelRoomFund.Search({ HotelId: hotelId, SupplierId: supplierId });
+        }
     },
 
     bindEvents: function () {
@@ -145,6 +154,26 @@ var fundDetailPage = {
             hotelRoomFund.AddOrUpdate(this.fundId);
         } else {
             _msgalert.error('Không tìm thấy module hotelRoomFund');
+        }
+    },
+
+    Reserve: function() {
+        if (typeof userReserveHotelRoomFund !== 'undefined') {
+            var hotelId = $('#detail-hotel-id').val();
+            var supplierId = $('#detail-supplier-id').val();
+            userReserveHotelRoomFund.AddOrUpdate(0, hotelId, supplierId);
+        } else {
+            _msgalert.error('Không tìm thấy module userReserveHotelRoomFund');
+        }
+    },
+
+    ReserveRoom: function(hotelRoomId) {
+        if (typeof userReserveHotelRoomFund !== 'undefined') {
+            var hotelId = $('#detail-hotel-id').val();
+            var supplierId = $('#detail-supplier-id').val();
+            userReserveHotelRoomFund.AddOrUpdate(0, hotelId, supplierId, hotelRoomId);
+        } else {
+            _msgalert.error('Không tìm thấy module userReserveHotelRoomFund');
         }
     }
 };

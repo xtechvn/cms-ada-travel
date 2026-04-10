@@ -10,6 +10,8 @@ namespace Entities.ViewModels
     public class HotelRoomFundDetailViewModel
     {
         public int Id { get; set; }
+        public int HotelId { get; set; }
+        public int SupplierId { get; set; }
         public string SupplierName { get; set; }
         public string HotelName { get; set; }
         public decimal? TotalRooms { get; set; }

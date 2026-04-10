@@ -15,7 +15,7 @@ using Utilities.Contants;
 
 namespace DAL
 {
-    public class HotelRoomFundDetailDAL : GenericService<HotelRoomFundDetail> 
+    public class HotelRoomFundDetailDAL : GenericService<HotelRoomFundDetail>
     {
 
         private static DbWorker _DbWorker;
@@ -44,7 +44,7 @@ namespace DAL
                 LogHelper.InsertLogTelegram("GetPagingList - ClientDAL: " + ex);
             }
             return 0;
-        } 
+        }
         public async Task<int> UpdateHotelRoomFundDetail(HotelRoomFundDetail Model)
         {
             try
@@ -57,7 +57,7 @@ namespace DAL
                 objParam[0] = new SqlParameter("@HotelRoomId", Model.HotelRoomId);
                 objParam[0] = new SqlParameter("@NumberOfRooms", Model.NumberOfRooms);
                 objParam[0] = new SqlParameter("@StartDate", Model.StartDate);
-                objParam[0] = new SqlParameter("@EndDate", Model.EndDate);               
+                objParam[0] = new SqlParameter("@EndDate", Model.EndDate);
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateHotelRoomFundDetail, objParam);
             }
@@ -67,15 +67,17 @@ namespace DAL
             }
             return 0;
         }
-        public async Task<List<HotelRoomFundDetailModel>> GetListHotelRoomFundDetail(int HotelRoomFundId)
+        public async Task<List<HotelRoomFundDetailModel>> GetListHotelRoomFundDetail(int HotelRoomFundId, DateTime? StartDate, DateTime? EndDate)
         {
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[1];
+                SqlParameter[] objParam = new SqlParameter[3];
 
                 objParam[0] = new SqlParameter("@HotelRoomFundId", HotelRoomFundId);
-             
+                objParam[1] = new SqlParameter("@StartDate", StartDate == null ? DBNull.Value : StartDate);
+                objParam[2] = new SqlParameter("@EndDate", EndDate == null ? DBNull.Value : EndDate);
+
 
                 var dt = _DbWorker.GetDataTable(StoreProcedureConstant.sp_GetListHotelRoomFundDetail, objParam);
                 if (dt != null && dt.Rows.Count > 0)
@@ -91,7 +93,7 @@ namespace DAL
             return null;
         }
 
-        public async Task<int> DeleteHotelRoomFundDetailByHotelRoomFundIdAndHotelRoomId(int hotelRoomFundId , int HotelRoomId)
+        public async Task<int> DeleteHotelRoomFundDetailByHotelRoomFundIdAndHotelRoomId(int hotelRoomFundId, int HotelRoomId)
         {
             try
             {

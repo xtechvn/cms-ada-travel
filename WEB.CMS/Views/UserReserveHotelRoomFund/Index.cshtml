@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Giữ phòng từ quỹ";
+}
+<style>
+    .white-popup {
+        max-width: 1200px !important;
+        min-height: 500px !important;
+    }
+</style>
+
+<section class="main-container">
+    <div class="row-main container">
+        <h2 class="title_page">Giữ phòng từ quỹ</h2>
+        <div class="bg_white filter-search">
+            <div class="row">
+                <div class="col-md-3 mb10">
+                    <input type="text" class="form-control" id="search-hotel-name" placeholder="Tên khách sạn" />
+                </div>
+                <div class="col-md-6 mb10">
+                    <button class="btn btn-default" onclick="userReserveHotelRoomFund.Search()">Tìm kiếm</button>
+                    <button class="btn btn-success" onclick="userReserveHotelRoomFund.AddOrUpdate(0)">Thêm mới</button>
+                </div>
+            </div>
+        </div>
+        <div id="grid-user-reserve-hotel-room-fund">
+
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script src="~/modules/user_reserve_hotel_room_fund.js"></script>
+}
+
+

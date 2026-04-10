@@ -122,6 +122,8 @@ namespace WEB.Adavigo.CMS.Controllers
                 }
 
                 viewModel.Id = model.Id;
+                viewModel.HotelId = model.HotelId;
+                viewModel.SupplierId = model.SupplierId ?? 0;
                 viewModel.SupplierName = model.SupplierName;
                 viewModel.HotelName = model.HotelName;
                 viewModel.TotalRooms = model.TotalRooms;
@@ -138,7 +140,6 @@ namespace WEB.Adavigo.CMS.Controllers
                     viewModel.DisplayDates.Add(startDate.AddDays(i));
                 }
 
-                // Nhóm details theo HotelRoomId
                 if (details != null && details.Any())
                 {
                     // Lấy danh sách mỗi Hạng phòng 1 bản ghi đại diện (unique categories)
@@ -146,34 +147,36 @@ namespace WEB.Adavigo.CMS.Controllers
                     
                     foreach (var category in uniqueCategories)
                     {
-                        // Lấy tất cả các chi tiết (dải ngày) thuộc về hạng phòng này
-                        var categoryDetails = details.Where(d => d.HotelRoomId == category.HotelRoomId).ToList();
-
                         var row = new RoomCategoryRow
                         {
                             HotelRoomId = category.HotelRoomId,
                             RoomName = category.RoomName,
-                            TotalCapacity = categoryDetails.Sum(s => s.TotalRoomNights)
+                            TotalCapacity = details.Where(d => d.HotelRoomId == category.HotelRoomId).Sum(s => s.TotalRoomNights)
                         };
-
-                        // Tính số phòng đã phân bổ và đã đặt cho mỗi ngày dựa trên danh sách chi tiết của hạng phòng này
-                        foreach (var date in viewModel.DisplayDates)
-                        {
-                            decimal allocated = 0;
-                            decimal booked = 0;
-                            foreach (var detail in categoryDetails)
-                            {
-                                if (date >= detail.StartDate.Date && date <= detail.EndDate.Date)
-                                {
-                                    allocated += detail.NumberOfRooms;
-                                    booked += detail.TotalBookedRooms;
-                                }
-                            }
-                            row.DailyAllocations[date] = allocated;
-                            row.DailyBooked[date] = booked;
-                        }
-
                         viewModel.RoomCategories.Add(row);
+                    }
+
+                    // Truy vấn lại theo từng đêm để lấy số phòng đã đặt chính xác cho đêm đó
+                    foreach (var date in viewModel.DisplayDates)
+                    {
+                        var nightDetails = await _hotelRoomFundRepository.GetListHotelRoomFundDetail(id, date, date.AddDays(1));
+                        
+                        foreach (var row in viewModel.RoomCategories)
+                        {
+                            var categoryNights = nightDetails?.Where(d => d.HotelRoomId == row.HotelRoomId).ToList();
+                            if (categoryNights != null && categoryNights.Any())
+                            {
+                                // Cộng dồn số phòng phân bổ từ tất cả các bản ghi quỹ của hạng phòng này trong đêm đó
+                                row.DailyAllocations[date] = categoryNights[0].NumberOfRooms;
+                                // Số phòng đã đặt là giá trị gộp của cả hạng phòng nên lấy giá trị lớn nhất (hoặc đầu tiên)
+                                row.DailyBooked[date] = categoryNights[0].TotalBookedRooms;
+                            }
+                            else
+                            {
+                                row.DailyAllocations[date] = 0;
+                                row.DailyBooked[date] = 0;
+                            }
+                        }
                     }
                 }
             }
@@ -225,41 +228,54 @@ namespace WEB.Adavigo.CMS.Controllers
                     // Lấy danh sách mỗi Hạng phòng 1 bản ghi đại diện (unique categories)
                     var uniqueCategories = details.GroupBy(d => d.HotelRoomId).Select(i => i.First()).ToList();
 
-                    foreach (var category in uniqueCategories)
+                    // Khởi tạo danh sách kết quả cho từng hạng phòng
+                    var rowList = uniqueCategories.Select(c => new
                     {
-                        // Lấy tất cả các chi tiết (dải ngày) thuộc về hạng phòng này
-                        var categoryDetails = details.Where(d => d.HotelRoomId == category.HotelRoomId).ToList();
+                        hotelRoomId = c.HotelRoomId,
+                        roomName = c.RoomName,
+                        totalCapacity = details.Where(d => d.HotelRoomId == c.HotelRoomId).Sum(s => s.TotalRoomNights),
+                        dailyList = new List<object>()
+                    }).ToList();
 
-                        var dailyData = new List<object>();
-                        foreach (var date in displayDates)
+                    // Truy vấn theo từng đêm (để lấy booked chính xác)
+                    foreach (var date in displayDates)
+                    {
+                        var nightDetails = await _hotelRoomFundRepository.GetListHotelRoomFundDetail(id, date, date.AddDays(1));
+                        
+                        foreach (var row in rowList)
                         {
+                            var categoryNights = nightDetails?.Where(d => d.HotelRoomId == row.hotelRoomId).ToList();
                             decimal allocated = 0;
                             decimal booked = 0;
-                            foreach (var detail in categoryDetails)
+
+                            if (categoryNights != null && categoryNights.Any())
                             {
-                                if (date >= detail.StartDate.Date && date <= detail.EndDate.Date)
-                                {
-                                    allocated += detail.NumberOfRooms;
-                                    booked += detail.TotalBookedRooms;
-                                }
+                                allocated = categoryNights[0].NumberOfRooms;
+                                booked = categoryNights[0].TotalBookedRooms;
                             }
-                            dailyData.Add(new
+
+                            row.dailyList.Add(new
                             {
                                 date = date.ToString("dd/MM/yyyy"),
-                                dayOfWeek = date.ToString("ddd", new System.Globalization.CultureInfo("vi-VN")).ToUpper(),
                                 day = date.Day,
+                                dayOfWeek = date.ToString("ddd", new System.Globalization.CultureInfo("vi-VN")).ToUpper(),
                                 isToday = date.Date == DateTime.Today,
-                                allocated = allocated,
-                                booked = booked,
+                                allocated = (double)allocated,
+                                booked = (double)booked,
                                 percentage = allocated > 0 ? Math.Round((booked / allocated) * 100, 0) : 0
                             });
                         }
+                    }
+
+                    // Chuyển đổi sang định dạng categories cuối cùng
+                    foreach (var row in rowList)
+                    {
                         categories.Add(new
                         {
-                            hotelRoomId = category.HotelRoomId,
-                            roomName = category.RoomName,
-                            totalCapacity = categoryDetails.Sum(s => s.TotalRoomNights),
-                            dailyData = dailyData
+                            hotelRoomId = row.hotelRoomId,
+                            roomName = row.roomName,
+                            totalCapacity = row.totalCapacity,
+                            dailyData = row.dailyList
                         });
                     }
                 }

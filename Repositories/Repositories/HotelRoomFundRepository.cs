@@ -3,6 +3,7 @@ using Entities.Models;
 using Entities.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Repositories.IRepositories;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -36,13 +37,13 @@ namespace Repositories.Repositories
 
         public async Task<int> InsertHotelRoomFundDetail(HotelRoomFundDetail model)
         {
-          
+
             return await _hotelRoomFundDetailDAL.InsertHotelRoomFundDetail(model);
         }
 
-        public async Task<List<HotelRoomFundDetailModel>> GetListHotelRoomFundDetail(int hotelRoomFundId)
+        public async Task<List<HotelRoomFundDetailModel>> GetListHotelRoomFundDetail(int hotelRoomFundId, DateTime? StartDate = null, DateTime? EndDate = null)
         {
-            return await _hotelRoomFundDetailDAL.GetListHotelRoomFundDetail(hotelRoomFundId);
+            return await _hotelRoomFundDetailDAL.GetListHotelRoomFundDetail(hotelRoomFundId, StartDate, EndDate);
         }
         public async Task<List<HotelRoomFundDetail>> GetListHotelRoomFundDetail2(int hotelRoomFundId)
         {

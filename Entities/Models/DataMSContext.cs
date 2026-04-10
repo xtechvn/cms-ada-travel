@@ -162,6 +162,7 @@ namespace Entities.Models
         public virtual DbSet<FlashSaleProduct> FlashSaleProducts { get; set; }
         public virtual DbSet<HotelRoomFund> HotelRoomFunds { get; set; }
         public virtual DbSet<HotelRoomFundDetail> HotelRoomFundDetails { get; set; }
+        public virtual DbSet<UserReserveHotelRoomFund> UserReserveHotelRoomFunds { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -3040,11 +3041,24 @@ namespace Entities.Models
 
                 entity.HasOne(d => d.HotelRoomFund)
                     .WithMany(p => p.HotelRoomFundDetails)
-                    .HasForeignKey(d => d.HotelRoomFundId)
+                    .HasForeignKey(d => d.HotelRoomId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_FundDetail_Fund");
             });
+            modelBuilder.Entity<UserReserveHotelRoomFund>(entity =>
+            {
+                entity.ToTable("UserReserveHotelRoomFund");
 
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.EndDate).HasColumnType("date");
+
+                entity.Property(e => e.StartDate).HasColumnType("date");
+
+                entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+            });
             modelBuilder.Entity<FlashSale>(entity =>
             {
                 entity.ToTable("FlashSale");

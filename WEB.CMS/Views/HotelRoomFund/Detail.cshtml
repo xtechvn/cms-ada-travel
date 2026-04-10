@@ -321,10 +321,17 @@
             <a href="/HotelRoomFund" class="btn-back" style="margin-bottom: 0;">
                 <i class="fa fa-arrow-left"></i> Quay lại danh sách
             </a>
-            <button type="button" class="btn btn-primary" onclick="fundDetailPage.Edit()" style="border-radius: 8px; font-weight: 600; padding: 8px 24px;">
-                <i class="fa fa-edit"></i> Chỉnh sửa quỹ
-            </button>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-success" onclick="fundDetailPage.Reserve()" style="border-radius: 8px; font-weight: 600; padding: 8px 24px;">
+                    <i class="fa fa-lock"></i> Giữ phòng
+                </button>
+                <button type="button" class="btn btn-primary" onclick="fundDetailPage.Edit()" style="border-radius: 8px; font-weight: 600; padding: 8px 24px;">
+                    <i class="fa fa-edit"></i> Chỉnh sửa quỹ
+                </button>
+            </div>
         </div>
+        <input type="hidden" id="detail-hotel-id" value="@Model.HotelId" />
+        <input type="hidden" id="detail-supplier-id" value="@Model.SupplierId" />
 
         <h2 class="title_page">Chi tiết quỹ phòng khách sạn</h2>
 
@@ -395,6 +402,11 @@
                                                 <div class="room-name">@room.RoomName</div>
                                                 <div class="room-capacity">Capacity: @room.TotalCapacity.ToString("N0") phòng</div>
                                             </div>
+                                            <div style="margin-left: auto;">
+                                               <button type="button" class="btn btn-default btn-xs" onclick="fundDetailPage.ReserveRoom(@room.HotelRoomId)" title="Giữ phòng này">
+                                                   <i class="fa fa-lock text-success"></i>
+                                               </button>
+                                            </div>
                                         </div>
                                     </td>
                                     @foreach (var date in Model.DisplayDates)
@@ -433,13 +445,14 @@
                 </table>
             </div>
         </div>
-
     </div>
 </section>
+
 
 <input type="hidden" id="fund-id" value="@Model.Id" />
 
 @section scripts {
     <script src="~/modules/hotel_room_fund.js"></script>
     <script src="~/modules/hotel_room_fund_detail.js"></script>
+    <script src="~/modules/user_reserve_hotel_room_fund.js"></script>
 }

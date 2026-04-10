@@ -100,6 +100,7 @@ builder.Services.AddTransient<IPolicyRepository, PolicyRepository>();
 builder.Services.AddTransient<IIdentifierServiceRepository, IdentifierServiceRepository>();
 builder.Services.AddTransient<IAccountClientRepository, AccountClientRepository>();
 builder.Services.AddTransient<IHotelRoomFundRepository, HotelRoomFundRepository>();
+builder.Services.AddTransient<IUserReserveHotelRoomFundRepository, UserReserveHotelRoomFundRepository>();
 builder.Services.AddTransient<IApartmentOrderRepository, ApartmentOrderRepository>();
 builder.Services.AddTransient<IFlashSaleRepository, FlashSaleRepository>();
 builder.Services.AddTransient<IFlashSaleProductRepository, FlashSaleProductRepository>();

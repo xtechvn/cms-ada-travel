@@ -1,0 +1,100 @@
+@using Entities.Models
+@model UserReserveHotelRoomFund
+
+<div class="modal-dialog" style="max-width: 800px">
+    <div class="modal-content">
+        <div class="modal-header">
+           
+        </div>
+        <div class="modal-body">
+            <form id="form-user-reserve-hotel-room-fund">
+                <input type="hidden" id="pre-hotel-room-id" value="@ViewBag.PreHotelRoomId" />
+                <div class="row">
+                    <div class="col-md-6 mb10">
+                        <label>Chọn khách sạn <span class="text-danger">*</span></label>
+                        <select class="select2 form-control" name="HotelId" id="reserve-hotel-id" style="width:100% !important">
+                            @if (ViewBag.PreHotelId > 0)
+                            {
+                                <option value="@ViewBag.PreHotelId" selected>@ViewBag.PreHotelName</option>
+                            }
+                            else
+                            {
+                                <option value="">-- Chọn khách sạn --</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb10">
+                        <label>Nhà cung cấp <span class="text-danger">*</span></label>
+                        <select class="select2 form-control" name="SupplierId" id="reserve-supplier-id" style="width:100% !important" @(ViewBag.PreSupplierId > 0 ? "" : "disabled")>
+                            @if (ViewBag.PreSupplierId > 0)
+                            {
+                                <option value="@ViewBag.PreSupplierId" selected>@ViewBag.PreSupplierName</option>
+                            }
+                            else
+                            {
+                                <option value="">-- Chọn khách sạn trước --</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-12 mb10" id="div-quick-apply" style="display:none; border: 1px dashed #ccc; padding: 15px; border-radius: 5px; background: #f9f9f9;">
+                        <h5 style="margin-top: 0; margin-bottom: 10px; font-weight: bold;">Giữ phòng nhiều ngày</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Hạng phòng</label>
+                                <select class="form-control select2" id="quick-room-type"></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Từ ngày - Đến ngày</label>
+                                <input type="text" class="form-control" id="quick-date-range" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Số phòng</label>
+                                <input type="number" class="form-control" id="quick-room-count" value="1" min="1" />
+                            </div>
+                            <div class="col-md-3">
+                                <label>&nbsp;</label>
+                                <button type="button" class="btn btn-info btn-block" onclick="userReserveHotelRoomFund.QuickAdd()">
+                                    <i class="fa fa-bolt"></i> Áp dụng nhanh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 mb10" id="div-room-type-table" style="display:none;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: bold;">Danh sách phòng giữ</label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="table-reserve-room-types">
+                                <thead>
+                                    <tr>
+                                        <th>Hạng phòng</th>
+                                        <th style="width: 110px;">Từ ngày</th>
+                                        <th style="width: 110px;">Đến ngày</th>
+                                        <th style="width: 90px;">Còn lại</th>
+                                        <th style="width: 110px;">Số đặt</th>
+                                        <th style="width: 150px;">Ghi chú</th>
+                                        <th style="width: 50px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-top: 10px;">
+                             <button type="button" class="btn btn-success btn-sm" onclick="userReserveHotelRoomFund.AddRoomTypeRow()"><i class="fa fa-plus"></i> Thêm dòng đơn lẻ</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" onclick="$.magnificPopup.close()">Hủy</button>
+            <button type="button" class="btn btn-primary" onclick="userReserveHotelRoomFund.Save()">Gửi yêu cầu</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    userReserveHotelRoomFund.InitUpsert();
+</script>
