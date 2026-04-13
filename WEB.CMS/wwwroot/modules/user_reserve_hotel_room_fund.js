@@ -139,27 +139,19 @@ var userReserveHotelRoomFund = {
         if (!roomId) { _msgalert.error("Vui lòng chọn hạng phòng"); return; }
         if (isNaN(count) || count <= 0) { _msgalert.error("Số lượng phòng không hợp lệ"); return; }
 
-        var currDate = moment(startDate);
-        while (currDate < endDate) {
-            var nextDate = moment(currDate).add(1, 'days');
-            var sStr = currDate.format('DD/MM/YYYY');
-            var eStr = nextDate.format('DD/MM/YYYY');
-            
-            // Check if already exists in table
-            var isDup = false;
-            $('#table-reserve-room-types tbody tr.room-row').each(function() {
-                 var rId = $(this).find('.room-select').val();
-                 var rsStr = $(this).find('.start-date').val();
-                 if (rId == roomId && rsStr == sStr) {
-                     isDup = true;
-                     return false;
-                 }
-            });
+        var isDup = false;
+        $('#table-reserve-room-types tbody tr.room-row').each(function() {
+             var rId = $(this).find('.room-select').val();
+             var rsStr = $(this).find('.start-date').val();
+             var reStr = $(this).find('.end-date').val();
+             if (rId == roomId && rsStr == dateRange[0].trim() && reStr == dateRange[1].trim()) {
+                 isDup = true;
+                 return false;
+             }
+        });
 
-            if (!isDup) {
-                this.AddRoomTypeRowWithData(roomId, roomName, sStr, eStr, count);
-            }
-            currDate.add(1, 'days');
+        if (!isDup) {
+            this.AddRoomTypeRowWithData(roomId, roomName, dateRange[0].trim(), dateRange[1].trim(), count);
         }
     },
 
