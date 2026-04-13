@@ -1,0 +1,123 @@
+@using Entities.ViewModels
+@model GenericViewModel<UserReserveHotelRoomFundViewModel>
+
+<div class="staff-mgmt-grid-wrapper" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid #eef2f7; overflow: hidden; margin-top: 20px;">
+    <table class="staff-list-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f8fafc; border-bottom: 1px solid #eef2f7;">
+                <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px;">NHÂN VIÊN</th>
+                <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px;">MÃ GIỮ CHỖ</th>
+                <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px;">HẠNG PHÒNG</th>
+                <th style="padding: 14px 20px; text-align: center; font-size: 11px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px;">SỐ LƯỢNG</th>
+                <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px;">NGÀY GIỮ / HẾT HẠN</th>
+                <th style="padding: 14px 20px; text-align: center; font-size: 11px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px;">TRẠNG THÁI</th>
+                <th style="padding: 14px 20px; text-align: center; font-size: 11px; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.ListData != null && Model.ListData.Any())
+            {
+                foreach (var item in Model.ListData)
+                {
+                    <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                        <td style="padding: 18px 20px;">
+                            <div class="user-info" style="display: flex; align-items: center; gap: 12px;">
+                                <div class="user-avatar" style="width: 44px; height: 44px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #64748b; font-size: 14px; overflow: hidden;">
+                                    @if(!string.IsNullOrEmpty(item.UserName)) {
+                                        <span>@item.UserName.Substring(0, 1).ToUpper()</span>
+                                    } else {
+                                        <i class="fa fa-user"></i>
+                                    }
+                                </div>
+                                <div>
+                                    <div class="user-name" style="font-size: 14px; font-weight: 700; color: #1a2a44;">@item.UserName</div>
+                                    <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">ID: STF-@item.UserId.ToString("D4")</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 18px 20px;">
+                            <div style="font-size: 13px; font-weight: 700; color: #1a2a44;">HLD-</div>
+                            <div style="font-size: 14px; font-weight: 800; color: #1a2a44;">@(44829 + item.Id)</div>
+                        </td>
+                        <td style="padding: 18px 20px;">
+                            <div style="font-size: 14px; font-weight: 600; color: #475569;">@item.RoomName</div>
+                            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase;">@(item.HotelName)</div>
+                        </td>
+                        <td style="padding: 18px 20px; text-align: center;">
+                            <span style="display: inline-block; padding: 6px 14px; background: #dbeafe; color: #1e40af; border-radius: 8px; font-weight: 800; font-size: 13px;">@item.NumberOfRooms.ToString("00")</span>
+                        </td>
+                        <td style="padding: 18px 20px;">
+                            @{
+                                var expiry = item.CreatedDate?.AddHours(1);
+                                var isExpired = expiry < DateTime.Now;
+                            }
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #475569;">
+                                    <i class="fa fa-calendar-o"></i> @item.StartDate.ToString("dd/MM/yyyy")
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: @(isExpired ? "#ef4444" : "#dc2626");">
+                                   @if(isExpired) {
+                                       <i class="fa fa-clock-o"></i> <span>Đã quá hạn</span>
+                                   } else {
+                                       <i class="fa fa-clock-o"></i> <span>Còn @((expiry.Value - DateTime.Now).ToString(@"hh\:mm"))</span>
+                                   }
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 18px 20px; text-align: center;">
+                            @if (item.Status == 0)
+                            {
+                                if (isExpired)
+                                {
+                                    <span class="status-badge" style="display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #fee2e2; color: #b91c1c; border-left: 4px solid #b91c1c;">● HẾT HẠN</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge" style="display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #fef3c7; color: #92400e; border-left: 4px solid #92400e;">● ĐANG GIỮ</span>
+                                }
+                            }
+                            else if (item.Status == 1)
+                            {
+                                <span class="status-badge" style="display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #f1f5f9; color: #475569; border-left: 4px solid #475569;">● ĐÃ XÁC NHẬN</span>
+                            }
+                        </td>
+                        <td style="padding: 18px 20px; text-align: center;">
+                             <div class="dropdown">
+                                <button class="btn btn-link p-0" type="button" data-toggle="dropdown" style="color: #94a3b8; font-size: 18px;">
+                                    <i class="fa fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="javascript:;" onclick="staffFundManagement.Edit(@item.Id)"><i class="fa fa-edit"></i> Chỉnh sửa</a>
+                                    <a class="dropdown-item text-danger" href="javascript:;"><i class="fa fa-trash"></i> Xóa</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" style="padding: 80px; text-align: center;">
+                         <div style="color: #94a3b8; font-weight: 600; font-size: 16px;">Không tìm thấy dữ liệu nhân viên giữ quỹ phù hợp</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @await Component.InvokeAsync("PagingNew", new
+    {
+
+            pageModel = new Paging()
+            {
+                TotalRecord = Model.TotalRecord,
+                TotalPage = Model.TotalPage,
+                CurrentPage = Model.CurrentPage,
+                PageSize = Model.PageSize,
+                RecordName = "kết quả",
+                 PageAction = "staffFundManagement.OnPaging({0})",
+                PageSelectPageSize = "staffFundManagement.OnSelectPageSize()"
+            }
+        })
+</div>
+

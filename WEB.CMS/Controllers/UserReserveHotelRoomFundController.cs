@@ -60,6 +60,75 @@ namespace WEB.Adavigo.CMS.Controllers
             return PartialView(model);
         }
 
+        public IActionResult StaffFundManagement(int hotelId = 0, int supplierId = 0)
+        {
+            ViewBag.HotelId = hotelId;
+            ViewBag.SupplierId = supplierId;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StaffFundManagementSearch(UserReserveHotelRoomFundSearchModel searchModel)
+        {
+            var model = new GenericViewModel<UserReserveHotelRoomFundViewModel>();
+            try
+            {
+                if (!string.IsNullOrEmpty(searchModel.FromDateStr))
+                {
+                    searchModel.FromDate = DateUtil.StringToDate(searchModel.FromDateStr);
+                }
+                if (!string.IsNullOrEmpty(searchModel.ToDateStr))
+                {
+                    searchModel.ToDate = DateUtil.StringToDate(searchModel.ToDateStr);
+                }
+
+                var datas = await _userReserveHotelRoomFundRepository.GetListUserReserveHotelRoomFund(searchModel);
+                
+                // If filtering by date is not fully supported by DAL/SP, we can filter here after fetching.
+                // However, let's assume DAL might be updated or we filter here if needed.
+                if (datas != null && datas.Any())
+                {
+                    if (searchModel.FromDate.HasValue)
+                        datas = datas.Where(x => x.StartDate >= searchModel.FromDate.Value).ToList();
+                    if (searchModel.ToDate.HasValue)
+                        datas = datas.Where(x => x.EndDate <= searchModel.ToDate.Value).ToList();
+                }
+
+                model.CurrentPage = searchModel.PageIndex;
+                model.ListData = datas;
+                model.PageSize = searchModel.PageSize;
+                model.TotalRecord = datas != null && datas.Any() ? datas.First().TotalRow : 0;
+                model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / searchModel.PageSize);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("StaffFundManagementSearch - UserReserveHotelRoomFundController: " + ex);
+            }
+            return PartialView("_StaffFundManagementSearch", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetListStaffHolding(UserReserveHotelRoomFundSearchModel searchModel)
+        {
+            var model = new GenericViewModel<UserReserveHotelRoomFundViewModel>();
+            try
+            {
+                searchModel.PageIndex = 1;
+                searchModel.PageSize = 5; // Show only top 5 as per the snippet
+                var datas = await _userReserveHotelRoomFundRepository.GetListUserReserveHotelRoomFund(searchModel);
+                model.ListData = datas;
+                model.TotalRecord = datas != null && datas.Any() ? datas.First().TotalRow : 0;
+                
+                ViewBag.HotelId = searchModel.HotelId;
+                ViewBag.SupplierId = searchModel.SupplierId;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListStaffHolding - UserReserveHotelRoomFundController: " + ex);
+            }
+            return PartialView("_ListStaffHolding", model);
+        }
+
         public async Task<IActionResult> AddOrUpdate(int id, int hotelId = 0, int supplierId = 0, int hotelRoomId = 0)
         {
             var model = new UserReserveHotelRoomFundViewModel();

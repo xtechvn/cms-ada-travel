@@ -98,7 +98,7 @@
 <script>
     window.hotelRoomFundExisting = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
         Model.HotelRoomFundDetails != null ? 
-        Model.HotelRoomFundDetails.Select(d => new { HotelRoomId = d.HotelRoomId, NumberOfRooms = d.NumberOfRooms, StartDate = d.StartDate.ToString("dd/MM/yyyy"), EndDate = d.EndDate.ToString("dd/MM/yyyy") }) : 
+        Model.HotelRoomFundDetails.Select(d => new { HotelRoomId = d.HotelRoomId, NumberOfRooms = d.NumberOfRooms, StartDate = ((DateTime)d.StartDate).ToString("dd/MM/yyyy"), EndDate = ((DateTime)d.EndDate).ToString("dd/MM/yyyy") }) : 
         new object[0]
     ));
     hotelRoomFund.InitUpsert();

@@ -351,6 +351,8 @@
             </div>
         </div>
 
+       
+
         <!-- Calendar Navigation -->
         <div class="calendar-nav">
             <button class="nav-btn" id="btn-prev-week" title="Tuần trước">
@@ -445,6 +447,13 @@
                 </table>
             </div>
         </div>
+
+         <!-- Staff Holding Fund List -->
+        <div id="staff-holding-container" style="margin-bottom: 30px;margin-top: 15px;">
+            <div style="padding: 20px; text-align: center; color: #8898aa;">
+                <i class="fa fa-spinner fa-spin"></i> Đang tải danh sách nhân viên...
+            </div>
+        </div>
     </div>
 </section>
 
@@ -452,7 +461,7 @@
 <input type="hidden" id="fund-id" value="@Model.Id" />
 
 @section scripts {
-    <script src="~/modules/hotel_room_fund.js"></script>
-    <script src="~/modules/hotel_room_fund_detail.js"></script>
-    <script src="~/modules/user_reserve_hotel_room_fund.js"></script>
+    <script src="~/modules/hotel_room_fund.js" asp-append-version="true"></script>
+    <script src="~/modules/hotel_room_fund_detail.js" asp-append-version="true"></script>
+    <script src="~/modules/user_reserve_hotel_room_fund.js" asp-append-version="true"></script>
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,10 @@ namespace Entities.ViewModels
         public int Status { get; set; } = -1;
         public int HotelId { get; set; }
         public int SupplierId { get; set; }
+        public string FromDateStr { get; set; }
+        public DateTime? FromDate { get; set; }
+        public string ToDateStr { get; set; }
+        public DateTime? ToDate { get; set; }
         public int PageIndex { get; set; }
         public int PageSize { get; set; }
     }

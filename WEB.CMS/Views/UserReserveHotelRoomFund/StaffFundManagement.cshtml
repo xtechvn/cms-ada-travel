@@ -1,0 +1,131 @@
+@{
+    ViewData["Title"] = "Quản lý Nhân viên Giữ quỹ";
+}
+
+<style>
+    .filter-wrapper {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+    .filter-item {
+        background: #fff;
+        border-radius: 12px;
+        padding: 12px 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #f1f5f9;
+        min-width: 180px;
+    }
+    .filter-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+    .status-filter-group {
+        display: flex;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 20px;
+    }
+    .status-filter-btn {
+        padding: 6px 16px;
+        border-radius: 18px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none !important;
+        background: transparent;
+        color: #64748b;
+    }
+    .status-filter-btn.active {
+        background: #1a2a44;
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(26,42,68,0.2);
+    }
+    .white-popup {
+        max-width: 1200px !important;
+        min-height: 500px !important;
+    }
+    .filter-item .select2-container--default .select2-selection--single {
+        border: none !important;
+        height: auto !important;
+        background: transparent !important;
+    }
+    .filter-item .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: inherit !important;
+        font-weight: 600;
+        color: #1a2a44;
+    }
+    .filter-item .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: -4px !important;
+    }
+</style>
+
+<section class="main-container" style="background: #f8fafc; min-height: 100vh; padding-top: 30px;">
+    <div class="row-main container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <div>
+                <nav style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px;">
+                    OPERATION / INVENTORY
+                </nav>
+                <h2 style="font-size: 28px; font-weight: 700; color: #1a2a44; margin: 0;">Quản lý Nhân viên Giữ quỹ</h2>
+            </div>
+        </div>
+
+        <input type="hidden" id="mgmt-hotel-id" value="@ViewBag.HotelId" />
+        <input type="hidden" id="mgmt-supplier-id" value="@ViewBag.SupplierId" />
+
+        <div class="filter-wrapper">
+            <div class="filter-item" style="flex: 1.2;">
+                <div class="filter-label">KHOẢNG NGÀY</div>
+                <div style="position: relative;">
+                    <input type="text" id="mgmt-date-range" class="form-control" style="border: none !important; padding: 0 !important; font-weight: 600; color: #1a2a44; background: transparent; cursor: pointer; box-shadow: none;" readonly />
+                    <i class="fa fa-calendar" style="position: absolute; right: 0; top: 2px; color: #94a3b8; pointer-events: none;"></i>
+                </div>
+            </div>
+            <div class="filter-item" style="flex: 1;">
+                <div class="filter-label">NHÂN VIÊN</div>
+                <select id="mgmt-user-id" class="form-control select2" style="width: 100%;">
+                  
+                </select>
+            </div>
+            <div class="filter-item" style="flex: 1;">
+                <div class="filter-label">HẠNG PHÒNG</div>
+                <select id="mgmt-room-id" class="form-control select2" style="width: 100%;">
+                    <option value="0">Tất cả hạng phòng</option>
+                </select>
+            </div>
+            <div class="filter-item" style="flex: 1; min-width: 320px;">
+                <div class="filter-label">TRẠNG THÁI</div>
+                <div class="status-filter-group" id="mgmt-status-filters">
+                    <button class="status-filter-btn active" data-status="-1">Tất cả</button>
+                    <button class="status-filter-btn" data-status="0">Đang giữ</button>
+                    <button class="status-filter-btn" data-status="1">Xác nhận</button>
+                    <button class="status-filter-btn" data-status="2">Hết hạn</button>
+                </div>
+                <input type="hidden" id="mgmt-filter-status" value="-1" />
+            </div>
+        </div>
+
+        <div id="grid-staff-fund-management">
+            <div style="text-align: center; padding: 50px;">
+                <i class="fa fa-spinner fa-spin fa-3x" style="color: #1a2a44;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script src="~/modules/staff_fund_management.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function() {
+            staffFundManagement.Init();
+        });
+    </script>
+}

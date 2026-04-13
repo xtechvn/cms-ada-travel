@@ -35,8 +35,8 @@ namespace DAL
                 objParam[1] = new SqlParameter("@UserId", model.UserId);
                 objParam[2] = new SqlParameter("@HotelRoomId", model.HotelRoomId);
                 objParam[3] = new SqlParameter("@NumberOfRooms", model.NumberOfRooms);
-                objParam[4] = new SqlParameter("@StartDate", model.StartDate);
-                objParam[5] = new SqlParameter("@EndDate", model.EndDate);
+                objParam[4] = new SqlParameter("@StartDate", DateUtil.StringToDateTime( model.StartDate.ToString("dd/MM/yyyy")));
+                objParam[5] = new SqlParameter("@EndDate", DateUtil.StringToDateTime( model.EndDate.ToString("dd/MM/yyyy")));
                 objParam[6] = new SqlParameter("@Status", model.Status);
 
 

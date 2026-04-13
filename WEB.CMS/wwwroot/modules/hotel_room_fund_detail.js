@@ -6,22 +6,37 @@ var fundDetailPage = {
     init: function () {
         this.updateNavTitle();
         this.bindEvents();
-        
-        // Ghi đè hàm Search của hotelRoomFund để refresh trang chi tiết thay vì quay về index
+
+        // Ghi đè hàm Search của các module để refresh trang chi tiết thay vì quay về index hoặc load grid không cần thiết
         if (typeof hotelRoomFund !== 'undefined') {
-            hotelRoomFund.Search = function() {
+            hotelRoomFund.Search = function () {
+                fundDetailPage.loadData();
+                fundDetailPage.loadStaffHolding();
+            };
+        }
+
+        if (typeof userReserveHotelRoomFund !== 'undefined') {
+            // Khi giữ phòng thành công hoặc refresh, chỉ cần load lại data và danh sách nhân viên của trang này
+            userReserveHotelRoomFund.Search = function () {
+                fundDetailPage.loadStaffHolding();
                 fundDetailPage.loadData();
             };
         }
 
-        // Auto-load reservations for this fund
-        if (typeof userReserveHotelRoomFund !== 'undefined') {
-            var hotelId = $('#detail-hotel-id').val();
-            var supplierId = $('#detail-supplier-id').val();
-            
-            // We need to pass these to Search to filter the results
-            userReserveHotelRoomFund.Search({ HotelId: hotelId, SupplierId: supplierId });
-        }
+        // Tải danh sách nhân viên đang giữ (container này trống lúc đầu)
+        this.loadStaffHolding();
+    },
+
+    loadStaffHolding: function () {
+        var hotelId = $('#detail-hotel-id').val();
+        var supplierId = $('#detail-supplier-id').val();
+
+        _ajax_caller.post('/UserReserveHotelRoomFund/GetListStaffHolding', {
+            HotelId: hotelId,
+            SupplierId: supplierId
+        }, function (result) {
+            $('#staff-holding-container').html(result);
+        });
     },
 
     bindEvents: function () {
@@ -102,7 +117,7 @@ var fundDetailPage = {
             var dayLabel = viDays[dateObj.getDay()];
             var todayClass = d.isToday ? 'is-today' : '';
             html += '<th class="' + todayClass + '">' + dayLabel;
-            html += '<span class="day-number">' + (d.day < 10 ?  d.day : d.day) + '</span>';
+            html += '<span class="day-number">' + (d.day < 10 ? d.day : d.day) + '</span>';
             if (d.isToday) {
                 html += '<span class="today-badge">HÔM NAY</span>';
             }
@@ -133,7 +148,7 @@ var fundDetailPage = {
                     else if (pct >= 80) level = 'level-high';
                     else if (pct >= 50) level = 'level-medium';
                     var todayCell = dd.isToday ? 'is-today-cell' : '';
-                    var bookedStr = dd.booked < 10 ?  Math.floor(dd.booked) : Math.floor(dd.booked);
+                    var bookedStr = dd.booked < 10 ? Math.floor(dd.booked) : Math.floor(dd.booked);
                     var allocatedStr = Math.floor(dd.allocated);
 
                     html += '<td><div class="alloc-cell ' + level + ' ' + todayCell + '" ';
@@ -149,7 +164,7 @@ var fundDetailPage = {
         $('#calendar-grid-container').html(html);
     },
 
-    Edit: function() {
+    Edit: function () {
         if (typeof hotelRoomFund !== 'undefined') {
             hotelRoomFund.AddOrUpdate(this.fundId);
         } else {
@@ -157,7 +172,7 @@ var fundDetailPage = {
         }
     },
 
-    Reserve: function() {
+    Reserve: function () {
         if (typeof userReserveHotelRoomFund !== 'undefined') {
             var hotelId = $('#detail-hotel-id').val();
             var supplierId = $('#detail-supplier-id').val();
@@ -167,7 +182,7 @@ var fundDetailPage = {
         }
     },
 
-    ReserveRoom: function(hotelRoomId) {
+    ReserveRoom: function (hotelRoomId) {
         if (typeof userReserveHotelRoomFund !== 'undefined') {
             var hotelId = $('#detail-hotel-id').val();
             var supplierId = $('#detail-supplier-id').val();

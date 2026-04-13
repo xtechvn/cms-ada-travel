@@ -71,7 +71,7 @@ namespace WEB.Adavigo.CMS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Save(HotelRoomFund model, List<HotelRoomFundDetail> details)
+        public async Task<IActionResult> Save(HotelRoomFund model, List<HotelRoomFundDetailAddModel> details)
         {
             try
             {
@@ -96,8 +96,16 @@ namespace WEB.Adavigo.CMS.Controllers
                 {
                     foreach (var detail in details)
                     {
-                        detail.HotelRoomFundId = model.Id;
-                        await _hotelRoomFundRepository.InsertHotelRoomFundDetail(detail);
+                        var detailModel = new HotelRoomFundDetail
+                        {
+                            HotelRoomFundId = model.Id,
+                            HotelRoomId = detail.HotelRoomId,
+                            NumberOfRooms = detail.NumberOfRooms,
+                            StartDate = detail.StartDate,
+                            EndDate = detail.EndDate
+                        };
+                        
+                        await _hotelRoomFundRepository.InsertHotelRoomFundDetail(detailModel);
                     }
                 }
 

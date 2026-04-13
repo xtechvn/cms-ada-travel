@@ -280,7 +280,7 @@ var hotelRoomFund = {
             if (sStr && eStr) {
                 var s = moment(sStr, 'DD/MM/YYYY');
                 var e = moment(eStr, 'DD/MM/YYYY');
-                if (startGeneral.isSameOrBefore(e) && endGeneral.isSameOrAfter(s)) {
+                if (startGeneral.isBefore(e) && endGeneral.isAfter(s)) {
                     isExistingOverlap = true;
                     return false;
                 }
@@ -309,7 +309,7 @@ var hotelRoomFund = {
 
                 // Kiểm tra chồng lấn giữa các Ngày đặc biệt
                 for (var sd of specialDates) {
-                    if (sdStart.isSameOrBefore(sd.end) && sdEnd.isSameOrAfter(sd.start)) {
+                    if (sdStart.isBefore(sd.end) && sdEnd.isAfter(sd.start)) {
                         _msgalert.error("Các Ngày đặc biệt không được chồng lấn thời gian với nhau.");
                         isSpecialOverlap = true;
                         return false;
@@ -338,7 +338,7 @@ var hotelRoomFund = {
                 finalRanges.push({
                     amount: amount,
                     start: currentStart.clone(),
-                    end: sd.start.clone().subtract(1, 'days')
+                    end: sd.start.clone()
                 });
             }
             // Thêm ngày đặc biệt
@@ -347,7 +347,7 @@ var hotelRoomFund = {
                 start: sd.start.clone(),
                 end: sd.end.clone()
             });
-            currentStart = sd.end.clone().add(1, 'days');
+            currentStart = sd.end.clone();
         }
 
         // Nếu còn khoảng trống đến cuối mốc chung
@@ -460,7 +460,7 @@ var hotelRoomFund = {
                 var end = moment(endStr, 'DD/MM/YYYY');
 
                 for (var r of ranges) {
-                    if (start.isSameOrBefore(r.end) && end.isSameOrAfter(r.start)) {
+                    if (start.isBefore(r.end) && end.isAfter(r.start)) {
                         isOverlap = true;
                         return false;
                     }
@@ -494,8 +494,8 @@ var hotelRoomFund = {
                 details.push({
                     HotelRoomId: row.find('input[name="HotelRoomId"]').val(),
                     NumberOfRooms: row.find('input[name="NumberOfRooms"]').val(),
-                    StartDate: row.find('input[name="StartDate"]').val(),
-                    EndDate: row.find('input[name="EndDate"]').val()
+                    StartDateSTR: row.find('input[name="StartDate"]').val(),
+                    EndDateSTR: row.find('input[name="EndDate"]').val()
                 });
             });
         });
