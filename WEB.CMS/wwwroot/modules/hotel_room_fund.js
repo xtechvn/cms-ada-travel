@@ -63,6 +63,32 @@ var hotelRoomFund = {
         };
         _ajax_caller.post('/HotelRoomFund/Search', searchModel, function (result) {
             $('#grid-data').html(result);
+            $('#selectPaggingOptions').val(searchModel.PageSize).attr("selected", "selected");
+        });
+    },
+    onSelectPageSize: function () {
+        var pageSize = $('#selectPaggingOptions').val();
+        var searchModel = {
+            SupplierId: $('#token-input-supplier').val(),
+            HotelId: $('#token-input-hotel').val(),
+            PageIndex: 1,
+            PageSize: pageSize
+        };
+        _ajax_caller.post('/HotelRoomFund/Search', searchModel, function (result) {
+            $('#grid-data').html(result);
+        });
+    },
+    ClientOnPaging: function (pageIndex) {
+        var pageSize = $('#selectPaggingOptions').val();
+        var searchModel = {
+            SupplierId: $('#token-input-supplier').val(),
+            HotelId: $('#token-input-hotel').val(),
+            PageIndex: pageIndex,
+            PageSize: pageSize
+        };
+        _ajax_caller.post('/HotelRoomFund/Search', searchModel, function (result) {
+            $('#grid-data').html(result);
+            $('#selectPaggingOptions').val(searchModel.PageSize).attr("selected", "selected");
         });
     },
     AddOrUpdate: function (id) {

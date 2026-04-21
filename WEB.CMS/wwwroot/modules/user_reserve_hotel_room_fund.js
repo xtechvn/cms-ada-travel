@@ -13,7 +13,7 @@ var userReserveHotelRoomFund = {
         var self = this;
         _ajax_caller.post('/UserReserveHotelRoomFund/Search', obj, function (result) {
             $('#grid-user-reserve-hotel-room-fund').html(result);
-
+            $('#selectPaggingOptions').val(obj.PageSize).attr("selected", "selected");
             // Handle Check All
             $('#check-all-reserve').on('change', function () {
                 var isChecked = $(this).prop('checked');
@@ -41,7 +41,7 @@ var userReserveHotelRoomFund = {
                     if (selected.length > 1) {
                         var first = selected.first().closest('tr');
                         var current = checkbox.closest('tr');
-                        
+
                         if (first.data('hotelid') !== current.data('hotelid') || first.data('supplierid') !== current.data('supplierid')) {
                             _msgalert.error("Chỉ được chọn các phòng cùng một khách sạn và cùng nhà cung cấp.");
                             checkbox.prop('checked', false);
@@ -95,7 +95,7 @@ var userReserveHotelRoomFund = {
         var title = "Tạo đơn hàng nhanh";
         var url = '/UserReserveHotelRoomFund/QuickOrderManual';
         var param = { ids: selectedIds };
-        
+
         _magnific.OpenSmallPopup(title, url, param, function () {
             // Callback after load if needed
         });
@@ -201,7 +201,7 @@ var userReserveHotelRoomFund = {
                     roomOptions += '<option value="' + item.id + '">' + item.name + '</option>';
                 });
                 $('#quick-room-type').html(roomOptions).select2({ placeholder: "-- Chọn hạng phòng --" });
-                
+
                 // Pre-select if needed
                 var preRoomId = $('#pre-hotel-room-id').val();
                 if (preRoomId && preRoomId > 0) {
@@ -221,19 +221,19 @@ var userReserveHotelRoomFund = {
         var startDate = moment(dateRange[0], 'DD/MM/YYYY');
         var endDate = moment(dateRange[1], 'DD/MM/YYYY');
         var count = parseInt($('#quick-room-count').val());
-        
+
         if (!roomId) { _msgalert.error("Vui lòng chọn hạng phòng"); return; }
         if (isNaN(count) || count <= 0) { _msgalert.error("Số lượng phòng không hợp lệ"); return; }
 
         var isDup = false;
-        $('#table-reserve-room-types tbody tr.room-row').each(function() {
-             var rId = $(this).find('.room-select').val();
-             var rsStr = $(this).find('.start-date').val();
-             var reStr = $(this).find('.end-date').val();
-             if (rId == roomId && rsStr == dateRange[0].trim() && reStr == dateRange[1].trim()) {
-                 isDup = true;
-                 return false;
-             }
+        $('#table-reserve-room-types tbody tr.room-row').each(function () {
+            var rId = $(this).find('.room-select').val();
+            var rsStr = $(this).find('.start-date').val();
+            var reStr = $(this).find('.end-date').val();
+            if (rId == roomId && rsStr == dateRange[0].trim() && reStr == dateRange[1].trim()) {
+                isDup = true;
+                return false;
+            }
         });
 
         if (!isDup) {
@@ -265,14 +265,14 @@ var userReserveHotelRoomFund = {
 
                 $('#table-reserve-room-types tbody').append(html);
                 var newRow = $('#table-reserve-room-types tbody tr:last');
-                
+
                 newRow.find('.select2').select2({ placeholder: "-- Hạng phòng --" });
                 newRow.find('.datepicker-reserve').daterangepicker({ singleDatePicker: true, autoApply: true, locale: { format: 'DD/MM/YYYY' } });
 
                 newRow.find('.room-select, .start-date, .end-date, .room-count').on('change', function () {
                     self.CheckAvailability(newRow);
                 });
-                
+
                 self.CheckAvailability(newRow);
             }
         });
@@ -292,13 +292,13 @@ var userReserveHotelRoomFund = {
 
         $('#table-reserve-room-types tbody').append(html);
         var newRow = $('#table-reserve-room-types tbody tr:last');
-        
+
         newRow.find('.datepicker-reserve').daterangepicker({ singleDatePicker: true, autoApply: true, locale: { format: 'DD/MM/YYYY' } });
 
         newRow.find('.start-date, .end-date, .room-count').on('change', function () {
             self.CheckAvailability(newRow);
         });
-        
+
         this.CheckAvailability(newRow);
     },
 
@@ -322,7 +322,7 @@ var userReserveHotelRoomFund = {
                     var avail = response.totalAvailable;
                     row.find('.avail-count').text(avail);
                     var msgNote = row.find('.msg-note');
-                    
+
                     if (requestedCount > avail || avail === 0) {
                         row.css('color', 'red').addClass('has-error');
                         row.find('input').css('color', 'red');
@@ -370,13 +370,13 @@ var userReserveHotelRoomFund = {
                 _msgalert.error("Vui lòng chọn hạng phòng");
                 hasError = true; return false;
             }
-            
+
             // Duplicate check
             var key = roomId + "_" + start;
             if (uniqueKeys[key]) {
-                 _msgalert.error("Hạng phòng và ngày " + start + " bị trùng trong danh sách");
-                 row.css('background', '#ffebeb');
-                 hasError = true; return false;
+                _msgalert.error("Hạng phòng và ngày " + start + " bị trùng trong danh sách");
+                row.css('background', '#ffebeb');
+                hasError = true; return false;
             }
             uniqueKeys[key] = true;
 
@@ -407,10 +407,10 @@ var userReserveHotelRoomFund = {
 
         var self = this;
         var successCount = 0;
-        
+
         // Use a small delay to ensure UI updates before synchronous AJAX if needed, 
         // though async: false is used here.
-        setTimeout(function() {
+        setTimeout(function () {
             $.each(requests, function (i, model) {
                 $.ajax({
                     url: '/UserReserveHotelRoomFund/Save',
@@ -421,7 +421,7 @@ var userReserveHotelRoomFund = {
                         if (result.status === 0) successCount++;
                         else _msgalert.error(result.msg);
                     },
-                    error: function() {
+                    error: function () {
                         _msgalert.error("Lỗi hệ thống khi lưu yêu cầu tại ngày " + model.StartDate);
                     }
                 });
