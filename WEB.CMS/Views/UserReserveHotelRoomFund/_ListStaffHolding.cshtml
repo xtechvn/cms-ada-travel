@@ -13,7 +13,8 @@
                 <tr style="background: #f8fafc; border-bottom: 1px solid #eef2f7;">
                     <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px;">NHÂN VIÊN</th>
                     <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px;">HẠNG PHÒNG</th>
-                    <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px;">NGÀY GIỮ</th>
+                    <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px;">NGÀY bắt đầu</th>
+                    <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px;">NGÀY kết thúc</th>
                     <th style="padding: 14px 20px; text-align: center; font-size: 11px; font-weight: 700; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px;">SỐ LƯỢNG</th>
                     <th style="padding: 14px 20px; text-align: left; font-size: 11px; font-weight: 700; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px;">THỜI GIAN HẾT HẠN</th>
                     <th style="padding: 14px 20px; text-align: center; font-size: 11px; font-weight: 700; color: #8898aa; text-transform: uppercase; letter-spacing: 0.5px;">TRẠNG THÁI</th>
@@ -39,6 +40,7 @@
                             </td>
                             <td style="padding: 14px 20px; font-size: 14px; color: #475569;">@item.RoomName</td>
                             <td style="padding: 14px 20px; font-size: 14px; color: #475569;">@item.StartDate.ToString("dd/MM/yyyy")</td>
+                            <td style="padding: 14px 20px; font-size: 14px; color: #475569;">@item.EndDate.ToString("dd/MM/yyyy")</td>
                             <td style="padding: 14px 20px; text-align: center; font-size: 15px; font-weight: 700; color: #1a2a44;">@item.NumberOfRooms.ToString("00")</td>
                             <td style="padding: 14px 20px;">
                                 @{
@@ -47,7 +49,7 @@
                                 }
                                 <div class="expiry-time" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: @(isExpired ? "#ef4444" : "#64748b");">
                                     <i class="fa fa-clock-o"></i>
-                                    <span>@(expiry?.ToString("HH:mm - dd/MM"))</span>
+                                    <span>@(expiry?.ToString("HH:mm - dd/MM/yyyy"))</span>
                                 </div>
                             </td>
                             <td style="padding: 14px 20px; text-align: center;">

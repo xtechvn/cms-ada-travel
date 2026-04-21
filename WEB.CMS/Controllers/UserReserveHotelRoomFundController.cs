@@ -289,9 +289,9 @@ namespace WEB.Adavigo.CMS.Controllers
                     if (categoryNights != null && categoryNights.Any())
                     {
                         // Tổng số phòng phân bổ của hạng phòng này trong đêm
-                        int totalAllocated = (int)nightDetails[0].NumberOfRooms;
+                        int totalAllocated = (int)categoryNights[0].NumberOfRooms;
                         // Số phòng đã đặt (thường là giá trị aggregate của hạng phòng)
-                        int totalBooked = nightDetails[0].TotalBookedRooms;
+                        int totalBooked = categoryNights[0].TotalBookedRooms;
 
                         int avail = totalAllocated - totalBooked;
                         if (avail < minAvail) minAvail = avail;
