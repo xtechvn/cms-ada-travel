@@ -10,8 +10,94 @@ var userReserveHotelRoomFund = {
     },
 
     GetGrid: function (obj) {
+        var self = this;
         _ajax_caller.post('/UserReserveHotelRoomFund/Search', obj, function (result) {
             $('#grid-user-reserve-hotel-room-fund').html(result);
+
+            // Handle Check All
+            $('#check-all-reserve').on('change', function () {
+                var isChecked = $(this).prop('checked');
+                if (isChecked) {
+                    var first = $('.check-reserve:not(:disabled)').first().closest('tr');
+                    if (first.length > 0) {
+                        var hId = first.data('hotelid');
+                        var sId = first.data('supplierid');
+                        $('.check-reserve:not(:disabled)').each(function () {
+                            var row = $(this).closest('tr');
+                            if (row.data('hotelid') === hId && row.data('supplierid') === sId) {
+                                $(this).prop('checked', true);
+                            }
+                        });
+                    }
+                } else {
+                    $('.check-reserve').prop('checked', false);
+                }
+            });
+
+            $('.check-reserve').on('change', function () {
+                var checkbox = $(this);
+                if (checkbox.prop('checked')) {
+                    var selected = $('.check-reserve:checked');
+                    if (selected.length > 1) {
+                        var first = selected.first().closest('tr');
+                        var current = checkbox.closest('tr');
+                        
+                        if (first.data('hotelid') !== current.data('hotelid') || first.data('supplierid') !== current.data('supplierid')) {
+                            _msgalert.error("Chỉ được chọn các phòng cùng một khách sạn và cùng nhà cung cấp.");
+                            checkbox.prop('checked', false);
+                        }
+                    }
+                }
+            });
+        });
+    },
+
+    CreateQuickOrder: function () {
+        var selectedIds = [];
+        var hotelId = -1;
+        var supplierId = -1;
+        var isValid = true;
+        var now = moment();
+
+        $('.check-reserve:checked').each(function () {
+            var row = $(this).closest('tr');
+            var id = $(this).val();
+            var hId = row.data('hotelid');
+            var sId = row.data('supplierid');
+            var keepUntilStr = row.data('keepuntil');
+            var keepUntil = moment(keepUntilStr, 'YYYY-MM-DD HH:mm:ss');
+
+            if (keepUntil.isBefore(now)) {
+                _msgalert.error("Một số phòng chọn đã hết hạn giữ phòng.");
+                isValid = false;
+                return false;
+            }
+
+            if (hotelId === -1) {
+                hotelId = hId;
+                supplierId = sId;
+            } else if (hotelId !== hId || supplierId !== sId) {
+                _msgalert.error("Các phòng được chọn phải cùng một khách sạn và cùng một nhà cung cấp.");
+                isValid = false;
+                return false;
+            }
+
+            selectedIds.push(id);
+        });
+
+        if (!isValid) return;
+
+        if (selectedIds.length === 0) {
+            _msgalert.error("Vui lòng chọn ít nhất một phòng để tạo đơn hàng nhanh.");
+            return;
+        }
+
+        var title = "Tạo đơn hàng nhanh";
+        var url = '/UserReserveHotelRoomFund/QuickOrderManual';
+        var param = { ids: selectedIds };
+        
+        _magnific.OpenSmallPopup(title, url, param, function () {
+            // Callback after load if needed
         });
     },
 

@@ -10,7 +10,8 @@ namespace Repositories.IRepositories
         Task<int> InsertUserReserveHotelRoomFund(UserReserveHotelRoomFund model);
         Task<int> UpdateUserReserveHotelRoomFund(UserReserveHotelRoomFund model);
         Task<List<UserReserveHotelRoomFundViewModel>> GetListUserReserveHotelRoomFund(UserReserveHotelRoomFundSearchModel searchModel);
-        Task<UserReserveHotelRoomFund> GetById(int id);
+        Task<UserReserveHotelRoomFundViewModel> GetById(int id);
+        Task<List<UserReserveHotelRoomFundViewModel>> GetListByIds(List<int> ids);
         Task<List<HotelRoomFundDetailModel>> GetHotelRoomFundDetailWithAvailability(int hotelId, int supplierId);
     }
 }

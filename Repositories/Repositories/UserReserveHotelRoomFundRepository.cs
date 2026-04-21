@@ -39,9 +39,14 @@ namespace Repositories.Repositories
             return await _userReserveHotelRoomFundDAL.GetListUserReserveHotelRoomFund(searchModel);
         }
 
-        public async Task<UserReserveHotelRoomFund> GetById(int id)
+        public async Task<UserReserveHotelRoomFundViewModel> GetById(int id)
         {
             return await _userReserveHotelRoomFundDAL.GetById(id);
+        }
+
+        public async Task<List<UserReserveHotelRoomFundViewModel>> GetListByIds(List<int> ids)
+        {
+            return await _userReserveHotelRoomFundDAL.GetListByIds(ids);
         }
 
         public async Task<List<HotelRoomFundDetailModel>> GetHotelRoomFundDetailWithAvailability(int hotelId, int supplierId)

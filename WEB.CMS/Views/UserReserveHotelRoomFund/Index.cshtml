@@ -3,7 +3,7 @@
 }
 <style>
     .white-popup {
-        max-width: 1200px !important;
+        max-width: 1600px !important;
         min-height: 500px !important;
     }
 </style>
@@ -13,12 +13,20 @@
         <h2 class="title_page">Giữ phòng từ quỹ</h2>
         <div class="bg_white filter-search">
             <div class="row">
-                <div class="col-md-3 mb10">
+                <div class="col-md-2 mb10">
                     <input type="text" class="form-control" id="search-hotel-name" placeholder="Tên khách sạn" />
                 </div>
-                <div class="col-md-6 mb10">
+                <div class="col-md-2 mb10">
+                    <select class="form-control" id="search-status">
+                        <option value="-1">Tất cả trạng thái</option>
+                        <option value="0">Đang giữ</option>
+                        <option value="1">Đã đặt</option>
+                    </select>
+                </div>
+                <div class="col-md-8 mb10">
                     <button class="btn btn-default" onclick="userReserveHotelRoomFund.Search()">Tìm kiếm</button>
                     <button class="btn btn-success" onclick="userReserveHotelRoomFund.AddOrUpdate(0)">Thêm mới</button>
+                    <button class="btn btn-primary" onclick="userReserveHotelRoomFund.CreateQuickOrder()">Tạo đơn hàng nhanh</button>
                 </div>
             </div>
         </div>
@@ -30,6 +38,7 @@
 
 @section scripts {
     <script src="~/modules/user_reserve_hotel_room_fund.js" asp-append-version="true"></script>
+    <script src="~/modules/quick_order_fund.js" asp-append-version="true"></script>
 }
 
 

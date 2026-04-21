@@ -101,7 +101,7 @@ namespace DAL
             }
             return null;
         }
-        public async Task<UserReserveHotelRoomFund> GetById(int id)
+        public async Task<UserReserveHotelRoomFundViewModel> GetById(int id)
         {
             try
             {
@@ -109,10 +109,10 @@ namespace DAL
 
                 objParam[0] = new SqlParameter("@id", id);
               
-                DataTable dt = _DbWorker.GetDataTable(StoreProcedureConstant.sp_GetListUserReserveHotelRoomFund, objParam);
+                DataTable dt = _DbWorker.GetDataTable(StoreProcedureConstant.sp_GetDetailUserReserveHotelRoomFund, objParam);
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    return dt.ToList<UserReserveHotelRoomFund>().FirstOrDefault();
+                    return dt.ToList<UserReserveHotelRoomFundViewModel>().FirstOrDefault();
                 }
             }
             catch (Exception ex)
@@ -120,6 +120,19 @@ namespace DAL
                 LogHelper.InsertLogTelegram("GetById - UserReserveHotelRoomFundDAL: " + ex);
             }
             return null;
+        }
+
+        public async Task<List<UserReserveHotelRoomFundViewModel>> GetListByIds(List<int> ids)
+        {
+            var list = new List<UserReserveHotelRoomFundViewModel>();
+            if (ids == null || !ids.Any()) return list;
+
+            foreach (var id in ids)
+            {
+                var item = await GetById(id);
+                if (item != null) list.Add(item);
+            }
+            return list;
         }
     }
 }

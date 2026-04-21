@@ -1,13 +1,20 @@
+using APP_CHECKOUT.RabitMQ;
+using Caching.Elasticsearch;
 using Entities.Models;
 using Entities.ViewModels;
+using Entities.ViewModels.ElasticSearch;
+using Entities.ViewModels.OrderManual;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Contants;
+using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
@@ -21,18 +28,57 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly IHotelRepository _hotelRepository;
         private readonly ManagementUser _managementUser;
         private readonly ISupplierRepository _supplierRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IOrderRepository _orderRepository;
+        private readonly IHotelBookingRepositories _hotelBookingRepository;
+        private readonly IAllCodeRepository _allCodeRepository;
+        private readonly IHotelBookingRoomRepository _hotelBookingRoomRepository;
+        private readonly IHotelBookingRoomRatesRepository _hotelBookingRoomRatesRepository;
+        private readonly IHotelBookingGuestRepository _hotelBookingGuestRepository;
+        private readonly IIdentifierServiceRepository _identifierServiceRepository;
+        private readonly IAccountClientRepository _accountClientRepository;
+        private readonly HotelESRepository _hotelESRepository;
+        private readonly IConfiguration _configuration;
+        private readonly WorkQueueClient _workQueueClient;
+        private readonly APIService _apiService;
+        private readonly ICustomerManagerRepository _customerManagerRepository;
 
 
         public UserReserveHotelRoomFundController(IUserReserveHotelRoomFundRepository userReserveHotelRoomFundRepository,
             IHotelRoomFundRepository hotelRoomFundRepository,
             IHotelRepository hotelRepository,
-            ManagementUser managementUser, ISupplierRepository supplierRepository)
+            ManagementUser managementUser, ISupplierRepository supplierRepository,
+            IUserRepository userRepository,
+            IOrderRepository orderRepository,
+            IHotelBookingRepositories hotelBookingRepository,
+            IAllCodeRepository allCodeRepository,
+            IHotelBookingRoomRepository hotelBookingRoomRepository,
+            IHotelBookingRoomRatesRepository hotelBookingRoomRatesRepository,
+            IHotelBookingGuestRepository hotelBookingGuestRepository,
+            IIdentifierServiceRepository identifierServiceRepository,
+            IAccountClientRepository accountClientRepository,
+            ICustomerManagerRepository customerManagerRepository,
+            IConfiguration configuration)
         {
             _userReserveHotelRoomFundRepository = userReserveHotelRoomFundRepository;
             _hotelRoomFundRepository = hotelRoomFundRepository;
             _hotelRepository = hotelRepository;
             _managementUser = managementUser;
             _supplierRepository = supplierRepository;
+            _userRepository = userRepository;
+            _orderRepository = orderRepository;
+            _hotelBookingRepository = hotelBookingRepository;
+            _allCodeRepository = allCodeRepository;
+            _hotelBookingRoomRepository = hotelBookingRoomRepository;
+            _hotelBookingRoomRatesRepository = hotelBookingRoomRatesRepository;
+            _hotelBookingGuestRepository = hotelBookingGuestRepository;
+            _identifierServiceRepository = identifierServiceRepository;
+            _accountClientRepository = accountClientRepository;
+            _configuration = configuration;
+            _hotelESRepository = new HotelESRepository(_configuration["DataBaseConfig:Elastic:Host"], configuration);
+            _workQueueClient = new WorkQueueClient(configuration);
+            _apiService = new APIService(configuration, _userRepository); // Wait, I need IUserRepository
+            _customerManagerRepository = customerManagerRepository;
         }
 
         public IActionResult Index()
@@ -269,6 +315,243 @@ namespace WEB.Adavigo.CMS.Controllers
             }
         }
 
+
+        public async Task<IActionResult> QuickOrderManual(List<int> ids)
+        {
+            long _UserId = 0;
+            if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+            {
+                _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            }
+            if (ids == null || !ids.Any())
+            {
+                return Content("Vui lòng chọn ít nhất một bản ghi.");
+            }
+
+            var listData = await _userReserveHotelRoomFundRepository.GetListByIds(ids);
+
+            if (!listData.Any()) return Content("Không tìm thấy dữ liệu.");
+
+            var first = listData.First();
+            if (listData.Any(x => x.HotelId != first.HotelId || x.SupplierId != first.SupplierId))
+            {
+                return Content("Các phòng chọn phải cùng khách sạn và nhà cung cấp.");
+            }
+            ViewBag.User_Create = new UserESViewModel();
+            var User_Create = await _userRepository.GetById(_UserId);
+            if (User_Create != null && User_Create.Id > 0)
+            {
+                ViewBag.User_Create = new UserESViewModel()
+                {
+                    email = User_Create.Email,
+                    fullname = User_Create.FullName,
+                    id = User_Create.Id,
+                    phone = User_Create.Phone,
+                    username = User_Create.UserName,
+                    _id = User_Create.Id
+                };
+            } 
+            ViewBag.User = new UserESViewModel();
+            var user = await _userRepository.GetChiefofDepartmentByServiceType((int)ServiceType.BOOK_HOTEL_ROOM_VIN);
+            if (user != null && user.Id > 0)
+            {
+                ViewBag.User = new UserESViewModel()
+                {
+                    email = user.Email,
+                    fullname = user.FullName,
+                    id = user.Id,
+                    phone = user.Phone,
+                    username = user.UserName,
+                    _id = user.Id
+                };
+            }
+            ViewBag.Branch = _allCodeRepository.GetListByType(AllCodeType.BRANCH_CODE);
+            ViewBag.Hotel = _hotelRepository.GetHotelById(first.HotelId ?? 0);
+            ViewBag.Supplier = _supplierRepository.GetById(first.SupplierId ?? 0);
+            ViewBag.ListData = listData;
+            ViewBag.TotalRooms = listData.Sum(x => x.NumberOfRooms);
+            ViewBag.StartDate = listData.Min(x => x.StartDate);
+            ViewBag.EndDate = listData.Max(x => x.EndDate);
+            ViewBag.FundIds = string.Join(",", ids);
+
+            return PartialView(listData);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitQuickOrder(QuickOrderRequestModel data, string fundIds)
+        {
+            try
+            {
+                if (data == null) return Json(new { status = 1, msg = "Dữ liệu không hợp lệ" });
+
+                var currentUser = _managementUser.GetCurrentUser();
+                var indentiferService = new IndentiferService(_configuration, _identifierServiceRepository, _orderRepository, null);
+
+                int company_type = 0;
+                try
+                {
+                    company_type = Convert.ToInt32(_configuration["CompanyType"]);
+                }
+                catch { }
+
+                // 1. Create Order
+                var order = new Entities.Models.Order()
+                {
+                    OrderNo = await indentiferService.buildOrderManual(company_type),
+                    ClientId = data.ClientId,
+                    SalerId = data.SalerId,
+                    SalerGroupId = data.SubSalerIds != null ? string.Join(",", data.SubSalerIds) : string.Empty,
+                    Label = data.Label,
+                    BranchCode = (short)data.BranchCode,
+                    Note = data.Note,
+                    UserUpdateId = currentUser.Id,
+                    CreatedBy = currentUser.Id,
+                    CreateTime = DateTime.Now,
+                    UpdateLast = DateTime.Now,
+                    AccountClientId = _accountClientRepository.GetMainAccountClientByClientId(data.ClientId),
+                    SystemType = (int)SystemType.Backend,
+                    OrderStatus = (int)OrderStatus.CREATED_ORDER,
+                    PaymentStatus = (int)PaymentStatus.UNPAID,
+                    ExpriryDate = DateTime.Now.AddMonths(1),
+                    Amount = 0
+                };
+
+                var result = await _orderRepository.CreateOrder(order);
+                var orderId = result.OrderId;
+                if (orderId <= 0) return Json(new { status = 1, msg = "Không thể tạo đơn hàng" });
+
+                // 2. Prepare Data for Hotel Service
+                var hotelES = await _hotelESRepository.GetHotelByID(data.HotelId.ToString());
+                var fundIdList = new List<int>();
+                if (!string.IsNullOrEmpty(fundIds))
+                {
+                    fundIdList = fundIds.Split(',').Select(int.Parse).ToList();
+                }
+
+                var fundData = await _userReserveHotelRoomFundRepository.GetListByIds(fundIdList);
+                if (fundData != null && fundData.Any(x => x.Status == 1))
+                {
+                    return Json(new { status = 1, msg = "Một trong những phòng chọn đã được đặt trước đó. Vui lòng kiểm tra lại." });
+                }
+
+                var hotelDetail = new OrderManualHotelSerivceSummitHotelDetail
+                {
+                    id = 0, // New service
+                    hotel_id = data.HotelId.ToString(),
+                    hotel_name = hotelES?.name,
+                    service_code = await indentiferService.buildServiceNo((int)ServicesType.VINHotelRent),
+                    arrive_date = fundData.Any() ? fundData.Min(x => x.StartDate) : DateTime.Now,
+                    departure_date = fundData.Any() ? fundData.Max(x => x.EndDate) : DateTime.Now,
+                    number_of_rooms = fundData.Sum(x => x.NumberOfRooms),
+                    number_of_adult = data.Adult,
+                    number_of_child = data.Child,
+                    number_of_infant = data.Infant,
+                    other_amount = data.OtherAmount,
+                    discount = data.Commission,
+                    main_staff_id = data.OperatorId > 0 ? data.OperatorId : data.SalerId,
+                    note = data.Note
+                };
+
+                var summitData = new OrderManualHotelSerivceSummitHotel
+                {
+                    order_id = orderId,
+                    hotel = hotelDetail,
+                    rooms = new List<OrderManualHotelSerivceSummitHotelRoom>(),
+                    guest = new List<OrderManualHotelSerivceSummitGuest>()
+                };
+
+                int roomIndex = 1;
+                foreach (var r in data.Rooms)
+                {
+                    var hbRoom = new OrderManualHotelSerivceSummitHotelRoom
+                    {
+                        id = 0,
+                        room_no = roomIndex++,
+                        room_type_id = r.RoomId.ToString(),
+                        number_of_rooms = (short)r.NumberOfRooms,
+                        room_type_name = r.RoomName,
+                        package = new List<OrderManualHotelSerivceSummitHotelRoomRate>()
+                    };
+
+                    foreach(var p in r.Packages)
+                    {
+                        DateTime startDate = DateTime.ParseExact(p.StartDate, "dd/MM/yyyy", null);
+                        DateTime endDate = DateTime.ParseExact(p.EndDate, "dd/MM/yyyy", null);
+                        int nights = (int)(endDate - startDate).TotalDays;
+                        if (nights == 0) nights = 1;
+
+                        hbRoom.package.Add(new OrderManualHotelSerivceSummitHotelRoomRate
+                        {
+                            id = 0,
+                            package_code = !string.IsNullOrEmpty(p.PackageName) ? p.PackageName : "Quỹ phòng",
+                            from = startDate,
+                            to = endDate,
+                            operator_price = p.ImportPrice,
+                            sale_price = p.ExportPrice,
+                            amount = p.ExportPrice * r.NumberOfRooms * nights,
+                            profit = (p.ExportPrice - p.ImportPrice) * r.NumberOfRooms * nights,
+                            nights = (short)nights
+                        });
+                    }
+                    summitData.rooms.Add(hbRoom);
+                }
+
+                if (data.Guests != null)
+                {
+                    foreach (var g in data.Guests)
+                    {
+                        DateTime? birthday = null;
+                        if (!string.IsNullOrEmpty(g.Birthday)) {
+                            try { birthday = DateTime.ParseExact(g.Birthday, "dd/MM/yyyy", null); } catch { }
+                        }
+
+                        summitData.guest.Add(new OrderManualHotelSerivceSummitGuest
+                        {
+                            id = 0,
+                            name = g.Name,
+                            note = g.Note,
+                            type = (short)g.Type,
+                            birthday = birthday,
+                            room_no = g.RoomId > 0 ? g.RoomId : 1
+                        });
+                    }
+                }
+
+                double totalOrderAmount = summitData.rooms.Sum(x => x.package.Sum(p => p.amount));
+                int is_debt_able = await _orderRepository.IsClientAllowedToDebtNewService(totalOrderAmount, data.ClientId, orderId, (int)ServiceType.BOOK_HOTEL_ROOM_VIN);
+
+                long bookingId = await _hotelBookingRepository.UpdateHotelBooking(summitData, hotelES, currentUser.Id, is_debt_able);
+                if (bookingId <= 0) return Json(new { status = 1, msg = "Thêm mới dịch vụ khách sạn thất bại" });
+
+                // 3. Update Status of Reservations
+                foreach (var fund in fundData)
+                {
+                    fund.Status = 1; // Mark as ordered
+                    await _userReserveHotelRoomFundRepository.UpdateUserReserveHotelRoomFund(fund);
+                }
+
+                await _orderRepository.UpdateOrderDetail(orderId, currentUser.Id);
+
+                _workQueueClient.SyncES(orderId, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"], ProjectType.ADAVIGO_CMS, "SubmitQuickOrder UserReserveHotelRoomFundController");
+                _workQueueClient.SyncES(bookingId, _configuration["DataBaseConfig:Elastic:SP:sp_GetHotelBooking"], _configuration["DataBaseConfig:Elastic:Index:HotelBooking"], ProjectType.ADAVIGO_CMS, "SubmitQuickOrder UserReserveHotelRoomFundController");
+
+                string link = "/Order/OrderDetail/" + orderId;
+                _apiService.SendMessage(currentUser.Id.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.TAO_MOI).ToString(), order.OrderNo, link, currentUser.Role);
+
+                var list_order =  _orderRepository.GetOrderByClientId((long)order.ClientId);
+                if (list_order != null && (list_order.Count == 0 || list_order.Count == 1))
+                {
+                    await _customerManagerRepository.UpdateStatusClient((int)ClientStatus.CHOT, (int)order.ClientId);
+                }
+
+                return Json(new { status = 0, msg = "Tạo đơn hàng nhanh thành công. Mã đơn: " + order.OrderNo, order_id = orderId });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SubmitQuickOrder - UserReserveHotelRoomFundController: " + ex);
+                return Json(new { status = 1, msg = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> Save(int HotelId, int SupplierId, int HotelRoomId, int NumberOfRooms, string StartDate, string EndDate)

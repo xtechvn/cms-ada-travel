@@ -1,0 +1,398 @@
+@using Entities.ViewModels
+@using Entities.Models
+@using Entities.ViewModels.Funding
+@model List<UserReserveHotelRoomFundViewModel>
+@{
+    Layout = null;
+    var branch = (List<AllCode>)ViewBag.Branch;
+    var hotel = (Hotel)ViewBag.Hotel;
+    var supplier = (SupplierViewModel)ViewBag.Supplier;
+    var totalRooms = (int)ViewBag.TotalRooms;
+    var startDate = (DateTime)ViewBag.StartDate;
+    var endDate = (DateTime)ViewBag.EndDate;
+    Entities.ViewModels.ElasticSearch.UserESViewModel? user = (Entities.ViewModels.ElasticSearch.UserESViewModel?)ViewBag.User;
+    var user_create = (Entities.ViewModels.ElasticSearch.UserESViewModel?)ViewBag.User_Create;
+
+}
+
+<style>
+    .quick-order-fund .modal-dialog {
+        max-width: 95%;
+    }
+    .quick-order-fund .lb-form {
+        background: #f4f6f8;
+        padding: 5px 10px;
+        font-weight: bold;
+        border-bottom: 1px solid #ddd;
+    }
+    .quick-order-fund .border {
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+    .quick-order-fund .pd10 {
+        padding: 10px;
+    }
+    .quick-order-fund .mb10 {
+        margin-bottom: 10px;
+    }
+    .quick-order-fund .txt_14 {
+        font-size: 14px;
+    }
+    .quick-order-fund .bold {
+        font-weight: bold;
+    }
+    .quick-order-fund .table-gray {
+        background: #fafafa;
+    }
+    .quick-order-fund input[readonly], .quick-order-fund input[disabled] {
+        background: #f4f6f8 !important;
+        cursor: not-allowed;
+    }
+    .quick-room-package-div, 
+    .quick-room-package-daterange-div, 
+    .quick-room-package-import-price-div, 
+    .quick-room-package-export-price-div, 
+    .quick-room-package-nights-div,
+    .quick-room-package-total-import-div,
+    .quick-room-package-total-export-div,
+    .quick-room-package-profit-div {
+        margin-bottom: 5px;
+        padding-bottom: 5px;
+        border-bottom: 1px dashed #eee;
+        min-height: 40px;
+    }
+    .quick-room-package-div:last-child, 
+    .quick-room-package-daterange-div:last-child, 
+    .quick-room-package-import-price-div:last-child, 
+    .quick-room-package-export-price-div:last-child, 
+    .quick-room-package-nights-div:last-child,
+    .quick-room-package-total-import-div:last-child,
+    .quick-room-package-total-export-div:last-child,
+    .quick-room-package-profit-div:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+</style>
+
+<div class="modal-body quick-order-fund pd10">
+    <form id="form-create-quick-order" onsubmit="return false">
+        <input type="hidden" id="quick-order-fund-ids" value="@ViewBag.FundIds" />
+        <!-- Customer & Order Info Sections (Stacked) -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="border">
+                    <div class="lb-form">Thông tin khách hàng</div>
+                    <div class="pd10">
+                        <div class="form-group">
+                            <select class="select2 client-select" id="quick-order-client" style="width:100% !important"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border">
+                    <div class="lb-form">Nhân viên chính <sup class="red">*</sup></div>
+                    <div class="pd10">
+                        <div class="form-group mb-0">
+                            <select class="select2 main-staff-select" id="quick-order-main-staff" style="width:100% !important">
+                                <option value="@(user_create.id)" selected="selected">@(user_create.fullname + " - "+ user_create.email)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border">
+                    <div class="lb-form">Nhãn đơn <sup class="red">*</sup></div>
+                    <div class="pd10">
+                        <div class="form-group mb-0">
+                            <input type="text" class="form-control" id="quick-order-label" value="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hotel Service Info Section (Full Width, structured like image) -->
+        <div class="border pd10">
+            <div class="lb-form mb10" style="background:none; border:none; padding:0;">Thông tin dịch vụ khách sạn</div>
+            
+            <!-- Header Row -->
+            <div class="row mb15">
+                <div class="col-md-4">
+                    <label class="lbl">Khách sạn <sup class="red">*</sup></label>
+                    <input type="text" class="form-control" value="@hotel?.Name" readonly>
+                    <input type="hidden" id="quick-service-hotel-id" value="@hotel?.HotelId" />
+                </div>
+                <div class="col-md-2">
+                    <label class="lbl">Số người <sup class="red">*</sup></label>
+                    <input type="number" class="form-control" id="quick-service-people" value="1">
+                    <div style="display:none;">
+                        <input type="number" id="quick-service-adult" value="0">
+                        <input type="number" id="quick-service-child" value="0">
+                        <input type="number" id="quick-service-infant" value="0">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="lbl">Số phòng <sup class="red">*</sup></label>
+                    <input type="number" class="form-control" id="quick-service-rooms" value="@totalRooms" readonly>
+                </div>
+                <div class="col-md-2">
+                    <label class="lbl">Ngày Checkin <sup class="red">*</sup></label>
+                    <input type="text" class="form-control" id="quick-service-checkin" value="@startDate.ToString("dd/MM/yyyy")" readonly>
+                </div>
+                <div class="col-md-2">
+                    <label class="lbl">Ngày Checkout <sup class="red">*</sup></label>
+                    <input type="text" class="form-control" id="quick-service-checkout" value="@endDate.ToString("dd/MM/yyyy")" readonly>
+                </div>
+                <div class="col-md-2">
+                    <label class="lbl">Điều hành viên <sup class="red">*</sup></label>
+                    <select class="select2 main-staff-select" id="quick-service-operator" style="width:100% !important">
+                        <option value="@(user.id)" selected="selected">@(user.fullname + " - "+ user.email)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Costs Row -->
+            <div class="row mb15">
+                <div class="col-md-2">
+                    <label class="lbl">Chi phí khác</label>
+                    <input type="text" class="form-control currency" id="quick-service-other-amount" value="0">
+                </div>
+                <div class="col-md-2">
+                    <label class="lbl">Hoa hồng CTV</label>
+                    <input type="text" class="form-control currency" id="quick-service-commission" value="0">
+                </div>
+            </div>
+
+            <div class="txt_14 bold mb10">Bảng kê dịch vụ phòng <small>(Đơn giá đã bao gồm thuế phí + Phí dịch vụ Adavigo)</small></div>
+            <div class="table-responsive table-gray mb15">
+                <table class="table table-nowrap" id="table-quick-order-rooms">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th class="text-center" style="min-width: 150px;">Hạng phòng<sup class="red">*</sup></th>
+                            <th class="text-center" style="min-width: 150px;">Gói<sup class="red">*</sup></th>
+                            <th class="text-center" style="min-width: 150px;">Thời gian sử dụng<sup class="red">*</sup></th>
+                            <th class="text-right" style="min-width: 120px;">Giá nhập<sup class="red">*</sup></th>
+                            <th class="text-right" style="min-width: 120px;">Giá bán<sup class="red">*</sup></th>
+                            <th class="text-right" style="min-width: 70px; width: 70px !important;">Số đêm</th>
+                            <th class="text-right" style="min-width: 70px; width: 70px !important;">Số lượng phòng<sup class="red">*</sup></th>
+                            <th class="text-right">Tổng tiền giá nhập</th>
+                            <th class="text-right">Tổng tiền giá bán</th>
+                            <th class="text-right">Lợi nhuận</th>
+                            <th>Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var processedGroups = new List<List<UserReserveHotelRoomFundViewModel>>();
+                            if (Model != null && Model.Any())
+                            {
+                                var sortedModel = Model.OrderBy(x => x.HotelRoomId).ThenBy(x => x.StartDate).ToList();
+                                var currentGroup = new List<UserReserveHotelRoomFundViewModel> { sortedModel[0] };
+                                
+                                for (int i = 1; i < sortedModel.Count; i++)
+                                {
+                                    var prev = sortedModel[i - 1];
+                                    var next = sortedModel[i];
+                                    
+                                    if (next.HotelRoomId == prev.HotelRoomId && next.StartDate == prev.EndDate)
+                                    {
+                                        currentGroup.Add(next);
+                                    }
+                                    else
+                                    {
+                                        processedGroups.Add(currentGroup);
+                                        currentGroup = new List<UserReserveHotelRoomFundViewModel> { next };
+                                    }
+                                }
+                                processedGroups.Add(currentGroup);
+                            }
+                        }
+
+                        @for (int i = 0; i < processedGroups.Count; i++)
+                        {
+                            var group = processedGroups[i];
+                            var firstItem = group.First();
+                            <tr class="servicemanual-hotel-room-tr quick-room-row" data-room-id="@firstItem.HotelRoomId">
+                                <td class="servicemanual-hotel-room-td-order quick-room-order">@(i + 1)</td>
+                                <td>
+                                    <input class="form-control servicemanual-hotel-room-type-name quick-room-name" type="text" placeholder="Nhập tên hạng phòng" value="@firstItem.RoomName" readonly>
+                                </td>
+                                <td class="servicemanual-hotel-room-td-rates-code">
+                                    @foreach (var item in group)
+                                    {
+                                        <div class="d-flex align-center servicemanual-hotel-room-div-code quick-room-package-div" data-fund-id="@item.Id">
+                                            <a class="fa fa-trash-o txt_14 mr-2 delete-room-rates-button btn-delete-package" href="javascript:;" style="@(group.Count > 1 ? "" : "display:none;")"></a>
+                                            <a class="fa fa-plus-circle green mr-1 add-room-rates-button btn-add-package" href="javascript:;" style="display:none;"></a>
+                                            <input class="form-control servicemanual-hotel-room-rates-code quick-room-package-name" type="text" placeholder="Nhập tên gói" value="">
+                                        </div>
+                                    }
+                                </td>
+                                <td class="servicemanual-hotel-room-td-rates-daterange">
+                                    @foreach (var item in group)
+                                    {
+                                        <div class="d-flex align-center quick-room-package-daterange-div">
+                                            <input class="form-control servicemanual-hotel-room-rates-daterange quick-room-package-daterange" type="text" value="@item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")" readonly>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="servicemanual-hotel-room-td-rates-operator-price">
+                                    @foreach (var item in group)
+                                    {
+                                        <div class="d-flex align-center quick-room-package-import-price-div">
+                                            <input class="form-control currency servicemanual-hotel-room-rates-operator-price text-right quick-room-import-price" type="text" placeholder="Giá nhập">
+                                        </div>
+                                    }
+                                </td>
+                                <td class="servicemanual-hotel-room-td-rates-sale-price">
+                                    @foreach (var item in group)
+                                    {
+                                        <div class="d-flex align-center quick-room-package-export-price-div">
+                                            <input class="form-control currency servicemanual-hotel-room-rates-sale-price text-right quick-room-export-price" type="text" placeholder="Giá bán">
+                                        </div>
+                                    }
+                                </td>
+                                <td class="text-right servicemanual-hotel-room-td-rates-nights">
+                                    @foreach (var item in group)
+                                    {
+                                        int nights = (int)(item.EndDate - item.StartDate).TotalDays;
+                                        if (nights == 0) nights = 1;
+                                        <div class="d-flex align-center justify-content-end quick-room-package-nights-div">
+                                            <input class="input-disabled-background form-control currency servicemanual-hotel-room-rates-nights text-right quick-room-package-nights" type="text" disabled value="@nights">
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    <input class="form-control servicemanual-hotel-room-number-of-rooms quick-room-count text-right" type="number" value="@firstItem.NumberOfRooms" readonly style="width: 70px;">
+                                </td>
+                                <td class="servicemanual-hotel-room-td-rates-operator-amount">
+                                    @foreach (var item in group)
+                                    {
+                                        <div class="d-flex align-center quick-room-package-total-import-div">
+                                            <input class="input-disabled-background form-control currency servicemanual-hotel-room-rates-operator-amount text-right quick-room-total-import" type="text" disabled value="0">
+                                        </div>
+                                    }
+                                </td>
+                                <td class="servicemanual-hotel-room-td-rates-total-amount">
+                                    @foreach (var item in group)
+                                    {
+                                        <div class="d-flex align-center quick-room-package-total-export-div">
+                                            <input class="input-disabled-background form-control currency servicemanual-hotel-room-rates-total-amount text-right quick-room-total-export" type="text" disabled value="0">
+                                        </div>
+                                    }
+                                </td>
+                                <td class="servicemanual-hotel-room-td-rates-profit">
+                                    @foreach (var item in group)
+                                    {
+                                        <div class="d-flex align-center quick-room-package-profit-div">
+                                            <input class="input-disabled-background form-control currency servicemanual-hotel-room-rates-profit text-right quick-room-profit" type="text" disabled value="0">
+                                        </div>
+                                    }
+                                </td>
+                                <td class="txt_14">
+                                    <a class="fa fa-trash-o btn-delete-room" href="javascript:;" title="Xóa phòng"></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="8">
+                                <div class="text-right"><strong>Tổng cộng</strong></div>
+                            </td>
+                            <td class="text-right bold quick-room-total-import-final" id="servicemanual-hotel-room-total-amount-final">0</td>
+                            <td class="text-right bold quick-room-total-export-final" id="servicemanual-hotel-room-total-sale-amount-final">0</td>
+                            <td class="text-right bold quick-room-total-profit-final" id="servicemanual-hotel-room-total-profit-final">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="row mb10">
+                <div class="col-md-12">
+                    <div class="bold txt_14 mb10">Ghi chú</div>
+                    <textarea class="form-control" id="quick-order-note" style="height: 100px;"></textarea>
+                </div>
+            </div>
+
+            <div class="bold mb15 txt_14">Danh sách đoàn</div>
+            <div class="form-group mb10">
+                <input type="file" style="display:none;" class="import_data_guest">
+                <button type="button" class="btn upload size upload-file-guest-btn" onclick="$('.import_data_guest').trigger('click');">
+                    <svg class="icon-svg mr-1" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.9414 15.0002C16.9414 15.5525 16.4937 16.0002 15.9414 16.0002H1.94141C1.38912 16.0002 0.941406 15.5525 0.941406 15.0002C0.941406 14.448 1.38912 14.0002 1.94141 14.0002H15.9414C16.4937 14.0002 16.9414 14.4479 16.9414 15.0002ZM5.39838 5.5433C5.65428 5.5433 5.91022 5.44567 6.10547 5.25039L7.94141 3.41445V11.1253C7.94141 11.6775 8.38912 12.1253 8.94141 12.1253C9.49369 12.1253 9.94141 11.6775 9.94141 11.1253V3.41445L11.7773 5.25039C12.1679 5.64092 12.801 5.64092 13.1916 5.25039C13.5821 4.85986 13.5821 4.22671 13.1916 3.83617L9.6485 0.293143C9.25797 -0.0973887 8.62481 -0.0973887 8.23428 0.293143L4.69125 3.83617C4.30072 4.22671 4.30072 4.85986 4.69125 5.25039C4.88653 5.44567 5.14244 5.5433 5.39838 5.5433Z" fill="#1254FF" />
+                    </svg>
+                    Upload danh sách khách nhanh (Khách sạn)
+                </button>
+            </div>
+            <div class="table-responsive table-gray">
+                <table class="table table-bordered" id="table-quick-order-guests">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th style="min-width: 200px;">Họ và tên</th>
+                            <th style="min-width: 150px;">Phân loại hành khách</th>
+                            <th style="min-width: 120px;">Ngày sinh</th>
+                            <th style="min-width: 150px;">Loại phòng</th>
+                            <th style="min-width: 200px;">Ghi chú</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="quick-guest-row">
+                            <td class="quick-guest-order">1</td>
+                            <td><input type="text" class="form-control quick-guest-name" placeholder="Tên khách"></td>
+                            <td>
+                                <select class="form-control quick-guest-type">
+                                    <option value="1">Người lớn</option>
+                                    <option value="2">Trẻ em</option>
+                                    <option value="3">Em bé</option>
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control datepicker-input quick-guest-birthday" placeholder="dd/mm/yyyy"></td>
+                            <td>
+                                <select class="form-control quick-guest-room">
+                                    @for(int j=0; j<Model.Count; j++)
+                                    {
+                                        <option value="@Model[j].HotelRoomId">Phòng @(j+1) - @Model[j].RoomName</option>
+                                    }
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control quick-guest-note"></td>
+                            <td><a href="javascript:;" class="red btn-delete-guest"><i class="fa fa-times"></i></a></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="7">
+                                <a href="javascript:;" id="btn-add-quick-guest" class="blue"><i class="fa fa-plus-circle green"></i> Thêm thông tin thành viên</a>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="row mt10">
+                <div class="col-md-6"></div>
+                <div class="col-md-6 text-right">
+                    <div class="bold">Tổng lợi nhuận dịch vụ: <strong class="quick-total-profit">0</strong></div>
+                    <div class="bold">Tổng tiền dịch vụ: <strong class="quick-total-amount">0</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt20">
+            <button class="btn btn-default" onclick="$.magnificPopup.close()">Hủy bỏ</button>
+            <button class="btn btn-success" id="btn-submit-quick-order">Tạo đơn hàng & Dịch vụ</button>
+        </div>
+    </form>
+</div>
+
+<script src="~/modules/quick_order_fund.js" asp-append-version="true"></script>
+<script>
+   _quick_order_fund.Init();
+</script>
