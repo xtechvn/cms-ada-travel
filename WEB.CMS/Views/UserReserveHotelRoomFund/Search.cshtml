@@ -1,5 +1,7 @@
 @using Entities.ViewModels
+@using System.Security.Claims
 @model GenericViewModel<UserReserveHotelRoomFundViewModel>
+
 
 <div class="table-responsive">
     <table class="table table-bordered table-striped">
@@ -17,26 +19,36 @@
                 <th>Người đặt</th>
                 <th>Ngày tạo</th>
                 <th>Giữ phòng đến</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
+
         <tbody>
             @if (Model != null && Model.ListData != null && Model.ListData.Any())
             {
                 int stt = (Model.CurrentPage - 1) * Model.PageSize + 1;
+                long currentUserId = 0;
+                if (User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    currentUserId = Convert.ToInt64(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+
                 foreach (var item in Model.ListData)
                 {
                     var keepUntil = item.CreatedDate?.AddHours(1);
                     var isExpired = keepUntil < DateTime.Now;
                     var isOrdered = item.Status == 1;
-                    <tr class="reserve-row @(isOrdered ? "ordered-row" : "")" data-id="@item.Id" data-hotelid="@item.HotelId" data-supplierid="@item.SupplierId" data-keepuntil="@(keepUntil?.ToString("yyyy-MM-dd HH:mm:ss"))">
-                        <td><input type="checkbox" class="check-reserve" value="@item.Id" @(isExpired || isOrdered ? "disabled" : "") /></td>
+                    var isCancelled = item.Status == 2;
+
+                    <tr class="reserve-row @(isOrdered ? "ordered-row" : "") @(isCancelled ? "cancelled-row" : "")" data-id="@item.Id" data-hotelid="@item.HotelId" data-supplierid="@item.SupplierId" data-keepuntil="@(keepUntil?.ToString("yyyy-MM-dd HH:mm:ss"))">
+                        <td><input type="checkbox" class="check-reserve" value="@item.Id" @(isExpired || isOrdered || isCancelled ||item.UserId != currentUserId? "disabled" : "") /></td>
                         <td>@(stt++)</td>
                         <td>
                             @if (isOrdered)
                             {
                                 <span class="status-green">Đã đặt</span>
                             }
-                            else if (isExpired)
+                            else if (isExpired || isCancelled)
                             {
                                 <span class="status-red">Hết hạn</span>
                             }
@@ -54,13 +66,22 @@
                         <td>@item.UserName</td>
                         <td>@item.CreatedDate?.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@item.CreatedDate?.AddHours(1).ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @if (!isOrdered && !isExpired && !isCancelled && item.UserId == currentUserId)
+                            {
+                                <button type="button" class="btn btn-default bg-main" onclick="userReserveHotelRoomFund.CancelReserve(@item.Id)">
+                                    Bỏ giữ phòng
+                                </button>
+                            }
+                        </td>
                     </tr>
                 }
             }
+
             else
             {
                 <tr>
-                    <td colspan="12" class="text-center">Không có dữ liệu</td>
+                    <td colspan="13" class="text-center">Không có dữ liệu</td>
                 </tr>
             }
         </tbody>

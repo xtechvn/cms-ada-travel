@@ -436,8 +436,24 @@ var userReserveHotelRoomFund = {
                 btnLuu.prop('disabled', false).removeClass('disabled').html('Lưu');
             }
         }, 100);
+    },
+
+    CancelReserve: function (id) {
+        _msgconfirm.openDialog("Xác nhận bỏ giữ phòng?", "Bạn Xác nhận bỏ giữ phòng?", function () {
+            _ajax_caller.post('/UserReserveHotelRoomFund/CancelReserve', { id: id }, function (result) {
+                if (result.status === 0) {
+                    _msgalert.success(result.msg);
+                    setTimeout(function () {
+                        userReserveHotelRoomFund.Search();
+                    },500)
+                } else {
+                    _msgalert.error(result.msg);
+                }
+            });
+        });
     }
 };
+
 
 $(document).ready(function () {
     userReserveHotelRoomFund.Init();

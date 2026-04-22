@@ -325,9 +325,11 @@
                 <button type="button" class="btn btn-success" onclick="fundDetailPage.Reserve()" style="border-radius: 8px; font-weight: 600; padding: 8px 24px;">
                     <i class="fa fa-lock"></i> Giữ phòng
                 </button>
-                <button type="button" class="btn btn-primary" onclick="fundDetailPage.Edit()" style="border-radius: 8px; font-weight: 600; padding: 8px 24px;">
-                    <i class="fa fa-edit"></i> Chỉnh sửa quỹ
-                </button>
+                @if(ViewBag.Edit==1){
+                    <button type="button" class="btn btn-primary" onclick="fundDetailPage.Edit()" style="border-radius: 8px; font-weight: 600; padding: 8px 24px;">
+                        <i class="fa fa-edit"></i> Chỉnh sửa quỹ
+                    </button>
+                }
             </div>
         </div>
         <input type="hidden" id="detail-hotel-id" value="@Model.HotelId" />

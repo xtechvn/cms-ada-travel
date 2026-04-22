@@ -55,7 +55,7 @@
                                    @if(isExpired) {
                                        <i class="fa fa-clock-o"></i> <span>Đã quá hạn</span>
                                    } else {
-                                       <i class="fa fa-clock-o"></i> <span>Còn @((expiry.Value - DateTime.Now).ToString(@"hh\:mm"))</span>
+                                       <i class="fa fa-clock-o"></i> <span>Hết hạn lúc: @(expiry?.ToString("HH:mm dd/MM/yyyy"))</span>
                                    }
                                 </div>
                             </div>
@@ -75,6 +75,10 @@
                             else if (item.Status == 1)
                             {
                                 <span class="status-green" >Đã đặt</span>
+                            }
+                            else if (item.Status == 2)
+                            {
+                                <span class="status-red" >Hết hạn</span>
                             }
                         </td>
                         <td style="padding: 18px 20px; text-align: center;">

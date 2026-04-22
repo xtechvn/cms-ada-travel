@@ -596,5 +596,34 @@ namespace WEB.Adavigo.CMS.Controllers
                 return Json(new { status = 1, msg = "Lỗi hệ thống: " + ex.Message });
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> CancelReserve(int id)
+        {
+            try
+            {
+                var data = await _userReserveHotelRoomFundRepository.GetById(id);
+                if (data == null) return Json(new { status = 1, msg = "Không tìm thấy thông tin" });
+
+                var currentUser = _managementUser.GetCurrentUser();
+                if (data.UserId != currentUser.Id)
+                {
+                    return Json(new { status = 1, msg = "Bạn không có quyền thực hiện thao tác này" });
+                }
+
+                if (data.Status == 1)
+                {
+                    return Json(new { status = 1, msg = "Phòng đã được đặt, không thể bỏ giữ" });
+                }
+
+                data.Status = 2; // Bỏ quỹ
+                await _userReserveHotelRoomFundRepository.UpdateUserReserveHotelRoomFund(data);
+                return Json(new { status = 0, msg = "Bỏ giữ phòng thành công" });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("CancelReserve - UserReserveHotelRoomFundController: " + ex);
+                return Json(new { status = 1, msg = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
     }
-}
+}

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Contants;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 
@@ -39,6 +40,32 @@ namespace WEB.Adavigo.CMS.Controllers
         [HttpPost]
         public async Task<IActionResult> Search(HotelRoomFundSearchMode searchModel)
         {
+            ViewBag.Edit = 1;
+            var current_user = _managementUser.GetCurrentUser();
+            if (current_user != null)
+            {
+                if (current_user.Role != "")
+                {
+                    var list = current_user.Role.Split(',');
+                    foreach (var item in list)
+                    {
+                        switch (Convert.ToInt32(item))
+                        {
+                            case (int)RoleType.SaleOnl:
+                            case (int)RoleType.SaleKd:
+                            case (int)RoleType.SaleTour:
+                            case (int)RoleType.Marketing:
+                            case (int)RoleType.Digital_Marketing:
+                                {
+                                    ViewBag.Edit = 0;
+                                }
+                                break;
+                        }
+                   
+                    }
+                }
+
+            }
             var model = new GenericViewModel<HotelRoomFundModel>();
             try
             {
@@ -123,6 +150,31 @@ namespace WEB.Adavigo.CMS.Controllers
             var viewModel = new HotelRoomFundDetailViewModel();
             try
             {
+                ViewBag.Edit = 1;
+                var current_user = _managementUser.GetCurrentUser();
+                if (current_user != null)
+                {
+                    if (current_user.Role != "")
+                    {
+                        var list = current_user.Role.Split(',');
+                        foreach (var item in list)
+                        {
+                            switch (Convert.ToInt32(item))
+                            {
+                                case (int)RoleType.SaleOnl:
+                                case (int)RoleType.SaleKd:
+                                case (int)RoleType.SaleTour:
+                                case (int)RoleType.Marketing:
+                                case (int)RoleType.Digital_Marketing:
+                                    {
+                                        ViewBag.Edit = 0;
+                                    }
+                                    break;
+                            }
+
+                        }
+                    }
+                }
                 var model = await _hotelRoomFundRepository.GetById(id);
                 if (model == null)
                 {

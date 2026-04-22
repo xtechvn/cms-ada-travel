@@ -34,7 +34,9 @@
                         <td>@item.CreateDate?.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>
                             <a class="btn btn-sm btn-info" href="/HotelRoomFund/Detail/@item.Id"><i class="fa fa-eye"></i> Xem</a>
-                            <a class="btn btn-sm btn-primary" onclick="hotelRoomFund.AddOrUpdate(@item.Id)"><i class="fa fa-edit"></i> Sửa</a>
+                            @if(ViewBag.Edit==1){
+                                <a class="btn btn-sm btn-primary" onclick="hotelRoomFund.AddOrUpdate(@item.Id)"><i class="fa fa-edit"></i> Sửa</a>
+                            }
                         </td>
                     </tr>
                 }
