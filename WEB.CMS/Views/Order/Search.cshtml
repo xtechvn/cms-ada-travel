@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
 }
 @using Utilities.Contants
@@ -44,7 +44,7 @@
         <div id="totalProfit" class="mb10 mr-4 hide-element">Lợi nhuận: <strong>@Total.TotalProfit</strong></div>
     </div>
 </div>
-<div id="top-scrollbar-wrapper" class="top-scrollbar-wrapper table-scroll" style="overflow-x: auto !important; overflow-y: hidden !important; width: 100% !important; position: sticky !important; top: 65px !important; z-index: 101 !important; background: #fff !important; border-bottom: 1px solid #ccc !important;">
+<div id="top-scrollbar-wrapper" class="top-scrollbar-wrapper table-scroll row-main container" style="overflow-x: auto !important; overflow-y: hidden !important; width: 100% !important; background: #fff !important; border-bottom: 1px solid #ccc !important;">
     <div class="top-scrollbar-content" style="height: 1px !important;"></div>
 </div>
 <div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding table-scroll" style="margin-top: -1px;">
@@ -248,11 +248,17 @@
 
 <script>
     $(document).ready(function () {
+        // Xóa các bản cũ trong TopBar nếu có (tránh lỗi khi load lại AJAX)
+        $('#topbar #top-scrollbar-wrapper, #topbar #fixed-header-container').remove();
+
         var $tableScroll = $('.table-responsive').last();
-        var $topScroll = $('.top-scrollbar-wrapper').last();
+        var $topScroll = $('#top-scrollbar-wrapper').last();
         var $topScrollContent = $topScroll.find('.top-scrollbar-content');
         var $table = $tableScroll.find('table');
         var $thHeader = $('#th-header-table th');
+
+        // Tạo placeholder để đánh dấu vị trí cũ của thanh cuộn
+        var $scrollbarPlaceholder = $('<div id="scrollbar-placeholder" style="display:none"></div>').insertBefore($topScroll);
 
         function syncWidth() {
             if (!$table.length || !$tableScroll.length) return;
@@ -287,13 +293,18 @@
                 // Di chuyển Scrollbar vào TopBar (giữ nguyên logic append)
                 if ($topBar.find('#top-scrollbar-wrapper').length === 0) {
                     $topBar.append($topScroll);
-                    $topScroll.css({ 'position': 'relative', 'top': '0', 'z-index': '105' });
+                    $topScroll.css({
+                        'position': 'relative',
+                        'top': '0',
+                        'z-index': '105',
+                        'display': 'block'
+                    });
                 }
                 
                 // Tạo bản sao Header để đưa vào TopBar (Clone approach để không lệch cột)
                 if ($topBar.find('#fixed-header-container').length === 0) {
                     var $headerContainer = $('<div id="fixed-header-container" class="table-scroll row-main container" style="overflow:hidden; background:#e5e5e5; border-bottom:1px solid #ccc;"></div>');
-                    var $fixedTable = $('<table class="table table-nowrap" style="margin:0; table-layout: fixed;"></table>');
+                    var $fixedTable = $('<table class="table table-nowrap" style="margin:0; table-layout: fixed; width: 100%;"></table>');
                     var $fixedThead = $('<thead></thead>');
                     var $clonedRow = $thHeaderRow.clone();
                     
@@ -322,8 +333,12 @@
             } else {
                 // Trả Scrollbar về vị trí cũ
                 if ($topBar.find('#top-scrollbar-wrapper').length > 0) {
-                    $originalParent.prepend($topScroll);
-                    $topScroll.css({ 'position': 'sticky', 'top': topBarHeight + 'px', 'z-index': '' });
+                    $topScroll.insertAfter($scrollbarPlaceholder);
+                    $topScroll.css({
+                        'position': '',
+                        'top': '',
+                        'z-index': ''
+                    });
                 }
                 
                 // Xóa Header clone và hiện lại header gốc
