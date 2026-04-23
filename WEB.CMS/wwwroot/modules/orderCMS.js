@@ -823,7 +823,7 @@ var _ordersCMS = {
             case 9:
 
                 break;
-            case 10:
+            case 11:
                 if ($('#CreatedNameCheck').is(":checked")) {
                     orderFields.CreatedName = true
                 } else {
@@ -832,7 +832,7 @@ var _ordersCMS = {
                 this.eraseCookie(cookieName);
                 this.setCookie(cookieName, JSON.stringify(orderFields), 10);
                 break;
-            case 11:
+            case 12:
                 if ($('#UpdatedDateCheck').is(":checked")) {
                     orderFields.UpdatedDate = true
                 } else {
@@ -841,7 +841,7 @@ var _ordersCMS = {
                 this.eraseCookie(cookieName);
                 this.setCookie(cookieName, JSON.stringify(orderFields), 10);
                 break;
-            case 12:
+            case 13:
                 if ($('#UpdatedNameCheck').is(":checked")) {
                     orderFields.UpdatedName = true
                 } else {
@@ -850,7 +850,7 @@ var _ordersCMS = {
                 this.eraseCookie(cookieName);
                 this.setCookie(cookieName, JSON.stringify(orderFields), 10);
                 break;
-            case 13:
+            case 14:
                 if ($('#MainEmployee').is(":checked")) {
                     orderFields.MainEmp = true
                 } else {

@@ -44,10 +44,13 @@
         <div id="totalProfit" class="mb10 mr-4 hide-element">Lợi nhuận: <strong>@Total.TotalProfit</strong></div>
     </div>
 </div>
-<div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding table-scroll">
+<div id="top-scrollbar-wrapper" class="top-scrollbar-wrapper table-scroll" style="overflow-x: auto !important; overflow-y: hidden !important; width: 100% !important; position: sticky !important; top: 65px !important; z-index: 101 !important; background: #fff !important; border-bottom: 1px solid #ccc !important;">
+    <div class="top-scrollbar-content" style="height: 1px !important;"></div>
+</div>
+<div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding table-scroll" style="margin-top: -1px;">
     <table class="table table-nowrap">
         <thead>
-            <tr>
+            <tr id="th-header-table">
                 <th>STT</th>
                 <th>Mã đơn</th>
                 <th>
@@ -244,6 +247,123 @@
 </div>
 
 <script>
+    $(document).ready(function () {
+        var $tableScroll = $('.table-responsive').last();
+        var $topScroll = $('.top-scrollbar-wrapper').last();
+        var $topScrollContent = $topScroll.find('.top-scrollbar-content');
+        var $table = $tableScroll.find('table');
+        var $thHeader = $('#th-header-table th');
+
+        function syncWidth() {
+            if (!$table.length || !$tableScroll.length) return;
+            
+            if (!$tableScroll.hasClass('table-scroll')) {
+                $tableScroll.addClass('table-scroll');
+            }
+            
+            var tableWidth = $table[0].scrollWidth;
+            if (tableWidth > 0) {
+                // Ensure the content width exactly matches the table's scrollable width
+                $topScrollContent.css('width', tableWidth + 'px');
+                
+                if (tableWidth <= $tableScroll.width() + 5) {
+                    $topScroll.attr('style', function(i,s) { return (s || '') + ' display: none !important;'; });
+                } else {
+                    $topScroll.attr('style', function(i,s) { return (s || '').replace('display: none !important;', '') + ' display: block !important;'; });
+                }
+            }
+        }
+
+        var $thHeaderRow = $('#th-header-table');
+        
+        function handleScroll() {
+            var scroll = $(window).scrollTop();
+            var $topBar = $('#topbar');
+            
+            var topBarHeight = $topBar.outerHeight() || 60;
+            if (topBarHeight < 50) topBarHeight = 60;
+            
+            if (scroll > 100) { 
+                // Di chuyển Scrollbar vào TopBar (giữ nguyên logic append)
+                if ($topBar.find('#top-scrollbar-wrapper').length === 0) {
+                    $topBar.append($topScroll);
+                    $topScroll.css({ 'position': 'relative', 'top': '0', 'z-index': '105' });
+                }
+                
+                // Tạo bản sao Header để đưa vào TopBar (Clone approach để không lệch cột)
+                if ($topBar.find('#fixed-header-container').length === 0) {
+                    var $headerContainer = $('<div id="fixed-header-container" class="table-scroll row-main container" style="overflow:hidden; background:#e5e5e5; border-bottom:1px solid #ccc;"></div>');
+                    var $fixedTable = $('<table class="table table-nowrap" style="margin:0; table-layout: fixed;"></table>');
+                    var $fixedThead = $('<thead></thead>');
+                    var $clonedRow = $thHeaderRow.clone();
+                    
+                    // Gán ID mới cho clone để tránh trùng
+                    $clonedRow.attr('id', 'th-header-table-clone');
+                    
+                    // Copy chính xác độ rộng từng cột
+                    $thHeaderRow.find('th').each(function(i) {
+                        var w = $(this).outerWidth();
+                        $clonedRow.find('th').eq(i).css({
+                            'width': w + 'px',
+                            'min-width': w + 'px'
+                        });
+                    });
+                    
+                    $fixedTable.append($fixedThead.append($clonedRow));
+                    $headerContainer.append($fixedTable);
+                    $topBar.append($headerContainer);
+                    
+                    // Ẩn tiêu đề gốc nhưng vẫn giữ chỗ để không sập bảng
+                    $thHeaderRow.css('visibility', 'hidden');
+                    
+                    // Đồng bộ cuộn ngang cho header clone
+                    $headerContainer.scrollLeft($tableScroll.scrollLeft());
+                }
+            } else {
+                // Trả Scrollbar về vị trí cũ
+                if ($topBar.find('#top-scrollbar-wrapper').length > 0) {
+                    $originalParent.prepend($topScroll);
+                    $topScroll.css({ 'position': 'sticky', 'top': topBarHeight + 'px', 'z-index': '' });
+                }
+                
+                // Xóa Header clone và hiện lại header gốc
+                if ($topBar.find('#fixed-header-container').length > 0) {
+                    $('#fixed-header-container').remove();
+                    $thHeaderRow.css('visibility', 'visible');
+                }
+            }
+        }
+        
+        // Đồng bộ cuộn ngang 3 chiều: Thanh cuộn top <-> Bảng chính <-> Header Clone
+        function syncAllScrolls(source) {
+            var scrollLeft = $(source).scrollLeft();
+            
+            if (source !== $tableScroll[0]) $tableScroll.scrollLeft(scrollLeft);
+            if (source !== $topScroll[0]) $topScroll.scrollLeft(scrollLeft);
+            
+            var $cloneHeaderContainer = $('#fixed-header-container');
+            if ($cloneHeaderContainer.length && source !== $cloneHeaderContainer[0]) {
+                $cloneHeaderContainer.scrollLeft(scrollLeft);
+            }
+        }
+
+        $topScroll.off('scroll').on('scroll', function () {
+            syncAllScrolls(this);
+        });
+
+        $tableScroll.off('scroll').on('scroll', function () {
+            syncAllScrolls(this);
+        });
+
+        syncWidth();
+        window.setTimeout(syncWidth, 500);
+        window.setTimeout(syncWidth, 1500);
+        
+        $(window).off('resize.orderTab').on('resize.orderTab', syncWidth);
+        $(window).off('scroll.orderTab').on('scroll.orderTab', handleScroll);
+        
+        handleScroll(); // Initial check
+    });
 </script>
 <style>
     .status-bold-green {
@@ -252,6 +372,29 @@
         color: #fff;
         padding: 2px 10px;
         border-radius: 5px
+    }
+
+    #th-header-table th {
+        position: sticky !important;
+        background: #e5e5e5 !important;
+        box-shadow: inset 0 -1px 0 #ccc !important;
+    }
+
+    .top-scrollbar-wrapper::-webkit-scrollbar {
+        height: 5px !important;
+    }
+    .top-scrollbar-wrapper::-webkit-scrollbar-thumb {
+        background-color: #D9D9D9 !important;
+        border-radius: 16px !important;
+    }
+    .top-scrollbar-wrapper::-webkit-scrollbar-track {
+        background-color: #fff !important;
+    }
+    .top_bar {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 110 !important;
+        background: #fff !important;
     }
 </style>
 @await Component.InvokeAsync("PagingNew", new
