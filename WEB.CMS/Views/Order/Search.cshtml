@@ -17,116 +17,117 @@
     var TotalData = (int)ViewBag.FilterOrder.TotalData;
     List<InvoiceRequestViewModel> invoiceList = (List<InvoiceRequestViewModel>)ViewBag.Invoice;
 }
-<div class="tab-default" style="border-bottom: 1px solid #CCCCCC;">
-    <div class="row" style=" width: 100%; ">
-        <input id="countOrder" value="@TotalRecord" style="display:none" />
-        <div class="tab-default col-md-9 mb0 mt10">
-            <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(99)" id="countSttAll" class="active">Tất cả đơn hàng (@TotalRecord)</a>
-            <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(1)" id="countSttCheck">Đang tư vấn (@TotalRecord1)</a>
-            <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(2)" id="countSttNotDone">Chưa khởi hành (@TotalRecord2)</a>
-            <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(3)" id="countSttDone">Đã khởi hành (@TotalRecord3)</a>
-            <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(4)" id="countSttErr">Đơn hàng lỗi (@TotalRecordErr)</a>
-            <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(0)" id="countSttNews">Đơn chờ nhận triển khai (@TotalRecord4)</a>
-        </div>
-        <div class="col-md-3 text-right mt10">
-            <button type="submit" class="btn btn-default" style="" onclick="_order_manual.CreateOrderManual()">Tạo đơn hàng</button>
+<div id="order-search-container">
+    <div class="tab-default" style="border-bottom: 1px solid #CCCCCC;">
+        <div class="row" style=" width: 100%; ">
+            <input id="countOrder" value="@TotalRecord" style="display:none" />
+            <div class="tab-default col-md-9 mb0 mt10">
+                <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(99)" id="countSttAll" class="active">Tất cả đơn hàng (@TotalRecord)</a>
+                <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(1)" id="countSttCheck">Đang tư vấn (@TotalRecord1)</a>
+                <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(2)" id="countSttNotDone">Chưa khởi hành (@TotalRecord2)</a>
+                <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(3)" id="countSttDone">Đã khởi hành (@TotalRecord3)</a>
+                <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(4)" id="countSttErr">Đơn hàng lỗi (@TotalRecordErr)</a>
+                <a href="javascript:;" onclick="_ordersCMS.OnSearchStatus(0)" id="countSttNews">Đơn chờ nhận triển khai (@TotalRecord4)</a>
+            </div>
+            <div class="col-md-3 text-right mt10">
+                <button type="submit" class="btn btn-default" style="" onclick="_order_manual.CreateOrderManual()">Tạo đơn hàng</button>
             @*<button type="submit" class="btn btn-default" style="" onclick="_order_ws_excel.ImportWSExcel()">Import đơn hàng TTB</button>*@
         </div>
     </div>
 
 
 </div>
-<div class="line-bottom mb20">
-    <div class="flex">
-        <div class="mb10 mr-4">Tổng giá trị: <strong>@Total.TotalAmmount</strong></div>
-        <div class="mb10 mr-4">Đã thanh toán: <strong>@Total.TotalProductService</strong></div>
-        <div class="mb10 mr-4">Chưa thanh toán: <strong>@((Convert.ToDouble(Total.TotalAmmount) - Convert.ToDouble(Total.TotalProductService)).ToString("N0"))</strong></div>
-        <div id="totalProfit" class="mb10 mr-4 hide-element">Lợi nhuận: <strong>@Total.TotalProfit</strong></div>
+    <div class="line-bottom mb20">
+        <div class="flex">
+            <div class="mb10 mr-4">Tổng giá trị: <strong>@Total.TotalAmmount</strong></div>
+            <div class="mb10 mr-4">Đã thanh toán: <strong>@Total.TotalProductService</strong></div>
+            <div class="mb10 mr-4">Chưa thanh toán: <strong>@((Convert.ToDouble(Total.TotalAmmount) - Convert.ToDouble(Total.TotalProductService)).ToString("N0"))</strong></div>
+            <div id="totalProfit" class="mb10 mr-4 hide-element">Lợi nhuận: <strong>@Total.TotalProfit</strong></div>
+        </div>
     </div>
-</div>
-<div id="top-scrollbar-wrapper" class="top-scrollbar-wrapper table-scroll row-main container" style="overflow-x: auto !important; overflow-y: hidden !important; width: 100% !important; background: #fff !important; border-bottom: 1px solid #ccc !important;">
-    <div class="top-scrollbar-content" style="height: 1px !important;"></div>
-</div>
-<div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding table-scroll" style="margin-top: -1px;">
-    <table class="table table-nowrap">
-        <thead>
-            <tr id="th-header-table">
-                <th>STT</th>
-                <th>Mã đơn</th>
+    <div id="top-scrollbar-wrapper" class="top-scrollbar-wrapper table-scroll row-main container" style="overflow-x: auto !important; overflow-y: hidden !important; width: 100% !important; background: #fff !important; border-bottom: 1px solid #ccc !important;">
+        <div class="top-scrollbar-content" style="height: 1px !important;"></div>
+    </div>
+    <div class="table-responsive table-default table-gray wrap_bg wrap_bg_no-padding table-scroll" style="margin-top: -1px;">
+        <table class="table table-nowrap table-scroll">
+            <thead>
+                <tr id="th-header-table">
+                    <th>STT</th>
+                    <th>Mã đơn</th>
                 <th>
                     Ngày bắt đầu - </br>
                     Ngày kết thúc
                 </th>
-                <th>Khách hàng</th>
-                <th>Nhãn đơn</th>
-                <th class="text-right">Thanh toán</th>
-                <th class="mfp-hide">Nguồn</th>
-                <th class="text-right">Lợi nhuận</th>
-                <th>Mã giới thiệu</th>
-                <th>Trạng thái</th>
+                    <th>Khách hàng</th>
+                    <th>Nhãn đơn</th>
+                    <th class="text-right">Thanh toán</th>
+                    <th class="mfp-hide">Nguồn</th>
+                    <th class="text-right">Lợi nhuận</th>
+                    <th>Mã giới thiệu</th>
+                    <th>Trạng thái</th>
                 <th>
                     Ngày tạo
                     <a class="sort">&#8595;</a>
                 </th>
-                <th class="mfp-hide">Người tạo</th>
+                    <th class="mfp-hide">Người tạo</th>
                 <th class="mfp-hide">
                     Ngày cập nhật
                     <a class="sort">&#8593;</a>
                 </th>
-                <th class="mfp-hide">Người cập nhật</th>
-                <th class="mfp-hide">Nhân viên chính</th>
-                <th class="mfp-hide">Nhân viên phụ</th>
-                <th class="mfp-hide">Voucher áp dụng</th>
-                <th class="mfp-hide">Điều hành viên</th>
-                <th class="mfp-hide action-btn">Action</th>
-                <th class="mfp-hide action-tc">Action</th>
+                    <th class="mfp-hide">Người cập nhật</th>
+                    <th class="mfp-hide">Nhân viên chính</th>
+                    <th class="mfp-hide">Nhân viên phụ</th>
+                    <th class="mfp-hide">Voucher áp dụng</th>
+                    <th class="mfp-hide">Điều hành viên</th>
+                    <th class="mfp-hide action-btn">Action</th>
+                    <th class="mfp-hide action-tc">Action</th>
                 
-                <th class="mfp-hide">Mã hóa đơn</th>
-                <th>Hình thức thanh toán</th>
-                <th class="mfp-hide">Khách phải trả</th>
-                <th class="mfp-hide">Yêu cầu hóa đơn</th>
+                    <th class="mfp-hide">Mã hóa đơn</th>
+                    <th>Hình thức thanh toán</th>
+                    <th class="mfp-hide">Khách phải trả</th>
+                    <th class="mfp-hide">Yêu cầu hóa đơn</th>
                 
 
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model.ListData != null && Model.ListData.Count > 0)
-            {
-                var counter = (Model.CurrentPage - 1) * Model.PageSize;
-                foreach (var item in Model.ListData)
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ListData != null && Model.ListData.Count > 0)
                 {
-                    counter++;
-                    <tr>
-                        <td class="center">@counter</td>
+                    var counter = (Model.CurrentPage - 1) * Model.PageSize;
+                    foreach (var item in Model.ListData)
+                    {
+                        counter++;
+                        <tr>
+                            <td class="center">@counter</td>
                         <td>
                             <a class="blue" href="/Order/@item.OrderId" onclick="_ordersCMS.saveCookieFilter()">@item.OrderCode</a>
                         </td>
                         <td style="width:15%">
                             @((item.StartDate + " - "+ item.EndDate).TrimEnd(' ','-'))
                         </td>
-                        <td>
-                            <div class="blue">@item.ClientName</div>
-                            <div>@item.ClientNumber</div>
-                            <div>@item.ClientEmail</div>
-                        </td>
-                        <td style="width:15%;"><textarea style="min-height: 95px !important; border: 1px solid #ffff !important; overflow-y: hidden !important;" readonly="readonly">@item.Note</textarea> </td>
-                        <td class="text-right">
-                            <div class="green">@item.Payment.ToString("#,##0")/</div>
+                            <td>
+                                <div class="blue">@item.ClientName</div>
+                                <div>@item.ClientNumber</div>
+                                <div>@item.ClientEmail</div>
+                            </td>
+                            <td style="width:15%;"><textarea style="min-height: 95px !important; border: 1px solid #ffff !important; overflow-y: hidden !important;" readonly="readonly">@item.Note</textarea> </td>
+                            <td class="text-right">
+                                <div class="green">@item.Payment.ToString("#,##0")/</div>
                             <div class="red">@(item.Amount ==0? "0":item.Amount.ToString("#,##"))</div>
-                        </td>
-                        <td class="mfp-hide">@item.UtmSource</td>
-                        <td class="text-right">@item.Profit.ToString("#,##")</td>
-                        <td class="text-right">@item.UtmMedium</td>
-                        <td style="width:10% !important">
-                            @switch (item.StatusCode)
-                            {
-                                case (int)(OrderStatus.CREATED_ORDER):
-                                case (int)(OrderStatus.CONFIRMED_SALE):
+                            </td>
+                            <td class="mfp-hide">@item.UtmSource</td>
+                            <td class="text-right">@item.Profit.ToString("#,##")</td>
+                            <td class="text-right">@item.UtmMedium</td>
+                            <td style="width:10% !important">
+                                @switch (item.StatusCode)
+                                {
+                                    case (int)(OrderStatus.CREATED_ORDER):
+                                    case (int)(OrderStatus.CONFIRMED_SALE):
                                     {
                                         <span class="status-oranger">@item.Status</span>
                                     }
-                                    break;
-                                case (int)(OrderStatus.WAITING_FOR_OPERATOR):
+                                        break;
+                                    case (int)(OrderStatus.WAITING_FOR_OPERATOR):
 
                                     {
                                         @*<div class="status-green">@(item.PermisionTypeName==null|| item.PermisionTypeName.Trim() == "" ? "Không công nợ": item.PermisionTypeName) - @item.PaymentStatusName</div>*@
@@ -134,184 +135,205 @@
 
                                     }
                                     break;
-                                case (int)(OrderStatus.WAITING_FOR_ACCOUNTANT):
+                                    case (int)(OrderStatus.WAITING_FOR_ACCOUNTANT):
                                     {
                                         <span class="status-green">@item.Status</span>
                                     }
                                     break;
-                                case (int)(OrderStatus.FINISHED):
+                                    case (int)(OrderStatus.FINISHED):
                                     {
                                         <span class="status-green">@item.Status</span>
                                     }
-                                    break;
-                                case ((int)(OrderStatus.CANCEL)):
-                                case ((int)(OrderStatus.ACCOUNTANT_DECLINE)):
-                                case ((int)(OrderStatus.OPERATOR_DECLINE)):
-                                case ((int)(OrderStatus.DonRac)):
+                                        break;
+                                    case ((int)(OrderStatus.CANCEL)):
+                                    case ((int)(OrderStatus.ACCOUNTANT_DECLINE)):
+                                    case ((int)(OrderStatus.OPERATOR_DECLINE)):
+                                    case ((int)(OrderStatus.DonRac)):
                                     {
                                         <span class="status-red">@item.Status</span>
                                     }
-                                    break;
-                            }
+                                        break;
+                                }
 
-                            <br />
+                                <br />
 
-                        </td>
+                            </td>
                         <td>
                             @item.CreateDate
                         </td>
 
-                        <td class="mfp-hide">@item.CreateName</td>
+                            <td class="mfp-hide">@item.CreateName</td>
 
-                        <td class="mfp-hide">@item.UpdateDate</td>
+                            <td class="mfp-hide">@item.UpdateDate</td>
 
-                        <td class="mfp-hide">@item.UpdateName</td>
+                            <td class="mfp-hide">@item.UpdateName</td>
 
-                        <td class="mfp-hide">
-                            <div>@item.SalerName </div>
-                            <div>@item.SalerUserName </div>
-                            <div>@item.SalerEmail </div>
-                        </td>
+                            <td class="mfp-hide">
+                                <div>@item.SalerName </div>
+                                <div>@item.SalerUserName </div>
+                                <div>@item.SalerEmail </div>
+                            </td>
 
                         <td class="mfp-hide">@(item.SaleGroupName.TrimEnd(' ',',')) </td>
-                        <td class="mfp-hide">@item.Vouchercode </td>
+                            <td class="mfp-hide">@item.Vouchercode </td>
                         <td class="mfp-hide">@(item.OperatorIdName.TrimEnd(' ',',')) </td>
-                        <td class="mfp-hide action-btn">
-                            @if (!item.OrderCode.ToUpper().StartsWith("DH") && !item.OrderCode.ToUpper().StartsWith("O") && (item.ServiceType == "" || item.ServiceType == null))
-                            {
-                                <button type="button" class="btn btn-default bg-main" onclick="_ordersCMS.ReCreateOrder(@item.OrderId)">
+                            <td class="mfp-hide action-btn">
+                                @if (!item.OrderCode.ToUpper().StartsWith("DH") && !item.OrderCode.ToUpper().StartsWith("O") && (item.ServiceType == "" || item.ServiceType == null))
+                                {
+                                    <button type="button" class="btn btn-default bg-main" onclick="_ordersCMS.ReCreateOrder(@item.OrderId)">
                                     <i class="fa fa-plus-circle"></i>
                                     Tạo lại đơn
-                                </button>
-                            }
-                        </td>
-                        <td class="mfp-hide action-tc">
+                                    </button>
+                                }
+                            </td>
+                            <td class="mfp-hide action-tc">
                             <button type="button" class="btn btn-default bg-main" onclick=" _ordersCMS.OpenPopupAddSale(@item.OrderId)">
                                 Nhận xử lý đơn hàng
                             </button>
-                        </td>
+                            </td>
                   
-                        <td class="mfp-hide">@item.UpdateName</td>
-                        <td style="width:12% !important">
-                            @if (item.PaymentStatus != "")
-                            {
-                                @if (Convert.ToInt32(item.PaymentStatus) == (int)PaymentStatus.UNPAID)
+                            <td class="mfp-hide">@item.UpdateName</td>
+                            <td style="width:12% !important">
+                                @if (item.PaymentStatus != "")
                                 {
+                                    @if (Convert.ToInt32(item.PaymentStatus) == (int)PaymentStatus.UNPAID)
+                                    {
                                     <div class="status-oranger">
                                         @(item.PermisionTypeName == null || item.PermisionTypeName.Trim()=="" ? "Không công nợ": item.PermisionTypeName) - @item.PaymentStatusName
                                     </div>
-                                }
-                                @if (Convert.ToInt32(item.PaymentStatus) == (int)PaymentStatus.PAID)
-                                {
+                                    }
+                                    @if (Convert.ToInt32(item.PaymentStatus) == (int)PaymentStatus.PAID)
+                                    {
                                     <div class="status-green">
                                         @(item.PermisionTypeName == null || item.PermisionTypeName.Trim()=="" ? "Không công nợ": item.PermisionTypeName) - @item.PaymentStatusName
                                     </div>
-                                }
-                                @if (Convert.ToInt32(item.PaymentStatus) == (int)PaymentStatus.PAID_NOT_ENOUGH)
-                                {
+                                    }
+                                    @if (Convert.ToInt32(item.PaymentStatus) == (int)PaymentStatus.PAID_NOT_ENOUGH)
+                                    {
                                     <div class="status-blue">
                                         @(item.PermisionTypeName == null || item.PermisionTypeName.Trim()=="" ? "Không công nợ": item.PermisionTypeName) - @item.PaymentStatusName
                                     </div>
+                                    }
                                 }
-                            }
-                        </td>
+                            </td>
                         <td class="mfp-hide text-right">
                             @((item.Amount - item.Payment).ToString("N0"))
                         </td>
 
-                        <td class="mfp-hide">
-                            @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.CHO_TBP_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.CHO_KTT_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.HOA_DON_NHAP))
-                            {
-                                <span class="status-wait">@item.InvoiceRequestStatusName</span>
-                            }
-                            @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.DA_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.HOAN_THANH))
-                            {
-                                <span class="status-approve">@item.InvoiceRequestStatusName</span>
-                            }
-                            @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.TU_CHOI))
-                            {
-                                <span class="status-reject">@item.InvoiceRequestStatusName</span>
-                            }
-                            @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.LUU_NHAP))
-                            {
-                                <span class="status-draft">@item.InvoiceRequestStatusName</span>
-                            }
-                        </td>
+                            <td class="mfp-hide">
+                                @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.CHO_TBP_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.CHO_KTT_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.DA_XUAT_NHAP) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.HOA_DON_NHAP))
+                                {
+                                    <span class="status-wait">@item.InvoiceRequestStatusName</span>
+                                }
+                                @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.DA_DUYET) || item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.HOAN_THANH))
+                                {
+                                    <span class="status-approve">@item.InvoiceRequestStatusName</span>
+                                }
+                                @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.TU_CHOI))
+                                {
+                                    <span class="status-reject">@item.InvoiceRequestStatusName</span>
+                                }
+                                @if (item.InvoiceRequestStatus == (int)(INVOICE_REQUEST_STATUS.LUU_NHAP))
+                                {
+                                    <span class="status-draft">@item.InvoiceRequestStatusName</span>
+                                }
+                            </td>
                        
-                    </tr>
+                        </tr>
+                    }
                 }
-            }
 
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 
 <script>
     $(document).ready(function () {
-        // Xóa các bản cũ trong TopBar nếu có (tránh lỗi khi load lại AJAX)
+        // Clear any old instances from the global topbar (important for AJAX reloads)
         $('#topbar #top-scrollbar-wrapper, #topbar #fixed-header-container').remove();
-
-        var $tableScroll = $('.table-responsive').last();
-        var $topScroll = $('#top-scrollbar-wrapper').last();
+        
+        // Scope the search within our specific container
+        var $scope = $('#order-search-container');
+        var $tableScroll = $scope.find('.table-responsive').last();
+        var $topScroll = $scope.find('#top-scrollbar-wrapper').last();
         var $topScrollContent = $topScroll.find('.top-scrollbar-content');
         var $table = $tableScroll.find('table');
-        var $thHeader = $('#th-header-table th');
-
-        // Tạo placeholder để đánh dấu vị trí cũ của thanh cuộn
+        var $thHeaderRow = $scope.find('#th-header-table');
         var $scrollbarPlaceholder = $('<div id="scrollbar-placeholder" style="display:none"></div>').insertBefore($topScroll);
+
+        var isSyncingScroll = false;
+        var ticking = false;
 
         function syncWidth() {
             if (!$table.length || !$tableScroll.length) return;
             
-            if (!$tableScroll.hasClass('table-scroll')) {
-                $tableScroll.addClass('table-scroll');
-            }
-            
             var tableWidth = $table[0].scrollWidth;
+            var containerWidth = $tableScroll.width();
+            
             if (tableWidth > 0) {
-                // Ensure the content width exactly matches the table's scrollable width
                 $topScrollContent.css('width', tableWidth + 'px');
                 
-                if (tableWidth <= $tableScroll.width() + 5) {
+                // Hide top scrollbar if not needed or on small screens
+                if (tableWidth <= containerWidth + 5 || window.innerWidth < 768) {
                     $topScroll.attr('style', function(i,s) { return (s || '') + ' display: none !important;'; });
                 } else {
                     $topScroll.attr('style', function(i,s) { return (s || '').replace('display: none !important;', '') + ' display: block !important;'; });
                 }
+                
+                // Update cloned header width if it exists
+                var $fixedContainer = $('#fixed-header-container');
+                if ($fixedContainer.length) {
+                    var $fixedTable = $fixedContainer.find('table');
+                    $fixedTable.css('width', $table.outerWidth() + 'px');
+                    
+                    $thHeaderRow.find('th').each(function(i) {
+                        var w = $(this).outerWidth();
+                        $fixedTable.find('th').eq(i).css({
+                            'width': w + 'px',
+                            'min-width': w + 'px'
+                        });
+                    });
+                }
             }
         }
 
-        var $thHeaderRow = $('#th-header-table');
-        
         function handleScroll() {
+            if (!$scope.length || !document.contains($scope[0])) {
+                 $(window).off('.orderTab');
+                 return;
+            }
+            
+            if (window.innerWidth < 768) {
+                if ($('#topbar #top-scrollbar-wrapper').length > 0) {
+                    resetStickyState();
+                }
+                return;
+            }
+
             var scroll = $(window).scrollTop();
             var $topBar = $('#topbar');
-            
-            var topBarHeight = $topBar.outerHeight() || 60;
-            if (topBarHeight < 50) topBarHeight = 60;
-            
-            if (scroll > 100) { 
-                // Di chuyển Scrollbar vào TopBar (giữ nguyên logic append)
+            if ($topBar.length === 0) return;
+
+            if (scroll > 150) { 
                 if ($topBar.find('#top-scrollbar-wrapper').length === 0) {
                     $topBar.append($topScroll);
                     $topScroll.css({
                         'position': 'relative',
                         'top': '0',
                         'z-index': '105',
+                        'background': '#fff',
                         'display': 'block'
                     });
                 }
                 
-                // Tạo bản sao Header để đưa vào TopBar (Clone approach để không lệch cột)
                 if ($topBar.find('#fixed-header-container').length === 0) {
                     var $headerContainer = $('<div id="fixed-header-container" class="table-scroll row-main container" style="overflow:hidden; background:#e5e5e5; border-bottom:1px solid #ccc;"></div>');
-                    var $fixedTable = $('<table class="table table-nowrap" style="margin:0; table-layout: fixed; width: 100%;"></table>');
-                    var $fixedThead = $('<thead></thead>');
+                    var $fixedTable = $('<table class="table table-nowrap" style="margin:0; table-layout: fixed;"></table>');
+                    $fixedTable.css('width', $table.outerWidth() + 'px');
+                    
                     var $clonedRow = $thHeaderRow.clone();
+                    $clonedRow.attr('id', 'th-header-table-clone').css('visibility', 'visible');
                     
-                    // Gán ID mới cho clone để tránh trùng
-                    $clonedRow.attr('id', 'th-header-table-clone');
-                    
-                    // Copy chính xác độ rộng từng cột
                     $thHeaderRow.find('th').each(function(i) {
                         var w = $(this).outerWidth();
                         $clonedRow.find('th').eq(i).css({
@@ -320,68 +342,75 @@
                         });
                     });
                     
-                    $fixedTable.append($fixedThead.append($clonedRow));
+                    $fixedTable.append($('<thead></thead>').append($clonedRow));
                     $headerContainer.append($fixedTable);
                     $topBar.append($headerContainer);
                     
-                    // Ẩn tiêu đề gốc nhưng vẫn giữ chỗ để không sập bảng
                     $thHeaderRow.css('visibility', 'hidden');
-                    
-                    // Đồng bộ cuộn ngang cho header clone
                     $headerContainer.scrollLeft($tableScroll.scrollLeft());
                 }
             } else {
-                // Trả Scrollbar về vị trí cũ
-                if ($topBar.find('#top-scrollbar-wrapper').length > 0) {
-                    $topScroll.insertAfter($scrollbarPlaceholder);
-                    $topScroll.css({
-                        'position': '',
-                        'top': '',
-                        'z-index': ''
-                    });
-                }
-                
-                // Xóa Header clone và hiện lại header gốc
-                if ($topBar.find('#fixed-header-container').length > 0) {
-                    $('#fixed-header-container').remove();
-                    $thHeaderRow.css('visibility', 'visible');
-                }
-            }
-        }
-        
-        // Đồng bộ cuộn ngang 3 chiều: Thanh cuộn top <-> Bảng chính <-> Header Clone
-        function syncAllScrolls(source) {
-            var scrollLeft = $(source).scrollLeft();
-            
-            if (source !== $tableScroll[0]) $tableScroll.scrollLeft(scrollLeft);
-            if (source !== $topScroll[0]) $topScroll.scrollLeft(scrollLeft);
-            
-            var $cloneHeaderContainer = $('#fixed-header-container');
-            if ($cloneHeaderContainer.length && source !== $cloneHeaderContainer[0]) {
-                $cloneHeaderContainer.scrollLeft(scrollLeft);
+                resetStickyState();
             }
         }
 
-        $topScroll.off('scroll').on('scroll', function () {
-            syncAllScrolls(this);
+        function resetStickyState() {
+            var $topBar = $('#topbar');
+            if ($topBar.find('#top-scrollbar-wrapper').length > 0) {
+                $topScroll.insertAfter($scrollbarPlaceholder);
+                $topScroll.css({'position': '', 'top': '', 'z-index': '', 'background': ''});
+                syncWidth();
+            }
+            if ($topBar.find('#fixed-header-container').length > 0) {
+                $('#fixed-header-container').remove();
+                $thHeaderRow.css('visibility', 'visible');
+            }
+        }
+
+        // Enhanced Synchronized Horizontal Scrolling
+        function sync(source, target1, target2) {
+            if (isSyncingScroll) return;
+            isSyncingScroll = true;
+            var left = $(source).scrollLeft();
+            if (target1 && target1.length) target1.scrollLeft(left);
+            if (target2 && target2.length) target2.scrollLeft(left);
+            setTimeout(function () { isSyncingScroll = false; }, 20);
+        }
+
+        $topScroll.on('scroll', function () {
+            sync(this, $tableScroll, $('#fixed-header-container'));
         });
 
-        $tableScroll.off('scroll').on('scroll', function () {
-            syncAllScrolls(this);
+        $tableScroll.on('scroll', function () {
+            sync(this, $topScroll, $('#fixed-header-container'));
         });
 
-        syncWidth();
-        window.setTimeout(syncWidth, 500);
-        window.setTimeout(syncWidth, 1500);
-        
-        $(window).off('resize.orderTab').on('resize.orderTab', syncWidth);
-        $(window).off('scroll.orderTab').on('scroll.orderTab', handleScroll);
-        
-        handleScroll(); // Initial check
+        $(window).off('.orderTab').on('resize.orderTab', function () {
+            if (!ticking) {
+                window.requestAnimationFrame(function () {
+                    syncWidth();
+                    handleScroll();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }).on('scroll.orderTab', function () {
+            if (!ticking) {
+                window.requestAnimationFrame(function () {
+                    handleScroll();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        setTimeout(function () { syncWidth(); handleScroll(); }, 100);
+        setTimeout(syncWidth, 1000);
+        setTimeout(syncWidth, 3000);
     });
 </script>
 <style>
-    .status-bold-green {
+    #order-search-container .status-bold-green {
         font-size: 12px;
         background: #009933;
         color: #fff;
@@ -389,28 +418,27 @@
         border-radius: 5px
     }
 
-    #th-header-table th {
+    #order-search-container #th-header-table th {
         position: sticky !important;
         background: #e5e5e5 !important;
         box-shadow: inset 0 -1px 0 #ccc !important;
     }
 
-    .top-scrollbar-wrapper::-webkit-scrollbar {
-        height: 5px !important;
+    #order-search-container .top-scrollbar-wrapper::-webkit-scrollbar,
+    #topbar .top-scrollbar-wrapper::-webkit-scrollbar {
+        height: 6px !important;
     }
-    .top-scrollbar-wrapper::-webkit-scrollbar-thumb {
-        background-color: #D9D9D9 !important;
-        border-radius: 16px !important;
+    #order-search-container .top-scrollbar-wrapper::-webkit-scrollbar-thumb,
+    #topbar .top-scrollbar-wrapper::-webkit-scrollbar-thumb {
+        background-color: #bcbcbc !important;
+        border-radius: 10px !important;
     }
-    .top-scrollbar-wrapper::-webkit-scrollbar-track {
-        background-color: #fff !important;
+    #order-search-container .top-scrollbar-wrapper::-webkit-scrollbar-track,
+    #topbar .top-scrollbar-wrapper::-webkit-scrollbar-track {
+        background-color: #f1f1f1 !important;
     }
-    .top_bar {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 110 !important;
-        background: #fff !important;
-    }
+
+   
 </style>
 @await Component.InvokeAsync("PagingNew", new
 {
@@ -425,3 +453,4 @@
         PageSelectPageSize = "_ordersCMS.onSelectPageSize()"
     }
 })
+</div>

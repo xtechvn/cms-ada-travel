@@ -815,7 +815,7 @@ var _SetService_Detail = {
         });
     },
     SendEmail: function () {
-        
+
         let FromCreate = $('#form-send-email');
         FromCreate.validate({
             rules: {
@@ -1251,6 +1251,14 @@ var _SetService_Detail = {
             id: id,
             profit: profit,
             type: type,
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    PopupHistoryPrint: function (id) {
+        let title = 'Lịch sử in yêu cầu chi';
+        let url = '/SetService/PopupHistoryPrint';
+        let param = {
+            PaymentRequestId: id,
         };
         _magnific.OpenSmallPopup(title, url, param);
     },

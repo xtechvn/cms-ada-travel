@@ -26,7 +26,6 @@
     },
 
     OnAddOrUpdate: function (id) {
-        debugger
         let title = `${id > 0 ? "Cập nhật" : "Thêm mới"} khách sạn`;
         let url = '/Hotel/AddOrUpdate';
 

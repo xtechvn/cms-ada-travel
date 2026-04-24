@@ -2135,7 +2135,19 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                 });
             }
         }
-
+        public async Task<IActionResult> PopupHistoryPrint(long PaymentRequestId)
+        {
+            try
+            {
+                var data =  _countYCCMongoService.GetListByPaymentRequestId(PaymentRequestId);
+                return PartialView(data);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("PopupHistoryPrint - SetServiceController: " + ex);
+            }
+            return PartialView();
+        }
     }
 
 }

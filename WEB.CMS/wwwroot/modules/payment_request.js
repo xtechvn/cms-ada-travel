@@ -1,4 +1,4 @@
-﻿
+
 let isPickerCreated = false;
 let isPickerPayment = false;
 let isPickerApproved = false;
@@ -171,6 +171,12 @@ $(document).ready(function () {
     //end multi select
     if (window.location.href.indexOf("PaymentRequest/Index") != -1) {
         var SearchParam = _payment_request_service.GetParam()
+        if (fields && fields.currentPage) {
+            SearchParam.currentPage = fields.currentPage;
+        }
+        if (fields && fields.status !== undefined) {
+             SearchParam.status = fields.status;
+        }
         _payment_request_service.Init(SearchParam);
     }
 
@@ -605,10 +611,10 @@ var _payment_request_service = {
         });
         if (is_count_status) {
             this.OnCountStatus()
-            this.SetActive(-1)
+            this.SetActive(input.status !== undefined && input.status !== null ? input.status : -1)
         }
     },
-    OnPaging: function (value, isClickSearch) {
+    OnPaging: function (value, isClickSearch = true) {
         var objSearch = this.GetParam()
         objSearch.currentPage = value;
         this.SearchParam = objSearch

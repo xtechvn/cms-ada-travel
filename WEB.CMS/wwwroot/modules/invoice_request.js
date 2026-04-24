@@ -1,10 +1,38 @@
-﻿let isPickerCreatedInvoiceRequest = false
+let isPickerCreatedInvoiceRequest = false
 let isPickerPayment = false
 let isPickerPlan = false
 let isPickerApproved = false
 let listStatusType = []
 let isResetTab = true
 let listUserCreate = []
+
+let fields = {
+    invoiceRequestNo: null,
+    invoiceNo: null,
+    invoiceCode: null,
+    orderNo: null,
+    status: -1,
+    statusMulti: [],
+    createByIds: null,
+    verifyByIds: null,
+    clientId: null,
+    currentPage: 1,
+    pageSize: 20,
+    createDateFromStr: null,
+    createDateToStr: null,
+    planDateFromStr: null,
+    planDateToStr: null,
+    exportDateFromStr: null,
+    exportDateToStr: null,
+    verifyDateFromStr: null,
+    verifyDateToStr: null,
+    isHasBill: null,
+}
+let cookieFilterInvoiceRequestName = 'invoice_request_search_cache'
+let cookieInvoiceRequest_filter_Client = 'cookieInvoiceRequest_filter_Client';
+let cookieInvoiceRequest_filter_CreateBy = 'cookieInvoiceRequest_filter_CreateBy';
+let cookieInvoiceRequest_filter_VerifyBy = 'cookieInvoiceRequest_filter_VerifyBy';
+
 $(document).ready(function () {
     $('input').attr('autocomplete', 'off');
     $('input').keyup(function (e) {
@@ -164,6 +192,25 @@ $(document).ready(function () {
             cache: true
         }
     });
+
+    if (_global_function.getCookie(cookieFilterInvoiceRequestName) != null && window.location.href.indexOf("InvoiceRequest/Index") != -1) {
+        let cookie = JSON.parse(_global_function.getCookie(cookieFilterInvoiceRequestName))
+        fields = cookie
+        _invoice_request_service.GetCacheFilter()
+        _global_function.eraseCookie(cookieFilterInvoiceRequestName)
+        
+        // Pass the cached fields directly or recreate them with GetParam.
+        var SearchParam = _invoice_request_service.GetParam()
+        // Override with safe cached paging if any
+        SearchParam.currentPage = fields.currentPage || 1;
+        if (fields.status !== undefined) {
+             SearchParam.status = fields.status;
+        }
+        _invoice_request_service.Init(SearchParam);
+    } else {
+        var SearchParam = _invoice_request_service.GetParam()
+        _invoice_request_service.Init(SearchParam);
+    }
 })
 var _invoice_request_service = {
     Init: function (objSearch) {
@@ -177,6 +224,40 @@ var _invoice_request_service = {
         this.OnPaging(1)
     },
     GetParam: function () {
+        var select_client = $('#token-input-client').select2("val");
+        var createdBy = $('#createdBy').select2("val");
+        var approveBy = $('#approveBy').select2("val");
+        if (select_client != null) {
+            let cookiename = {
+                id: select_client[0],
+                nameselect: $('#token-input-client').select2('data')[0].text
+            }
+            _global_function.eraseCookie(cookieInvoiceRequest_filter_Client)
+            window.localStorage.setItem(cookieInvoiceRequest_filter_Client, JSON.stringify(cookiename))
+        } else {
+            window.localStorage.removeItem(cookieInvoiceRequest_filter_Client)
+        }
+        if (createdBy != null) {
+            let cookiename = {
+                id: createdBy[0],
+                nameselect: $('#createdBy').select2('data')[0].text
+            }
+            _global_function.eraseCookie(cookieInvoiceRequest_filter_CreateBy)
+            window.localStorage.setItem(cookieInvoiceRequest_filter_CreateBy, JSON.stringify(cookiename))
+        } else {
+            window.localStorage.removeItem(cookieInvoiceRequest_filter_CreateBy)
+        }
+        if (approveBy != null) {
+            let cookiename = {
+                id: approveBy[0],
+                nameselect: $('#approveBy').select2('data')[0].text
+            }
+            _global_function.eraseCookie(cookieInvoiceRequest_filter_VerifyBy)
+            window.localStorage.setItem(cookieInvoiceRequest_filter_VerifyBy, JSON.stringify(cookiename))
+        } else {
+            window.localStorage.removeItem(cookieInvoiceRequest_filter_VerifyBy)
+        }
+
         var objSearch = {
             invoiceRequestNo: $('#billNo').val(),
             invoiceNo: $('#content').val(),
@@ -232,6 +313,111 @@ var _invoice_request_service = {
             objSearch.isHasBill = true
         return objSearch
     },
+    SetCacheFilter: function (objSearch) {
+        fields.invoiceRequestNo = objSearch.invoiceRequestNo
+        fields.invoiceNo = objSearch.invoiceNo
+        fields.invoiceCode = objSearch.invoiceCode
+        fields.orderNo = objSearch.orderNo
+        fields.status = objSearch.status
+        fields.createByIds = objSearch.createByIds
+        fields.verifyByIds = objSearch.verifyByIds
+        fields.statusMulti = objSearch.statusMulti
+        fields.clientId = objSearch.clientId
+        fields.currentPage = objSearch.currentPage
+        fields.createDateFromStr = objSearch.createDateFromStr
+        fields.createDateToStr = objSearch.createDateToStr
+        fields.planDateFromStr = objSearch.planDateFromStr
+        fields.planDateToStr = objSearch.planDateToStr
+        fields.exportDateFromStr = objSearch.exportDateFromStr
+        fields.exportDateToStr = objSearch.exportDateToStr
+        fields.verifyDateFromStr = objSearch.verifyDateFromStr
+        fields.verifyDateToStr = objSearch.verifyDateToStr
+        fields.isHasBill = objSearch.isHasBill
+        _global_function.setCookie(cookieFilterInvoiceRequestName, JSON.stringify(fields), 100)
+    },
+    GetCacheFilter: function () {
+        let cookie = _global_function.getCookie(cookieFilterInvoiceRequestName)
+        fields = JSON.parse(cookie)
+        $('#billNo').val(fields.invoiceRequestNo)
+        $('#content').val(fields.invoiceNo)
+        $('#invoiceCode').val(fields.invoiceCode)
+        $('#orderNo').val(fields.orderNo)
+        if (window.localStorage.getItem(cookieInvoiceRequest_filter_Client) != null) {
+            var cookie1 = window.localStorage.getItem(cookieInvoiceRequest_filter_Client)
+            var client = JSON.parse(cookie1)
+            $('#token-input-client').html('<option selected value = ' + client.id + '> ' + client.nameselect + '</option>')
+            _global_function.eraseCookie(cookieInvoiceRequest_filter_Client)
+        }
+        if (window.localStorage.getItem(cookieInvoiceRequest_filter_CreateBy) != null) {
+            var cookie1 = window.localStorage.getItem(cookieInvoiceRequest_filter_CreateBy)
+            var createBy = JSON.parse(cookie1)
+            $('#createdBy').html('<option selected value = ' + createBy.id + '> ' + createBy.nameselect + '</option>')
+        }
+        if (window.localStorage.getItem(cookieInvoiceRequest_filter_VerifyBy) != null) {
+            var cookie1 = window.localStorage.getItem(cookieInvoiceRequest_filter_VerifyBy)
+            var approveBy = JSON.parse(cookie1)
+            $('#approveBy').html('<option selected value = ' + approveBy.id + '> ' + approveBy.nameselect + '</option>')
+            _global_function.eraseCookie(cookieInvoiceRequest_filter_VerifyBy)
+        }
+        
+        if (fields.statusMulti != null && fields.statusMulti !== undefined && fields.statusMulti.length > 0) {
+            var btnTextStatus = document.querySelector(".btn-text-status-type");
+            btnTextStatus.innerText = `${fields.statusMulti.length} Selected`;
+            for (var i = 0; i < fields.statusMulti.length; i++) {
+                $('#status_type_' + fields.statusMulti[i] + '').addClass('checked')
+            }
+            listStatusType = fields.statusMulti
+        }
+        
+        if (fields.createDateFromStr != null && fields.createDateFromStr != undefined && fields.createDateFromStr !== '') {
+            $('input[name="datetimeCreate"]').daterangepicker({
+                autoUpdateInput: true,
+                autoApply: true,
+                showDropdowns: true,
+                drops: 'down',
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+            $('input[name="datetimeCreate"]').data('daterangepicker').setStartDate(fields.createDateFromStr);
+            $('input[name="datetimeCreate"]').data('daterangepicker').setEndDate(fields.createDateToStr);
+        }
+        if (fields.exportDateFromStr != null && fields.exportDateFromStr != undefined && fields.exportDateFromStr !== '') {
+            $('input[name="datetimePayment"]').daterangepicker({
+                autoUpdateInput: true,
+                autoApply: true,
+                showDropdowns: true,
+                drops: 'down',
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+            $('input[name="datetimePayment"]').data('daterangepicker').setStartDate(fields.exportDateFromStr);
+            $('input[name="datetimePayment"]').data('daterangepicker').setEndDate(fields.exportDateToStr);
+        }
+        if (fields.verifyDateFromStr != null && fields.verifyDateFromStr != undefined && fields.verifyDateFromStr !== '') {
+            $('input[name="datetimeApprove"]').daterangepicker({
+                autoUpdateInput: true,
+                autoApply: true,
+                showDropdowns: true,
+                drops: 'down',
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+            $('input[name="datetimeApprove"]').data('daterangepicker').setStartDate(fields.verifyDateFromStr);
+            $('input[name="datetimeApprove"]').data('daterangepicker').setEndDate(fields.verifyDateToStr);
+        }
+
+        if (fields.isHasBill) {
+            $("#isHasBill").val(1).prop('selected', true);
+            $("#select2-isHasBill-container").html(' Có hóa đơn ')
+        }
+        if (fields.isHasBill === false) {
+            $("#isHasBill").val(0).prop('selected', true);
+            $("#select2-isHasBill-container").html(' Chưa có hóa đơn ')
+        }
+    },
     BackToList: function () {
         window.location.href = '/InvoiceRequest/Index'
     },
@@ -259,7 +445,7 @@ var _invoice_request_service = {
             }
         });
     },
-    Search: function (input, is_count_status = true) {
+    Search: function (input, is_count_status = true, isClickSearch = false) {
         window.scrollTo(0, 0);
         //$('#imgLoading').show();
         _global_function.AddLoading()
@@ -271,18 +457,22 @@ var _invoice_request_service = {
                 _global_function.RemoveLoading()
                 //$('#imgLoading').hide();
                 $('#grid_data_invoice').html(result);
+                if (isClickSearch) {
+                    var modelCache = _invoice_request_service.GetParam()
+                    _invoice_request_service.SetCacheFilter(modelCache)
+                }
             }
         });
         if (is_count_status) {
             this.OnCountStatus()
-            this.SetActive(-1)
+            this.SetActive(input.status !== undefined && input.status !== null ? input.status : -1)
         }
     },
-    OnPaging: function (value) {
+    OnPaging: function (value, isClickSearch = true) {
         var objSearch = this.GetParam()
         objSearch.currentPage = value;
         this.SearchParam = objSearch
-        this.Search(objSearch);
+        this.Search(objSearch, true, isClickSearch);
     },
     OnChangeAccountClientId: function (value) {
         listUserCreate = []

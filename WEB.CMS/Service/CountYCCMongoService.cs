@@ -74,5 +74,28 @@ namespace WEB.CMS.Service
             }
             return Count;
         }
+        public List<PaymentRequestMongoModel> GetListByPaymentRequestId(long PaymentRequestId)
+        {
+            var Count = 0;
+            var listLog = new List<PaymentRequestMongoModel>();
+            try
+            {
+                var db = MongodbService.GetDatabase();
+
+
+                var collection = db.GetCollection<PaymentRequestMongoModel>(configuration["DataBaseConfig:MongoServer:Count_ycc"]);
+                var filter = Builders<PaymentRequestMongoModel>.Filter.Empty;
+                filter &= Builders<PaymentRequestMongoModel>.Filter.Where(s => s.PaymentRequestId == PaymentRequestId);
+                var S = Builders<PaymentRequestMongoModel>.Sort.Descending("_id");
+                listLog = collection.Find(filter).Sort(S).ToList();
+                
+                return listLog;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetCountYCC - CountYCCMongoService . " + JsonConvert.SerializeObject(ex));
+            }
+            return null;
+        }
     }
 }

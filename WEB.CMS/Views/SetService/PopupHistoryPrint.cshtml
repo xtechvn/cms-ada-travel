@@ -1,0 +1,24 @@
+﻿@using Entities.ViewModels.Mongo;
+@model List<PaymentRequestMongoModel>
+<div class="content_lightbox">
+    <ul class="list-notifi">
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var item in Model)
+            {
+                <li>
+                    <i class="fa fa-check"></i>
+                    <div>@item.CreatedUserName </div>
+                    <div class="date">Ngày: @item.CreatedTime.ToString("dd/MM/yyyy HH:mm")</div>
+                </li>
+            }
+
+        }
+        else
+        {
+            <div>
+                Chưa có lịch sử in ấn nào
+            </div>
+        }
+    </ul>
+</div>
