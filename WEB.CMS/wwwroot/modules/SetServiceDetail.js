@@ -623,6 +623,11 @@ var _SetService_Detail = {
 
     },
     PopupAddCode: function (id, HotelBookingId, type) {
+        var mPopup = $('#magnific-popup-small');
+        var mTitle = mPopup.find('.magnific-title');
+        var mBody = mPopup.find('.magnific-body');
+        mTitle.html('');
+        mBody.html('');
         let title = 'Thêm mới Code';
         if (id.trim() != "") {
             title = 'Sửa Code dịch vụ'
@@ -772,6 +777,11 @@ var _SetService_Detail = {
 
     },
     PopupSendEmail: function () {
+        var mPopup = $('#magnific-popup-small');
+        var mTitle = mPopup.find('.magnific-title');
+        var mBody = mPopup.find('.magnific-body');
+        mTitle.html('');
+        mBody.html('');
         let title = 'Gửi Code dịch vụ khách sạn';
         let url = '/SetService/SendEmail';
         let param = {
@@ -783,6 +793,11 @@ var _SetService_Detail = {
 
     },
     PopupSendEmail2: function () {
+        var mPopup = $('#magnific-popup-small');
+        var mTitle = mPopup.find('.magnific-title');
+        var mBody = mPopup.find('.magnific-body');
+        mTitle.html('');
+        mBody.html('');
         let title = 'Gửi Email nhà cung cấp';
         let url = '/SetService/SendEmailSupplier';
         let param = {
@@ -939,7 +954,11 @@ var _SetService_Detail = {
 
     },
     OpenPopupUserAgent: function (id, orderid, type) {
-
+        var mPopup = $('#magnific-popup-small');
+        var mTitle = mPopup.find('.magnific-title');
+        var mBody = mPopup.find('.magnific-body');
+        mTitle.html('');
+        mBody.html('');
         let title = 'Đổi điều hành viên';
         let url = '/SetService/DetailUserHotel';
         let param = {
@@ -1193,7 +1212,11 @@ var _SetService_Detail = {
         });
     },
     OpenPopupSupplier: function (id) {
-
+        var mPopup = $('#magnific-popup-small');
+        var mTitle = mPopup.find('.magnific-title');
+        var mBody = mPopup.find('.magnific-body');
+        mTitle.html('');
+        mBody.html('');
         let title = 'Đổi nhà cung cấp';
         let url = '/SetService/DetailSupplier';
         let param = {
@@ -1236,6 +1259,11 @@ var _SetService_Detail = {
         });
     },
     PopupYCChi: function (id, type) {
+        var mPopup = $('#magnific-popup-small');
+        var mTitle = mPopup.find('.magnific-title');
+        var mBody = mPopup.find('.magnific-body');
+        mTitle.html('');
+        mBody.html('');
         let title = 'Yêu cầu chi';
         if (type == 1) {
             title = 'Yêu cầu chi hoàn trả khách hàng'
@@ -1255,6 +1283,12 @@ var _SetService_Detail = {
         _magnific.OpenSmallPopup(title, url, param);
     },
     PopupHistoryPrint: function (id) {
+        var mPopup = $('#magnific-popup-small');
+        var mTitle = mPopup.find('.magnific-title');
+        var mBody = mPopup.find('.magnific-body');
+        mTitle.html('');
+        mBody.html('');
+
         let title = 'Lịch sử in yêu cầu chi';
         let url = '/SetService/PopupHistoryPrint';
         let param = {
