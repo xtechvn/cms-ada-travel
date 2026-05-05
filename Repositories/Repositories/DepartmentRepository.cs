@@ -954,6 +954,24 @@ namespace Repositories.IRepositories
                                         ws.Cells["M" + RowIndex].PutValue(searchModel.StartDateToStr);
                                         ws.Cells["N" + RowIndex].PutValue(searchModel.EndDateFromStr);
                                         ws.Cells["O" + RowIndex].PutValue(searchModel.EndDateToStr);
+
+                                        style = ws.Cells["A"+ RowIndex].GetStyle();
+                                        style.Font.IsBold = true;
+                                        style.IsTextWrapped = true;
+                                        style.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                        style.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                        style.Pattern = BackgroundType.Solid;
+                                        style.Font.Color = Color.White;
+                                        style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
+                                        style.Borders[BorderType.TopBorder].Color = Color.Black;
+                                        style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
+                                        style.Borders[BorderType.BottomBorder].Color = Color.Black;
+                                        style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
+                                        style.Borders[BorderType.LeftBorder].Color = Color.Black;
+                                        style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
+                                        style.Borders[BorderType.RightBorder].Color = Color.Black;
+                                        style.VerticalAlignment = TextAlignmentType.Center;
+                                        range.ApplyStyle(style, st);
                                         foreach (var item2 in item.listReportDepartment)
                                         {
                                             RowIndex++;
