@@ -2370,11 +2370,13 @@ namespace Repositories.IRepositories
                     ws.Cells["E1"].PutValue("Khách hàng");
                     ws.Cells["F1"].PutValue("Nhãn đơn");
                     ws.Cells["G1"].PutValue("Thanh toán");
-                    ws.Cells["H1"].PutValue("Lợi nhuận");
-                    ws.Cells["I1"].PutValue("Trạng thái");
-                    ws.Cells["J1"].PutValue("Ngày tạo");
-                    ws.Cells["k1"].PutValue("Nhân viên chính");
-                    ws.Cells["L1"].PutValue("Hình thức thanh toán");
+                    ws.Cells["H1"].PutValue("Doanh thu");
+                    ws.Cells["I1"].PutValue("Lợi nhuận");
+                    ws.Cells["J1"].PutValue("Trạng thái");
+                    ws.Cells["K1"].PutValue("Ngày tạo");
+                    ws.Cells["L1"].PutValue("Nhân viên chính");
+                    ws.Cells["M1"].PutValue("Hình thức thanh toán");
+                 
 
 
 
@@ -2439,13 +2441,16 @@ namespace Repositories.IRepositories
                         ws.Cells["D" + RowIndex].PutValue(Convert.ToDateTime(item.EndDate).ToString("dd/MM/yyyy HH:ss"));
                         ws.Cells["E" + RowIndex].PutValue(item.ClientName + " - " + item.ClientEmail);
                         ws.Cells["F" + RowIndex].PutValue(item.Note);
-                        ws.Cells["G" + RowIndex].PutValue(item.Payment + "/" + (item.Amount == 0 ? 0 : item.Amount));
-                        ws.Cells["H" + RowIndex].PutValue(item.Profit);
+                        ws.Cells["G" + RowIndex].PutValue(item.Payment);
+                        ws.Cells["G" + RowIndex].SetStyle(numberStyle);
+                        ws.Cells["H" + RowIndex].PutValue(item.Amount == 0 ? 0 : item.Amount);
                         ws.Cells["H" + RowIndex].SetStyle(numberStyle);
-                        ws.Cells["I" + RowIndex].PutValue(item.Status);
-                        ws.Cells["J" + RowIndex].PutValue(Convert.ToDateTime(item.CreateDate).ToString("dd/MM/yyyy HH:ss"));
-                        ws.Cells["k" + RowIndex].PutValue(item.SalerName + " - " + item.SalerEmail);
-                        ws.Cells["L" + RowIndex].PutValue((item.PermisionTypeName == null || item.PermisionTypeName.Trim() == "" ? "Không công nợ" : item.PermisionTypeName) + " - " + item.PaymentStatusName);
+                        ws.Cells["I" + RowIndex].PutValue(item.Profit);
+                        ws.Cells["I" + RowIndex].SetStyle(numberStyle);
+                        ws.Cells["J" + RowIndex].PutValue(item.Status);
+                        ws.Cells["K" + RowIndex].PutValue(Convert.ToDateTime(item.CreateDate).ToString("dd/MM/yyyy HH:ss"));
+                        ws.Cells["L" + RowIndex].PutValue(item.SalerName + " - " + item.SalerEmail);
+                        ws.Cells["M" + RowIndex].PutValue((item.PermisionTypeName == null || item.PermisionTypeName.Trim() == "" ? "Không công nợ" : item.PermisionTypeName) + " - " + item.PaymentStatusName);
 
 
                     }
