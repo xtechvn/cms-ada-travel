@@ -261,7 +261,6 @@
         var $thHeaderRow = $scope.find('#th-header-table');
         var $scrollbarPlaceholder = $('<div id="scrollbar-placeholder" style="display:none"></div>').insertBefore($topScroll);
 
-        var isSyncingScroll = false;
         var ticking = false;
 
         function syncWidth() {
@@ -316,6 +315,10 @@
 
             if (scroll > 150) { 
                 if ($topBar.find('#top-scrollbar-wrapper').length === 0) {
+                    $scrollbarPlaceholder.css({
+                        'display': 'block',
+                        'height': $topScroll.outerHeight() + 'px'
+                    });
                     $topBar.append($topScroll);
                     $topScroll.css({
                         'position': 'relative',
@@ -346,6 +349,10 @@
                     $headerContainer.append($fixedTable);
                     $topBar.append($headerContainer);
                     
+                    $headerContainer.on('scroll', function() {
+                        sync(this, $topScroll, $tableScroll);
+                    });
+                    
                     $thHeaderRow.css('visibility', 'hidden');
                     $headerContainer.scrollLeft($tableScroll.scrollLeft());
                 }
@@ -358,6 +365,7 @@
             var $topBar = $('#topbar');
             if ($topBar.find('#top-scrollbar-wrapper').length > 0) {
                 $topScroll.insertAfter($scrollbarPlaceholder);
+                $scrollbarPlaceholder.css('display', 'none');
                 $topScroll.css({'position': '', 'top': '', 'z-index': '', 'background': ''});
                 syncWidth();
             }
@@ -368,13 +376,26 @@
         }
 
         // Enhanced Synchronized Horizontal Scrolling
+        var activeSyncSource = null;
+        var syncTimeout = null;
+
         function sync(source, target1, target2) {
-            if (isSyncingScroll) return;
-            isSyncingScroll = true;
+            if (activeSyncSource && activeSyncSource !== source) return;
+            
+            activeSyncSource = source;
             var left = $(source).scrollLeft();
-            if (target1 && target1.length) target1.scrollLeft(left);
-            if (target2 && target2.length) target2.scrollLeft(left);
-            setTimeout(function () { isSyncingScroll = false; }, 20);
+            
+            if (target1 && target1.length && Math.abs(target1.scrollLeft() - left) > 1) {
+                target1.scrollLeft(left);
+            }
+            if (target2 && target2.length && Math.abs(target2.scrollLeft() - left) > 1) {
+                target2.scrollLeft(left);
+            }
+            
+            clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(function() {
+                activeSyncSource = null;
+            }, 50);
         }
 
         $topScroll.on('scroll', function () {
