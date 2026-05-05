@@ -1,4 +1,4 @@
-﻿using Aspose.Cells;
+using Aspose.Cells;
 using DAL;
 using Entities.ConfigModels;
 using Entities.Models;
@@ -906,6 +906,26 @@ namespace Repositories.IRepositories
                                     numberStyle.HorizontalAlignment = TextAlignmentType.Right;
                                     numberStyle.VerticalAlignment = TextAlignmentType.Center;
 
+                                    Style numberStyle_T = ws.Cells["A3"].GetStyle();
+                                    numberStyle_T.Font.IsBold = true;
+                                    numberStyle_T.IsTextWrapped = true;
+                                    numberStyle_T.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    numberStyle_T.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    numberStyle_T.Pattern = BackgroundType.Solid;
+                                    numberStyle_T.Font.Color = Color.White;
+                                    numberStyle_T.Number = 3;
+                                    numberStyle_T.HorizontalAlignment = TextAlignmentType.Right;
+                                    numberStyle_T.VerticalAlignment = TextAlignmentType.Center;
+
+                                    Style alignCenterStyle_T = ws.Cells["A3"].GetStyle();
+                                    alignCenterStyle_T.Font.IsBold = true;
+                                    alignCenterStyle_T.IsTextWrapped = true;
+                                    alignCenterStyle_T.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                    alignCenterStyle_T.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                    alignCenterStyle_T.Pattern = BackgroundType.Solid;
+                                    alignCenterStyle_T.Font.Color = Color.White;
+                                    alignCenterStyle_T.HorizontalAlignment = TextAlignmentType.Center;
+
                                     int RowIndex = 3;
                                     ws.Cells["B" + RowIndex].PutValue("Tổng cộng");
                                     ws.Cells["C" + RowIndex].PutValue(data.Sum(s => s.TotalOrder));
@@ -929,49 +949,42 @@ namespace Repositories.IRepositories
                                     foreach (var item in List_ReportDepartment)
                                     {
 
+                                        range = cell.CreateRange(RowIndex, 0, 1, 16);
+
+                                        Style style_T = ws.Cells["A" + RowIndex].GetStyle();
+                                        style_T.Font.IsBold = true;
+                                        style_T.IsTextWrapped = true;
+                                        style_T.ForegroundColor = Color.FromArgb(33, 88, 103);
+                                        style_T.BackgroundColor = Color.FromArgb(33, 88, 103);
+                                        style_T.Pattern = BackgroundType.Solid;
+                                        style_T.Font.Color = Color.White;
+                                        range.ApplyStyle(style_T, st);
                                         RowIndex++;
                                         ws.Cells["A" + RowIndex].PutValue(RowIndex - 3);
-                                        ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle);
+                                        ws.Cells["A" + RowIndex].SetStyle(alignCenterStyle_T);
                                         ws.Cells["B" + RowIndex].PutValue(item.DepartmentName);
                                         ws.Cells["C" + RowIndex].PutValue(item.ParentDepartmentTotalOrder);
                                         ws.Cells["D" + RowIndex].PutValue(item.ParentDepartmentAmount);
-                                        ws.Cells["D" + RowIndex].SetStyle(numberStyle);
+                                        ws.Cells["D" + RowIndex].SetStyle(numberStyle_T);
                                         ws.Cells["E" + RowIndex].PutValue(item.ParentDepartmentPrice);
-                                        ws.Cells["E" + RowIndex].SetStyle(numberStyle);
+                                        ws.Cells["E" + RowIndex].SetStyle(numberStyle_T);
                                         ws.Cells["F" + RowIndex].PutValue(item.ParentDepartmentComission);
-                                        ws.Cells["F" + RowIndex].SetStyle(numberStyle);
+                                        ws.Cells["F" + RowIndex].SetStyle(numberStyle_T);
                                         ws.Cells["G" + RowIndex].PutValue(item.ParentDepartmentProfit);
-                                        ws.Cells["G" + RowIndex].SetStyle(numberStyle);
+                                        ws.Cells["G" + RowIndex].SetStyle(numberStyle_T);
                                         ws.Cells["H" + RowIndex].PutValue(item.ParentDepartmentPercent.ToString("N2") + "%");
                                         ws.Cells["I" + RowIndex].PutValue(item.ParentDepartmentAmountVat);
-                                        ws.Cells["I" + RowIndex].SetStyle(numberStyle);
+                                        ws.Cells["I" + RowIndex].SetStyle(numberStyle_T);
                                         ws.Cells["J" + RowIndex].PutValue(item.ParentDepartmentPriceVat);
-                                        ws.Cells["J" + RowIndex].SetStyle(numberStyle);
+                                        ws.Cells["J" + RowIndex].SetStyle(numberStyle_T);
                                         ws.Cells["k" + RowIndex].PutValue(item.ParentDepartmentProfitVat);
-                                        ws.Cells["k" + RowIndex].SetStyle(numberStyle);
+                                        ws.Cells["k" + RowIndex].SetStyle(numberStyle_T);
 
                                         ws.Cells["L" + RowIndex].PutValue(searchModel.StartDateFromStr);
                                         ws.Cells["M" + RowIndex].PutValue(searchModel.StartDateToStr);
                                         ws.Cells["N" + RowIndex].PutValue(searchModel.EndDateFromStr);
                                         ws.Cells["O" + RowIndex].PutValue(searchModel.EndDateToStr);
 
-                                        style = ws.Cells["A"+ RowIndex].GetStyle();
-                                        style.Font.IsBold = true;
-                                        style.IsTextWrapped = true;
-                                        style.ForegroundColor = Color.FromArgb(33, 88, 103);
-                                        style.BackgroundColor = Color.FromArgb(33, 88, 103);
-                                        style.Pattern = BackgroundType.Solid;
-                                        style.Font.Color = Color.White;
-                                        style.Borders[BorderType.TopBorder].LineStyle = CellBorderType.Thin;
-                                        style.Borders[BorderType.TopBorder].Color = Color.Black;
-                                        style.Borders[BorderType.BottomBorder].LineStyle = CellBorderType.Thin;
-                                        style.Borders[BorderType.BottomBorder].Color = Color.Black;
-                                        style.Borders[BorderType.LeftBorder].LineStyle = CellBorderType.Thin;
-                                        style.Borders[BorderType.LeftBorder].Color = Color.Black;
-                                        style.Borders[BorderType.RightBorder].LineStyle = CellBorderType.Thin;
-                                        style.Borders[BorderType.RightBorder].Color = Color.Black;
-                                        style.VerticalAlignment = TextAlignmentType.Center;
-                                        range.ApplyStyle(style, st);
                                         foreach (var item2 in item.listReportDepartment)
                                         {
                                             RowIndex++;
