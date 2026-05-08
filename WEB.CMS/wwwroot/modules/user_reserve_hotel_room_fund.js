@@ -225,19 +225,30 @@ var userReserveHotelRoomFund = {
         if (!roomId) { _msgalert.error("Vui lòng chọn hạng phòng"); return; }
         if (isNaN(count) || count <= 0) { _msgalert.error("Số lượng phòng không hợp lệ"); return; }
 
-        var isDup = false;
-        $('#table-reserve-room-types tbody tr.room-row').each(function () {
-            var rId = $(this).find('.room-select').val();
-            var rsStr = $(this).find('.start-date').val();
-            var reStr = $(this).find('.end-date').val();
-            if (rId == roomId && rsStr == dateRange[0].trim() && reStr == dateRange[1].trim()) {
-                isDup = true;
-                return false;
-            }
-        });
+        var days = endDate.diff(startDate, 'days');
+        if (days <= 0) {
+            _msgalert.error("Ngày kết thúc phải lớn hơn ngày bắt đầu");
+            return;
+        }
 
-        if (!isDup) {
-            this.AddRoomTypeRowWithData(roomId, roomName, dateRange[0].trim(), dateRange[1].trim(), count);
+        for (var i = 0; i < days; i++) {
+            var currentStart = moment(startDate).add(i, 'days').format('DD/MM/YYYY');
+            var currentEnd = moment(startDate).add(i + 1, 'days').format('DD/MM/YYYY');
+
+            var isDup = false;
+            $('#table-reserve-room-types tbody tr.room-row').each(function () {
+                var rId = $(this).find('.room-select').val();
+                var rsStr = $(this).find('.start-date').val();
+                var reStr = $(this).find('.end-date').val();
+                if (rId == roomId && rsStr == currentStart && reStr == currentEnd) {
+                    isDup = true;
+                    return false;
+                }
+            });
+
+            if (!isDup) {
+                this.AddRoomTypeRowWithData(roomId, roomName, currentStart, currentEnd, count);
+            }
         }
     },
 
@@ -445,7 +456,7 @@ var userReserveHotelRoomFund = {
                     _msgalert.success(result.msg);
                     setTimeout(function () {
                         userReserveHotelRoomFund.Search();
-                    },500)
+                    }, 500)
                 } else {
                     _msgalert.error(result.msg);
                 }
