@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -332,6 +332,14 @@ namespace Utilities.Contants
         public static string sp_UpdateUserReserveHotelRoomFund = "sp_UpdateUserReserveHotelRoomFund";
         public static string sp_GetListUserReserveHotelRoomFund = "sp_GetListUserReserveHotelRoomFund";
         public static string sp_GetDetailUserReserveHotelRoomFund = "sp_GetDetailUserReserveHotelRoomFund";
+
+        public static string SP_GetListFlightWarehouse = "SP_GetListFlightWarehouse";
+        public static string sp_UpsertFlightWarehouseBooking = "sp_UpsertFlightWarehouseBooking";
+        public static string sp_UpsertFlightWarehouseSegment = "sp_UpsertFlightWarehouseSegment";
+        public static string sp_UpsertFlightWarehousePrice = "sp_UpsertFlightWarehousePrice";
+        public static string sp_GetDetailFlightWarehousePriceByBookingId = "sp_GetDetailFlightWarehousePriceByBookingId";
+        public static string sp_GetDetailFlightWarehouseSegmentByBookingId = "sp_GetDetailFlightWarehouseSegmentByBookingId";
+        public static string sp_GetDetailFlightWarehouseBooking = "sp_GetDetailFlightWarehouseBooking";
 
 
 

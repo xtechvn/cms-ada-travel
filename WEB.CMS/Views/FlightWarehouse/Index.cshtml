@@ -1,0 +1,48 @@
+@{
+    ViewData["Title"] = "Kho vé máy bay";
+}
+<style>
+    .white-popup {
+        max-width: 1200px !important;
+        min-height: 500px !important;
+    }
+</style>
+
+<section class="main-container">
+    <div class="row-main container">
+        <h2 class="title_page">Kho vé máy bay</h2>
+        <div class="bg_white filter-search">
+            <div class="row">
+                <div class="col-md-2 mb10">
+                    <input type="text" class="form-control" id="search-booking-code" placeholder="Mã booking">
+                </div>
+                <div class="col-md-2 mb10">
+                    <input type="text" class="form-control" id="search-departure" placeholder="Điểm đi">
+                </div>
+                <div class="col-md-2 mb10">
+                    <input type="text" class="form-control" id="search-arrival" placeholder="Điểm đến">
+                </div>
+                <div class="col-md-2 mb10">
+                    <input type="text" class="form-control" id="search-airline" placeholder="Hãng bay">
+                </div>
+                <div class="col-md-4 mb10">
+                    <button class="btn btn-default" onclick="_flight_warehouse.Search()">Tìm kiếm</button>
+                    <button class="btn btn-success" onclick="_flight_warehouse.Upsert(0)">Thêm mới</button>
+                </div>
+            </div>
+        </div>
+        <div id="grid-data">
+            <!-- List data will be loaded here -->
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script src="~/modules/flight_warehouse.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            _flight_warehouse.Init();
+            _flight_warehouse.Search();
+        });
+    </script>
+}

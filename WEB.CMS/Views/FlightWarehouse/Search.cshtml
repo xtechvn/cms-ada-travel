@@ -1,0 +1,70 @@
+@using System.Data
+@model DataTable
+
+<div class="table-responsive bg_white">
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th style="width: 50px;">STT</th>
+                <th>Mã Booking</th>
+                <th>Hành trình</th>
+                <th>Điểm đi/đến</th>
+                <th>Số vé</th>
+                <th>Hoàn hủy</th>
+                <th>Hãng bay</th>
+                <th>Ngày bay</th>
+                <th>Ghi chú</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Rows.Count > 0)
+            {
+                int stt = ((int)ViewBag.PageIndex - 1) * (int)ViewBag.PageSize;
+                foreach (DataRow row in Model.Rows)
+                {
+                    stt++;
+                    <tr>
+                        <td>@stt</td>
+                        <td>@row["BookingCode"]</td>
+                        <td>@(row["TripType"].ToString() == "1" ? "Một chiều" : "Khứ hồi")</td>
+                        <td>@row["DeparturePoint"] - @row["ArrivalPoint"]</td>
+                        <td>@row["TotalTicket"]</td>
+                        <td>@(row["IsRefundable"].ToString() == "1" ? "Có" : "Không")</td>
+                        <td>@row["Airline"]</td>
+                        <td>@(row["FlightDate"] != DBNull.Value ? Convert.ToDateTime(row["FlightDate"]).ToString("dd/MM/yyyy") : "")</td>
+                        <td>@row["Note"]</td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" onclick="_flight_warehouse.Upsert(@row["Id"])"><i class="fa fa-edit"></i> Sửa</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center">Không có dữ liệu</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model != null && Model.Rows.Count > 0)
+{
+    var totalRecord = Convert.ToInt32(Model.Rows[0]["TotalRow"]);
+    var totalPage = (int)Math.Ceiling((double)totalRecord / (int)ViewBag.PageSize);
+
+    @await Component.InvokeAsync("PagingNew", new
+    {
+        pageModel = new Entities.ViewModels.Paging()
+        {
+            TotalRecord = totalRecord,
+            TotalPage = totalPage,
+            CurrentPage = (int)ViewBag.PageIndex,
+            PageSize = (int)ViewBag.PageSize,
+            RecordName = "vé máy bay",
+            PageAction = "_flight_warehouse.OnPaging({0})"
+        }
+    })
+}

@@ -163,6 +163,9 @@ namespace Entities.Models
         public virtual DbSet<HotelRoomFund> HotelRoomFunds { get; set; }
         public virtual DbSet<HotelRoomFundDetail> HotelRoomFundDetails { get; set; }
         public virtual DbSet<UserReserveHotelRoomFund> UserReserveHotelRoomFunds { get; set; }
+        public virtual DbSet<FlightWarehouseBooking> FlightWarehouseBookings { get; set; }
+        public virtual DbSet<FlightWarehousePrice> FlightWarehousePrices { get; set; }
+        public virtual DbSet<FlightWarehouseSegment> FlightWarehouseSegments { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -3067,6 +3070,69 @@ namespace Entities.Models
             modelBuilder.Entity<FlashSaleProduct>(entity =>
             {
                 entity.ToTable("FlashSaleProduct");
+            });
+            modelBuilder.Entity<FlightWarehouseBooking>(entity =>
+            {
+                entity.ToTable("FlightWarehouseBooking");
+
+                entity.Property(e => e.ArrivalPoint).HasMaxLength(255);
+
+                entity.Property(e => e.BookingCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CarryOnBaggage).HasMaxLength(50);
+
+                entity.Property(e => e.CheckedBaggage).HasMaxLength(50);
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DeparturePoint).HasMaxLength(255);
+
+                entity.Property(e => e.TotalTicket).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<FlightWarehousePrice>(entity =>
+            {
+                entity.ToTable("FlightWarehousePrice");
+
+                entity.Property(e => e.AdtAmount).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.AdtPrice).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.AdtProfit).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.ChdAmount).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.ChdPrice).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.ChdProfit).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.InfAmount).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.InfPrice).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.InfProfit).HasColumnType("decimal(18, 2)");
+            });
+
+            modelBuilder.Entity<FlightWarehouseSegment>(entity =>
+            {
+                entity.ToTable("FlightWarehouseSegment");
+
+                entity.Property(e => e.Airline).HasMaxLength(255);
+
+                entity.Property(e => e.FlightCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FlightDate).HasColumnType("date");
+
+                entity.Property(e => e.Pnrcode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("PNRCode");
             });
             OnModelCreatingPartial(modelBuilder);
         }

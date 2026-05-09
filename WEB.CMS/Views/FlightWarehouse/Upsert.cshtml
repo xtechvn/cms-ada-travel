@@ -1,0 +1,251 @@
+@using Entities.ViewModels.FlightWarehouse
+@model FlightWarehouseUpsertModel
+
+@{
+    Layout = null;
+}
+
+<style>
+    .fly_booking_service {
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="modal fade fly_booking_service show" id="flight-warehouse-upsert-modal" aria-modal="true" role="dialog" style="display: block;">
+    <div class="modal-dialog" style="max-width: 95%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">@(Model.Booking.Id > 0 ? "Cập nhật" : "Thêm mới") kho vé máy bay</h4>
+                <button type="button" class="close" onclick="_flight_warehouse.CloseModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="flight-warehouse-form">
+                    <input type="hidden" name="Id" value="@Model.Booking.Id" />
+                    <div class="row row_min">
+                        <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Mã Booking <sup class="red">*</sup></label>
+                            <input type="text" class="form-control" name="BookingCode" value="@Model.Booking.BookingCode" required>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Hành trình <sup class="red">*</sup></label>
+                            <select class="form-control select2" name="TripType" id="upsert-trip-type">
+                                @if (Model.Booking.TripType == 1)
+                                {
+                                    <option value="1" selected="selected">Một chiều</option>
+                                }
+                                else
+                                {
+                                    <option value="1">Một chiều</option>
+                                }
+                                @if (Model.Booking.TripType == 2)
+                                {
+                                    <option value="2" selected="selected">Khứ hồi</option>
+                                }
+                                else
+                                {
+                                    <option value="2">Khứ hồi</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Điểm đi <sup class="red">*</sup></label>
+                            <input type="text" class="form-control" name="DeparturePoint" value="@Model.Booking.DeparturePoint" required>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Điểm đến <sup class="red">*</sup></label>
+                            <input type="text" class="form-control" name="ArrivalPoint" value="@Model.Booking.ArrivalPoint" required>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Tổng số vé <sup class="red">*</sup></label>
+                            <input type="number" class="form-control" name="TotalTicket" value="@Model.Booking.TotalTicket" required>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Hoàn hủy</label>
+                            <select class="form-control" name="IsRefundable">
+                                @if (Model.Booking.IsRefundable == 0)
+                                {
+                                    <option value="0" selected="selected">Không</option>
+                                }
+                                else
+                                {
+                                    <option value="0">Không</option>
+                                }
+                                @if (Model.Booking.IsRefundable == 1)
+                                {
+                                    <option value="1" selected="selected">Có</option>
+                                }
+                                else
+                                {
+                                    <option value="1">Có</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Hành lý xách tay</label>
+                            <input type="text" class="form-control" name="CarryOnBaggage" value="@Model.Booking.CarryOnBaggage">
+                        </div>
+                        <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Hành lý ký gửi</label>
+                            <input type="text" class="form-control" name="CheckedBaggage" value="@Model.Booking.CheckedBaggage">
+                        </div>
+                    </div>
+
+                    <div class="bold mb15 txt_14">Thông tin chặng</div>
+                    <div class="table-responsive table-gray mb15">
+                        <table class="table table-bordered" id="segment-table">
+                            <thead>
+                                <tr>
+                                    <th>Loại chặng</th>
+                                    <th>Ngày bay</th>
+                                    <th>Hãng bay</th>
+                                    <th>Mã chuyến bay</th>
+                                    <th>Mã PNR</th>
+                                    <th style="width: 50px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Segments != null && Model.Segments.Count > 0)
+                                {
+                                    foreach (var segment in Model.Segments)
+                                    {
+                                        <tr class="segment-row" data-id="@segment.Id">
+                                            <td>
+                                                <select class="form-control segment-type">
+                                                    @if (segment.SegmentType == 0)
+                                                    {
+                                                        <option value="0" selected="selected">Đi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="0">Đi</option>
+                                                    }
+                                                    @if (segment.SegmentType == 1)
+                                                    {
+                                                        <option value="1" selected="selected">Về</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="1">Về</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td><input type="text" class="form-control datepicker segment-date" value="@segment.FlightDate?.ToString("dd/MM/yyyy")"></td>
+                                            <td><input type="text" class="form-control segment-airline" value="@segment.Airline"></td>
+                                            <td><input type="text" class="form-control segment-flight-code" value="@segment.FlightCode"></td>
+                                            <td><input type="text" class="form-control segment-pnr" value="@segment.Pnrcode"></td>
+                                            <td><button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('tr').remove()"><i class="fa fa-times"></i></button></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr class="segment-row" data-id="0">
+                                        <td>
+                                            <select class="form-control segment-type">
+                                                <option value="0">Đi</option>
+                                                <option value="1">Về</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control datepicker segment-date" value=""></td>
+                                        <td><input type="text" class="form-control segment-airline" value=""></td>
+                                        <td><input type="text" class="form-control segment-flight-code" value=""></td>
+                                        <td><input type="text" class="form-control segment-pnr" value=""></td>
+                                        <td><button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('tr').remove()"><i class="fa fa-times"></i></button></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-info btn-sm" onclick="_flight_warehouse.AddSegmentRow()">+ Thêm chặng</button>
+                    </div>
+
+                    <div class="bold mb15 txt_14">Bảng kê giá</div>
+                    <div class="table-responsive table-gray mb15">
+                        <table class="table table-bordered" id="price-table">
+                            <thead>
+                                <tr>
+                                    <th>Loại giá</th>
+                                    <th>Đại lý áp dụng (IDs)</th>
+                                    <th>Giá ADT</th>
+                                    <th>Phí ADT</th>
+                                    <th>Giá CHD</th>
+                                    <th>Phí CHD</th>
+                                    <th>Giá INF</th>
+                                    <th>Phí INF</th>
+                                    <th style="width: 50px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Prices != null && Model.Prices.Count > 0)
+                                {
+                                    foreach (var price in Model.Prices)
+                                    {
+                                        <tr class="price-row" data-id="@price.Id">
+                                            <td>
+                                                <select class="form-control price-type">
+                                                    @if (price.PriceType == 1)
+                                                    {
+                                                        <option value="1" selected="selected">Giá nét</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="1">Giá nét</option>
+                                                    }
+                                                    @if (price.PriceType == 2)
+                                                    {
+                                                        <option value="2" selected="selected">Giá bán</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="2">Giá bán</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td><input type="text" class="form-control apply-agencies" value="@price.ApplyAgencyIds"></td>
+                                            <td><input type="text" class="form-control currency adt-price" value="@price.AdtPrice?.ToString("N0")"></td>
+                                            <td><input type="text" class="form-control currency adt-amount" value="@price.AdtAmount?.ToString("N0")"></td>
+                                            <td><input type="text" class="form-control currency chd-price" value="@price.ChdPrice?.ToString("N0")"></td>
+                                            <td><input type="text" class="form-control currency chd-amount" value="@price.ChdAmount?.ToString("N0")"></td>
+                                            <td><input type="text" class="form-control currency inf-price" value="@price.InfPrice?.ToString("N0")"></td>
+                                            <td><input type="text" class="form-control currency inf-amount" value="@price.InfAmount?.ToString("N0")"></td>
+                                            <td><button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('tr').remove()"><i class="fa fa-times"></i></button></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr class="price-row" data-id="0">
+                                        <td>
+                                            <select class="form-control price-type">
+                                                <option value="1">Giá nét</option>
+                                                <option value="2">Giá bán</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="text" class="form-control apply-agencies" value=""></td>
+                                        <td><input type="text" class="form-control currency adt-price" value="0"></td>
+                                        <td><input type="text" class="form-control currency adt-amount" value="0"></td>
+                                        <td><input type="text" class="form-control currency chd-price" value="0"></td>
+                                        <td><input type="text" class="form-control currency chd-amount" value="0"></td>
+                                        <td><input type="text" class="form-control currency inf-price" value="0"></td>
+                                        <td><input type="text" class="form-control currency inf-amount" value="0"></td>
+                                        <td><button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('tr').remove()"><i class="fa fa-times"></i></button></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-info btn-sm" onclick="_flight_warehouse.AddPriceRow()">+ Thêm dòng giá</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="lbl mb5">Ghi chú</label>
+                        <textarea class="form-control" name="Note" rows="3">@Model.Booking.Note</textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="_flight_warehouse.CloseModal()">Bỏ qua</button>
+                <button type="button" class="btn btn-primary" onclick="_flight_warehouse.Submit()">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
