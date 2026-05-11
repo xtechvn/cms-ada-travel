@@ -15,7 +15,7 @@ namespace Entities.ViewModels.FlightWarehouse
     }
     public class FlightWarehouseSegmentModel : FlightWarehouseSegment
     {
-      
+        public string FlightDateStr { get; set; }
     }
     public class FlightWarehousePriceModel : FlightWarehousePrice
     {

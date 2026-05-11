@@ -13,8 +13,8 @@
         <h2 class="title_page">Kho vé máy bay</h2>
         <div class="bg_white filter-search">
             <div class="row">
-                <div class="col-md-2 mb10">
-                    <input type="text" class="form-control" id="search-booking-code" placeholder="Mã booking">
+                <div class="col-md-2 mb10" style="display:none">
+                    <input type="hidden" class="form-control" id="search-booking-code" placeholder="Mã booking">
                 </div>
                 <div class="col-md-2 mb10">
                     <input type="text" class="form-control" id="search-departure" placeholder="Điểm đi">
@@ -39,10 +39,10 @@
 
 @section scripts {
     <script src="~/modules/flight_warehouse.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="~/modules/order_detail_html.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
             _flight_warehouse.Init();
-            _flight_warehouse.Search();
         });
     </script>
 }

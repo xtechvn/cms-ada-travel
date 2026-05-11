@@ -1,4 +1,5 @@
 using Entities.Models;
+using Entities.ViewModels;
 using Entities.ViewModels.FlightWarehouse;
 using System.Collections.Generic;
 using System.Data;
@@ -8,7 +9,7 @@ namespace Repositories.IRepositories
 {
     public interface IFlightWarehouseRepository
     {
-        Task<DataTable> GetListFlightWarehouse(GetListFlightWarehouseModel searchModel, int pageIndex, int pageSize);
+        Task<GenericViewModel<FlightWarehouseBookingViewModel>> GetListFlightWarehouse(GetListFlightWarehouseModel searchModel, int pageIndex, int pageSize);
         Task<long> UpsertBooking(FlightWarehouseBooking model);
         Task<long> UpsertSegment(FlightWarehouseSegment model);
         Task<long> UpsertPrice(FlightWarehousePrice model);

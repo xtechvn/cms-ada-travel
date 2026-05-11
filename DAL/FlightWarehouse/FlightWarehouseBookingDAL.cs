@@ -23,7 +23,7 @@ namespace DAL.FlightWarehouse
 
             _DbWorker = new DbWorker(connection);
         }
-        public async Task<DataTable> GetListFlightWarehouse(GetListFlightWarehouseModel searchModel, int pageIndex, int pageSize)
+        public async Task<List<FlightWarehouseBookingViewModel>> GetListFlightWarehouse(GetListFlightWarehouseModel searchModel, int pageIndex, int pageSize)
         {
             try
             {
@@ -36,8 +36,13 @@ namespace DAL.FlightWarehouse
                 objParam[3] = new SqlParameter("@Airline", searchModel.Airline ?? (object)DBNull.Value);
                 objParam[4] = new SqlParameter("@PageIndex", pageIndex);
                 objParam[5] = new SqlParameter("@PageSize", pageSize);
-
-                return _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListFlightWarehouse, objParam);
+               var dt= _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListFlightWarehouse, objParam);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<FlightWarehouseBookingViewModel>();
+                    return data;
+                }
+         
             }
             catch (Exception ex)
             {
@@ -50,7 +55,7 @@ namespace DAL.FlightWarehouse
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[13];
+                SqlParameter[] objParam = new SqlParameter[12];
 
                 objParam[0] = new SqlParameter("@Id", model.Id);
                 objParam[1] = new SqlParameter("@BookingCode", model.BookingCode ?? (object)DBNull.Value);
@@ -62,15 +67,12 @@ namespace DAL.FlightWarehouse
                 objParam[7] = new SqlParameter("@CarryOnBaggage", model.CarryOnBaggage ?? (object)DBNull.Value);
                 objParam[8] = new SqlParameter("@CheckedBaggage", model.CheckedBaggage ?? (object)DBNull.Value);
                 objParam[9] = new SqlParameter("@Note", model.Note ?? (object)DBNull.Value);
-                objParam[10] = new SqlParameter("@CreatedBy", (object)DBNull.Value);
-                objParam[11] = new SqlParameter("@UpdatedBy", (object)DBNull.Value);
-                objParam[12] = new SqlParameter("@Identity", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                objParam[10] = new SqlParameter("@CreatedBy", model.CreatedBy>0? model.CreatedBy : DBNull.Value);
+                objParam[11] = new SqlParameter("@UpdatedBy", model.UpdatedBy > 0 ? model.UpdatedBy : DBNull.Value);
+               
 
                 var result = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpsertFlightWarehouseBooking, objParam);
-                if (objParam[12].Value != DBNull.Value)
-                {
-                    return (long)objParam[12].Value;
-                }
+               
                 return result;
             }
             catch (Exception ex)

@@ -29,7 +29,7 @@ namespace DAL.FlightWarehouse
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[11];
+                SqlParameter[] objParam = new SqlParameter[10];
 
                 objParam[0] = new SqlParameter("@Id", model.Id);
                 objParam[1] = new SqlParameter("@BookingId", model.BookingId);
@@ -41,14 +41,9 @@ namespace DAL.FlightWarehouse
                 objParam[7] = new SqlParameter("@ChdAmount", model.ChdAmount ?? (object)DBNull.Value);
                 objParam[8] = new SqlParameter("@InfPrice", model.InfPrice ?? (object)DBNull.Value);
                 objParam[9] = new SqlParameter("@InfAmount", model.InfAmount ?? (object)DBNull.Value);
-                objParam[10] = new SqlParameter("@Identity", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-
-
+               
                 var result = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpsertFlightWarehousePrice, objParam);
-                if (objParam[10].Value != DBNull.Value)
-                {
-                    return (long)objParam[10].Value;
-                }
+               
                 return result;
             }
             catch (Exception ex)

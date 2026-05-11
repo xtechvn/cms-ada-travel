@@ -1,6 +1,7 @@
 using DAL.FlightWarehouse;
 using Entities.ConfigModels;
 using Entities.Models;
+using Entities.ViewModels;
 using Entities.ViewModels.FlightWarehouse;
 using Microsoft.Extensions.Options;
 using Repositories.IRepositories;
@@ -26,9 +27,25 @@ namespace Repositories.Repositories
             flightWarehousePriceDAL = new FlightWarehousePriceDAL(connectionString);
         }
 
-        public async Task<DataTable> GetListFlightWarehouse(GetListFlightWarehouseModel searchModel, int pageIndex, int pageSize)
+        public async Task<GenericViewModel<FlightWarehouseBookingViewModel>> GetListFlightWarehouse(GetListFlightWarehouseModel searchModel, int pageIndex, int pageSize)
         {
-            return await flightWarehouseBookingDAL.GetListFlightWarehouse(searchModel, pageIndex, pageSize);
+            try
+            {
+                var data = await flightWarehouseBookingDAL.GetListFlightWarehouse(searchModel, pageIndex, pageSize);
+                var model = new GenericViewModel<FlightWarehouseBookingViewModel>();
+                model.ListData = data;
+                model.TotalRecord = data != null && data.Count > 0 ? data[0].TotalRow : 0;
+                model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / pageSize);
+                model.CurrentPage = pageIndex;
+                model.PageSize = pageSize;
+                return model;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListFlightWarehouse - FlightWarehouseRepository: " + ex);
+            }
+
+            return null;
         }
 
         public async Task<long> UpsertBooking(FlightWarehouseBooking model)

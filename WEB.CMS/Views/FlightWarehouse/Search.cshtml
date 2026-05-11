@@ -1,70 +1,118 @@
-@using System.Data
-@model DataTable
+@using Entities.ViewModels
+@using Entities.ViewModels.FlightWarehouse
+@model GenericViewModel<FlightWarehouseBookingViewModel>
 
-<div class="table-responsive bg_white">
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th style="width: 50px;">STT</th>
-                <th>Mã Booking</th>
-                <th>Hành trình</th>
-                <th>Điểm đi/đến</th>
-                <th>Số vé</th>
-                <th>Hoàn hủy</th>
-                <th>Hãng bay</th>
-                <th>Ngày bay</th>
-                <th>Ghi chú</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Rows.Count > 0)
-            {
-                int stt = ((int)ViewBag.PageIndex - 1) * (int)ViewBag.PageSize;
-                foreach (DataRow row in Model.Rows)
-                {
-                    stt++;
-                    <tr>
-                        <td>@stt</td>
-                        <td>@row["BookingCode"]</td>
-                        <td>@(row["TripType"].ToString() == "1" ? "Một chiều" : "Khứ hồi")</td>
-                        <td>@row["DeparturePoint"] - @row["ArrivalPoint"]</td>
-                        <td>@row["TotalTicket"]</td>
-                        <td>@(row["IsRefundable"].ToString() == "1" ? "Có" : "Không")</td>
-                        <td>@row["Airline"]</td>
-                        <td>@(row["FlightDate"] != DBNull.Value ? Convert.ToDateTime(row["FlightDate"]).ToString("dd/MM/yyyy") : "")</td>
-                        <td>@row["Note"]</td>
-                        <td>
-                            <a class="btn btn-sm btn-primary" onclick="_flight_warehouse.Upsert(@row["Id"])"><i class="fa fa-edit"></i> Sửa</a>
-                        </td>
-                    </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="10" class="text-center">Không có dữ liệu</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+<style>
+    .group-flight-header {
+        background: #f8f9fa;
+        padding: 10px 15px;
+        border: 1px solid #dee2e6;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        border-radius: 4px 4px 0 0;
+        margin-top: 20px;
+    }
+    .group-flight-header h5 {
+        margin: 0;
+        font-weight: bold;
+        color: #333;
+        text-transform: uppercase;
+    }
+    .group-flight-header .badge {
+        margin-left: 15px;
+        padding: 5px 10px;
+    }
+    .table-group {
+        border-radius: 0 0 4px 4px;
+        margin-bottom: 20px;
+    }
+</style>
 
-@if (Model != null && Model.Rows.Count > 0)
+@if (Model != null && Model.ListData != null && Model.ListData.Count > 0)
 {
-    var totalRecord = Convert.ToInt32(Model.Rows[0]["TotalRow"]);
-    var totalPage = (int)Math.Ceiling((double)totalRecord / (int)ViewBag.PageSize);
+    var groupedData = Model.ListData.GroupBy(x => x.RouteName).ToList();
+
+    foreach (var group in groupedData)
+    {
+        var routeItems = group.ToList();
+        <div class="group-flight-container">
+            <div class="group-flight-header">
+                <i class="fa fa-exchange mr-2 text-primary"></i>
+                <h5>@group.Key</h5>
+                <span class="badge badge-secondary">@routeItems.Count Chuỗi vé</span>
+            </div>
+            <div class="table-responsive bg_white table-group">
+                <table class="table table-bordered table-hover mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th style="width: 50px;" class="text-center">STT</th>            
+                            <th>HÀNH TRÌNH</th>
+                            <th class="text-right">GIÁ DL / KL</th>
+                            <th class="text-center">SL</th>
+                            <th class="text-center">ĐỘ DÀI</th>
+                            <th class="text-center">SHCB</th>
+                            <th class="text-center">NGÀY ĐI</th>
+                            <th class="text-center">SHCB(V)</th>
+                            <th class="text-center">NGÀY VỀ</th>
+                            <th class="text-center" style="width: 100px;">THAO TÁC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int innerStt = 0;
+                        }
+                        @foreach (var item in routeItems)
+                        {
+                            innerStt++;
+                            <tr>
+                                <td class="text-center">@innerStt</td>
+                                <td>
+                                    <span class="text-muted small">@item.Airline</span>
+                                    <div class="badge badge-light border text-primary mb-1 cursor-pointer" >@item.RouteName</div><br />
+                                </td>
+                                <td class="text-right">
+                                     <div class="bold green">@item.PriceDisplay</div>
+                                </td>
+                                <td class="text-center font-weight-bold">@item.TotalTicket</td>
+                                <td class="text-center">@item.TotalDay</td>
+                                <td class="text-center">@item.FlightCodeGo</td>
+                                <td class="text-center">
+                                    @(item.DepartureDate != DateTime.MinValue ? item.DepartureDate.ToString("dd/MM/yyyy HH:mm") : "---")
+                                </td>
+                                <td class="text-center">@item.FlightCodeBack</td>
+                                <td class="text-center">
+                                    @(item.ReturnDate != DateTime.MinValue ? item.ReturnDate.ToString("dd/MM/yyyy HH:mm") : "---")
+                                </td>
+                                <td class="text-center">
+                                    <a class="text-primary mr-2" title="Chỉnh sửa" onclick="_flight_warehouse.Upsert(@item.Id)"><i class="fa fa-edit" style="font-size: 18px;"></i></a>
+                                    <a class="text-info" title="Xem chi tiết" href="/FlightWarehouse/Detail?id=@item.Id"><i class="fa fa-eye" style="font-size: 18px;"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 
     @await Component.InvokeAsync("PagingNew", new
     {
-        pageModel = new Entities.ViewModels.Paging()
+        pageModel = new Paging()
         {
-            TotalRecord = totalRecord,
-            TotalPage = totalPage,
-            CurrentPage = (int)ViewBag.PageIndex,
-            PageSize = (int)ViewBag.PageSize,
+            TotalRecord = Model.TotalRecord,
+            TotalPage = Model.TotalPage,
+            CurrentPage = Model.CurrentPage,
+            PageSize = Model.PageSize,
             RecordName = "vé máy bay",
-            PageAction = "_flight_warehouse.OnPaging({0})"
+            PageAction = "_flight_warehouse.OnPaging({0})",
+            PageSelectPageSize = "_flight_warehouse.onSelectPageSize()"
         }
     })
+}
+else
+{
+    <div class="table-responsive bg_white border rounded p-3 text-center">
+        <p class="mb-0">Không có dữ liệu hiển thị</p>
+    </div>
 }

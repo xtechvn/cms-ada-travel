@@ -1,10 +1,14 @@
 using Entities.Models;
+using Entities.ViewModels;
+using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.FlightWarehouse;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 using Repositories.IRepositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
@@ -15,11 +19,18 @@ namespace WEB.CMS.Controllers
     public class FlightWarehouseController : Controller
     {
         private readonly IFlightWarehouseRepository _flightWarehouseRepository;
+        private readonly IFlyBookingDetailRepository _flyBookingDetailRepository;
+        private readonly IAirlinesRepository _airlinesRepository;
         private readonly ManagementUser _managementUser;
 
-        public FlightWarehouseController(IFlightWarehouseRepository flightWarehouseRepository, ManagementUser managementUser)
+        public FlightWarehouseController(IFlightWarehouseRepository flightWarehouseRepository, 
+            IFlyBookingDetailRepository flyBookingDetailRepository,
+            IAirlinesRepository airlinesRepository,
+            ManagementUser managementUser)
         {
             _flightWarehouseRepository = flightWarehouseRepository;
+            _flyBookingDetailRepository = flyBookingDetailRepository;
+            _airlinesRepository = airlinesRepository;
             _managementUser = managementUser;
         }
 
@@ -33,10 +44,8 @@ namespace WEB.CMS.Controllers
         {
             try
             {
-                var dt = await _flightWarehouseRepository.GetListFlightWarehouse(searchModel, pageIndex, pageSize);
-                ViewBag.PageIndex = pageIndex;
-                ViewBag.PageSize = pageSize;
-                return PartialView(dt);
+                var data = await _flightWarehouseRepository.GetListFlightWarehouse(searchModel, pageIndex, pageSize);
+                return PartialView(data);
             }
             catch (Exception ex)
             {
@@ -45,7 +54,7 @@ namespace WEB.CMS.Controllers
             return PartialView(null);
         }
 
-        public async Task<IActionResult> Upsert(long id = 0)
+        public async Task<IActionResult> Upsert(long id = 0, long order_id = 0, string group_fly = "")
         {
             var model = new FlightWarehouseUpsertModel
             {
@@ -54,11 +63,17 @@ namespace WEB.CMS.Controllers
                 Prices = new List<FlightWarehousePriceModel>()
             };
 
+            ViewBag.flybooking_from = null;
+            ViewBag.flybooking_to = null;
+
             if (id > 0)
             {
                 model.Booking = await _flightWarehouseRepository.GetBookingById(id);
                 model.Segments = await _flightWarehouseRepository.GetSegmentsByBookingId(id);
                 model.Prices = await _flightWarehouseRepository.GetPricesByBookingId(id);
+                ViewBag.flybooking_from = await _airlinesRepository.GetAirportByCode(model.Booking.DeparturePoint);
+                ViewBag.flybooking_to = await _airlinesRepository.GetAirportByCode(model.Booking.ArrivalPoint);
+                ViewBag.airline= await _airlinesRepository.getAllAirlines();
             }
 
             return PartialView(model);
@@ -69,11 +84,24 @@ namespace WEB.CMS.Controllers
         {
             try
             {
+                var _UserId = 0;
+                if (HttpContext.User.FindFirst(ClaimTypes.Name) == null)
+                {
+                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
                 if (model == null || model.Booking == null)
                 {
                     return Json(new { status = 1, msg = "Dữ liệu không hợp lệ" });
                 }
+                if (model.Booking.Id > 0)
+                {
+                    model.Booking.UpdatedBy = _UserId;
+                }
+                else
+                {
+                    model.Booking.CreatedBy = _UserId;
 
+                }
                 // Save Booking
                 var bookingId = await _flightWarehouseRepository.UpsertBooking(model.Booking);
                 if (bookingId <= 0)
@@ -87,6 +115,7 @@ namespace WEB.CMS.Controllers
                     foreach (var segment in model.Segments)
                     {
                         segment.BookingId = bookingId;
+                        segment.FlightDate = DateUtil.StringToDateTime(segment.FlightDateStr);
                         await _flightWarehouseRepository.UpsertSegment(segment);
                     }
                 }
@@ -108,6 +137,75 @@ namespace WEB.CMS.Controllers
                 LogHelper.InsertLogTelegram("UpsertBooking - FlightWarehouseController: " + ex);
                 return Json(new { status = 1, msg = "Lỗi hệ thống: " + ex.Message });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AirPortCodeSuggestion(string txt_search)
+        {
+            try
+            {
+                var data = await _airlinesRepository.GetAirportCode(txt_search);
+                return Ok(new
+                {
+                    status = (int)ResponseType.SUCCESS,
+                    data = data
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("AirPortCodeSuggestion - FlightWarehouseController: " + ex.ToString());
+                return Ok(new
+                {
+                    status = (int)ResponseType.SUCCESS,
+                    data = new List<AirPortCode>()
+                });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> AirlinesSuggestion(string txt_search)
+        {
+
+            try
+            {
+                var data = await _airlinesRepository.SearchAirlines(txt_search);
+                return Ok(new
+                {
+                    status = (int)ResponseType.SUCCESS,
+                    data = data
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("HotelSuggestion - FlightWarehouseController: " + ex.ToString());
+                return Ok(new
+                {
+                    status = (int)ResponseType.SUCCESS,
+                    data = new List<CustomerESViewModel>()
+                });
+            }
+
+        }
+
+        public async Task<IActionResult> Detail(long id)
+        {
+            var model = new FlightWarehouseUpsertModel
+            {
+                Booking = new FlightWarehouseBookingModel(),
+                Segments = new List<FlightWarehouseSegmentModel>(),
+                Prices = new List<FlightWarehousePriceModel>()
+            };
+
+            if (id > 0)
+            {
+                model.Booking = await _flightWarehouseRepository.GetBookingById(id);
+                model.Segments = await _flightWarehouseRepository.GetSegmentsByBookingId(id);
+                model.Prices = await _flightWarehouseRepository.GetPricesByBookingId(id);
+                ViewBag.flybooking_from = await _airlinesRepository.GetAirportByCode(model.Booking.DeparturePoint);
+                ViewBag.flybooking_to = await _airlinesRepository.GetAirportByCode(model.Booking.ArrivalPoint);
+                ViewBag.airline = await _airlinesRepository.getAllAirlines();
+            }
+
+            return View(model);
         }
     }
 }

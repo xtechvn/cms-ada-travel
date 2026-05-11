@@ -35,11 +35,11 @@ var _flight_warehouse = {
             }
         });
     },
-    Upsert: function (id) {
+    Upsert: function (id, order_id, group_fly) {
         $.ajax({
             url: "/FlightWarehouse/Upsert",
             type: "GET",
-            data: { id: id },
+            data: { id: id, order_id: order_id, group_fly: group_fly },
             success: function (result) {
                 $('#flight-warehouse-upsert-modal').remove();
                 $('body').append(result);
@@ -47,20 +47,96 @@ var _flight_warehouse = {
             }
         });
     },
+    Detail: function (id) {
+        window.location.href = "/FlightWarehouse/Detail?id=" + id;
+    },
     InitUpsert: function () {
-        $('.datepicker').daterangepicker({
-            singleDatePicker: true,
-            showDropdowns: true,
-            locale: {
-                format: 'DD/MM/YYYY'
+        $('.datepicker').each(function () {
+            var element = $(this);
+            var row = element.closest('.segment-row');
+            var timeValue = row.find('.segment-time').val();
+            var dateValue = element.val();
+            var fullValue = dateValue;
+            if (timeValue && timeValue.length === 5) fullValue += ' ' + timeValue;
+
+            element.daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                timePicker: true,
+                timePicker24Hour: true,
+                startDate: (fullValue && fullValue.length >= 10) ? moment(fullValue, 'DD/MM/YYYY') : moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+        });
+
+        $('.datepicker').on('apply.daterangepicker', function (ev, picker) {
+            var date = picker.startDate.format('DD/MM/YYYY');
+            var time = picker.startDate.format('HH:mm');
+
+            $(this).val(date);
+            $(this).closest('.segment-row').find('.segment-time').val(time);
+        });
+
+        $(document).on('change', '.segment-time', function () {
+            var row = $(this).closest('.segment-row');
+            var dateInput = row.find('.segment-date');
+            var timeInput = row.find('.segment-time');
+            var dateValue = dateInput.val();
+            var timeValue = $(this).val();
+            if (dateValue && timeValue && timeValue.length === 5) {
+                var fullValue = dateValue + ' ' + timeValue;
+                if (fullValue.length >= 10 && dateInput.data('daterangepicker')) {
+                    dateInput.data('daterangepicker').setStartDate(moment(fullValue, 'DD/MM/YYYY'));
+                    timeInput.data('daterangepicker').setStartDate(moment(fullValue, 'HH:mm'));
+                }
             }
         });
-        $('.currency').on('keyup', function () {
+
+        $(document).off('input', '.currency').on('input', '.currency', function () {
             var val = $(this).val().replace(/,/g, '');
             if (!isNaN(val) && val !== '') {
                 $(this).val(parseFloat(val).toLocaleString('en-US'));
             }
+            _flight_warehouse.CalculateProfit($(this).closest('tr'));
         });
+
+        $('#upsert-trip-type').on('change', function () {
+            if ($(this).val() == '1') {
+                $('#back-segment-container').hide();
+            } else {
+                $('#back-segment-container').show();
+            }
+        });
+        $('#upsert-trip-type').trigger('change');
+
+        // Initial profit calculation for all rows
+        $('.price-data-row, .price-row').each(function () {
+            _flight_warehouse.CalculateProfit($(this));
+        });
+
+        this.AirPortCodeSuggestion();
+        this.AirlineCodeSuggesstion();
+    },
+    CalculateProfit: function (row) {
+        var netVal = row.find('.price-net, .adt-amount, .chd-amount, .inf-amount').val() || "0";
+        var sellVal = row.find('.price-sell, .adt-price, .chd-price, .inf-price').val() || "0";
+
+        var net = parseFloat(netVal.toString().replace(/,/g, '')) || 0;
+        var sell = parseFloat(sellVal.toString().replace(/,/g, '')) || 0;
+
+        var profit = net - sell;
+        var profitCell = row.find('.price-profit');
+        
+        if (profitCell.length > 0) {
+            profitCell.text(profit.toLocaleString('en-US'));
+            if (profit < 0) {
+                profitCell.removeClass('green').addClass('red');
+            } else {
+                profitCell.removeClass('red').addClass('green');
+            }
+        }
     },
     CloseModal: function () {
         $('#flight-warehouse-upsert-modal').remove();
@@ -106,71 +182,140 @@ var _flight_warehouse = {
     },
     Submit: function () {
         var form = $('#flight-warehouse-form');
-        if (!form[0].checkValidity()) {
-            form[0].reportValidity();
-            return;
+        var obj = {
+            Booking: {
+                Id: parseInt(form.find('input[name="Id"]').val()) || 0,
+                TripType: parseInt(form.find('select[name="TripType"]').val()) || 0,
+                DeparturePoint: form.find('select[name="DeparturePoint"]').val() || "",
+                ArrivalPoint: form.find('select[name="ArrivalPoint"]').val() || "",
+                TotalTicket: parseInt(form.find('input[name="TotalTicket"]').val()) || 0,
+                IsRefundable: parseInt(form.find('select[name="IsRefundable"]').val()) || 0,
+                CarryOnBaggage: form.find('input[name="CarryOnBaggage"]').val() || "",
+                CheckedBaggage: form.find('input[name="CheckedBaggage"]').val() || ""
+            },
+            Segments: [],
+            Prices: []
+        };
+
+        $('.segment-row:visible').each(function () {
+            var row = $(this);
+            var dateStr = row.find('.segment-date').val();
+            var timeStr = row.find('.segment-time').val();
+            var flightDate = dateStr;
+            if (dateStr) {
+                var parts = dateStr.split('/');
+                flightDate += ' ' + timeStr + ':00';
+                //if (parts.length === 3) {
+                //    flightDate = parts[2] + '-' + parts[1] + '-' + parts[0];
+                //    flightDate += ' ' + timeStr + ':00';
+                //}
+            }
+            obj.Segments.push({
+                Id: parseInt(row.attr('data-id')) || 0,
+                BookingId: obj.Booking.Id,
+                SegmentType: parseInt(row.find('.segment-type').val()) || 0,
+                FlightDateStr: flightDate,
+                Airline: row.find('.segment-airline').val() || "",
+                FlightCode: row.find('.segment-flight-code').val() || "",
+                Pnrcode: row.find('.segment-pnr').val() || ""
+            });
+        });
+
+        var netPriceId = parseInt($('#net-price-id').val()) || 0;
+        var sellPriceId = parseInt($('#sell-price-id').val()) || 0;
+
+        // Helper to get decimal value safely
+        var getDecimal = function (container, selector) {
+            var val = container.find(selector).val();
+            if (!val) return 0;
+            return parseFloat(val.replace(/,/g, '')) || 0;
+        };
+
+        // 1: Set Đại lý (Agent)
+        var agentRows = $('.price-policy-box table').eq(0).find('.price-data-row');
+        if (agentRows.length > 0) {
+            var adtRow = agentRows.filter('[data-type="adt"]');
+            var chdRow = agentRows.filter('[data-type="chd"]');
+            var infRow = agentRows.filter('[data-type="inf"]');
+
+            obj.Prices.push({
+                Id: netPriceId,
+                BookingId: obj.Booking.Id,
+                PriceType: 1,
+                AdtAmount: getDecimal(adtRow, '.price-net'),
+                AdtPrice: getDecimal(adtRow, '.price-sell'),
+                ChdAmount: getDecimal(chdRow, '.price-net'),
+                ChdPrice: getDecimal(chdRow, '.price-sell'),
+                InfAmount: getDecimal(infRow, '.price-net'),
+                InfPrice: getDecimal(infRow, '.price-sell')
+            });
         }
 
-        var booking = {
-            Id: form.find('input[name="Id"]').val(),
-            BookingCode: form.find('input[name="BookingCode"]').val(),
-            TripType: form.find('select[name="TripType"]').val(),
-            DeparturePoint: form.find('input[name="DeparturePoint"]').val(),
-            ArrivalPoint: form.find('input[name="ArrivalPoint"]').val(),
-            TotalTicket: form.find('input[name="TotalTicket"]').val(),
-            IsRefundable: form.find('select[name="IsRefundable"]').val(),
-            CarryOnBaggage: form.find('input[name="CarryOnBaggage"]').val(),
-            CheckedBaggage: form.find('input[name="CheckedBaggage"]').val(),
-            Note: form.find('textarea[name="Note"]').val()
-        };
+        // 2: Set Khách lẻ (Retail)
+        var retailRows = $('.price-policy-box table').eq(1).find('.price-data-row');
+        if (retailRows.length > 0) {
+            var adtRow = retailRows.filter('[data-type="adt"]');
+            var chdRow = retailRows.filter('[data-type="chd"]');
+            var infRow = retailRows.filter('[data-type="inf"]');
 
-        var segments = [];
-        $('.segment-row').each(function () {
-            var row = $(this);
-            segments.push({
-                Id: row.attr('data-id'),
-                SegmentType: row.find('.segment-type').val(),
-                FlightDate: _flight_warehouse.ParseDate(row.find('.segment-date').val()),
-                Airline: row.find('.segment-airline').val(),
-                FlightCode: row.find('.segment-flight-code').val(),
-                Pnrcode: row.find('.segment-pnr').val()
+            obj.Prices.push({
+                Id: sellPriceId,
+                BookingId: obj.Booking.Id,
+                PriceType: 2,
+                AdtAmount: getDecimal(adtRow, '.price-net'),
+                AdtPrice: getDecimal(adtRow, '.price-sell'),
+                ChdAmount: getDecimal(chdRow, '.price-net'),
+                ChdPrice: getDecimal(chdRow, '.price-sell'),
+                InfAmount: getDecimal(infRow, '.price-net'),
+                InfPrice: getDecimal(infRow, '.price-sell')
             });
-        });
-
-        var prices = [];
-        $('.price-row').each(function () {
-            var row = $(this);
-            prices.push({
-                Id: row.attr('data-id'),
-                PriceType: row.find('.price-type').val(),
-                ApplyAgencyIds: row.find('.apply-agencies').val(),
-                AdtPrice: row.find('.adt-price').val().replace(/,/g, ''),
-                AdtAmount: row.find('.adt-amount').val().replace(/,/g, ''),
-                ChdPrice: row.find('.chd-price').val().replace(/,/g, ''),
-                ChdAmount: row.find('.chd-amount').val().replace(/,/g, ''),
-                InfPrice: row.find('.inf-price').val().replace(/,/g, ''),
-                InfAmount: row.find('.inf-amount').val().replace(/,/g, '')
-            });
-        });
-
-        var data = {
-            Booking: booking,
-            Segments: segments,
-            Prices: prices
-        };
+        }
 
         $.ajax({
             url: "/FlightWarehouse/UpsertBooking",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify(data),
+            data: JSON.stringify(obj),
             success: function (result) {
                 if (result.status === 0) {
                     _msgalert.success(result.msg);
-                    _flight_warehouse.CloseModal();
-                    _flight_warehouse.Search();
+                    setTimeout(() => {
+                        _flight_warehouse.CloseModal();
+                        _flight_warehouse.Search();
+                    }, 1500);
                 } else {
                     _msgalert.error(result.msg);
+                }
+            }
+        });
+    },
+
+    AirPortCodeSuggestion: function () {
+        var element_from = $('.service-fly-select-route-from');
+        var element_to = $('.service-fly-select-route-to');
+        var val_from = element_from.val();
+        var val_to = element_to.val();
+
+        element_from.select2();
+        element_to.select2();
+
+        $.ajax({
+            url: "/FlightWarehouse/AirPortCodeSuggestion",
+            type: "post",
+            data: { txt_search: "" },
+            success: function (result) {
+                if (result != undefined && result.data != undefined && result.data.length > 0) {
+                    result.data.forEach(function (item) {
+                        if (element_from.find('option[value="' + item.code + '"]').length == 0) {
+                            element_from.append(_order_detail_html.html_airport_code_option.replaceAll('{airport_code}', item.code).replaceAll('{airport_name}', item.districtVi).replaceAll('{if_selected}', ''));
+                        }
+                        if (element_to.find('option[value="' + item.code + '"]').length == 0) {
+                            element_to.append(_order_detail_html.html_airport_code_option.replaceAll('{airport_code}', item.code).replaceAll('{airport_name}', item.districtVi).replaceAll('{if_selected}', ''));
+                        }
+                    });
+
+                    element_from.val(val_from).trigger('change');
+                    element_to.val(val_to).trigger('change');
                 }
             }
         });
@@ -182,5 +327,34 @@ var _flight_warehouse = {
             return parts[2] + '-' + parts[1] + '-' + parts[0];
         }
         return null;
+    },
+    AirlineCodeSuggesstion: function () {
+        var element = $('.segment-airline')
+        var value = element.val()
+        element.select2();
+
+        $.ajax({
+            url: "/FlightWarehouse/AirlinesSuggestion",
+            type: "post",
+            data: { txt_search: "" },
+            success: function (result) {
+                if (result != undefined && result.data != undefined && result.data.length > 0) {
+                    result.data.forEach(function (item) {
+                        element.append(_order_detail_html.html_airline_option.replaceAll('{airline_code}', item.code).replace('{airline_name}', item.nameVi).replace('{if_selected}', ''))
+
+                    });
+                    element.trigger('change');
+                }
+                else {
+                    element.trigger('change');
+
+                }
+                element.val(value).trigger('change');
+
+            }
+        });
+    },
+    onSelectPageSize: function () {
+        this.Search();
     }
 };
