@@ -54,202 +54,137 @@
         <div class="row">
             <!-- Main Content (Left) -->
             <div class="col-lg-8">
-                <!-- Header Card -->
-                <div class="card-detail p-4 mb-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-6 border-right">
-                            <div class="text-muted x-small mb-1">Mã Hàng Vé</div>
-                            <div class="font-weight-bold h4 text-primary mb-3">@(Model.Booking.BookingCode ?? "---")</div>
-                            <div class="d-flex align-items-center">
-                                <div class="text-center mr-4">
-                                    <div class="h2 mb-0 font-weight-bold">@Model.Booking.DeparturePoint</div>
-                                    <div class="text-muted small">@(fromAirport?.DistrictVi ?? "Điểm đi")</div>
+                <!-- Combined Main Card -->
+                <div class="card-detail mb-4">
+                    <div class="p-4 border-bottom">
+                        <div class="row align-items-center">
+                            <div class="col-md-7">
+                                <div class="text-muted x-small mb-2">Mã Hàng Vé: @(Model.Booking.BookingCode ?? "---")</div>
+                                <div class="d-flex align-items-center">
+                                    <h2 class="font-weight-bold mb-0 mr-3">@Model.Booking.DeparturePoint <i class="fa fa-arrow-right text-muted mx-2" style="font-size: 18px;"></i> @Model.Booking.ArrivalPoint</h2>
+                                    <span class="badge border py-2 px-3 mr-2" style="background: #f0f2f5; color: #4e5e71; border-radius: 4px; font-weight: normal;">
+                                         @(Model.Booking.TripType == 1 ? "Một chiều" : "Khứ hồi")
+                                    </span>
+                                    <span class="badge border py-2 px-3" style="background: #fff8e1; color: #f57c00; border-radius: 4px; border-color: #ffe0b2 !important; font-weight: normal;">
+                                         Hạng: Phổ thông
+                                    </span>
                                 </div>
-                                <div class="flex-grow-1 text-center px-4 position-relative" style="min-width: 100px;">
-                                    <div style="border-top: 2px dashed #ddd; width: 100%; position: absolute; top: 50%; left: 0; z-index: 1;"></div>
-                                    <i class="fa fa-plane text-primary bg-white px-2 position-relative" style="z-index: 2; font-size: 24px;"></i>
-                                </div>
-                                <div class="text-center ml-4">
-                                    <div class="h2 mb-0 font-weight-bold">@Model.Booking.ArrivalPoint</div>
-                                    <div class="text-muted small">@(toAirport?.DistrictVi ?? "Điểm đến")</div>
-                                </div>
+                            </div>
+                            <div class="col-md-5 text-right">
+                                <button class="btn btn-light border px-4 py-2 radius5 mr-2 font-weight-bold" onclick="_flight_warehouse.Upsert(@Model.Booking.Id)">
+                                    <i class="fa fa-pencil mr-2 text-muted"></i> Chỉnh sửa
+                                </button>
+                                <button class="btn btn-success px-4 radius5 shadow-sm" onclick="_flight_warehouse_hold_ticket.HoldTicketPopup(@Model.Booking.Id)">
+                                    <i class="fa fa-plus-circle mr-2"></i> Giữ vé
+                                </button>
                             </div>
                         </div>
-                        <div class="col-md-6 pl-md-5 mt-3 mt-md-0">
-                            <div class="mb-3 d-flex align-items-center">
-                                <span class="badge badge-primary-light px-3 py-2 radius5 border mr-3">
-                                    <i class="fa fa-refresh mr-1"></i> @(Model.Booking.TripType == 1 ? "Một chiều" : "Khứ hồi")
-                                </span>
-                                <span class="badge badge-warning-light px-3 py-2 radius5 border">
-                                    <i class="fa fa-star mr-1"></i> Hạng: Phổ thông
-                                </span>
+                    </div>
+
+                    <div class="p-4 border-bottom" style="background: #fff;">
+                        <div class="row">
+                            <!-- CHIỀU ĐI -->
+                            <div class="@(Model.Booking.TripType == 1 ? "col-md-12" : "col-md-6")">
+                                 <div class="border radius10 p-4 h-100" style="background: #fff;">
+                                      <div class="d-flex align-items-center text-success font-weight-bold mb-4">
+                                           <i class="fa fa-plane mr-2" style="transform: rotate(-45deg); font-size: 20px;"></i> CHIỀU ĐI
+                                      </div>
+                                      <div class="row mb-4">
+                                           <div class="col-6">
+                                                <div class="text-muted x-small">NGÀY ĐI</div>
+                                                <div class="h5 font-weight-bold mb-0">@(goSegment.FlightDate?.ToString("dd/MM/yyyy") ?? "---")</div>
+                                           </div>
+                                           <div class="col-6 text-right">
+                                                <div class="text-muted x-small">GIỜ ĐI</div>
+                                                <div class="h5 font-weight-bold mb-0">@(goSegment.FlightDate?.ToString("HH:mm") ?? "--:--")</div>
+                                           </div>
+                                      </div>
+                                      <div class="row small">
+                                           <div class="col-4">
+                                                <div class="text-muted x-small">HÃNG BAY</div>
+                                                <div class="font-weight-bold">@(airline_0?.NameVi ?? goSegment.Airline)</div>
+                                           </div>
+                                           <div class="col-4 text-center">
+                                                <div class="text-muted x-small">MÃ CHUYẾN BAY</div>
+                                                <div class="font-weight-bold text-primary">@goSegment.FlightCode</div>
+                                           </div>
+                                           <div class="col-4 text-right">
+                                                <div class="text-muted x-small">MÃ ĐẶT CHỖ</div>
+                                                <div class="font-weight-bold">@(goSegment.Pnrcode ?? "---")</div>
+                                           </div>
+                                      </div>
+                                 </div>
                             </div>
-                            <div class="text-muted small">
-                                <i class="fa fa-clock-o mr-1"></i> Ngày tạo: @(Model.Booking.CreatedDate?.ToString("dd/MM/yyyy HH:mm") ?? "---")
+                            
+                            @if (Model.Booking.TripType == 2) {
+                                <!-- CHIỀU VỀ -->
+                                <div class="col-md-6">
+                                     <div class="border radius10 p-4 h-100" style="background: #fff;">
+                                          <div class="d-flex align-items-center text-warning font-weight-bold mb-4">
+                                               <i class="fa fa-plane mr-2 fa-flip-vertical" style="font-size: 20px; color: #e67e22;"></i> CHIỀU VỀ
+                                          </div>
+                                          <div class="row mb-4">
+                                               <div class="col-6">
+                                                    <div class="text-muted x-small">NGÀY VỀ</div>
+                                                    <div class="h5 font-weight-bold mb-0">@(backSegment.FlightDate?.ToString("dd/MM/yyyy") ?? "---")</div>
+                                               </div>
+                                               <div class="col-6 text-right">
+                                                    <div class="text-muted x-small">GIỜ VỀ</div>
+                                                    <div class="h5 font-weight-bold mb-0">@(backSegment.FlightDate?.ToString("HH:mm") ?? "--:--")</div>
+                                               </div>
+                                          </div>
+                                          <div class="row small">
+                                               <div class="col-4">
+                                                    <div class="text-muted x-small">HÃNG BAY</div>
+                                                    <div class="font-weight-bold">@(airline_1?.NameVi ?? backSegment.Airline)</div>
+                                               </div>
+                                               <div class="col-4 text-center">
+                                                    <div class="text-muted x-small">MÃ CHUYẾN BAY</div>
+                                                    <div class="font-weight-bold text-primary">@backSegment.FlightCode</div>
+                                               </div>
+                                               <div class="col-4 text-right">
+                                                    <div class="text-muted x-small">MÃ ĐẶT CHỖ</div>
+                                                    <div class="font-weight-bold">@(backSegment.Pnrcode ?? "---")</div>
+                                               </div>
+                                          </div>
+                                     </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <h6 class="font-weight-bold mb-4 d-flex align-items-center" style="color: #4e5e71;">
+                            <i class="fa fa-id-card-o mr-3" style="font-size: 18px;"></i> ĐIỀU KIỆN VÉ
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                 <div class="text-muted x-small mb-2">Hoàn hủy</div>
+                                 <div class="p-3 bg-light border radius5 font-weight-bold" style="background: #f8f9fa !important; min-height: 45px;">
+                                      @(Model.Booking.IsRefundable == 1 ? "Có" : "Không")
+                                 </div>
+                            </div>
+                            <div class="col-md-4">
+                                 <div class="text-muted x-small mb-2">Hành lý xách tay (kg)</div>
+                                 <div class="p-3 bg-light border radius5 font-weight-bold" style="background: #f8f9fa !important; min-height: 45px;">
+                                      @(Model.Booking.CarryOnBaggage ?? "7kg")
+                                 </div>
+                            </div>
+                            <div class="col-md-4">
+                                 <div class="text-muted x-small mb-2">Hành lý ký gửi (kg)</div>
+                                 <div class="p-3 bg-light border radius5 font-weight-bold" style="background: #f8f9fa !important; min-height: 45px;">
+                                      @(Model.Booking.CheckedBaggage ?? "20kg")
+                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Segments -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card-detail p-4 h-100">
-                            <div class="d-flex align-items-center text-info font-weight-bold mb-4">
-                                <div class="bg-info-light rounded-circle p-2 mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fa fa-plane" style="transform: rotate(-45deg);"></i>
-                                </div>
-                                CHIỀU ĐI
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-6">
-                                    <div class="text-muted x-small">NGÀY ĐI</div>
-                                    <div class="h5 font-weight-bold mb-0">@(goSegment.FlightDate?.ToString("dd/MM/yyyy") ?? "---")</div>
-                                </div>
-                                <div class="col-6 text-right">
-                                    <div class="text-muted x-small">GIỜ ĐI</div>
-                                    <div class="h5 font-weight-bold mb-0">@(goSegment.FlightDate?.ToString("HH:mm") ?? "--:--")</div>
-                                </div>
-                            </div>
-                            <div class="p-3 bg-light radius10 small border">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Hãng bay:</span>
-                                    <span class="font-weight-bold">@(airline_0?.NameVi ?? goSegment.Airline)</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Mã chuyến:</span>
-                                    <span class="font-weight-bold text-primary">@goSegment.FlightCode</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span class="text-muted">Mã đặt chỗ:</span>
-                                    <span class="font-weight-bold text-danger">@goSegment.Pnrcode</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card-detail p-4 h-100 @(Model.Booking.TripType == 1 ? "opacity-50" : "")">
-                            <div class="d-flex align-items-center text-warning font-weight-bold mb-4">
-                                <div class="bg-warning-light rounded-circle p-2 mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fa fa-plane fa-flip-vertical"></i>
-                                </div>
-                                CHIỀU VỀ
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-6">
-                                    <div class="text-muted x-small">NGÀY VỀ</div>
-                                    <div class="h5 font-weight-bold mb-0">@(backSegment.FlightDate?.ToString("dd/MM/yyyy") ?? "---")</div>
-                                </div>
-                                <div class="col-6 text-right">
-                                    <div class="text-muted x-small">GIỜ VỀ</div>
-                                    <div class="h5 font-weight-bold mb-0">@(backSegment.FlightDate?.ToString("HH:mm") ?? "--:--")</div>
-                                </div>
-                            </div>
-                            <div class="p-3 bg-light radius10 small border">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Hãng bay:</span>
-                                    <span class="font-weight-bold">@(airline_1?.NameVi ?? backSegment.Airline)</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Mã chuyến:</span>
-                                    <span class="font-weight-bold text-primary">@backSegment.FlightCode</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span class="text-muted">Mã đặt chỗ:</span>
-                                    <span class="font-weight-bold text-danger">@backSegment.Pnrcode</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Price Policy Section -->
-                <div class="card-detail p-4 mb-4">
-                    <h6 class="font-weight-bold mb-4 d-flex align-items-center">
-                        <i class="fa fa-money mr-3 text-primary"></i> CHÍNH SÁCH GIÁ ÁP DỤNG
-                        <span class="ml-auto x-small text-muted font-weight-normal"><i class="fa fa-info-circle mr-1"></i> Giá đã bao gồm thuế phí</span>
-                    </h6>
-                    
-                    <div class="row">
-                        <div class="col-md-6 border-right pr-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="font-weight-bold small text-uppercase text-secondary">Set Đại lý</span>
-                              
-                            </div>
-                            <table class="table table-sm table-borderless small">
-                                <thead>
-                                    <tr class="text-muted border-bottom x-small">
-                                        <th>ĐỐI TƯỢNG</th>
-                                        <th class="text-right">GIÁ NHẬP</th>
-                                        <th class="text-right text-success">LỢI NHUẬN</th>
-                                        <th class="text-right">GIÁ BÁN</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="border-bottom">
-                                        <td class="py-3">Người lớn</td>
-                                        <td class="text-right py-3">@netPrices.AdtAmount?.ToString("N0")</td>
-                                        <td class="text-right text-success py-3">+@((sellPrices.AdtPrice - netPrices.AdtAmount)?.ToString("N0"))</td>
-                                        <td class="text-right font-weight-bold py-3">@sellPrices.AdtPrice?.ToString("N0")</td>
-                                    </tr>
-                                    <tr class="border-bottom">
-                                        <td class="py-3">Trẻ em</td>
-                                        <td class="text-right py-3">@netPrices.ChdAmount?.ToString("N0")</td>
-                                        <td class="text-right text-success py-3">+@((sellPrices.ChdPrice - netPrices.ChdAmount)?.ToString("N0"))</td>
-                                        <td class="text-right font-weight-bold py-3">@sellPrices.ChdPrice?.ToString("N0")</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3">Em bé</td>
-                                        <td class="text-right py-3">@netPrices.InfAmount?.ToString("N0")</td>
-                                        <td class="text-right text-success py-3">+@((sellPrices.InfPrice - netPrices.InfAmount)?.ToString("N0"))</td>
-                                        <td class="text-right font-weight-bold py-3">@sellPrices.InfPrice?.ToString("N0")</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6 pl-4 mt-4 mt-md-0">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="font-weight-bold small text-uppercase text-secondary">Set Khách lẻ</span>
-                                <span class="badge badge-success x-small">Mặc định</span>
-                            </div>
-                            <table class="table table-sm table-borderless small">
-                                <thead>
-                                    <tr class="text-muted border-bottom x-small">
-                                        <th>ĐỐI TƯỢNG</th>
-                                        <th class="text-right">GIÁ NHẬP</th>
-                                        <th class="text-right text-success">LỢI NHUẬN</th>
-                                        <th class="text-right">GIÁ BÁN</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="border-bottom">
-                                        <td class="py-3">Người lớn</td>
-                                        <td class="text-right py-3">@netPrices.AdtAmount?.ToString("N0")</td>
-                                        <td class="text-right text-success py-3">+@((sellPrices.AdtPrice - netPrices.AdtAmount)?.ToString("N0"))</td>
-                                        <td class="text-right font-weight-bold py-3">@sellPrices.AdtPrice?.ToString("N0")</td>
-                                    </tr>
-                                    <tr class="border-bottom">
-                                        <td class="py-3">Trẻ em</td>
-                                        <td class="text-right py-3">@netPrices.ChdAmount?.ToString("N0")</td>
-                                        <td class="text-right text-success py-3">+@((sellPrices.ChdPrice - netPrices.ChdAmount)?.ToString("N0"))</td>
-                                        <td class="text-right font-weight-bold py-3">@sellPrices.ChdPrice?.ToString("N0")</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3">Em bé</td>
-                                        <td class="text-right py-3">@netPrices.InfAmount?.ToString("N0")</td>
-                                        <td class="text-right text-success py-3">+@((sellPrices.InfPrice - netPrices.InfAmount)?.ToString("N0"))</td>
-                                        <td class="text-right font-weight-bold py-3">@sellPrices.InfPrice?.ToString("N0")</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Sidebar Info (Right) -->
             <div class="col-lg-4">
-                <div class="card-detail p-4 sticky-top" style="top: 100px; z-index: 10;">
+                <div class="card-detail p-4 mb-4">
                     <div class="text-center mb-5 mt-2">
                         <div class="bg-primary-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
                             <i class="fa fa-users text-primary h2 mb-0"></i>
@@ -269,56 +204,128 @@
                         
                         <div class="row text-center small">
                             <div class="col-4 px-1">
-                                <div class="font-weight-bold h6 mb-0">142</div>
+                                <div class="font-weight-bold h6 mb-0">0</div>
                                 <div class="text-muted x-small">ĐÃ CHỐT</div>
                             </div>
                             <div class="col-4 px-1 border-left border-right">
-                                <div class="font-weight-bold h6 mb-0">12</div>
+                                <div class="font-weight-bold h6 mb-0">0</div>
                                 <div class="text-muted x-small">ĐL GIỮ</div>
                             </div>
                             <div class="col-4 px-1">
-                                <div class="font-weight-bold h6 mb-0 text-danger">38</div>
+                                <div class="font-weight-bold h6 mb-0 text-danger">0</div>
                                 <div class="text-muted x-small">CÒN LẠI</div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="bg-primary text-white p-4 radius10 mb-4 shadow-sm position-relative overflow-hidden">
-                        <div style="position: absolute; right: -20px; top: -20px; opacity: 0.1; font-size: 100px;">
-                            <i class="fa fa-money"></i>
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- Price Policy Section -->
+                <div class="card-detail p-4 mb-4">
+                    <h6 class="font-weight-bold mb-4 d-flex align-items-center">
+                        <i class="fa fa-money mr-3 text-primary"></i> CHÍNH SÁCH GIÁ ÁP DỤNG
+                        <span class="ml-auto x-small text-muted font-weight-normal"><i class="fa fa-info-circle mr-1"></i> Giá đã bao gồm thuế phí</span>
+                    </h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6 border-right pr-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="font-weight-bold small text-uppercase text-secondary">Set Đại lý</span>
+                              
+                            </div>
+                            <table class="table table-sm table-borderless small">
+                                <thead>
+                                    <tr class="text-muted border-bottom x-small">
+                                        <th>ĐỐI TƯỢNG</th>
+                                         <th class="text-right">GIÁ NHẬP</th>
+                                        <th class="text-right">GIÁ BÁN</th>
+                                        <th class="text-right text-success">LỢI NHUẬN</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-bottom">
+                                        <td class="py-3">Người lớn</td>
+                                        <td class="text-right py-3">@netPrices.AdtAmount?.ToString("N0")</td>
+                                        <td class="text-right font-weight-bold py-3">@sellPrices.AdtPrice?.ToString("N0")</td>
+                                        <td class="text-right text-success py-3">@((sellPrices.AdtPrice - netPrices.AdtAmount)?.ToString("N0"))</td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <td class="py-3">Trẻ em</td>
+                                        <td class="text-right py-3">@netPrices.ChdAmount?.ToString("N0")</td>
+                                        <td class="text-right font-weight-bold py-3">@sellPrices.ChdPrice?.ToString("N0")</td>
+                                        <td class="text-right text-success py-3">@((sellPrices.ChdPrice - netPrices.ChdAmount)?.ToString("N0"))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3">Em bé</td>
+                                        <td class="text-right py-3">@netPrices.InfAmount?.ToString("N0")</td>
+                                        <td class="text-right font-weight-bold py-3">@sellPrices.InfPrice?.ToString("N0")</td>
+                                        <td class="text-right text-success py-3">@((sellPrices.InfPrice - netPrices.InfAmount)?.ToString("N0"))</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2 position-relative">
-                            <span class="x-small font-weight-bold">LỢI NHUẬN ƯỚC TÍNH</span>
-                            <i class="fa fa-arrow-up text-white"></i>
+                        <div class="col-md-6 pl-4 mt-4 mt-md-0">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="font-weight-bold small text-uppercase text-secondary">Set Khách lẻ</span>
+                                <span class="badge badge-success x-small">Mặc định</span>
+                            </div>
+                            <table class="table table-sm table-borderless small">
+                                <thead>
+                                    <tr class="text-muted border-bottom x-small">
+                                        <th>ĐỐI TƯỢNG</th>
+                                         <th class="text-right">GIÁ NHẬP</th>
+                                        <th class="text-right">GIÁ BÁN</th>
+                                        <th class="text-right text-success">LỢI NHUẬN</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-bottom">
+                                        <td class="py-3">Người lớn</td>
+                                        <td class="text-right py-3">@netPrices.AdtAmount?.ToString("N0")</td>
+                                        <td class="text-right font-weight-bold py-3">@sellPrices.AdtPrice?.ToString("N0")</td>
+                                        <td class="text-right text-success py-3">@((sellPrices.AdtPrice - netPrices.AdtAmount)?.ToString("N0"))</td>
+                                    </tr>
+                                    <tr class="border-bottom">
+                                        <td class="py-3">Trẻ em</td>
+                                        <td class="text-right py-3">@netPrices.ChdAmount?.ToString("N0")</td>
+                                        <td class="text-right font-weight-bold py-3">@sellPrices.ChdPrice?.ToString("N0")</td>
+                                        <td class="text-right text-success py-3">@((sellPrices.ChdPrice - netPrices.ChdAmount)?.ToString("N0"))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3">Em bé</td>
+                                        <td class="text-right py-3">@netPrices.InfAmount?.ToString("N0")</td>
+                                        <td class="text-right font-weight-bold py-3">@sellPrices.InfPrice?.ToString("N0")</td>
+                                        <td class="text-right text-success py-3">@((sellPrices.InfPrice - netPrices.InfAmount)?.ToString("N0"))</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="h3 font-weight-bold mb-0 position-relative">16,230,000 đ</div>
                     </div>
+                </div>
 
-                    <div class="mb-5">
-                        <h6 class="font-weight-bold text-dark mb-3 text-uppercase x-small border-bottom pb-2">Điều kiện vé & Chính sách</h6>
-                        <ul class="list-group list-group-flush small">
-                            <li class="list-group-item px-0 d-flex justify-content-between border-0 bg-transparent">
-                                <span class="text-muted"><i class="fa fa-undo mr-2 text-info"></i>Hoàn hủy:</span>
-                                <span class="font-weight-bold">@(Model.Booking.IsRefundable == 1 ? "Cho phép hoàn" : "Không hoàn hủy")</span>
-                            </li>
-                            <li class="list-group-item px-0 d-flex justify-content-between border-0 bg-transparent">
-                                <span class="text-muted"><i class="fa fa-briefcase mr-2 text-info"></i>Hành lý xách tay:</span>
-                                <span class="font-weight-bold">@(Model.Booking.CarryOnBaggage ?? "7kg") / khách</span>
-                            </li>
-                            <li class="list-group-item px-0 d-flex justify-content-between border-0 bg-transparent">
-                                <span class="text-muted"><i class="fa fa-archive mr-2 text-info"></i>Hành lý ký gửi:</span>
-                                <span class="font-weight-bold">@(Model.Booking.CheckedBaggage ?? "20kg") / khách</span>
-                            </li>
-                        </ul>
+                <!-- Hold Ticket List Section -->
+                <div class="card-detail p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                        <h6 class="font-weight-bold mb-0">
+                            <i class="fa fa-ticket mr-3 text-primary"></i> DANH SÁCH GIỮ VÉ
+                        </h6>
+                        
                     </div>
-
-                    <button class="btn btn-primary btn-block py-3 radius10 font-weight-bold shadow-sm" onclick="_flight_warehouse.Upsert(@Model.Booking.Id)">
-                        <i class="fa fa-edit mr-2"></i> CHỈNH SỬA THÔNG TIN
-                    </button>
+                    
+                    <div id="grid_hold_ticket" class="position-relative" style="min-height: 200px;">
+                        <div class="text-center py-5 text-muted">
+                            <div class="spinner-border spinner-border-sm mr-2" role="status"></div>
+                            Đang tải danh sách...
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 </section>
 
 @section scripts {
@@ -329,10 +336,12 @@
     <link href="~/lib/datepicker/daterangepicker.css" rel="stylesheet" />
 
     <script src="~/modules/flight_warehouse.js" asp-append-version="true"></script>
+    <script src="~/modules/flight_warehouse_hold_ticket.js" asp-append-version="true"></script>
     <script type="text/javascript" src="~/modules/order_detail_html.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
             _flight_warehouse.Init();
+            _flight_warehouse_hold_ticket.LoadHoldTickets(@Model.Booking.Id);
         });
     </script>
 }

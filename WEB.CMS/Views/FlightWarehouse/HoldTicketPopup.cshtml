@@ -1,0 +1,109 @@
+@using Entities.Models
+@using Entities.ViewModels.FlightWarehouse
+@model List<FlightWarehousePriceModel>
+
+@{
+    var netPrices = Model?.FirstOrDefault(x => x.PriceType == 1) ?? new FlightWarehousePriceModel();
+    var sellPrices = Model?.FirstOrDefault(x => x.PriceType == 2) ?? new FlightWarehousePriceModel();
+}
+
+<div class="p-3">
+    <input type="hidden" id="hold-ticket-booking-id" value="@ViewBag.bookingId" />
+    
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="font-weight-bold">Đối tượng:</label>
+            <select class="form-control" id="hold-ticket-group-object" onchange="_flight_warehouse_hold_ticket.CalculateHoldTicketPrice()">
+                <option value="">-- Chọn đối tượng --</option>
+                <option value="1" data-adt="@sellPrices.AdtPrice" data-chd="@sellPrices.ChdPrice" data-inf="@sellPrices.InfPrice">Đại lý</option>
+                <option value="2" data-adt="@sellPrices.AdtPrice" data-chd="@sellPrices.ChdPrice" data-inf="@sellPrices.InfPrice">Khách lẻ</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="font-weight-bold">Số lượng vé giữ:</label>
+            <input type="number" class="form-control" id="hold-ticket-total-qty" value="0" oninput="_flight_warehouse_hold_ticket.CalculateHoldTicketPrice()" />
+        </div>
+    </div>
+
+    <div class="hold-ticket-price-table-container" style="display:none;">
+        <table class="table table-bordered small">
+            <thead>
+                <tr class="bg-light">
+                    <th>Đối tượng</th>
+                    <th class="text-center" style="width: 100px;">Số lượng</th>
+                    <th class="text-right">Giá nhập</th>
+                    <th class="text-right">Giá bán</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="align-middle">Người lớn</td>
+                    <td>
+                        <input type="number" class="form-control text-center" id="hold-ticket-adt-qty" value="0" min="0" readonly />
+                    </td>
+                    <td class="text-right align-middle">
+                        <span class="adt-amount-text">@netPrices.AdtAmount?.ToString("N0")</span>
+                        <input type="hidden" class="adt-amount-val" value="@(netPrices.AdtAmount ?? 0)" />
+                    </td>
+                    <td class="text-right align-middle">
+                        <span class="adt-sell-text">@sellPrices.AdtPrice?.ToString("N0")</span>
+                        <input type="hidden" class="adt-sell-val" value="@(sellPrices.AdtPrice ?? 0)" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-middle">Trẻ em</td>
+                    <td>
+                        <input type="number" class="form-control text-center" id="hold-ticket-chd-qty" value="0" min="0" readonly />
+                    </td>
+                    <td class="text-right align-middle">
+                        <span class="chd-amount-text">@netPrices.ChdAmount?.ToString("N0")</span>
+                        <input type="hidden" class="chd-amount-val" value="@(netPrices.ChdAmount ?? 0)" />
+                    </td>
+                    <td class="text-right align-middle">
+                        <span class="chd-sell-text">@sellPrices.ChdPrice?.ToString("N0")</span>
+                        <input type="hidden" class="chd-sell-val" value="@(sellPrices.ChdPrice ?? 0)" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-middle">Em bé</td>
+                    <td>
+                        <input type="number" class="form-control text-center" id="hold-ticket-inf-qty" value="0" min="0" readonly />
+                    </td>
+                    <td class="text-right align-middle">
+                        <span class="inf-amount-text">@netPrices.InfAmount?.ToString("N0")</span>
+                        <input type="hidden" class="inf-amount-val" value="@(netPrices.InfAmount ?? 0)" />
+                    </td>
+                    <td class="text-right align-middle">
+                        <span class="inf-sell-text">@sellPrices.InfPrice?.ToString("N0")</span>
+                        <input type="hidden" class="inf-sell-val" value="@(sellPrices.InfPrice ?? 0)" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="p-3 bg-light radius10 border mt-4">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="font-weight-bold">Tổng giá bán:</span>
+                <span class="h5 font-weight-bold text-primary mb-0" id="hold-ticket-total-amount">0 đ</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span class="font-weight-bold">Lợi nhuận ước tính:</span>
+                <span class="h5 font-weight-bold text-success mb-0" id="hold-ticket-total-profit">0 đ</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-right mt-4">
+        <button type="button" class="btn btn-secondary px-4 mr-2" onclick="$.magnificPopup.close()">Hủy</button>
+        <button type="button" class="btn btn-primary px-4" onclick="_flight_warehouse_hold_ticket.SubmitHoldTicket()">Xác nhận giữ vé</button>
+    </div>
+</div>
+
+<script>
+    $('#magnific-popup-small .currency').on('input', function () {
+        var val = $(this).val().replace(/,/g, '');
+        if (!isNaN(val) && val !== '') {
+            $(this).val(parseFloat(val).toLocaleString('en-US'));
+        }
+    });
+</script>

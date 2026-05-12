@@ -1,0 +1,80 @@
+@using Entities.ViewModels
+@using Entities.ViewModels.FlightWarehouse
+@model GenericViewModel<FlightWarehouseHoldTicketViewModel>
+
+@if (Model != null && Model.ListData != null && Model.ListData.Count > 0)
+{
+    <div class="table-responsive">
+        <table class="table table-hover small">
+            <thead>
+                <tr class="bg-light">
+                    <th>STT</th>
+                    <th>Đối tượng</th>
+                    <th>Số lượng (A/C/I)</th>
+                    <th class="text-right">Giá bán</th>
+                    <th class="text-right">Lợi nhuận</th>
+                    <th>Người giữ</th>
+                    <th>Ngày giữ</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = (Model.CurrentPage - 1) * Model.PageSize;
+                }
+                @foreach (var item in Model.ListData)
+                {
+                    stt++;
+                    <tr>
+                        <td>@stt</td>
+                        <td>@(item.GroupObject == 1 ? "Đại lý" : "Khách lẻ")</td>
+                        <td>@item.AdultQuantity / @item.ChildQuantity / @item.InfantQuantity</td>
+                        <td class="text-right font-weight-bold">@item.AdultPrice.ToString("N0")</td>
+                        <td class="text-right text-success">@item.Profit.ToString("N0")</td>
+                        <td>@item.FullName</td>
+                        <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @if(item.Status == 0)
+                            {
+                                <span class="badge badge-warning">@item.StatusName</span>
+                            }
+                            @if(item.Status == 1)
+                            {
+                                <span class="badge badge-success">@item.StatusName</span>
+                            }
+                            @if(item.Status == 2)
+                            {
+                                <span class="badge badge-danger">@item.StatusName</span>
+                            }
+                            @if(item.Status == 3)
+                            {
+                                <span class="badge badge-danger">@item.StatusName</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @await Component.InvokeAsync("PagingNew", new
+    {
+        pageModel = new Paging()
+        {
+            TotalRecord = Model.TotalRecord,
+            TotalPage = Model.TotalPage,
+            CurrentPage = Model.CurrentPage,
+            PageSize = Model.PageSize,
+            RecordName = "giữ vé",
+            PageAction = "_flight_warehouse_hold_ticket.OnPagingHoldTicket({0}, " + Model.ListData[0].FlightWarehouseBookingId + ")",
+            PageSelectPageSize = "_flight_warehouse_hold_ticket.onSelectPageSize()"
+        }
+    })
+}
+else
+{
+    <div class="text-center py-5">
+        <img src="/images/icons/empty.png" style="width: 80px; opacity: 0.5;" class="mb-3" />
+        <p class="text-muted">Chưa có thông tin giữ vé nào</p>
+    </div>
+}

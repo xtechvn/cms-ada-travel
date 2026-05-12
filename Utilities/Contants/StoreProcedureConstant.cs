@@ -341,6 +341,9 @@ namespace Utilities.Contants
         public static string sp_GetDetailFlightWarehouseSegmentByBookingId = "sp_GetDetailFlightWarehouseSegmentByBookingId";
         public static string sp_GetDetailFlightWarehouseBooking = "sp_GetDetailFlightWarehouseBooking";
 
+        public static string sp_GetListFlightWarehouseHoldTicket = "sp_GetListFlightWarehouseHoldTicket";
+        public static string sp_InsertFlightWarehouseHoldTicket = "sp_InsertFlightWarehouseHoldTicket";
+
 
 
 

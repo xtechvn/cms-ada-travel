@@ -166,6 +166,7 @@ namespace Entities.Models
         public virtual DbSet<FlightWarehouseBooking> FlightWarehouseBookings { get; set; }
         public virtual DbSet<FlightWarehousePrice> FlightWarehousePrices { get; set; }
         public virtual DbSet<FlightWarehouseSegment> FlightWarehouseSegments { get; set; }
+        public virtual DbSet<FlightWarehouseHoldTicket> FlightWarehouseHoldTickets { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -3133,6 +3134,18 @@ namespace Entities.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("PNRCode");
+            });
+            modelBuilder.Entity<FlightWarehouseHoldTicket>(entity =>
+            {
+                entity.ToTable("FlightWarehouseHoldTicket");
+
+                entity.Property(e => e.CreatedBy).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.GroupObject).HasDefaultValueSql("((1))");
             });
             OnModelCreatingPartial(modelBuilder);
         }

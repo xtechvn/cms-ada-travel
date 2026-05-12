@@ -16,5 +16,7 @@ namespace Repositories.IRepositories
         Task<FlightWarehouseBookingModel> GetBookingById(long id);
         Task<List<FlightWarehouseSegmentModel>> GetSegmentsByBookingId(long bookingId);
         Task<List<FlightWarehousePriceModel>> GetPricesByBookingId(long bookingId);
+        Task<GenericViewModel<FlightWarehouseHoldTicketViewModel>> GetListHoldTicket(FlightWarehouseHoldTicketSearchModel searchModel);
+        Task<long> UpsertHoldTicket(FlightWarehouseHoldTicket model);
     }
 }

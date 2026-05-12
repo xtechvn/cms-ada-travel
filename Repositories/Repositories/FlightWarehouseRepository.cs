@@ -18,6 +18,7 @@ namespace Repositories.Repositories
         private readonly FlightWarehouseBookingDAL flightWarehouseBookingDAL;
         private readonly FlightWarehouseSegmentDAL flightWarehouseSegmentDAL;
         private readonly FlightWarehousePriceDAL flightWarehousePriceDAL;
+        private readonly FlightWarehouseHoldTicketDAL flightWarehouseHoldTicketDAL;
 
         public FlightWarehouseRepository(IOptions<DataBaseConfig> dataBaseConfig)
         {
@@ -25,6 +26,7 @@ namespace Repositories.Repositories
             flightWarehouseBookingDAL = new FlightWarehouseBookingDAL(connectionString);
             flightWarehouseSegmentDAL = new FlightWarehouseSegmentDAL(connectionString);
             flightWarehousePriceDAL = new FlightWarehousePriceDAL(connectionString);
+            flightWarehouseHoldTicketDAL = new FlightWarehouseHoldTicketDAL(connectionString);
         }
 
         public async Task<GenericViewModel<FlightWarehouseBookingViewModel>> GetListFlightWarehouse(GetListFlightWarehouseModel searchModel, int pageIndex, int pageSize)
@@ -76,6 +78,32 @@ namespace Repositories.Repositories
         public async Task<List<FlightWarehousePriceModel>> GetPricesByBookingId(long bookingId)
         {
             return await flightWarehousePriceDAL.GetByBookingId(bookingId);
+        }
+
+        public async Task<GenericViewModel<FlightWarehouseHoldTicketViewModel>> GetListHoldTicket(FlightWarehouseHoldTicketSearchModel searchModel)
+        {
+            try
+            {
+                var data = await flightWarehouseHoldTicketDAL.GetListFlightWarehouseHoldTicket(searchModel);
+                var model = new GenericViewModel<FlightWarehouseHoldTicketViewModel>();
+                model.ListData = data;
+                model.TotalRecord = data != null && data.Count > 0 ? data[0].TotalRow : 0;
+                model.TotalPage = (int)Math.Ceiling((double)model.TotalRecord / searchModel.pageSize);
+                model.CurrentPage = searchModel.pageIndex;
+                model.PageSize = searchModel.pageSize;
+                return model;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetListHoldTicket - FlightWarehouseRepository: " + ex);
+            }
+
+            return null;
+        }
+
+        public async Task<long> UpsertHoldTicket(FlightWarehouseHoldTicket model)
+        {
+            return await flightWarehouseHoldTicketDAL.InsertFlightWarehouseHoldTicket(model);
         }
     }
 }

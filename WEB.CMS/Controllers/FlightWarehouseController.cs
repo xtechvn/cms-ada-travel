@@ -207,5 +207,63 @@ namespace WEB.CMS.Controllers
 
             return View(model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> HoldTicketList(FlightWarehouseHoldTicketSearchModel searchModel)
+        {
+            try
+            {
+                var data = await _flightWarehouseRepository.GetListHoldTicket(searchModel);
+                return PartialView(data);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("HoldTicketList - FlightWarehouseController: " + ex);
+            }
+            return PartialView(null);
+        }
+
+        public async Task<IActionResult> HoldTicketPopup(long bookingId)
+        {
+            ViewBag.bookingId = bookingId;
+            var prices = await _flightWarehouseRepository.GetPricesByBookingId(bookingId);
+            return PartialView(prices);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpsertHoldTicket([FromBody] FlightWarehouseHoldTicket model)
+        {
+            try
+            {
+                var _UserId = 0;
+                if (HttpContext.User.FindFirst(ClaimTypes.Name) != null)
+                {
+                    _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                
+                if (model == null || model.FlightWarehouseBookingId <= 0)
+                {
+                    return Json(new { status = 1, msg = "Dữ liệu không hợp lệ" });
+                }
+
+                model.CreatedBy = _UserId;
+                model.CreatedDate = DateTime.Now;
+
+                var result = await _flightWarehouseRepository.UpsertHoldTicket(model);
+                if (result > 0)
+                {
+                    return Json(new { status = 0, msg = "Giữ vé thành công" });
+                }
+                else
+                {
+                    return Json(new { status = 1, msg = "Giữ vé thất bại" });
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpsertHoldTicket - FlightWarehouseController: " + ex);
+                return Json(new { status = 1, msg = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
     }
 }
