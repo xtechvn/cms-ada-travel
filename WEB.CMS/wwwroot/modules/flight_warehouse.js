@@ -120,15 +120,15 @@ var _flight_warehouse = {
         this.AirlineCodeSuggesstion();
     },
     CalculateProfit: function (row) {
-        var netVal = row.find('.price-net, .adt-amount, .chd-amount, .inf-amount').val() || "0";
-        var sellVal = row.find('.price-sell, .adt-price, .chd-price, .inf-price').val() || "0";
+        var netVal = row.find('.price-net').val() || "0";
+        var sellVal = row.find('.price-sell').val() || "0";
 
         var net = parseFloat(netVal.toString().replace(/,/g, '')) || 0;
         var sell = parseFloat(sellVal.toString().replace(/,/g, '')) || 0;
 
-        var profit = net - sell;
+        var profit = sell - net;
         var profitCell = row.find('.price-profit');
-        
+
         if (profitCell.length > 0) {
             profitCell.text(profit.toLocaleString('en-US'));
             if (profit < 0) {
@@ -242,12 +242,12 @@ var _flight_warehouse = {
                 Id: netPriceId,
                 BookingId: obj.Booking.Id,
                 PriceType: 1,
-                AdtAmount: getDecimal(adtRow, '.price-net'),
-                AdtPrice: getDecimal(adtRow, '.price-sell'),
-                ChdAmount: getDecimal(chdRow, '.price-net'),
-                ChdPrice: getDecimal(chdRow, '.price-sell'),
-                InfAmount: getDecimal(infRow, '.price-net'),
-                InfPrice: getDecimal(infRow, '.price-sell')
+                AdtAmount: getDecimal(adtRow, '.price-sell'),
+                AdtPrice: getDecimal(adtRow, '.price-net'),
+                ChdAmount: getDecimal(chdRow, '.price-sell'),
+                ChdPrice: getDecimal(chdRow, '.price-net'),
+                InfAmount: getDecimal(infRow, '.price-sell'),
+                InfPrice: getDecimal(infRow, '.price-net')
             });
         }
 
@@ -262,12 +262,12 @@ var _flight_warehouse = {
                 Id: sellPriceId,
                 BookingId: obj.Booking.Id,
                 PriceType: 2,
-                AdtAmount: getDecimal(adtRow, '.price-net'),
-                AdtPrice: getDecimal(adtRow, '.price-sell'),
-                ChdAmount: getDecimal(chdRow, '.price-net'),
-                ChdPrice: getDecimal(chdRow, '.price-sell'),
-                InfAmount: getDecimal(infRow, '.price-net'),
-                InfPrice: getDecimal(infRow, '.price-sell')
+                AdtAmount: getDecimal(adtRow, '.price-sell'),
+                AdtPrice: getDecimal(adtRow, '.price-net'),
+                ChdAmount: getDecimal(chdRow, '.price-sell'),
+                ChdPrice: getDecimal(chdRow, '.price-net'),
+                InfAmount: getDecimal(infRow, '.price-sell'),
+                InfPrice: getDecimal(infRow, '.price-net')
             });
         }
 
@@ -280,8 +280,7 @@ var _flight_warehouse = {
                 if (result.status === 0) {
                     _msgalert.success(result.msg);
                     setTimeout(() => {
-                        _flight_warehouse.CloseModal();
-                        _flight_warehouse.Search();
+                        window.location.reload();
                     }, 1500);
                 } else {
                     _msgalert.error(result.msg);

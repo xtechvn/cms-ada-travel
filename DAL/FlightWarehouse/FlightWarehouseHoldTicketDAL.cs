@@ -1,4 +1,4 @@
-﻿using DAL.Generic;
+using DAL.Generic;
 using DAL.StoreProcedure;
 using Entities.Models;
 using Entities.ViewModels.FlightWarehouse;
@@ -53,7 +53,7 @@ namespace DAL.FlightWarehouse
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[15];
+                SqlParameter[] objParam = new SqlParameter[16];
 
                 objParam[0] = new SqlParameter("@FlightWarehouseBookingId", Model.FlightWarehouseBookingId);
                 objParam[1] = new SqlParameter("@GroupObject", Model.GroupObject);
@@ -70,6 +70,7 @@ namespace DAL.FlightWarehouse
                 objParam[12] = new SqlParameter("@CreatedBy", Model.CreatedBy);
                 objParam[13] = new SqlParameter("@CreatedDate", DBNull.Value );
                 objParam[14] = new SqlParameter("@TotalTicket", Model.TotalTicket);
+                objParam[15] = new SqlParameter("@ExpirationDate", Model.ExpirationDate);
      
           
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_InsertFlightWarehouseHoldTicket, objParam);

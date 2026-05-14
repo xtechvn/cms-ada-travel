@@ -11,7 +11,8 @@ namespace Entities.ViewModels.FlightWarehouse
     }
     public class FlightWarehouseBookingModel : FlightWarehouseBooking
     {
-       
+       public int? AdaTotalTicket { get; set; }
+       public int? TotalClosedTicket { get; set; }
     }
     public class FlightWarehouseSegmentModel : FlightWarehouseSegment
     {

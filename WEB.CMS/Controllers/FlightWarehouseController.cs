@@ -21,16 +21,19 @@ namespace WEB.CMS.Controllers
         private readonly IFlightWarehouseRepository _flightWarehouseRepository;
         private readonly IFlyBookingDetailRepository _flyBookingDetailRepository;
         private readonly IAirlinesRepository _airlinesRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ManagementUser _managementUser;
 
-        public FlightWarehouseController(IFlightWarehouseRepository flightWarehouseRepository, 
+        public FlightWarehouseController(IFlightWarehouseRepository flightWarehouseRepository,
             IFlyBookingDetailRepository flyBookingDetailRepository,
             IAirlinesRepository airlinesRepository,
+            IUserRepository userRepository,
             ManagementUser managementUser)
         {
             _flightWarehouseRepository = flightWarehouseRepository;
             _flyBookingDetailRepository = flyBookingDetailRepository;
             _airlinesRepository = airlinesRepository;
+            _userRepository = userRepository;
             _managementUser = managementUser;
         }
 
@@ -73,7 +76,7 @@ namespace WEB.CMS.Controllers
                 model.Prices = await _flightWarehouseRepository.GetPricesByBookingId(id);
                 ViewBag.flybooking_from = await _airlinesRepository.GetAirportByCode(model.Booking.DeparturePoint);
                 ViewBag.flybooking_to = await _airlinesRepository.GetAirportByCode(model.Booking.ArrivalPoint);
-                ViewBag.airline= await _airlinesRepository.getAllAirlines();
+                ViewBag.airline = await _airlinesRepository.getAllAirlines();
             }
 
             return PartialView(model);
@@ -203,6 +206,14 @@ namespace WEB.CMS.Controllers
                 ViewBag.flybooking_from = await _airlinesRepository.GetAirportByCode(model.Booking.DeparturePoint);
                 ViewBag.flybooking_to = await _airlinesRepository.GetAirportByCode(model.Booking.ArrivalPoint);
                 ViewBag.airline = await _airlinesRepository.getAllAirlines();
+                var flightDate = model.Segments.FirstOrDefault(x => x.SegmentType == 0)?.FlightDate;
+                ViewBag.Btnadd = 0;
+                var phantram = ((model.Booking.AgencyTotalTicket==null?0: (double)model.Booking.AgencyTotalTicket) / (model.Booking.TotalTicket==null?0: (double)model.Booking.TotalTicket) * 100).ToString("0.00");
+                ViewBag.phantram = phantram;
+                if (flightDate <= DateTime.Now)
+                {
+                    ViewBag.Btnadd = 1;
+                }
             }
 
             return View(model);
@@ -227,11 +238,40 @@ namespace WEB.CMS.Controllers
         {
             ViewBag.bookingId = bookingId;
             var prices = await _flightWarehouseRepository.GetPricesByBookingId(bookingId);
+            var segments = await _flightWarehouseRepository.GetSegmentsByBookingId(bookingId);
+            var flightDate = segments.FirstOrDefault(x => x.SegmentType == 0)?.FlightDate;
+            ViewBag.add = 0;
+            if(flightDate<=DateTime.Now)
+            {
+                ViewBag.add = 1;
+            }
+            DateTime holdLimit = DateTime.Now;
+            if (flightDate.HasValue)
+            {
+                if (flightDate.Value.Date > DateTime.Now.Date)
+                {
+                    holdLimit = DateTime.Now.AddHours(1);
+                }
+                else if (DateTime.Now.Date < flightDate.Value.Date)
+                {
+                    holdLimit = DateTime.Now.AddHours(124);
+                }
+
+                if (holdLimit > flightDate.Value)
+                {
+                    holdLimit = flightDate.Value;
+                }
+            }
+            ViewBag.HoldLimit = holdLimit;
+
+            var users = _userRepository.GetAll();
+            ViewBag.Users = users;
+
             return PartialView(prices);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpsertHoldTicket([FromBody] FlightWarehouseHoldTicket model)
+        public async Task<IActionResult> UpsertHoldTicket([FromBody]FlightWarehouseHoldTicketModel model)
         {
             try
             {
@@ -240,12 +280,12 @@ namespace WEB.CMS.Controllers
                 {
                     _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
                 }
-                
+
                 if (model == null || model.FlightWarehouseBookingId <= 0)
                 {
                     return Json(new { status = 1, msg = "Dữ liệu không hợp lệ" });
                 }
-
+                model.ExpirationDate =  DateUtil.StringToDateTime(model.ExpirationDateStr);
                 model.CreatedBy = _UserId;
                 model.CreatedDate = DateTime.Now;
 
@@ -263,6 +303,33 @@ namespace WEB.CMS.Controllers
             {
                 LogHelper.InsertLogTelegram("UpsertHoldTicket - FlightWarehouseController: " + ex);
                 return Json(new { status = 1, msg = "Lỗi hệ thống: " + ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> AgencyHoldPopup(long bookingId)
+        {
+            var booking = await _flightWarehouseRepository.GetBookingById(bookingId);
+            return PartialView(booking);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateAgencyHold(long bookingId, int quantity)
+        {
+            try
+            {
+                var booking = await _flightWarehouseRepository.GetBookingById(bookingId);
+                if (booking == null) return Json(new { status = 1, msg = "Không tìm thấy thông tin đơn hàng" });
+
+                booking.AgencyTotalTicket = quantity;
+                var result = await _flightWarehouseRepository.UpsertBooking(booking);
+
+                if (result > 0) return Json(new { status = 0, msg = "Cập nhật thành công" });
+                else return Json(new { status = 1, msg = "Cập nhật thất bại" });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("UpdateAgencyHold - FlightWarehouseController: " + ex);
+                return Json(new { status = 1, msg = "Lỗi hệ thống" });
             }
         }
     }

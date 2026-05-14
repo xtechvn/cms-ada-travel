@@ -1,0 +1,22 @@
+@model Entities.Models.FlightWarehouseBooking
+
+@{
+    Layout = null;
+}
+
+<div class="p-4" style="min-width: 400px;">
+    <div class="mb-4">
+        <label class="text-muted small uppercase font-weight-bold mb-2">
+            <i class="fa fa-users mr-2"></i> Số lượng
+        </label>
+        <div class="form-group">
+            <label class="mb-1">Số lượng</label>
+            <input type="number" class="form-control radius5" id="agency-hold-quantity" value="@(Model.AgencyTotalTicket ?? 1)" min="0" max="@Model.TotalTicket"/>
+        </div>
+    </div>
+
+    <div class="text-right pt-3 border-top">
+        <button type="button" class="btn btn-link text-muted px-4 mr-2" onclick="$.magnificPopup.close()">Hủy</button>
+        <button type="button" class="btn btn-primary px-5 radius10" onclick="_flight_warehouse_hold_ticket.SubmitAgencyHold(@Model.Id)">Lưu</button>
+    </div>
+</div>

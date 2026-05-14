@@ -55,7 +55,7 @@ namespace DAL.FlightWarehouse
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[12];
+                SqlParameter[] objParam = new SqlParameter[13];
 
                 objParam[0] = new SqlParameter("@Id", model.Id);
                 objParam[1] = new SqlParameter("@BookingCode", model.BookingCode ?? (object)DBNull.Value);
@@ -69,6 +69,7 @@ namespace DAL.FlightWarehouse
                 objParam[9] = new SqlParameter("@Note", model.Note ?? (object)DBNull.Value);
                 objParam[10] = new SqlParameter("@CreatedBy", model.CreatedBy>0? model.CreatedBy : DBNull.Value);
                 objParam[11] = new SqlParameter("@UpdatedBy", model.UpdatedBy > 0 ? model.UpdatedBy : DBNull.Value);
+                objParam[12] = new SqlParameter("@AgencyTotalTicket", model.AgencyTotalTicket !=null  ? model.AgencyTotalTicket : 0);
                
 
                 var result = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpsertFlightWarehouseBooking, objParam);

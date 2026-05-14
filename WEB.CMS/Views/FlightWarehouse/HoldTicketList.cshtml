@@ -29,7 +29,7 @@
                         <td>@stt</td>
                         <td>@(item.GroupObject == 1 ? "Đại lý" : "Khách lẻ")</td>
                         <td>@item.AdultQuantity / @item.ChildQuantity / @item.InfantQuantity</td>
-                        <td class="text-right font-weight-bold">@item.AdultPrice.ToString("N0")</td>
+                        <td class="text-right font-weight-bold">@item.TotalAmount.ToString("N0")</td>
                         <td class="text-right text-success">@item.Profit.ToString("N0")</td>
                         <td>@item.FullName</td>
                         <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>

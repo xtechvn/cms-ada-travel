@@ -18,5 +18,6 @@ namespace Entities.Models
         public DateTime? CreatedDate { get; set; }
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
+        public int? AgencyTotalTicket { get; set; }
     }
 }
