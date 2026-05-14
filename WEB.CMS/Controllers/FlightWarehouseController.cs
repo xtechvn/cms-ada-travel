@@ -208,7 +208,7 @@ namespace WEB.CMS.Controllers
                 ViewBag.airline = await _airlinesRepository.getAllAirlines();
                 var flightDate = model.Segments.FirstOrDefault(x => x.SegmentType == 0)?.FlightDate;
                 ViewBag.Btnadd = 0;
-                var phantram = ((model.Booking.AgencyTotalTicket==null?0: (double)model.Booking.AgencyTotalTicket) / (model.Booking.TotalTicket==null?0: (double)model.Booking.TotalTicket) * 100).ToString("0.00");
+                var phantram = model.Booking.AgencyTotalTicket>0?((model.Booking.AgencyTotalTicket==null?0: (double)model.Booking.AgencyTotalTicket) / (model.Booking.TotalTicket==null?0: (double)model.Booking.TotalTicket) * 100).ToString("0.00"):"0";
                 ViewBag.phantram = phantram;
                 if (flightDate <= DateTime.Now)
                 {

@@ -24,6 +24,8 @@ namespace Entities.ViewModels.FlightWarehouse
         public int TotalRow { get; set; }
 
         public string TripTypeName { get; set; }
+        public string FlightPNRCodeGo { get; set; }
+        public string FlightPNRCodeBack { get; set; }
 
     }
 }
