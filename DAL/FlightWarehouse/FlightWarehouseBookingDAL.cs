@@ -28,7 +28,7 @@ namespace DAL.FlightWarehouse
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[6];
+                SqlParameter[] objParam = new SqlParameter[7];
 
                 objParam[0] = new SqlParameter("@BookingCode", searchModel.BookingCode ?? (object)DBNull.Value);
                 objParam[1] = new SqlParameter("@DeparturePoint", searchModel.DeparturePoint ?? (object)DBNull.Value);
@@ -36,6 +36,7 @@ namespace DAL.FlightWarehouse
                 objParam[3] = new SqlParameter("@Airline", searchModel.Airline ?? (object)DBNull.Value);
                 objParam[4] = new SqlParameter("@PageIndex", pageIndex);
                 objParam[5] = new SqlParameter("@PageSize", pageSize);
+                objParam[6] = new SqlParameter("@Date", searchModel.Date );
                var dt= _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListFlightWarehouse, objParam);
                 if (dt != null && dt.Rows.Count > 0)
                 {

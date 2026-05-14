@@ -14,5 +14,6 @@ namespace Entities.ViewModels.FlightWarehouse
         public string Airline { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+        public int Date { get; set; }
     }
 }

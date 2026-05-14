@@ -1,5 +1,59 @@
 var _flight_warehouse = {
     Init: function () {
+        $("#search-departure").select2({
+            theme: 'bootstrap4',
+            placeholder: "Điểm đi",
+            maximumSelectionLength: 1,
+            ajax: {
+                url: "/FlightWarehouse/AirPortCodeSuggestion",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        txt_search: params.term,
+                    }
+                    return query;
+                },
+                processResults: function (response) {
+                    return {
+                        results: $.map(response.data, function (item) {
+                            return {
+                                text: item.code+'('+ item.districtVi+')',
+                                id: item.code,
+                            }
+                        })
+                    };
+                },
+            }
+        });
+        $("#search-arrival").select2({
+            theme: 'bootstrap4',
+            placeholder: "Điểm đến",
+
+            ajax: {
+                url: "/FlightWarehouse/AirPortCodeSuggestion",
+                type: "post",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    var query = {
+                        txt_search: params.term,
+                    }
+                    return query;
+                },
+                processResults: function (response) {
+                    return {
+                        results: $.map(response.data, function (item) {
+                            return {
+                                text: item.code + '(' + item.districtVi + ')',
+                                id: item.code,
+                            }
+                        })
+                    };
+                },
+            }
+        });
         this.Search();
     },
     Search: function () {
@@ -7,7 +61,8 @@ var _flight_warehouse = {
             BookingCode: $('#search-booking-code').val(),
             DeparturePoint: $('#search-departure').val(),
             ArrivalPoint: $('#search-arrival').val(),
-            Airline: $('#search-airline').val()
+            Airline: $('#search-airline').val(),
+            Date: $('#Date').val()
         };
         $.ajax({
             url: "/FlightWarehouse/Search",
@@ -24,6 +79,7 @@ var _flight_warehouse = {
             DeparturePoint: $('#search-departure').val(),
             ArrivalPoint: $('#search-arrival').val(),
             Airline: $('#search-airline').val(),
+            Date: $('#Date').val(),
             pageIndex: pageIndex
         };
         $.ajax({
