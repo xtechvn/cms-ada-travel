@@ -141,11 +141,11 @@ namespace DAL.FlightWarehouse
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[12];
+                SqlParameter[] objParam = new SqlParameter[14];
 
                 objParam[0] = new SqlParameter("@Id", model.Id);
-                objParam[1] = new SqlParameter("@GroupObject", model.Id);
-                objParam[2] = new SqlParameter("@Status", model.Id);
+                objParam[1] = new SqlParameter("@GroupObject", model.GroupObject);
+                objParam[2] = new SqlParameter("@Status", model.Status);
                 objParam[3] = new SqlParameter("@AdultQuantity", model.AdultQuantity);
                 objParam[4] = new SqlParameter("@ChildQuantity", model.ChildQuantity);
                 objParam[5] = new SqlParameter("@InfantQuantity", model.InfantQuantity);
@@ -155,6 +155,8 @@ namespace DAL.FlightWarehouse
                 objParam[9] = new SqlParameter("@ChildPrice", model.ChildPrice);
                 objParam[10] = new SqlParameter("@InfantAmount", model.InfantAmount);
                 objParam[11] = new SqlParameter("@InfantPrice", model.InfantPrice);
+                objParam[12] = new SqlParameter("@OrderId", model.OrderId);
+                objParam[13] = new SqlParameter("@OrderNo", model.OrderNo);
               
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateFlightWarehouseHoldTicket, objParam);
                

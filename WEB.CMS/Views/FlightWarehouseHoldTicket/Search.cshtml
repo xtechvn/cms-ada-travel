@@ -17,7 +17,8 @@
                     <th class="text-uppercase text-muted font-weight-bold align-middle" style="font-size: 13px;">GIÁ BÁN <i class="fa fa-info-circle text-muted"></i></th>
                     <th class="text-right text-uppercase text-muted font-weight-bold align-middle" style="font-size: 13px;">TỔNG GIÁ</th>
                     <th class="text-center text-uppercase text-muted font-weight-bold align-middle" style="font-size: 13px;">TRẠNG THÁI</th>
-                         <th class="text-center text-uppercase text-muted font-weight-bold align-middle" style="font-size: 13px;">Thời gian hết hạn</th>
+                    <th class="text-center text-uppercase text-muted font-weight-bold align-middle" style="font-size: 13px;">Thời gian hết hạn</th>
+                    <th class="text-center text-uppercase text-muted font-weight-bold align-middle" style="font-size: 13px;">Đơn hàng</th>
                     <th class="text-center text-uppercase text-muted font-weight-bold align-middle" style="width: 80px; font-size: 13px;">THAO TÁC</th>
                 </tr>
             </thead>
@@ -28,42 +29,43 @@
                 @foreach (var item in Model.ListData)
                 {
                     stt++;
-                    
+
                     <tr>
                         <td class="text-center font-weight-bold align-middle">@stt.ToString("00")</td>
                         <td class="align-middle">
                             <div class="font-weight-bold text-dark mb-1">
                                 @item.FullName
-                             
+
                             </div>
-                          
+
                         </td>
                         <td class="align-middle">
                             <div class="font-weight-bold text-dark mb-1">@item.DeparturePointName (@item.DeparturePoint)  <i class="fa fa-arrow-right mx-1 text-muted"></i> @item.ArrivalPointName (@item.ArrivalPoint)</div>
                             <div class="text-muted small">MÃ CHUYẾN BAY: @item.FlightCodeGo</div>
                             <div class="text-muted small">MÃ ĐẶT CHỖ: @item.FlightPNRCodeGo</div>
-                           
+
                             @if (item.TripType == 1)
                             {
-                                 <div class="text-muted small">Chiều đi</div>
-                            }else
+                                <div class="text-muted small">Chiều đi</div>
+                            }
+                            else
                             {
                                 <div class="text-muted small">Khứ hồi</div>
                             }
                         </td>
                         <td class="align-middle">
                             <div class="text-dark mb-1 font-weight-bold">
-                                @(item.DepartureDate.HasValue ? item.DepartureDate.Value.ToString("dd/MM/yyyy HH:mmm") : "---")
+                                @(item.DepartureDate.HasValue? item.DepartureDate.Value.ToString("dd/MM/yyyy HH:mmm") : "---")
                             </div>
                             <div class="text-muted small">
-                                @(item.ArrivalDate.HasValue ? item.ArrivalDate.Value.ToString("dd/MM/yyyy HH:mmm"): "")
+                                @(item.ArrivalDate.HasValue? item.ArrivalDate.Value.ToString("dd/MM/yyyy HH:mmm"): "")
                             </div>
                         </td>
                         <td class="text-center align-middle">
-                            <div class="font-weight-bold mb-1" style="font-size: 18px; color: #111;">@(item.AdultQuantity+item.ChildQuantity+item.InfantQuantity)</div>
+                            <div class="font-weight-bold mb-1" style="font-size: 18px; color: #111;">@(item.AdultQuantity + item.ChildQuantity + item.InfantQuantity)</div>
                             <div class="small text-muted">
-                                @item.AdultQuantity<span class="text-dark font-weight-bold">NL</span> &bull; 
-                                @item.ChildQuantity<span class="text-primary font-weight-bold">TE</span> &bull; 
+                                @item.AdultQuantity<span class="text-dark font-weight-bold">NL</span> &bull;
+                                @item.ChildQuantity<span class="text-primary font-weight-bold">TE</span> &bull;
                                 @item.InfantQuantity<span class="text-success font-weight-bold">EB</span>
                             </div>
                         </td>
@@ -97,6 +99,9 @@
                         </td>
                         <td class="text-center align-middle">
                             <div class="font-weight-bold" style="font-size: 15px; color: #111;">@(((DateTime)item.ExpirationDate).ToString("dd/MM/yyyy HH:mm"))</div>
+                        </td>
+                        <td class="text-center align-middle">
+                            <div class="font-weight-bold" style="font-size: 15px; color: #111;"><a href="/Order/@item.OrderId"> @(item.OrderNo)</a> </div>
                         </td>
                         <td class="text-center align-middle">
                             @if (item.Status == (int)Utilities.Contants.FlightWarehouseHoldTicketStatus.HOLD && item.ExpirationDate > DateTime.Now) // Không hiển thị nếu đã hủy

@@ -232,7 +232,7 @@ namespace WEB.CMS.Controllers
                     };
                 }
                 // Add packages (prices)
-                if (holdTicket.AdultQuantity > 0)
+                if (data.AdultQuantity > 0)
                 {
                     summitData.extra_packages.Add(new OrderManualFlyBookingServiceSummitRouteExtraPackage
                     {
@@ -245,7 +245,7 @@ namespace WEB.CMS.Controllers
                         profit = data.AdultAmount * data.AdultQuantity - data.AdultPrice * data.AdultQuantity,
                     });
                 }
-                if (holdTicket.ChildQuantity > 0)
+                if (data.ChildQuantity > 0)
                 {
                     summitData.extra_packages.Add(new OrderManualFlyBookingServiceSummitRouteExtraPackage
                     {
@@ -258,7 +258,7 @@ namespace WEB.CMS.Controllers
                         profit = data.ChildAmount* data.ChildQuantity - data.ChildtPrice * data.ChildQuantity,
                     });
                 }
-                if (holdTicket.InfantQuantity > 0)
+                if (data.InfantQuantity > 0)
                 {
                     summitData.extra_packages.Add(new OrderManualFlyBookingServiceSummitRouteExtraPackage
                     {
@@ -279,8 +279,22 @@ namespace WEB.CMS.Controllers
                 if (flyBookingId <= 0) return Json(new { status = 1, msg = "Thêm mới dịch vụ vé máy bay thất bại" });
 
                 // 3. Update Hold Ticket Status
-               
-                await _flightWarehouseHoldTicketRepository.UpdateFlightWarehouseHoldTicketStatus(data.HoldTicketId, (int)FlightWarehouseHoldTicketStatus.ISSUED);
+                holdTicket.AdultQuantity = data.AdultQuantity;
+                holdTicket.AdultAmount = (long)(data.AdultAmount* data.AdultQuantity);
+                holdTicket.AdultPrice = (long)(data.AdultPrice* data.AdultQuantity);
+
+                holdTicket.AdultQuantity = data.AdultQuantity;
+                holdTicket.ChildAmount = (long)(data.ChildAmount* data.AdultQuantity);
+                holdTicket.ChildPrice = (long)(data.ChildtPrice* data.AdultQuantity);
+
+                holdTicket.InfantQuantity = data.InfantQuantity;
+                holdTicket.InfantAmount = (long)(data.InfantAmount* data.InfantQuantity);
+                holdTicket.InfantPrice = (long)(data.InfantPrice* data.InfantQuantity);
+
+                holdTicket.OrderId = (int?)orderId;
+                holdTicket.OrderNo = order.OrderNo;
+                holdTicket.Status = (int)FlightWarehouseHoldTicketStatus.ISSUED;
+                await _flightWarehouseHoldTicketRepository.UpdateFlightWarehouseHoldTicket(holdTicket);
 
                 await _orderRepository.UpdateOrderDetail(orderId, _UserId);
 

@@ -23,5 +23,7 @@ namespace Entities.Models
         public DateTime CreatedDate { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public int? SalerId { get; set; }
+        public int? OrderId { get; set; }
+        public string OrderNo { get; set; }
     }
 }

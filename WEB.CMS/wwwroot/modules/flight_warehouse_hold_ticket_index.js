@@ -93,7 +93,7 @@ var _flight_warehouse_hold_ticket_index = {
             GroupObject: $('#search-group-object').val(),
             Date: $('#Date').val(),
             pageIndex: 1,
-            pageSize: $('#selectPaggingOptions').length > 0 ? $('#selectPaggingOptions').val() : 10
+            pageSize: $("#selectPaggingOptions").find(':selected').val() == undefined ? 20 : $("#selectPaggingOptions").find(':selected').val()
         };
         $.ajax({
             url: "/FlightWarehouseHoldTicket/Search",
@@ -101,6 +101,7 @@ var _flight_warehouse_hold_ticket_index = {
             data: obj,
             success: function (result) {
                 $('#grid-data').html(result);
+                $('#selectPaggingOptions').val(obj.pageSize).attr("selected", "selected");
             }
         });
     },
@@ -113,7 +114,7 @@ var _flight_warehouse_hold_ticket_index = {
             GroupObject: $('#search-group-object').val(),
             Date: $('#Date').val(),
             pageIndex: pageIndex,
-            pageSize: $('#selectPaggingOptions').length > 0 ? $('#selectPaggingOptions').val() : 10
+            pageSize: $("#selectPaggingOptions").find(':selected').val() == undefined ? 20 : $("#selectPaggingOptions").find(':selected').val()
         };
         $.ajax({
             url: "/FlightWarehouseHoldTicket/Search",
@@ -121,6 +122,7 @@ var _flight_warehouse_hold_ticket_index = {
             data: obj,
             success: function (result) {
                 $('#grid-data').html(result);
+                $('#selectPaggingOptions').val(obj.pageSize).attr("selected", "selected");
             }
         });
     },
