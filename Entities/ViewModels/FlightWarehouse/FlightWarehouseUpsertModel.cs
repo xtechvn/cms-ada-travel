@@ -13,6 +13,7 @@ namespace Entities.ViewModels.FlightWarehouse
     {
        public int? AdaTotalTicket { get; set; }
        public int? TotalClosedTicket { get; set; }
+       public int? RemainTicket { get; set; }
     }
     public class FlightWarehouseSegmentModel : FlightWarehouseSegment
     {

@@ -1,0 +1,76 @@
+@using Entities.ViewModels
+@using Entities.Models
+@{
+    ViewData["Title"] = "Danh sách yêu cầu giữ chỗ";
+    var Type = (List<AllCode>)ViewBag.Type;
+}
+
+<section class="main-container">
+    <div class="row-main container">
+        <h2 class="title_page">Danh sách yêu cầu giữ chỗ</h2>
+        <div class="bg_white filter-search">
+            <div class="row">
+              <div class="col-md-3 mb10">
+                    <select type="text" class="form-control" id="CreateBy" multiple="multiple" placeholder="Người tạo"></select>
+                </div>
+             <div class="col-md-3 mb10">
+                    <select type="text" class="form-control service-fly-select-route-from-departure" id="search-departure" multiple="multiple" placeholder="Điểm đi"></select>
+                </div>
+                <div class="col-md-3 mb10">
+                    <select type="text" class="form-control service-fly-select-route-from-arrival" id="search-arrival" multiple="multiple" placeholder="Điểm đến"></select>
+                </div>
+                <div class="col-md-3 mb10">
+                    <select class="form-control" id="search-status">
+                        <option value="">Tất cả trạng thái</option>
+                        @if (Type != null && Type.Count > 0) {
+                            foreach (var item in Type)
+                            {
+                                <option value="@item.CodeValue">@item.Description</option>
+                            }
+                        }
+                       
+                    </select>
+                </div>
+                <div class="col-md-3 mb10">
+                    <select class="form-control" id="search-group-object">
+                        <option value="">Tất cả đối tượng</option>
+                        <option value="1">Đại lý</option>
+                        <option value="2">Khách lẻ</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb10">
+                    <select type="text" class="form-control" id="Date">
+                        <option value="0">Chọn Tháng</option>
+                        <option value="1">Tháng 1</option>
+                        <option value="2">Tháng 2</option>
+                        <option value="3">Tháng 3</option>
+                        <option value="4">Tháng 4</option>
+                        <option value="5">Tháng 5</option>
+                        <option value="6">Tháng 6</option>
+                        <option value="7">Tháng 7</option>
+                        <option value="8">Tháng 8</option>
+                        <option value="9">Tháng 9</option>
+                        <option value="10">Tháng 10</option>
+                        <option value="11">Tháng 11</option>
+                        <option value="12">Tháng 12</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb10">
+                    <button class="btn btn-default" onclick="_flight_warehouse_hold_ticket_index.Search()">Tìm kiếm</button>
+                </div>
+            </div>
+        </div>
+        <div id="grid-data" class="mt-3">
+            <!-- List data will be loaded here -->
+        </div>
+    </div>
+</section>
+
+@section scripts {
+    <script src="~/modules/flight_warehouse_hold_ticket_index.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            _flight_warehouse_hold_ticket_index.Init();
+        });
+    </script>
+}

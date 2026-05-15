@@ -34,7 +34,7 @@ namespace DAL.FlightWarehouse
                 objParam[2] = new SqlParameter("@Status", searchModel.Status ?? (object)DBNull.Value);
                 objParam[3] = new SqlParameter("@PageIndex", searchModel.pageIndex);
                 objParam[4] = new SqlParameter("@PageSize", searchModel.pageSize);
-                var dt = _DbWorker.GetDataTable(StoreProcedureConstant.sp_GetListFlightWarehouseHoldTicket, objParam);
+                var dt = _DbWorker.GetDataTable(StoreProcedureConstant.sp_GetListFlightWarehouseHoldTicketByBookingId, objParam);
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     var data = dt.ToList<FlightWarehouseHoldTicketViewModel>();
@@ -84,6 +84,105 @@ namespace DAL.FlightWarehouse
             return -1;
         }
 
+        public async Task<List<FlightWarehouseHoldTicketViewModel>> GetList(FlightWarehouseHoldTicketSearchModel searchModel)
+        {
+            try
+            {
 
+                SqlParameter[] objParam = new SqlParameter[8];
+
+                objParam[0] = new SqlParameter("@CreatedBy", searchModel.CreatedBy ?? (object)DBNull.Value);
+                objParam[1] = new SqlParameter("@GroupObject", searchModel.GroupObject ?? (object)DBNull.Value);
+                objParam[2] = new SqlParameter("@Status", searchModel.Status ?? (object)DBNull.Value);
+                objParam[3] = new SqlParameter("@PageIndex", searchModel.pageIndex);
+                objParam[4] = new SqlParameter("@PageSize", searchModel.pageSize);
+                objParam[5] = new SqlParameter("@DeparturePoint", searchModel.DeparturePoint);
+                objParam[6] = new SqlParameter("@ArrivalPoint", searchModel.ArrivalPoint);
+                objParam[7] = new SqlParameter("@Date", searchModel.Date);
+                var dt = _DbWorker.GetDataTable(StoreProcedureConstant.sp_GetListFlightWarehouseHoldTicket, objParam);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<FlightWarehouseHoldTicketViewModel>();
+                    return data;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetList - FlightWarehouseHoldTicketDAL: " + ex);
+            }
+            return null;
+        }  
+        public async Task<FlightWarehouseHoldTicket> GetById(long id)
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[1];
+
+                objParam[0] = new SqlParameter("@Id", id);
+              
+                var dt = _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetDetailFlightWarehouseHoldTicketById, objParam);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    var data = dt.ToList<FlightWarehouseHoldTicket>();
+                    return data[0];
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetById - FlightWarehouseHoldTicketDAL: " + ex);
+            }
+            return null;
+        } 
+        public async Task<int> UpdateFlightWarehouseHoldTicket(FlightWarehouseHoldTicket model)
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[12];
+
+                objParam[0] = new SqlParameter("@Id", model.Id);
+                objParam[1] = new SqlParameter("@GroupObject", model.Id);
+                objParam[2] = new SqlParameter("@Status", model.Id);
+                objParam[3] = new SqlParameter("@AdultQuantity", model.AdultQuantity);
+                objParam[4] = new SqlParameter("@ChildQuantity", model.ChildQuantity);
+                objParam[5] = new SqlParameter("@InfantQuantity", model.InfantQuantity);
+                objParam[6] = new SqlParameter("@AdultAmount", model.AdultAmount);
+                objParam[7] = new SqlParameter("@AdultPrice", model.AdultPrice);
+                objParam[8] = new SqlParameter("@ChildAmount", model.ChildAmount);
+                objParam[9] = new SqlParameter("@ChildPrice", model.ChildPrice);
+                objParam[10] = new SqlParameter("@InfantAmount", model.InfantAmount);
+                objParam[11] = new SqlParameter("@InfantPrice", model.InfantPrice);
+              
+                return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateFlightWarehouseHoldTicket, objParam);
+               
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetById - FlightWarehouseHoldTicketDAL: " + ex);
+            }
+            return -1;
+        }   
+        public async Task<int> UpdateFlightWarehouseHoldTicketStatus(long id,int Status)
+        {
+            try
+            {
+
+                SqlParameter[] objParam = new SqlParameter[2];
+
+                objParam[0] = new SqlParameter("@Id", id);
+                objParam[1] = new SqlParameter("@Status", Status);
+              
+                return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateFlightWarehouseHoldTicketStatus, objParam);
+               
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetById - FlightWarehouseHoldTicketDAL: " + ex);
+            }
+            return -1;
+        }
     }
 }

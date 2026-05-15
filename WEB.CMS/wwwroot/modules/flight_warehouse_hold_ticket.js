@@ -51,9 +51,35 @@ var _flight_warehouse_hold_ticket = {
                 if (result.status === 0) {
                     _msgalert.success(result.msg);
                     $.magnificPopup.close();
-                    location.reload();
+                    _flight_warehouse_hold_ticket.UpdateSummary(bookingId);
+                    if (typeof _flight_warehouse_hold_ticket.LoadHoldTickets === 'function') {
+                        _flight_warehouse_hold_ticket.LoadHoldTickets(bookingId);
+                    }
                 } else {
                     _msgalert.error(result.msg);
+                }
+            }
+        });
+    },
+
+    UpdateSummary: function (bookingId) {
+        $.ajax({
+            url: "/FlightWarehouse/GetBookingSummary",
+            type: "POST",
+            data: { bookingId: bookingId },
+            success: function (result) {
+                if (result.status === 0) {
+                    var data = result.data;
+                    $('#summary-total-ticket').text(data.total);
+                    $('#summary-total-closed').text(data.closed);
+                    $('#summary-ada-hold').text(data.ada);
+                    $('#summary-agency-hold').text(data.agency);
+                    $('#summary-remaining').text(data.remaining);
+                    
+                    var progressBar = $('#summary-progress-bar');
+                    progressBar.css('width', data.percent + '%');
+                    progressBar.attr('aria-valuenow', data.percent);
+                    progressBar.text(data.percent + '%');
                 }
             }
         });
@@ -182,6 +208,7 @@ var _flight_warehouse_hold_ticket = {
                 if (result.status === 0) {
                     _msgalert.success(result.msg);
                     $.magnificPopup.close();
+                    _flight_warehouse_hold_ticket.UpdateSummary(bookingId);
                     if (typeof _flight_warehouse_hold_ticket.LoadHoldTickets === 'function') {
                         _flight_warehouse_hold_ticket.LoadHoldTickets(bookingId);
                     }

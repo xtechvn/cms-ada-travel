@@ -343,6 +343,10 @@ namespace Utilities.Contants
 
         public static string sp_GetListFlightWarehouseHoldTicket = "sp_GetListFlightWarehouseHoldTicket";
         public static string sp_InsertFlightWarehouseHoldTicket = "sp_InsertFlightWarehouseHoldTicket";
+        public static string sp_GetListFlightWarehouseHoldTicketByBookingId = "sp_GetListFlightWarehouseHoldTicketByBookingId";
+        public static string SP_GetDetailFlightWarehouseHoldTicketById = "SP_GetDetailFlightWarehouseHoldTicketById";
+        public static string sp_UpdateFlightWarehouseHoldTicketStatus = "sp_UpdateFlightWarehouseHoldTicketStatus";
+        public static string sp_UpdateFlightWarehouseHoldTicket = "sp_UpdateFlightWarehouseHoldTicket";
 
 
 

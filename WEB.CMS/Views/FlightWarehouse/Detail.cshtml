@@ -198,28 +198,28 @@
 
                     <div class="p-4 border radius10 mb-4 bg-light shadow-inner">
                         <div class="text-center mb-3">
-                            <div class="h1 font-weight-bold mb-0 text-dark">@Model.Booking.TotalTicket</div>
+                            <div class="h1 font-weight-bold mb-0 text-dark" id="summary-total-ticket">@Model.Booking.TotalTicket</div>
                             <div class="text-muted x-small">TỔNG SỐ CHỖ ĐANG QUẢN LÝ</div>
                         </div>
                         <div class="progress mb-4 shadow-sm" style="height: 18px; border-radius: 20px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width:@(ViewBag.phantram)%;" aria-valuenow="@(ViewBag.phantram)" aria-valuemin="0" aria-valuemax="100">@(ViewBag.phantram)%</div>
+                            <div id="summary-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width:@(ViewBag.phantram)%;" aria-valuenow="@(ViewBag.phantram)" aria-valuemin="0" aria-valuemax="100">@(ViewBag.phantram)%</div>
                         </div>
                         
                         <div class="row text-center small">
                             <div class="col-3 px-1">
-                                <div class="font-weight-bold h6 mb-0">@(Model.Booking.TotalClosedTicket ?? 0)</div>
+                                <div class="font-weight-bold h6 mb-0" id="summary-total-closed">@(Model.Booking.TotalClosedTicket ?? 0)</div>
                                 <div class="text-muted x-small">ĐÃ CHỐT</div>
                             </div>
                             <div class="col-3 px-1 border-left border-right">
-                                <div class="font-weight-bold h6 mb-0">@(Model.Booking.AdaTotalTicket ?? 0)</div>
+                                <div class="font-weight-bold h6 mb-0" id="summary-ada-hold">@(Model.Booking.AdaTotalTicket ?? 0)</div>
                                 <div class="text-muted x-small">ADA GIỮ</div>
                             </div>
                             <div class="col-3 px-1 border-left border-right">
-                                <div class="font-weight-bold h6 mb-0">@(Model.Booking.AgencyTotalTicket ?? 0)</div>
+                                <div class="font-weight-bold h6 mb-0" id="summary-agency-hold">@(Model.Booking.AgencyTotalTicket ?? 0)</div>
                                 <div class="text-muted x-small">ĐL GIỮ</div>
                             </div>
                             <div class="col-3 px-1">
-                                <div class="font-weight-bold h6 mb-0 text-danger">@(Model.Booking.TotalTicket ?? 0 - Model.Booking.AdaTotalTicket ?? 0 - Model.Booking.AgencyTotalTicket ?? 0)</div>
+                                <div class="font-weight-bold h6 mb-0 text-danger" id="summary-remaining">@(Model.Booking.RemainTicket ?? 0)</div>
                                 <div class="text-muted x-small">CÒN LẠI</div>
                             </div>
                         </div>
@@ -267,8 +267,8 @@
                                     </tr>
                                     <tr>
                                         <td class="">Em bé</td>
-                                        <td class="text-right ">@netPrices.InfAmount?.ToString("N0")</td>
-                                        <td class="text-right font-weight-bold ">@netPrices.InfPrice?.ToString("N0")</td>
+                                        <td class="text-right ">@netPrices.InfPrice?.ToString("N0")</td>
+                                        <td class="text-right font-weight-bold ">@netPrices.InfAmount?.ToString("N0")</td>
                                         <td class="text-right text-success ">@((netPrices.InfAmount - netPrices.InfPrice)?.ToString("N0"))</td>
                                     </tr>
                                 </tbody>

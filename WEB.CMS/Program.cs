@@ -146,6 +146,7 @@ builder.Services.AddTransient<IDebtGuaranteeRepository, DebtGuaranteeRepository>
 builder.Services.AddTransient<IRecruitmentRepository, RecruitmentRepository>();
 builder.Services.AddTransient<ITicketRepository, TicketRepository>();
 builder.Services.AddTransient<IFlightWarehouseRepository, FlightWarehouseRepository>();
+builder.Services.AddTransient<IFlightWarehouseHoldTicketRepository, FlightWarehouseHoldTicketRepository>();
 
 // Setting Redis                     
 builder.Services.AddSingleton<RedisConn>();

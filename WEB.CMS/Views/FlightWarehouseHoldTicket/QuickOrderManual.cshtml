@@ -1,0 +1,340 @@
+@using Entities.Models
+@using Entities.ViewModels.ElasticSearch
+@using Entities.ViewModels.FlightWarehouse
+@{
+    Layout = null;
+    var user = (UserESViewModel)ViewBag.User;
+ 
+    var branchs = (List<AllCode>)ViewBag.Branch;
+    var holdTicket = (FlightWarehouseHoldTicket)ViewBag.HoldTicket;
+    var prices = (List<FlightWarehousePriceModel>)ViewBag.Prices;
+    var price = prices?.FirstOrDefault(p => p.PriceType == 1) ?? new FlightWarehousePriceModel();
+    var booking = (FlightWarehouseBookingModel)ViewBag.Booking;
+    
+}
+<style>
+    .form-control:disabled{
+        background-color: #e3e6e9!important;
+    }
+    .quick-order-fly {
+        overflow-y: scroll;
+        overflow-x: hidden;
+        max-height: 90vh;
+    }
+
+    .mfp-content .white-popup {
+        max-width: 85% !important;
+        width: 85% !important;
+        max-height: 85% !important;
+        height: 85% !important;
+    }
+
+    .quick-order-fly .flight-segment-box {
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 20px;
+        background: #fff;
+    }
+
+    .quick-order-fly .flight-segment-box.go {
+        border-top: 3px solid #17a2b8;
+    }
+
+    .quick-order-fly .flight-segment-box.back {
+        border-top: 3px solid #fd7e14;
+    }
+
+    .quick-order-fly .section-title {
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        text-transform: uppercase;
+    }
+
+    .quick-order-fly .section-title i {
+        margin-right: 10px;
+        font-size: 16px;
+    }
+
+    .quick-order-fly .section-title.blue {
+        color: #17a2b8;
+    }
+
+    .quick-order-fly .price-policy-box {
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .quick-order-fly .price-policy-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 15px;
+        border-bottom: 1px solid #dee2e6;
+        background: #fff;
+    }
+
+    .quick-order-fly .price-policy-header .nav-tabs {
+        border-bottom: none;
+    }
+
+    .quick-order-fly .price-policy-header .nav-link {
+        padding: 12px 20px;
+        border: none;
+        color: #666;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+    }
+
+    .quick-order-fly .price-policy-header .nav-link.active {
+        color: #17a2b8;
+        border-bottom: 2px solid #17a2b8;
+        background: transparent;
+    }
+
+    .quick-order-fly .price-table-container {
+        padding: 15px;
+    }
+
+    .quick-order-fly .table-gray thead tr {
+        background-color: #f8f9fa;
+    }
+
+    .quick-order-fly .table-gray th {
+        font-size: 12px;
+        color: #666;
+        border-bottom: none;
+        padding: 10px;
+    }
+
+    .quick-order-fly .green {
+        color: #28a745 !important;
+    }
+</style>
+<div  id="quick-order-fly-modal" aria-modal="true" role="dialog" style="display: block;">
+    <div>
+        <div class="modal-content">
+            <!-- Modal Header -->
+         
+            <div class="modal-body">
+                <form id="quick-order-fly-form">
+                    <input type="hidden" id="quick-order-hold-ticket-id" value="@(holdTicket?.Id)" />
+                    <input type="hidden" id="quick-order-booking-id" value="@(booking?.Id)" />
+
+                    <!-- TOP INFO -->
+                    <div class="flight-segment-box">
+                        <div class="section-title blue">
+                            <i class="fa fa-info-circle"></i> THÔNG TIN ĐƠN HÀNG
+                        </div>
+                        <div class="row row_min">
+                            <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                                <label class="lbl mb5">Khách hàng <sup class="red">*</sup></label>
+                                <select id="quick-order-client" class="select2" style="width: 100%;">
+                                </select>
+                            </div>
+                            <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                                <label class="lbl mb5">Điều hành viên <sup class="red">*</sup></label>
+                                <select id="quick-service-operator" class="select2" style="width: 100%;">
+                                    @if (user != null && user.id > 0)
+                                    {
+                                        <option value="@user.id" selected="selected">@(user.fullname + " - " + user.email)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                                <label class="lbl mb5">Chi nhánh <sup class="red">*</sup></label>
+                                <select id="quick-order-branch" class="select2" style="width: 100%;">
+                                    @if (branchs != null)
+                                    {
+                                        foreach (var item in branchs)
+                                        {
+                                            <option value="@item.CodeValue">@item.Description</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                                <label class="lbl mb5">Nhãn đơn <sup class="red">*</sup></label>
+                                <input type="text" id="quick-order-label" class="form-control" placeholder="Tên đơn hàng..." value="Đơn hàng vé máy bay tự động">
+                            </div>
+                            <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                                <label class="lbl mb5">Chi phí khác</label>
+                                <input type="text" id="quick-order-other-amount" class="form-control currency text-right" placeholder="0" value="0">
+                            </div>
+                            <div class="col-xl-2 col-lg-3 col-md-6 mb15">
+                                <label class="lbl mb5">Hoa hồng CTV</label>
+                                <input type="text" id="quick-order-commission" class="form-control currency text-right" placeholder="0" value="0">
+                            </div>
+                            <div class="col-xl-12 col-lg-12 col-md-12 mb15">
+                                <label class="lbl mb5">Ghi chú</label>
+                                <input type="text" id="quick-order-note" class="form-control" placeholder="Ghi chú đơn hàng...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FLIGHT SEGMENT -->
+                    @{
+                        var segments = (List<FlightWarehouseSegmentModel>)ViewBag.Segments;
+                        var goSegment = segments?.FirstOrDefault(x => x.SegmentType == 0) ?? new FlightWarehouseSegmentModel();
+                        var backSegment = segments?.FirstOrDefault(x => x.SegmentType == 1) ?? new FlightWarehouseSegmentModel();
+                    }
+                    <div class="row row_min">
+                        <div class="col-md-6">
+                            <div class="flight-segment-box go">
+                                <div class="section-title blue">
+                                    <i class="fa fa-plane" style="transform: rotate(-45deg);"></i> CHIỀU ĐI
+                                </div>
+                                <div class="row row_min">
+                                    <div class="col-md-6 mb15">
+                                        <label class="lbl mb5">Ngày đi</label>
+                                        <input type="text" class="form-control" disabled value="@(goSegment.FlightDate?.ToString("dd/MM/yyyy") ?? "")">
+                                    </div>
+                                    <div class="col-md-6 mb15">
+                                        <label class="lbl mb5">Giờ đi</label>
+                                        <input type="text" class="form-control" disabled value="@(goSegment.FlightDate?.ToString("HH:mm") ?? "")">
+                                    </div>
+                                </div>
+                                <div class="row row_min">
+                                    <div class="col-md-4 mb15">
+                                        <label class="lbl mb5">Hãng bay</label>
+                                        <input type="text" class="form-control" disabled value="@(goSegment.Airline)">
+                                    </div>
+                                    <div class="col-md-4 mb15">
+                                        <label class="lbl mb5">Mã chuyến bay</label>
+                                        <input type="text" class="form-control" disabled value="@(goSegment.FlightCode)">
+                                    </div>
+                                    <div class="col-md-4 mb15">
+                                        <label class="lbl mb5">Mã đặt chỗ</label>
+                                        <input type="text" class="form-control" disabled value="@(goSegment.Pnrcode)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6" style="@(booking?.TripType == 1 ? "display:none;" : "")">
+                            <div class="flight-segment-box back">
+                                <div class="section-title orange" style="color:orange!important">
+                                    <i class="fa fa-plane fa-flip-vertical"></i> CHIỀU VỀ
+                                </div>
+                                <div class="row row_min">
+                                    <div class="col-md-6 mb15">
+                                        <label class="lbl mb5">Ngày về</label>
+                                        <input type="text" class="form-control" disabled value="@(backSegment.FlightDate?.ToString("dd/MM/yyyy") ?? "")">
+                                    </div>
+                                    <div class="col-md-6 mb15">
+                                        <label class="lbl mb5">Giờ về</label>
+                                        <input type="text" class="form-control" disabled value="@(backSegment.FlightDate?.ToString("HH:mm") ?? "")">
+                                    </div>
+                                </div>
+                                <div class="row row_min">
+                                    <div class="col-md-4 mb15">
+                                        <label class="lbl mb5">Hãng bay</label>
+                                        <input type="text" class="form-control" disabled value="@(backSegment.Airline)">
+                                    </div>
+                                    <div class="col-md-4 mb15">
+                                        <label class="lbl mb5">Mã chuyến bay</label>
+                                        <input type="text" class="form-control" disabled value="@(backSegment.FlightCode)">
+                                    </div>
+                                    <div class="col-md-4 mb15">
+                                        <label class="lbl mb5">Mã đặt chỗ</label>
+                                        <input type="text" class="form-control" disabled value="@(backSegment.Pnrcode)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PRICE POLICY -->
+                    <div class="price-policy-box">
+                        <div class="price-policy-header">
+                            <ul class="nav nav-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="javascript:;"><i class="fa fa-money"></i> BẢNG KÊ DỊCH VỤ</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="price-table-container">
+                            <div class="table-responsive table-gray">
+                                <table class="table table-bordered mb0">
+                                    <thead>
+                                        <tr>
+                                            <th>ĐỐI TƯỢNG</th>
+                                            <th class="text-right" style="width: 120px;">SỐ LƯỢNG</th>
+                                            <th class="text-right" style="width: 150px;">GIÁ NHẬP</th>
+                                            <th class="text-right" style="width: 150px;">GIÁ BÁN</th>
+                                            <th class="text-right">TỔNG TIỀN BÁN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="quick-order-price-row" data-type="adt">
+                                            <td>Người lớn (NL)</td>
+                                            <td class="text-right">
+                                                <input type="number" id="quick-order-adt-qty" class="form-control text-right qty-input" value="@(holdTicket?.AdultQuantity ?? 0)" min="0">
+                                            </td>
+                                            <td class="text-right">
+                                                <input type="text" id="quick-order-adt-price" disabled class="form-control text-right currency price-net" value="@(price?.AdtPrice?.ToString("N0") ?? "0")">
+                                            </td>
+                                            <td class="text-right">
+                                                <input type="text" id="quick-order-adt-amount" disabled class="form-control text-right currency price-sell" value="@(price?.AdtAmount?.ToString("N0") ?? "0")">
+                                            </td>
+                                            <td class="text-right bold row-total">0</td>
+                                        </tr>
+                                        <tr class="quick-order-price-row" data-type="chd">
+                                            <td>Trẻ em (TE)</td>
+                                            <td class="text-right">
+                                                <input type="number" id="quick-order-chd-qty" class="form-control text-right qty-input" value="@(holdTicket?.ChildQuantity ?? 0)" min="0">
+                                            </td>
+                                            <td class="text-right">
+                                                <input type="text" id="quick-order-chd-price" disabled class="form-control text-right currency price-net" value="@(price?.ChdPrice?.ToString("N0") ?? "0")">
+                                            </td>
+                                            <td class="text-right">
+                                                <input type="text" id="quick-order-chd-amount" disabled class="form-control text-right currency price-sell" value="@(price?.ChdAmount?.ToString("N0") ?? "0")">
+                                            </td>
+                                            <td class="text-right bold row-total">0</td>
+                                        </tr>
+                                        <tr class="quick-order-price-row" data-type="inf">
+                                            <td>Em bé (EB)</td>
+                                            <td class="text-right">
+                                                <input type="number" id="quick-order-inf-qty" class="form-control text-right qty-input" value="@(holdTicket?.InfantQuantity ?? 0)" min="0">
+                                            </td>
+                                            <td class="text-right">
+                                                <input type="text" id="quick-order-inf-price" disabled class="form-control text-right currency price-net" value="@(price?.InfPrice?.ToString("N0") ?? "0")">
+                                            </td>
+                                            <td class="text-right">
+                                                <input type="text" id="quick-order-inf-amount" disabled class="form-control text-right currency price-sell" value="@(price?.InfAmount?.ToString("N0") ?? "0")">
+                                            </td>
+                                            <td class="text-right bold row-total">0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 text-right">
+                                <div><span class="bold">Tổng tiền dịch vụ:</span> <span id="quick-order-total-amount" class="bold text-danger" style="font-size:16px;">0 VND</span></div>
+                                <div class="mt-2"><span class="bold">Tổng lợi nhuận:</span> <span id="quick-order-total-profit" class="bold text-success" style="font-size:16px;">0 VND</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding-top: 10px;">
+                        <div id="service-fly-button-div" class="text-right">
+                            <button type="button" class="btn btn-default cancel" onclick="$.magnificPopup.close();">Bỏ qua</button>
+                            <button type="button" class="btn btn-success" id="btn-submit-quick-order-fly" onclick="_flight_warehouse_hold_ticket_index.SubmitQuickOrder()"><i class="fa fa-save"></i> Lưu & Tạo đơn</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        _flight_warehouse_hold_ticket_index.InitQuickOrderManual();
+    });
+</script>

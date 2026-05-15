@@ -208,8 +208,11 @@ namespace WEB.CMS.Controllers
                 ViewBag.airline = await _airlinesRepository.getAllAirlines();
                 var flightDate = model.Segments.FirstOrDefault(x => x.SegmentType == 0)?.FlightDate;
                 ViewBag.Btnadd = 0;
-                var phantram = model.Booking.AgencyTotalTicket>0?((model.Booking.AgencyTotalTicket==null?0: (double)model.Booking.AgencyTotalTicket) / (model.Booking.TotalTicket==null?0: (double)model.Booking.TotalTicket) * 100).ToString("0.00"):"0";
-                ViewBag.phantram = phantram;
+                var AgencyTotalTicket = model.Booking.AgencyTotalTicket > 0 ? ((model.Booking.AgencyTotalTicket == null ? 0 : (double)model.Booking.AgencyTotalTicket)+ model.Booking.RemainTicket>0 ? (double)model.Booking.RemainTicket:0) : 0;
+                var TotalTicket = model.Booking.TotalTicket > 0 ? (double)model.Booking.TotalTicket : 0;
+                var TotalClosedTicket = model.Booking.TotalClosedTicket > 0 ? (double)model.Booking.TotalClosedTicket : 0;
+                var phantram = TotalTicket > 0? ((AgencyTotalTicket+ TotalClosedTicket) / TotalTicket * 100) : 0;
+                ViewBag.phantram = phantram.ToString("0.00");
                 if (flightDate <= DateTime.Now)
                 {
                     ViewBag.Btnadd = 1;
@@ -217,6 +220,38 @@ namespace WEB.CMS.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetBookingSummary(long bookingId)
+        {
+            try
+            {
+                var booking = await _flightWarehouseRepository.GetBookingById(bookingId);
+                if (booking == null) return Json(new { status = 1, msg = "Không tìm thấy thông tin" });
+                var AgencyTotalTicket = booking.AgencyTotalTicket > 0 ? ((booking.AgencyTotalTicket == null ? 0 : (double)booking.AgencyTotalTicket) + booking.RemainTicket > 0 ? (double)booking.RemainTicket : 0) : 0;
+                var RemainTicket = booking.RemainTicket > 0 ? (double)booking.RemainTicket : 0;
+                var TotalTicket = booking.TotalTicket > 0 ? (double)booking.TotalTicket : 0;
+                var TotalClosedTicket = booking.TotalClosedTicket > 0 ? (double)booking.TotalClosedTicket : 0;
+                var phantram = TotalTicket > 0? ((AgencyTotalTicket+ TotalClosedTicket) / TotalTicket * 100) : 0;
+                return Json(new
+                {
+                    status = 0,
+                    data = new
+                    {
+                        total = booking.TotalTicket,
+                        closed = booking.TotalClosedTicket ?? 0,
+                        ada = booking.AdaTotalTicket ?? 0,
+                        agency = booking.AgencyTotalTicket ?? 0,
+                        remaining = booking.RemainTicket ?? 0,
+                        percent = phantram.ToString("0.00")
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = 1, msg = ex.Message });
+            }
         }
 
         [HttpPost]
