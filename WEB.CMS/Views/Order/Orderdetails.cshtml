@@ -1,4 +1,4 @@
-﻿@{ object order = new
+@{ object order = new
     {
         order_id = ViewBag.OrderId,
         type = "3",
@@ -102,6 +102,8 @@
                         @if (list_status_not_allow != null && list_sale_role != null)
                         {
                             <button type="button" class="btn btn-default  ml-1 " onclick="_orderDetail.PopupSendEmail()">Báo giá</button>
+                            <button type="button" class="btn btn-default  ml-1 " onclick="_orderDetail.PopupMatVe(@ViewBag.OrderId)">Mặt vé máy bay</button>
+
                             @if (ViewBag.OrderNo_Type == 0 && ViewBag.FlyingTicketStause == 1)
                             {
 

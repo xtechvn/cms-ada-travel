@@ -1,4 +1,4 @@
-﻿let input = $('#order_Id').val();
+let input = $('#order_Id').val();
 let type = 7;
 $(document).ready(function () {
 
@@ -280,6 +280,14 @@ var _orderDetail = {
         let param = {
             Orderid: Orderid,
             type: 33,
+        };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    PopupMatVe: function (Orderid) {
+        let title = 'Mặt vé máy bay';
+        let url = '/Order/PopupMatVe';
+        let param = {
+            OrderId: Orderid
         };
         _magnific.OpenSmallPopup(title, url, param);
     },

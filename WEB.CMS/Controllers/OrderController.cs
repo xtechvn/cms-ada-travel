@@ -1,4 +1,4 @@
-﻿using APP_CHECKOUT.RabitMQ;
+using APP_CHECKOUT.RabitMQ;
 using Aspose.Cells;
 using Caching.Elasticsearch;
 using Entities.Models;
@@ -71,13 +71,16 @@ namespace WEB.Adavigo.CMS.Controllers
         private LogActionMongoService LogActionMongo;
         private IndentiferService _indentiferService;
         private IDebtGuaranteeRepository _debtGuaranteeRepository;
+        private IPassengerRepository _passengerRepository;
+        private readonly IAirlinesRepository _airlinesRepository;
+
 
         private readonly List<int> list_order_status_not_allow_to_edit = new List<int>() { (int)OrderStatus.FINISHED, (int)OrderStatus.CANCEL, (int)OrderStatus.WAITING_FOR_ACCOUNTANT, (int)OrderStatus.WAITING_FOR_OPERATOR };
         public OrderController(IConfiguration configuration, IOrderRepository orderRepository, IClientRepository clientRepository, IHotelBookingRepositories hotelBookingRepositories, ManagementUser managementUser, IContractRepository contractRepository,
             IAllCodeRepository allcodeRepository, IContactClientRepository contactClientRepository, IOrderRepositor iOrderRepositories, IFlightSegmentRepository flightSegmentRepository, IBagageRepository bagageRepository, IContactClientRepository ContactClientRepository, IHotelBookingCodeRepository hotelBookingCodeRepository,
             IFlyBookingDetailRepository flyBookingDetailRepository, IUserRepository userRepository, IContractPayRepository contractPayRepository, IAttachFileRepository AttachFileRepository, ITourRepository tourRepository, IEmailService emailService, IAttachFileRepository attachFileRepository, IOtherBookingRepository otherBookingRepository,
             IInvoiceRequestRepository invoiceRequestRepository, IVinWonderBookingRepository vinWonderBookingRepository, IIdentifierServiceRepository identifierServiceRepository,
-            IWebHostEnvironment WebHostEnvironment, IInvoiceRepository invoiceRepository, IAccountClientRepository accountClientRepository, IPaymentRequestRepository paymentRequestRepository, IDebtGuaranteeRepository debtGuaranteeRepository)
+            IWebHostEnvironment WebHostEnvironment, IInvoiceRepository invoiceRepository, IAccountClientRepository accountClientRepository, IPaymentRequestRepository paymentRequestRepository, IDebtGuaranteeRepository debtGuaranteeRepository, IPassengerRepository passengerRepository, IAirlinesRepository airlinesRepository)
         {
             _invoiceRequestRepository = invoiceRequestRepository;
             _configuration = configuration;
@@ -113,6 +116,8 @@ namespace WEB.Adavigo.CMS.Controllers
             _identifierServiceRepository = identifierServiceRepository;
             _indentiferService = new IndentiferService(configuration, identifierServiceRepository, orderRepository, contractPayRepository);
             _debtGuaranteeRepository = debtGuaranteeRepository;
+            _passengerRepository = passengerRepository;
+            _airlinesRepository = airlinesRepository;
         }
 
 
@@ -1432,6 +1437,51 @@ namespace WEB.Adavigo.CMS.Controllers
                 return PartialView();
             }
 
+        }
+        public async Task<IActionResult> PopupMatVe(long OrderId)
+        {
+            try
+            {
+                var fly_list = _flyBookingDetailRepository.GetListByOrderId(OrderId);
+                if (fly_list == null || fly_list.Count == 0) return PartialView();
+                
+                var order = await _orderRepository.GetOrderByID(OrderId);
+                var passengers = await _passengerRepository.GetPassengerByOrderId(OrderId);
+                List<Baggage> baggages = new List<Baggage>();
+                if (passengers != null && passengers.Count > 0)
+                {
+                    baggages = _bagageRepository.GetBaggages(passengers.Select(s => s.Id).ToList());
+                }
+                var flightSegments = _flightSegmentRepository.GetByFlyBookingDetailIds(fly_list.Select(n => n.Id).ToList());
+                
+                ViewBag.FlyList = fly_list;
+                ViewBag.Order = order;
+                ViewBag.Passengers = passengers;
+                ViewBag.Baggages = baggages;
+                ViewBag.FlightSegments = flightSegments;
+                var listAirportCode = await _airlinesRepository.getAllAirlines();
+                var listAirlines = await _airlinesRepository.getAllAirlines();
+                ViewBag.ListAirportCode = listAirportCode;
+                ViewBag.ListAirlines = listAirlines;
+                
+                // Get Sale
+                if (order.SalerId.HasValue)
+                {
+                    var user = await _userRepository.GetById(order.SalerId.Value);
+                    if (user != null)
+                    {
+                        ViewBag.SaleName = user.FullName;
+                        ViewBag.SalePhone = user.Phone;
+                    }
+                }
+
+                return PartialView();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("PopupMatVe - OrderController: " + ex);
+                return PartialView();
+            }
         }
         public async Task<IActionResult> SendEmail(long id, long Orderid, int type, string group_booking_id = "")
         {

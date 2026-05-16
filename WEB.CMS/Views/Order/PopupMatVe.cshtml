@@ -1,0 +1,380 @@
+@using Entities.Models
+@using Entities.ViewModels
+@{
+    var flyList = ViewBag.FlyList as List<FlyBookingDetail>;
+    var order = ViewBag.Order as Order;
+    var passengers = ViewBag.Passengers as List<Passenger>;
+    var baggages = ViewBag.Baggages as List<Baggage>;
+    var flightSegments = ViewBag.FlightSegments as List<FlightSegment>;
+    var listAirportCode = ViewBag.ListAirportCode as List<AllCode>;
+    var listAirlines = ViewBag.ListAirlines as List<AllCode>;
+
+    var flyGo = flyList?.FirstOrDefault(x => x.Leg == 0);
+    var flyReturn = flyList?.FirstOrDefault(x => x.Leg == 1);
+
+    var segmentGo = flyGo != null ? flightSegments?.FirstOrDefault(x => x.FlyBookingId == flyGo.Id) : null;
+    var segmentReturn = flyReturn != null ? flightSegments?.FirstOrDefault(x => x.FlyBookingId == flyReturn.Id) : null;
+
+    string saleName = ViewBag.SaleName ?? "";
+    string salePhone = ViewBag.SalePhone ?? "";
+    string departureCode = flyGo?.StartPoint ?? "";
+    string destinationCode = flyGo?.EndPoint ?? "";
+    
+    var goAirport = listAirportCode?.FirstOrDefault(x => x.CodeValue.ToString() == departureCode);
+    var returnAirport = listAirportCode?.FirstOrDefault(x => x.CodeValue.ToString() == destinationCode);
+
+    string departureName = goAirport != null ? goAirport.Description : departureCode;
+    string destinationName = returnAirport != null ? returnAirport.Description : destinationCode;
+
+    var goAirline = listAirlines?.FirstOrDefault(x => x.CodeValue.ToString() == flyGo?.Airline);
+    var returnAirline = listAirlines?.FirstOrDefault(x => x.CodeValue.ToString() == flyReturn?.Airline);
+
+    string pnrGo = flyGo?.BookingCode ?? "";
+    string pnrReturn = flyReturn?.BookingCode ?? "";
+    
+    bool isRoundTrip = flyReturn != null;
+    string tripType = isRoundTrip ? "KHỨ HỒI" : "MỘT CHIỀU";
+}
+
+<style>
+ .mfp-content .white-popup {
+        max-width: 85% !important;
+        width: 85% !important;
+        max-height: 85% !important;
+        height: 85% !important;
+    }
+    .matve-popup {
+        background: #fff;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        color: #333;
+        border-radius: 8px;
+        margin: 0 auto;
+    }
+    .matve-header {
+        display: flex;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 20px;
+    }
+    .matve-booking-info {
+        flex: 1;
+        padding: 15px;
+        border-right: 1px solid #e0e0e0;
+    }
+    .matve-passenger-info {
+        flex: 2;
+        padding: 15px;
+    }
+    .matve-pnr-info {
+        flex: 1;
+        padding: 15px;
+        border-left: 1px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .matve-title {
+        font-weight: bold;
+        color: #004d8c;
+        margin-bottom: 15px;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+    .info-label {
+        color: #777;
+    }
+    .info-value {
+        font-weight: bold;
+    }
+    .pnr-box {
+        border: 1px solid #e0e0e0;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    .pnr-label {
+        font-size: 11px;
+        color: #777;
+        margin-bottom: 5px;
+    }
+    .pnr-code {
+        font-size: 20px;
+        font-weight: bold;
+        color: #004d8c;
+    }
+    .table-passenger {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+    .table-passenger th {
+        text-align: left;
+        color: #777;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .table-passenger td {
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .flight-card {
+        border: 1px solid #004d8c;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+    .flight-card-header {
+        background: #004d8c;
+        color: #fff;
+        padding: 8px 15px;
+        font-weight: bold;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+    .flight-card-body {
+        display: flex;
+        padding: 15px;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .flight-detail {
+        text-align: center;
+    }
+    .flight-time {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .flight-airport {
+        font-size: 12px;
+        color: #777;
+    }
+    .flight-duration {
+        font-size: 11px;
+        color: #999;
+        text-align: center;
+    }
+    .flight-airline {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    
+    .bottom-cards {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .bottom-card {
+        flex: 1;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 15px;
+    }
+    .bottom-card-title {
+        font-weight: bold;
+        color: #004d8c;
+        margin-bottom: 10px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .bottom-card-content {
+        font-size: 12px;
+        color: #555;
+        line-height: 1.5;
+    }
+    .bottom-card-content ul {
+        padding-left: 20px;
+        margin: 0;
+    }
+    .msg-adavigo {
+        color: #004d8c;
+        font-style: italic;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="matve-popup">
+    <!-- Header Section -->
+    <div class="matve-header">
+        <div class="matve-booking-info">
+            <div class="matve-title">THÔNG TIN ĐẶT CHỖ</div>
+            <div class="info-row"><span class="info-label">Loại</span><span class="info-value">@tripType</span></div>
+            <div class="info-row"><span class="info-label">Điểm đi</span><span class="info-value">@departureCode</span></div>
+            <div class="info-row"><span class="info-label">Điểm đến</span><span class="info-value">@destinationCode</span></div>
+            <div class="info-row"><span class="info-label">Ngày đi</span><span class="info-value">@(flyGo?.StartDate?.ToString("dd/MM/yyyy") ?? "")</span></div>
+            @if (isRoundTrip)
+            {
+                <div class="info-row"><span class="info-label">Ngày về</span><span class="info-value">@(flyReturn?.StartDate?.ToString("dd/MM/yyyy") ?? "")</span></div>
+            }
+            <div class="info-row"><span class="info-label">Sale phụ trách</span><span class="info-value">@saleName (@salePhone)</span></div>
+        </div>
+        
+        <div class="matve-passenger-info">
+            <div class="matve-title">THÔNG TIN HÀNH KHÁCH</div>
+            <table class="table-passenger">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>HỌ VÀ TÊN</th>
+                        <th>NGÀY SINH</th>
+                        <th>GIỚI TÍNH</th>
+                        <th>HÀNH LÝ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (passengers != null && passengers.Any())
+                    {
+                        int stt = 1;
+                        foreach (var pax in passengers)
+                        {
+                            var baggage = baggages?.FirstOrDefault(b => b.PassengerId == pax.Id);
+                            string baggageText = baggage != null ? $"{baggage.WeightValue} kg" : "0 kg";
+                            string gender = pax.Gender == true ? "Nam" : "Nữ";
+                            <tr>
+                                <td>@stt</td>
+                                <td><b>@pax.Name.ToUpper()</b></td>
+                                <td>@(pax.Birthday?.ToString("dd/MM/yyyy") ?? "")</td>
+                                <td>@gender</td>
+                                <td>@baggageText</td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="matve-pnr-info">
+            @if (!string.IsNullOrEmpty(pnrGo))
+            {
+                <div class="pnr-box">
+                    <div class="pnr-label">PNR CHIỀU ĐI</div>
+                    <div class="pnr-code">@pnrGo</div>
+                </div>
+            }
+            @if (isRoundTrip && !string.IsNullOrEmpty(pnrReturn))
+            {
+                <div class="pnr-box">
+                    <div class="pnr-label">PNR CHIỀU VỀ</div>
+                    <div class="pnr-code">@pnrReturn</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Flight Go -->
+    @if (flyGo != null)
+    {
+        <div class="flight-card">
+            <div class="flight-card-header">CHIỀU ĐI: @departureName (@departureCode) ✈ @destinationName (@destinationCode)</div>
+            <div class="flight-card-body">
+                <div>
+                    <div style="font-weight: bold; color:#004d8c;">@(segmentGo?.FlightNumber ?? flyGo.Flight)</div>
+                    <div style="font-size:12px; color:#777;">@(flyGo.StartDate?.ToString("dd/MM/yyyy"))</div>
+                </div>
+                
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <div class="flight-detail">
+                        <div class="flight-time">@(segmentGo?.StartTime.ToString("HH:mm") ?? flyGo.StartDate?.ToString("HH:mm"))</div>
+                        <div class="flight-airport">@departureCode</div>
+                    </div>
+                    
+                    <div class="flight-duration">
+                        <div>✈</div>
+                        <div>bay</div>
+                    </div>
+                    
+                    <div class="flight-detail">
+                        <div class="flight-time">@(segmentGo?.EndTime.ToString("HH:mm") ?? flyGo.EndDate?.ToString("HH:mm"))</div>
+                        <div class="flight-airport">@destinationCode</div>
+                    </div>
+                </div>
+                
+                <div class="flight-airline">
+                    <span style="color:#004d8c; margin-right:5px;">🛩</span> @(goAirline?.Description ?? flyGo.Airline)
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Flight Return -->
+    @if (flyReturn != null)
+    {
+        <div class="flight-card">
+            <div class="flight-card-header">CHIỀU VỀ: @destinationName (@destinationCode) ✈ @departureName (@departureCode)</div>
+            <div class="flight-card-body">
+                <div>
+                    <div style="font-weight: bold; color:#004d8c;">@(segmentReturn?.FlightNumber ?? flyReturn.Flight)</div>
+                    <div style="font-size:12px; color:#777;">@(flyReturn.StartDate?.ToString("dd/MM/yyyy"))</div>
+                </div>
+                
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <div class="flight-detail">
+                        <div class="flight-time">@(segmentReturn?.StartTime.ToString("HH:mm") ?? flyReturn.StartDate?.ToString("HH:mm"))</div>
+                        <div class="flight-airport">@destinationCode</div>
+                    </div>
+                    
+                    <div class="flight-duration">
+                        <div>✈</div>
+                        <div>bay</div>
+                    </div>
+                    
+                    <div class="flight-detail">
+                        <div class="flight-time">@(segmentReturn?.EndTime.ToString("HH:mm") ?? flyReturn.EndDate?.ToString("HH:mm"))</div>
+                        <div class="flight-airport">@departureCode</div>
+                    </div>
+                </div>
+                
+                <div class="flight-airline">
+                    <span style="color:#004d8c; margin-right:5px;">🛩</span> @(returnAirline?.Description ?? flyReturn.Airline)
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Bottom Notes -->
+    <div class="bottom-cards">
+        <div class="bottom-card">
+            <div class="bottom-card-title">💼 QUY ĐỊNH HÀNH LÝ</div>
+            <div class="bottom-card-content">
+                <ul>
+                    <li>Hành lý xách tay: 7kg/kiện (56cm x 36cm x 23cm)</li>
+                    <li>Hành lý ký gửi: Theo quy định của hãng</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="bottom-card">
+            <div class="bottom-card-title">🕒 LƯU Ý QUAN TRỌNG</div>
+            <div class="bottom-card-content">
+                <ul>
+                    <li>Có mặt tại sân bay trước giờ khởi hành ít nhất 120 phút.</li>
+                    <li>Mang theo giấy tờ tùy thân hợp lệ khi làm thủ tục.</li>
+                    <li>Kiểm tra kỹ thông tin trên vé. Liên hệ Adavigo nếu có sai sót.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="bottom-card" style="flex: 1.2;">
+            <div class="bottom-card-title">✉ LỜI NHẮN TỪ ADAVIGO</div>
+            <div class="bottom-card-content">
+                Quý khách vui lòng đọc kỹ mọi thông tin trên vé (họ tên, hành trình, ngày giờ bay) trước khi xác nhận thông tin xuất vé. Chúng tôi sẽ không chịu trách nhiệm nào về sai sót thông tin trên vé sau khi quý khách đã xác nhận thông tin xuất vé.
+                <div class="msg-adavigo">KÍNH CHÚC QUÝ KHÁCH CÓ CHUYẾN BAY TỐT ĐẸP!</div>
+            </div>
+        </div>
+    </div>
+</div>
