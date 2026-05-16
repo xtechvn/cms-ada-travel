@@ -283,11 +283,11 @@ namespace WEB.CMS.Controllers
             DateTime holdLimit = DateTime.Now;
             if (flightDate.HasValue)
             {
-                if (flightDate.Value.Date > DateTime.Now.Date)
+                if (flightDate.Value > DateTime.Now)
                 {
                     holdLimit = DateTime.Now.AddHours(1);
                 }
-                else if (DateTime.Now.Date < flightDate.Value.Date)
+                else if (DateTime.Now < flightDate.Value)
                 {
                     holdLimit = DateTime.Now.AddHours(124);
                 }

@@ -273,8 +273,8 @@
                 var row_element_2 = $(this);
                 var selected_package_id = row_element_2.find('.service-fly-extrapackage-packagename-select option:selected').val()
                 if (selected_package_id == 'inf_amount') {
-                    row_element_2.find('.service-fly-extrapackage-profit').hide()
-                    row_element_2.find('.service-fly-extrapackage-profit').val('0')
+                    //row_element_2.find('.service-fly-extrapackage-profit').hide()
+                    //row_element_2.find('.service-fly-extrapackage-profit').val('0')
                 }
                 else {
                     row_element_2.find('.service-fly-extrapackage-profit').show()
@@ -286,8 +286,8 @@
         else {
             var selected_package_id = row_element.find('.service-fly-extrapackage-packagename-select option:selected').val()
             if (selected_package_id == 'inf_amount') {
-                row_element.find('.service-fly-extrapackage-profit').hide()
-                row_element.find('.service-fly-extrapackage-profit').val('0')
+                //row_element.find('.service-fly-extrapackage-profit').hide()
+                //row_element.find('.service-fly-extrapackage-profit').val('0')
             }
             else {
                 row_element.find('.service-fly-extrapackage-profit').show()

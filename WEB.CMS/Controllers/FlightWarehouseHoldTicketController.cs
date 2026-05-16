@@ -208,6 +208,7 @@ namespace WEB.CMS.Controllers
                     end_date = goSegment.FlightDate ?? DateTime.Now,
                     service_code = await _indentiferService.buildServiceNo((int)ServicesType.FlyingTicket),
                     note = "",
+                    profit= (double)data.Profit,
                     others_amount = data.OthersAmount,
                     commission = data.Commission,
                     go = new OrderManualFlyBookingServiceSummitRoute
