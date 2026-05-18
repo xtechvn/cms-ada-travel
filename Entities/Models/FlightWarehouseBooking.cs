@@ -19,5 +19,6 @@ namespace Entities.Models
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
         public int? AgencyTotalTicket { get; set; }
+        public int? FundType { get; set; }
     }
 }

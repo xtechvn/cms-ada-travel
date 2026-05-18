@@ -58,11 +58,16 @@
                 <div class="card-detail mb-4">
                     <div class="p-4 border-bottom">
                         <div class="row align-items-center">
-                            <div class="col-md-6">                               
+                            <div class="col-md-6 row">                               
                                 <div class="d-flex align-items-center">
                                     <h2 class="font-weight-bold mb-0 mr-3">@Model.Booking.DeparturePoint <i class="fa fa-arrow-right text-muted mx-2" style="font-size: 18px;"></i> @Model.Booking.ArrivalPoint</h2>
                                     <span class="badge border py-2 px-3 mr-2" style="background: #f0f2f5; color: #4e5e71; border-radius: 4px; font-weight: normal;">
                                          @(Model.Booking.TripType == 1 ? "Một chiều" : "Khứ hồi")
+                                    </span>
+                                </div>
+                                  <div class="d-flex align-items-center">
+                                    <span class="badge border py-2 px-3 mr-2" style="background: #f0f2f5; color: #4e5e71; border-radius: 4px; font-weight: normal;">
+                                         @(Model.Booking.FundType == 1 ? "Quỹ mềm" : "Quỹ cứng")
                                     </span>
                                 </div>
                             </div>

@@ -185,7 +185,18 @@
 
                             </select>
                         </div>
-                     
+                       <div class="col-xl-3 col-lg-3 col-md-6 mb15">
+                            <label class="lbl mb5">Quỹ <sup class="red">*</sup></label>
+                            <select class="form-control" name="fund-type" id="fund-type" style="width: 100%;">
+                                @if(Model.Booking.FundType==1){
+                                    <option value="1" selected>Quỹ mềm</option>
+                                    <option value="2">Quỹ cứng</option>
+                                }else{
+                                    <option value="1">Quỹ mềm</option>
+                                    <option value="2" selected>Quỹ cứng</option>
+                                }
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Flight Segments -->

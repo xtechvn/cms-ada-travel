@@ -15,5 +15,6 @@ namespace Entities.ViewModels.FlightWarehouse
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public int Date { get; set; }
+        public int FundType { get; set; }
     }
 }

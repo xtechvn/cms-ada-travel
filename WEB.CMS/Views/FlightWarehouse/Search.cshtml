@@ -70,6 +70,11 @@
                                 <td>
                                     <span class="text-muted small">@item.Airline</span>
                                     <div class="badge badge-light border text-primary mb-1 cursor-pointer" >@item.FlightPNRCodeGo</div><br />
+                                    @if(item.FundType==1){
+                                        <span class="badge badge-light border text-primary mb-1 cursor-pointer">Quỹ mềm</span>
+                                    }else{
+                                        <span class="badge badge-light border cursor-pointer">Quỹ cứng</span>
+                                    }
                                 </td>
                                 <td class="text-right">
                                      <div class="bold green">@item.PriceDisplay</div>

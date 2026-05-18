@@ -19,7 +19,7 @@ var _flight_warehouse = {
                     return {
                         results: $.map(response.data, function (item) {
                             return {
-                                text: item.code+'('+ item.districtVi+')',
+                                text: item.code + '(' + item.districtVi + ')',
                                 id: item.code,
                             }
                         })
@@ -62,7 +62,8 @@ var _flight_warehouse = {
             DeparturePoint: $('#search-departure').val(),
             ArrivalPoint: $('#search-arrival').val(),
             Airline: $('#search-airline').val(),
-            Date: $('#Date').val()
+            Date: $('#Date').val(),
+            FundType: $('#search-fund-type').val()
         };
         $.ajax({
             url: "/FlightWarehouse/Search",
@@ -80,6 +81,7 @@ var _flight_warehouse = {
             ArrivalPoint: $('#search-arrival').val(),
             Airline: $('#search-airline').val(),
             Date: $('#Date').val(),
+            FundType: $('#search-fund-type').val(),
             pageIndex: pageIndex
         };
         $.ajax({
@@ -247,7 +249,8 @@ var _flight_warehouse = {
                 TotalTicket: parseInt(form.find('input[name="TotalTicket"]').val()) || 0,
                 IsRefundable: parseInt(form.find('select[name="IsRefundable"]').val()) || 0,
                 CarryOnBaggage: form.find('input[name="CarryOnBaggage"]').val() || "",
-                CheckedBaggage: form.find('input[name="CheckedBaggage"]').val() || ""
+                CheckedBaggage: form.find('input[name="CheckedBaggage"]').val() || "",
+                FundType: $('#fund-type').val()
             },
             Segments: [],
             Prices: []

@@ -26,6 +26,7 @@ namespace Entities.ViewModels.FlightWarehouse
         public string TripTypeName { get; set; }
         public string FlightPNRCodeGo { get; set; }
         public string FlightPNRCodeBack { get; set; }
+        public int FundType { get; set; }
 
     }
 }

@@ -28,7 +28,7 @@ namespace DAL.FlightWarehouse
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[7];
+                SqlParameter[] objParam = new SqlParameter[8];
 
                 objParam[0] = new SqlParameter("@BookingCode", searchModel.BookingCode ?? (object)DBNull.Value);
                 objParam[1] = new SqlParameter("@DeparturePoint", searchModel.DeparturePoint ?? (object)DBNull.Value);
@@ -37,6 +37,7 @@ namespace DAL.FlightWarehouse
                 objParam[4] = new SqlParameter("@PageIndex", pageIndex);
                 objParam[5] = new SqlParameter("@PageSize", pageSize);
                 objParam[6] = new SqlParameter("@Date", searchModel.Date );
+                objParam[7] = new SqlParameter("@FundType", searchModel.FundType);
                var dt= _DbWorker.GetDataTable(StoreProcedureConstant.SP_GetListFlightWarehouse, objParam);
                 if (dt != null && dt.Rows.Count > 0)
                 {
@@ -56,7 +57,7 @@ namespace DAL.FlightWarehouse
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[13];
+                SqlParameter[] objParam = new SqlParameter[14];
 
                 objParam[0] = new SqlParameter("@Id", model.Id);
                 objParam[1] = new SqlParameter("@BookingCode", model.BookingCode ?? (object)DBNull.Value);
@@ -71,6 +72,7 @@ namespace DAL.FlightWarehouse
                 objParam[10] = new SqlParameter("@CreatedBy", model.CreatedBy>0? model.CreatedBy : DBNull.Value);
                 objParam[11] = new SqlParameter("@UpdatedBy", model.UpdatedBy > 0 ? model.UpdatedBy : DBNull.Value);
                 objParam[12] = new SqlParameter("@AgencyTotalTicket", model.AgencyTotalTicket !=null  ? model.AgencyTotalTicket : 0);
+                objParam[13] = new SqlParameter("@FundType", model.FundType != null  ? model.FundType : 0);
                
 
                 var result = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpsertFlightWarehouseBooking, objParam);
