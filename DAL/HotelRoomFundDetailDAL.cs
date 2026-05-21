@@ -35,6 +35,9 @@ namespace DAL
                 objParam[2] = new SqlParameter("@NumberOfRooms", Model.NumberOfRooms);
                 objParam[3] = new SqlParameter("@StartDate", Model.StartDate);
                 objParam[4] = new SqlParameter("@EndDate", Model.EndDate);
+                objParam[5] = new SqlParameter("@EndDate", Model.HardFundRoom);
+                objParam[6] = new SqlParameter("@EndDate", Model.SoftFundRoom);
+                objParam[7] = new SqlParameter("@EndDate", Model.ExpiredDate);
 
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_InsertHotelRoomFundDetail, objParam);
@@ -50,15 +53,17 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[4];
+                SqlParameter[] objParam = new SqlParameter[9];
 
                 objParam[0] = new SqlParameter("@Id", Model.Id);
-                objParam[0] = new SqlParameter("@HotelRoomFundId", Model.HotelRoomFundId);
-                objParam[0] = new SqlParameter("@HotelRoomId", Model.HotelRoomId);
-                objParam[0] = new SqlParameter("@NumberOfRooms", Model.NumberOfRooms);
-                objParam[0] = new SqlParameter("@StartDate", Model.StartDate);
-                objParam[0] = new SqlParameter("@EndDate", Model.EndDate);
-
+                objParam[1] = new SqlParameter("@HotelRoomFundId", Model.HotelRoomFundId);
+                objParam[2] = new SqlParameter("@HotelRoomId", Model.HotelRoomId);
+                objParam[3] = new SqlParameter("@NumberOfRooms", Model.NumberOfRooms);
+                objParam[4] = new SqlParameter("@StartDate", Model.StartDate);
+                objParam[5] = new SqlParameter("@EndDate", Model.EndDate);
+                objParam[6] = new SqlParameter("@EndDate", Model.HardFundRoom);
+                objParam[7] = new SqlParameter("@EndDate", Model.SoftFundRoom);
+                objParam[8] = new SqlParameter("@EndDate", Model.ExpiredDate);
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateHotelRoomFundDetail, objParam);
             }
             catch (Exception ex)

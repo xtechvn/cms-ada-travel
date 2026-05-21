@@ -33,6 +33,18 @@ namespace Entities.ViewModels
                     return DateUtil.StringToDate(EndDateSTR);
                 return null;
             }
+        } 
+        public string HardFundRoom { get; set; }
+        public string SoftFundRoom { get; set; }
+        public string ExpiredDateSTR { get; set; }
+        public DateTime? ExpiredDate
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(EndDateSTR))
+                    return DateUtil.StringToDate(EndDateSTR);
+                return null;
+            }
         }
     }
 }

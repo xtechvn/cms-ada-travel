@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 
 namespace Entities.Models
 {
@@ -12,6 +13,9 @@ namespace Entities.Models
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
+        public int HardFundRoom { get; set; }//Số lượng phòng quỹ cứng
+        public int SoftFundRoom { get; set; }//Số lượng phòng quỹ mềm
+        public DateTime? ExpiredDate { get; set; }//Ngày hết hạn
         public virtual HotelRoomFund HotelRoomFund { get; set; }
     }
 }

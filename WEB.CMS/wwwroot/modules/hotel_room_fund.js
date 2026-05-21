@@ -230,13 +230,23 @@ var hotelRoomFund = {
                 <div class="quick-add-section">
                     <span class="title"><i class="fa fa-bolt"></i> Thêm nhanh (Tự động chia ngày)</span>
                     <div class="row">
-                        <div class="col-md-3">
-                            <input type="number" class="form-control qa-amount" placeholder="Số lượng phòng" />
+                        <div class="col-md-2">
+                            <label style="font-size:12px;">Quỹ cứng</label>
+                            <input type="number" class="form-control qa-hard-fund" placeholder="Quỹ cứng" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-2">
+                            <label style="font-size:12px;">Quỹ mềm</label>
+                            <input type="number" class="form-control qa-soft-fund" placeholder="Quỹ mềm" />
+                        </div>
+                        <div class="col-md-3">
+                            <label style="font-size:12px;">Thời gian chung</label>
                             <input type="text" class="form-control qa-date-range" placeholder="Thời gian chung" />
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <label style="font-size:12px;">Ngày hết hạn</label>
+                            <input type="text" class="form-control datepicker qa-expiry-date" placeholder="Ngày hết hạn" />
+                        </div>
+                        <div class="col-md-3" style="padding-top:22px;">
                             <button type="button" class="btn btn-sm btn-info" onclick="hotelRoomFund.QuickAdd(this)">Áp dụng</button>
                         </div>
                     </div>
@@ -245,6 +255,15 @@ var hotelRoomFund = {
                         <div class="special-dates-list"></div>
                         <button type="button" class="btn btn-xs btn-default mt5" onclick="hotelRoomFund.AddSpecialDateRow(this)"><i class="fa fa-plus"></i> Thêm ngày đặc biệt</button>
                     </div>
+                </div>
+                <div class="detail-header" style="display:flex; align-items:center; gap:8px; font-weight:600; background:#e9ecef; padding:4px 5px; margin-bottom:4px;">
+                    <div style="width:80px; flex:none;">Số lượng</div>
+                    <div style="width:100px; flex:none;">Ngày bắt đầu</div>
+                    <div style="width:100px; flex:none;">Ngày kết thúc</div>
+                    <div style="width:80px; flex:none;">Quỹ cứng</div>
+                    <div style="width:80px; flex:none;">Quỹ mềm</div>
+                    <div style="width:120px; flex:none;">Ngày hết hạn</div>
+                    <div style="width:30px; flex:none;">Thao tác</div>
                 </div>
                 <div class="room-fund-details-list">
                     <!-- Dòng chi tiết sẽ được sinh ra ở đây -->
@@ -261,18 +280,31 @@ var hotelRoomFund = {
             autoApply: true,
             locale: { format: 'DD/MM/YYYY' }
         });
+        lastGroup.find('.qa-expiry-date').daterangepicker({
+            singleDatePicker: true,
+            autoApply: true,
+            locale: { format: 'DD/MM/YYYY' }
+        });
     },
     AddSpecialDateRow: function (btn) {
         var list = $(btn).closest('.special-dates-container').find('.special-dates-list');
         var rowHtml = `
             <div class="special-date-item">
-                <input type="number" class="form-control sd-amount" style="width: 100px;" placeholder="Số lượng phòng" />
+                <input type="number" class="form-control sd-hard-fund" style="width: 90px;" placeholder="Quỹ cứng" />
+                <input type="number" class="form-control sd-soft-fund" style="width: 90px;" placeholder="Quỹ mềm" />
                 <input type="text" class="form-control sd-date-range" style="width: 220px;" placeholder="Thời gian" />
+                <input type="text" class="form-control sd-expiry-date" style="width: 120px;" placeholder="Ngày hết hạn" />
                 <i class="fa fa-trash text-danger" style="cursor:pointer" onclick="$(this).parent().remove()"></i>
             </div>
         `;
         list.append(rowHtml);
-        list.find('.special-date-item:last .sd-date-range').daterangepicker({
+        var lastItem = list.find('.special-date-item:last');
+        lastItem.find('.sd-date-range').daterangepicker({
+            autoApply: true,
+            locale: { format: 'DD/MM/YYYY' }
+        });
+        lastItem.find('.sd-expiry-date').daterangepicker({
+            singleDatePicker: true,
             autoApply: true,
             locale: { format: 'DD/MM/YYYY' }
         });
@@ -287,11 +319,14 @@ var hotelRoomFund = {
     QuickAdd: function (btn) {
         var group = $(btn).closest('.room-type-group');
         var roomTypeId = group.data('room-type-id');
-        var amount = group.find('.qa-amount').val();
+        var hardFund = parseFloat(group.find('.qa-hard-fund').val()) || 0;
+        var softFund = parseFloat(group.find('.qa-soft-fund').val()) || 0;
+        var amount = hardFund + softFund;
         var dateRange = group.find('.qa-date-range').val();
+        var expiryDate = group.find('.qa-expiry-date').val();
 
-        if (!amount || !dateRange) {
-            _msgalert.error("Vui lòng nhập số tiền và thời gian chung");
+        if ((!hardFund && !softFund) || !dateRange) {
+            _msgalert.error("Vui lòng nhập Quỹ cứng/Quỹ mềm và thời gian chung");
             return;
         }
 
@@ -320,9 +355,11 @@ var hotelRoomFund = {
         var specialDates = [];
         var isSpecialOverlap = false;
         group.find('.special-date-item').each(function () {
-            var sdAmount = $(this).find('.sd-amount').val();
+            var sdHard = parseFloat($(this).find('.sd-hard-fund').val()) || 0;
+            var sdSoft = parseFloat($(this).find('.sd-soft-fund').val()) || 0;
             var sdRange = $(this).find('.sd-date-range').val();
-            if (sdAmount && sdRange) {
+            var sdExpiry = $(this).find('.sd-expiry-date').val();
+            if ((sdHard || sdSoft) && sdRange) {
                 var sdStart = moment(sdRange.split(' - ')[0], 'DD/MM/YYYY');
                 var sdEnd = moment(sdRange.split(' - ')[1], 'DD/MM/YYYY');
 
@@ -343,7 +380,10 @@ var hotelRoomFund = {
                 }
 
                 specialDates.push({
-                    amount: sdAmount,
+                    hardFund: sdHard,
+                    softFund: sdSoft,
+                    amount: sdHard + sdSoft,
+                    expiryDate: sdExpiry,
                     start: sdStart,
                     end: sdEnd
                 });
@@ -359,27 +399,33 @@ var hotelRoomFund = {
         var currentStart = startGeneral;
 
         for (var sd of specialDates) {
-            // Nếu ngày đặc biệt bắt đầu sau mốc hiện tại, thêm khoảng trống với giá chung
             if (sd.start.isAfter(currentStart)) {
                 finalRanges.push({
                     amount: amount,
+                    hardFund: hardFund,
+                    softFund: softFund,
+                    expiryDate: expiryDate,
                     start: currentStart.clone(),
                     end: sd.start.clone()
                 });
             }
-            // Thêm ngày đặc biệt
             finalRanges.push({
                 amount: sd.amount,
+                hardFund: sd.hardFund,
+                softFund: sd.softFund,
+                expiryDate: sd.expiryDate || expiryDate,
                 start: sd.start.clone(),
                 end: sd.end.clone()
             });
             currentStart = sd.end.clone();
         }
 
-        // Nếu còn khoảng trống đến cuối mốc chung
         if (currentStart.isSameOrBefore(endGeneral)) {
             finalRanges.push({
                 amount: amount,
+                hardFund: hardFund,
+                softFund: softFund,
+                expiryDate: expiryDate,
                 start: currentStart.clone(),
                 end: endGeneral.clone()
             });
@@ -393,10 +439,13 @@ var hotelRoomFund = {
             var rowHtml = `
                 <div class="detail-row">
                     <input type="hidden" name="HotelRoomId" value="${roomTypeId}" />
-                    <input type="number" class="form-control" name="NumberOfRooms" value="${range.amount}" />
-                    <input type="text" class="form-control datepicker" name="StartDate" value="${range.start.format('DD/MM/YYYY')}" />
-                    <input type="text" class="form-control datepicker" name="EndDate" value="${range.end.format('DD/MM/YYYY')}" />
-                    <button type="button" class="btn btn-xs btn-danger remove-detail-btn" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>
+                    <input type="number" class="form-control" name="NumberOfRooms" value="${range.amount}" style="width:80px; flex:none; background:#f5f5f5;" readonly />
+                    <input type="text" class="form-control datepicker" name="StartDate" value="${range.start.format('DD/MM/YYYY')}" style="width:100px; flex:none;" />
+                    <input type="text" class="form-control datepicker" name="EndDate" value="${range.end.format('DD/MM/YYYY')}" style="width:100px; flex:none;" />
+                    <input type="number" class="form-control" name="HardFundRoom" value="${range.hardFund}" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />
+                    <input type="number" class="form-control" name="SoftFundRoom" value="${range.softFund}" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />
+                    <input type="text" class="form-control datepicker" name="ExpiredDate" value="${range.expiryDate}" style="width:120px; flex:none;" />
+                    <button type="button" class="btn btn-xs btn-danger remove-detail-btn" style="width:30px; flex:none;" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>
                 </div>
             `;
             detailsList.append(rowHtml);
@@ -421,10 +470,13 @@ var hotelRoomFund = {
             var d = details[i];
             var rowHtml = '<div class="detail-row">' +
                 '<input type="hidden" name="HotelRoomId" value="' + roomTypeId + '" />' +
-                '<input type="number" class="form-control" name="NumberOfRooms" value="' + d.NumberOfRooms + '" />' +
-                '<input type="text" class="form-control datepicker" name="StartDate" value="' + d.StartDate + '" />' +
-                '<input type="text" class="form-control datepicker" name="EndDate" value="' + d.EndDate + '" />' +
-                '<button type="button" class="btn btn-xs btn-danger remove-detail-btn" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>' +
+                '<input type="number" class="form-control" name="NumberOfRooms" value="' + ((parseFloat(d.HardFundRoom) || 0) + (parseFloat(d.SoftFundRoom) || 0)) + '" style="width:80px; flex:none; background:#f5f5f5;" readonly />' +
+                '<input type="text" class="form-control datepicker" name="StartDate" value="' + d.StartDate + '" style="width:100px; flex:none;" />' +
+                '<input type="text" class="form-control datepicker" name="EndDate" value="' + d.EndDate + '" style="width:100px; flex:none;" />' +
+                '<input type="number" class="form-control" name="HardFundRoom" value="' + (d.HardFundRoom || '') + '" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />' +
+                '<input type="number" class="form-control" name="SoftFundRoom" value="' + (d.SoftFundRoom || '') + '" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />' +
+                '<input type="text" class="form-control datepicker" name="ExpiredDate" value="' + (d.ExpiredDate || '') + '" style="width:120px; flex:none;" />' +
+                '<button type="button" class="btn btn-xs btn-danger remove-detail-btn" style="width:30px; flex:none;" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>' +
                 '</div>';
             detailsList.append(rowHtml);
         }
@@ -447,12 +499,15 @@ var hotelRoomFund = {
         var detailsList = roomTypeGroup.find('.room-fund-details-list');
 
         var newRowHtml = `
-            <div class="detail-row">
+            <div class="detail-row" style="display:flex; align-items:center; gap:8px; padding:4px 5px; margin-bottom:4px; background:#fff;">
                 <input type="hidden" name="HotelRoomId" value="${roomTypeId}" />
-                <input type="number" class="form-control" name="NumberOfRooms" value="0" />
-                <input type="text" class="form-control datepicker" name="StartDate" />
-                <input type="text" class="form-control datepicker" name="EndDate" />
-                <button type="button" class="btn btn-xs btn-danger remove-detail-btn" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>
+                <input type="number" class="form-control" name="NumberOfRooms" value="0" style="width:80px; flex:none; background:#f5f5f5;" readonly />
+                <input type="text" class="form-control datepicker" name="StartDate" value="${moment().format('DD/MM/YYYY')}" style="width:100px; flex:none;" />
+                <input type="text" class="form-control datepicker" name="EndDate" value="${moment().format('DD/MM/YYYY')}" style="width:100px; flex:none;" />
+                <input type="number" class="form-control" name="HardFundRoom" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />
+                <input type="number" class="form-control" name="SoftFundRoom" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />
+                <input type="text" class="form-control datepicker" name="ExpiredDate" style="width:120px; flex:none;" />
+                <button type="button" class="btn btn-xs btn-danger remove-detail-btn" style="width:30px; flex:none;" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>
             </div>
         `;
 
@@ -521,7 +576,10 @@ var hotelRoomFund = {
                     HotelRoomId: row.find('input[name="HotelRoomId"]').val(),
                     NumberOfRooms: row.find('input[name="NumberOfRooms"]').val(),
                     StartDateSTR: row.find('input[name="StartDate"]').val(),
-                    EndDateSTR: row.find('input[name="EndDate"]').val()
+                    EndDateSTR: row.find('input[name="EndDate"]').val(),
+                    HardFundRoom: row.find('input[name="HardFundRoom"]').val(),
+                    SoftFundRoom: row.find('input[name="SoftFundRoom"]').val(),
+                    ExpiredDateSTR: row.find('input[name="ExpiredDate"]').val()
                 });
             });
         });
@@ -555,5 +613,11 @@ var hotelRoomFund = {
                 btnSave.removeAttr('disabled').removeClass('disabled');
             }
         });
+    },
+    CalcNumberOfRooms: function (input) {
+        var row = $(input).closest('.detail-row');
+        var hard = parseFloat(row.find('input[name="HardFundRoom"]').val()) || 0;
+        var soft = parseFloat(row.find('input[name="SoftFundRoom"]').val()) || 0;
+        row.find('input[name="NumberOfRooms"]').val(hard + soft);
     }
 };
