@@ -595,6 +595,7 @@ var hotelRoomFund = {
             Id: form.find('input[name="Id"]').val(),
             SupplierId: form.find('input[name="SupplierId"]').length ? form.find('input[name="SupplierId"]').val() : form.find('select[name="SupplierId"]').val(),
             HotelId: form.find('input[name="HotelId"]').length ? form.find('input[name="HotelId"]').val() : form.find('select[name="HotelId"]').val(),
+            ExpiredHours: parseInt(form.find('input[name="ExpiredHours"]').val()) || 0,
             Details: details
         };
 

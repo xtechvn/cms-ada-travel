@@ -226,11 +226,11 @@
 
     /* ===== ALLOCATION CELL ===== */
     .alloc-cell {
-        display: inline-flex;
+  
         align-items: center;
         justify-content: center;
         min-width: 72px;
-        height: 40px;
+        
         border-radius: 8px;
         border: 2px solid #e2e8f0;
         font-size: 14px;
@@ -406,17 +406,14 @@
                                                 <div class="room-name">@room.RoomName</div>
                                                 <div class="room-capacity">Capacity: @room.TotalCapacity.ToString("N0") phòng</div>
                                             </div>
-                                            <div style="margin-left: auto;">
-                                               <button type="button" class="btn btn-default btn-xs" onclick="fundDetailPage.ReserveRoom(@room.HotelRoomId)" title="Giữ phòng này">
-                                                   <i class="fa fa-lock text-success"></i>
-                                               </button>
-                                            </div>
+                                       
                                         </div>
                                     </td>
                                     @foreach (var date in Model.DisplayDates)
                                     {
                                         var allocated = room.DailyAllocations.ContainsKey(date) ? room.DailyAllocations[date] : 0;
                                         var booked = room.DailyBooked.ContainsKey(date) ? room.DailyBooked[date] : 0;
+                                        var Available = allocated - booked;
                                         var percentage = allocated > 0 ? Math.Round((booked / allocated) * 100, 0) : 0;
                                         var level = "level-low";
                                         if (percentage >= 100) level = "level-full";
@@ -425,9 +422,14 @@
                                         var isToday = date.Date == DateTime.Today;
 
                                         <td>
-                                            <div class="alloc-cell @level @(isToday ? "is-today-cell" : "")"
-                                                 title="Đã đặt: @booked.ToString("N0") / Quỹ: @allocated.ToString("N0") (@percentage%)">
-                                                 @booked.ToString("N0")/ @allocated.ToString("N0")
+                                            <div class="alloc-cell @level @(isToday ? "is-today-cell" : "")">
+                                                <div>
+                                                    <strong style="color: #28a745;"> @Available.ToString("N0")</strong>
+                                                </div>
+                                                <div 
+                                                     title="Đã đặt: @booked.ToString("N0") / Quỹ: @allocated.ToString("N0") (@percentage%)">
+                                                     @booked.ToString("N0")/ @allocated.ToString("N0")
+                                                </div>
                                             </div>
                                         </td>
                                     }

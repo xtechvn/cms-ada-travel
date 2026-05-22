@@ -5,6 +5,7 @@ using Entities.ViewModels;
 using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.OrderManual;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver.Linq;
 using Repositories.IRepositories;
 using Repositories.Repositories;
 using System;
@@ -559,6 +560,10 @@ namespace WEB.Adavigo.CMS.Controllers
             try
             {
                 int userId = _managementUser.GetCurrentUser().Id;
+                var searchModel = new HotelRoomFundSearchMode { PageIndex = 1, PageSize = 100 };
+                searchModel.HotelId = HotelId;
+                searchModel.SupplierId = SupplierId;
+                var Hotel_funds = await _hotelRoomFundRepository.GetListHotelRoomFund(searchModel);
 
                 var model = new UserReserveHotelRoomFund
                 {
@@ -568,6 +573,7 @@ namespace WEB.Adavigo.CMS.Controllers
                     HotelRoomId = HotelRoomId,
                     NumberOfRooms = NumberOfRooms,
                     CreatedDate = DateTime.Now,
+                    ExpirationDate = DateTime.Now.AddHours(Hotel_funds!=null &&Hotel_funds.Count>0? Hotel_funds[0].ExpiredHours:0),
                     Status = 0
                 };
 

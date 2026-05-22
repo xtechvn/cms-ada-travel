@@ -129,7 +129,10 @@ namespace WEB.Adavigo.CMS.Controllers
                             HotelRoomId = detail.HotelRoomId,
                             NumberOfRooms = detail.NumberOfRooms,
                             StartDate = detail.StartDate,
-                            EndDate = detail.EndDate
+                            EndDate = detail.EndDate,
+                            SoftFundRoom = detail.SoftFundRoom,
+                            HardFundRoom = detail.HardFundRoom,
+                            ExpiredDate = detail.ExpiredDate,
                         };
                         
                         await _hotelRoomFundRepository.InsertHotelRoomFundDetail(detailModel);

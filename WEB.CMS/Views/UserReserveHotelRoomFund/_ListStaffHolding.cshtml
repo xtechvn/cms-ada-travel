@@ -44,12 +44,12 @@
                             <td style="padding: 14px 20px; text-align: center; font-size: 15px; font-weight: 700; color: #1a2a44;">@item.NumberOfRooms.ToString("00")</td>
                             <td style="padding: 14px 20px;">
                                 @{
-                                    var expiry = item.CreatedDate?.AddHours(1);
-                                    var isExpired = expiry < DateTime.Now;
+                                   
+                                    var isExpired = item.ExpirationDate < DateTime.Now;
                                 }
                                 <div class="expiry-time" style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: @(isExpired ? "#ef4444" : "#64748b");">
                                     <i class="fa fa-clock-o"></i>
-                                    <span>@(expiry?.ToString("HH:mm - dd/MM/yyyy"))</span>
+                                    <span>@(item.ExpirationDate != null ? item.ExpirationDate.Value.ToString("HH:mm - dd/MM/yyyy"):"")</span>
                                 </div>
                             </td>
                             <td style="padding: 14px 20px; text-align: center;">

@@ -283,15 +283,18 @@ namespace WEB.CMS.Controllers
             DateTime holdLimit = DateTime.Now;
             if (flightDate.HasValue)
             {
-                if (flightDate.Value > DateTime.Now)
-                {
-                    holdLimit = DateTime.Now.AddHours(1);
-                }
-                else if (DateTime.Now < flightDate.Value)
-                {
-                    holdLimit = DateTime.Now.AddHours(124);
-                }
+                    // 🔥 Nếu flightDate còn hơn 7 ngày
+                    if (flightDate.Value.AddDays(-7) > DateTime.Now)
+                    {
+                        holdLimit = DateTime.Now.AddHours(24);
+                    }
+                    else
+                    {
+                        // 🔥 Còn dưới 7 ngày
+                        holdLimit = DateTime.Now.AddHours(1);
+                    }
 
+                // 🔥 Không được vượt quá giờ bay
                 if (holdLimit > flightDate.Value)
                 {
                     holdLimit = flightDate.Value;

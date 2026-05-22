@@ -150,11 +150,11 @@ var fundDetailPage = {
                     var todayCell = dd.isToday ? 'is-today-cell' : '';
                     var bookedStr = dd.booked < 10 ? Math.floor(dd.booked) : Math.floor(dd.booked);
                     var allocatedStr = Math.floor(dd.allocated);
-
-                    html += '<td><div class="alloc-cell ' + level + ' ' + todayCell + '" ';
+                    var Available = allocatedStr - bookedStr;
+                    html += '<td> <div class="alloc-cell ' + level + ' ' + todayCell + '"> <div><strong style="color: #28a745;"> '+Available+'</strong></div><div ';
                     html += 'title="Đã đặt: ' + dd.booked + ' / Quỹ: ' + dd.allocated + ' (' + pct + '%)">';
                     html += bookedStr + '/' + allocatedStr;
-                    html += '</div></td>';
+                    html += '</div></div></td>';
                 }
                 html += '</tr>';
             }

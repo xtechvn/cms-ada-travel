@@ -13,6 +13,7 @@ namespace Entities.Models
         public DateTime EndDate { get; set; }
         public int? Status { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
         public int? HotelId { get; set; }
         public int? SupplierId { get; set; }
     }

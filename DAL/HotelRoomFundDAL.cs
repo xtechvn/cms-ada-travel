@@ -29,7 +29,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[6];
+                SqlParameter[] objParam = new SqlParameter[7];
 
                 objParam[0] = new SqlParameter("@HotelId", model.HotelId);
                 objParam[1] = new SqlParameter("@SupplierId", model.SupplierId);  
@@ -37,6 +37,7 @@ namespace DAL
                 objParam[3] = new SqlParameter("@CreateBy", model.CreateBy);
                 objParam[4] = new SqlParameter("@CreateDate", model.CreateDate);
                 objParam[5] = new SqlParameter("@UpdateDate", model.UpdateDate);
+                objParam[6] = new SqlParameter("@ExpiredHours", model.ExpiredHours);
 
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_InsertHotelRoomFund, objParam);
@@ -52,13 +53,14 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[5];
+                SqlParameter[] objParam = new SqlParameter[6];
 
                 objParam[0] = new SqlParameter("@Id", Model.Id);
                 objParam[1] = new SqlParameter("@HotelId", Model.HotelId);
                 objParam[2] = new SqlParameter("@SupplierId", Model.SupplierId);
                 objParam[3] = new SqlParameter("@TotalRooms", Model.TotalRooms);
                 objParam[4] = new SqlParameter("@UpdateBy", Model.UpdateBy);      
+                objParam[5] = new SqlParameter("@ExpiredHours", Model.ExpiredHours);      
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateHotelRoomFund, objParam);
             }

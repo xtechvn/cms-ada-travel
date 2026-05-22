@@ -29,7 +29,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[7];
+                SqlParameter[] objParam = new SqlParameter[8];
 
                 objParam[0] = new SqlParameter("@Id", model.Id);
                 objParam[1] = new SqlParameter("@UserId", model.UserId);
@@ -38,6 +38,8 @@ namespace DAL
                 objParam[4] = new SqlParameter("@StartDate", DateUtil.StringToDateTime( model.StartDate.ToString("dd/MM/yyyy")));
                 objParam[5] = new SqlParameter("@EndDate", DateUtil.StringToDateTime( model.EndDate.ToString("dd/MM/yyyy")));
                 objParam[6] = new SqlParameter("@Status", model.Status);
+                objParam[7] = new SqlParameter("@ExpirationDate", model.ExpirationDate);
+
 
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateUserReserveHotelRoomFund, objParam);
@@ -53,7 +55,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[8];
+                SqlParameter[] objParam = new SqlParameter[9];
 
                 objParam[0] = new SqlParameter("@UserId", model.UserId);
                 objParam[1] = new SqlParameter("@HotelRoomId", model.HotelRoomId);
@@ -63,6 +65,7 @@ namespace DAL
                 objParam[5] = new SqlParameter("@Status", model.Status);
                 objParam[6] = new SqlParameter("@HotelId", model.HotelId);
                 objParam[7] = new SqlParameter("@SupplierId", model.SupplierId);
+                objParam[8] = new SqlParameter("@ExpirationDate", model.ExpirationDate);
 
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_InsertUserReserveHotelRoomFund, objParam);
