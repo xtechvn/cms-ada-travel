@@ -34,6 +34,8 @@
                 #room-fund-details-container .detail-row input[name="HardFundRoom"],
                 #room-fund-details-container .detail-row input[name="SoftFundRoom"] { width: 80px !important; flex: none; }
                 #room-fund-details-container .detail-row input[name="ExpiredDate"] { width: 120px !important; flex: none; }
+                #room-fund-details-container .detail-row input[name="Number"] { width: 100px !important; flex: none; }
+                #room-fund-details-container .detail-row input[name="ResetDate"] { width: 120px !important; flex: none; }
                 #room-fund-details-container .detail-row .remove-detail-btn { width: 30px; flex: none; color: #fff; cursor: pointer; }
                 .select-room-type-container { margin-bottom: 20px; display: none; }
             </style>
@@ -113,7 +115,8 @@
             EndDate = ((DateTime)d.EndDate).ToString("dd/MM/yyyy"),
             HardFundRoom = d.HardFundRoom,
             SoftFundRoom = d.SoftFundRoom,
-            ExpiredDate = d.ExpiredDate.HasValue ? d.ExpiredDate.Value.ToString("dd/MM/yyyy") : ""
+            ExpiredDate = d.ExpiredDate.HasValue ? d.ExpiredDate.Value.ToString("dd/MM/yyyy") : "",
+            Number = d.Number
         }) : 
         new object[0]
     ));

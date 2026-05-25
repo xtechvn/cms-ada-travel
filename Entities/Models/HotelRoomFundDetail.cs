@@ -16,6 +16,7 @@ namespace Entities.Models
         public int HardFundRoom { get; set; }//Số lượng phòng quỹ cứng
         public int SoftFundRoom { get; set; }//Số lượng phòng quỹ mềm
         public DateTime? ExpiredDate { get; set; }//Ngày hết hạn
+        public int Number { get; set; }//số Ngày hết hạn trước
         public virtual HotelRoomFund HotelRoomFund { get; set; }
     }
 }

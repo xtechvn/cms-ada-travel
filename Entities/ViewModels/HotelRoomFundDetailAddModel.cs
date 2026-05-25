@@ -46,5 +46,6 @@ namespace Entities.ViewModels
                 return null;
             }
         }
+        public int Number { get; set; }
     }
 }

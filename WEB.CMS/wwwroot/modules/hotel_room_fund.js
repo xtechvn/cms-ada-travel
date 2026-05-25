@@ -238,7 +238,7 @@ var hotelRoomFund = {
                             <label style="font-size:12px;">Quỹ mềm</label>
                             <input type="number" class="form-control qa-soft-fund" placeholder="Quỹ mềm" />
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label style="font-size:12px;">Thời gian chung</label>
                             <input type="text" class="form-control qa-date-range" placeholder="Thời gian chung" />
                         </div>
@@ -246,7 +246,11 @@ var hotelRoomFund = {
                             <label style="font-size:12px;">Ngày hết hạn</label>
                             <input type="text" class="form-control datepicker qa-expiry-date" placeholder="Ngày hết hạn" />
                         </div>
-                        <div class="col-md-3" style="padding-top:22px;">
+                        <div class="col-md-2">
+                            <label style="font-size:12px;">Trừ trước (ngày)</label>
+                            <input type="number" class="form-control qa-number" placeholder="Trừ trước (ngày)" min="0" />
+                        </div>
+                        <div class="col-md-2" style="padding-top:22px;">
                             <button type="button" class="btn btn-sm btn-info" onclick="hotelRoomFund.QuickAdd(this)">Áp dụng</button>
                         </div>
                     </div>
@@ -263,6 +267,8 @@ var hotelRoomFund = {
                     <div style="width:80px; flex:none;">Quỹ cứng</div>
                     <div style="width:80px; flex:none;">Quỹ mềm</div>
                     <div style="width:120px; flex:none;">Ngày hết hạn</div>
+                    <div style="width:100px; flex:none;">Trừ trước (ngày)</div>
+                    <div style="width:120px; flex:none;">Ngày reset</div>
                     <div style="width:30px; flex:none;">Thao tác</div>
                 </div>
                 <div class="room-fund-details-list">
@@ -294,6 +300,7 @@ var hotelRoomFund = {
                 <input type="number" class="form-control sd-soft-fund" style="width: 90px;" placeholder="Quỹ mềm" />
                 <input type="text" class="form-control sd-date-range" style="width: 220px;" placeholder="Thời gian" />
                 <input type="text" class="form-control sd-expiry-date" style="width: 120px;" placeholder="Ngày hết hạn" />
+                <input type="number" class="form-control sd-number" style="width: 100px;" placeholder="Trừ trước (ngày)" min="0" />
                 <i class="fa fa-trash text-danger" style="cursor:pointer" onclick="$(this).parent().remove()"></i>
             </div>
         `;
@@ -324,6 +331,7 @@ var hotelRoomFund = {
         var amount = hardFund + softFund;
         var dateRange = group.find('.qa-date-range').val();
         var expiryDate = group.find('.qa-expiry-date').val();
+        var number = parseInt(group.find('.qa-number').val()) || 0;
 
         if ((!hardFund && !softFund) || !dateRange) {
             _msgalert.error("Vui lòng nhập Quỹ cứng/Quỹ mềm và thời gian chung");
@@ -359,6 +367,7 @@ var hotelRoomFund = {
             var sdSoft = parseFloat($(this).find('.sd-soft-fund').val()) || 0;
             var sdRange = $(this).find('.sd-date-range').val();
             var sdExpiry = $(this).find('.sd-expiry-date').val();
+            var sdNumber = parseInt($(this).find('.sd-number').val()) || 0;
             if ((sdHard || sdSoft) && sdRange) {
                 var sdStart = moment(sdRange.split(' - ')[0], 'DD/MM/YYYY');
                 var sdEnd = moment(sdRange.split(' - ')[1], 'DD/MM/YYYY');
@@ -384,6 +393,7 @@ var hotelRoomFund = {
                     softFund: sdSoft,
                     amount: sdHard + sdSoft,
                     expiryDate: sdExpiry,
+                    number: sdNumber,
                     start: sdStart,
                     end: sdEnd
                 });
@@ -405,6 +415,7 @@ var hotelRoomFund = {
                     hardFund: hardFund,
                     softFund: softFund,
                     expiryDate: expiryDate,
+                    number: number,
                     start: currentStart.clone(),
                     end: sd.start.clone()
                 });
@@ -414,6 +425,7 @@ var hotelRoomFund = {
                 hardFund: sd.hardFund,
                 softFund: sd.softFund,
                 expiryDate: sd.expiryDate || expiryDate,
+                number: sd.number,
                 start: sd.start.clone(),
                 end: sd.end.clone()
             });
@@ -426,6 +438,7 @@ var hotelRoomFund = {
                 hardFund: hardFund,
                 softFund: softFund,
                 expiryDate: expiryDate,
+                number: number,
                 start: currentStart.clone(),
                 end: endGeneral.clone()
             });
@@ -436,6 +449,13 @@ var hotelRoomFund = {
         // detailsList.empty(); // Bỏ dòng này để QuickAdd luôn thêm dòng mới, không xóa dòng cũ
 
         for (var range of finalRanges) {
+            var resetDateStr = '';
+            if (range.expiryDate) {
+                var expDate = moment(range.expiryDate, 'DD/MM/YYYY');
+                if (expDate.isValid()) {
+                    resetDateStr = expDate.clone().subtract(range.number, 'days').format('DD/MM/YYYY');
+                }
+            }
             var rowHtml = `
                 <div class="detail-row">
                     <input type="hidden" name="HotelRoomId" value="${roomTypeId}" />
@@ -445,6 +465,8 @@ var hotelRoomFund = {
                     <input type="number" class="form-control" name="HardFundRoom" value="${range.hardFund}" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />
                     <input type="number" class="form-control" name="SoftFundRoom" value="${range.softFund}" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />
                     <input type="text" class="form-control datepicker" name="ExpiredDate" value="${range.expiryDate}" style="width:120px; flex:none;" />
+                    <input type="number" class="form-control" name="Number" value="${range.number}" style="width:100px; flex:none;" min="0" oninput="hotelRoomFund.CalcResetDate(this)" />
+                    <input type="text" class="form-control" name="ResetDate" value="${resetDateStr}" readonly style="width:120px; flex:none; background:#f5f5f5;" />
                     <button type="button" class="btn btn-xs btn-danger remove-detail-btn" style="width:30px; flex:none;" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>
                 </div>
             `;
@@ -459,6 +481,7 @@ var hotelRoomFund = {
             if (hotelRoomFund.CheckOverlap(roomTypeId)) {
                 _msgalert.error("Thời gian bạn vừa chọn bị chồng lấn với các khoảng thời gian khác của hạng phòng này.");
             }
+            hotelRoomFund.CalcResetDate(this);
         });
 
         _msgalert.success("Đã áp dụng và chia ngày tự động thành công");
@@ -468,6 +491,13 @@ var hotelRoomFund = {
         var detailsList = group.find('.room-fund-details-list');
         for (var i = 0; i < details.length; i++) {
             var d = details[i];
+            var resetDateStr = '';
+            if (d.ExpiredDate) {
+                var expDate = moment(d.ExpiredDate, 'DD/MM/YYYY');
+                if (expDate.isValid()) {
+                    resetDateStr = expDate.clone().subtract(d.Number || 0, 'days').format('DD/MM/YYYY');
+                }
+            }
             var rowHtml = '<div class="detail-row">' +
                 '<input type="hidden" name="HotelRoomId" value="' + roomTypeId + '" />' +
                 '<input type="number" class="form-control" name="NumberOfRooms" value="' + ((parseFloat(d.HardFundRoom) || 0) + (parseFloat(d.SoftFundRoom) || 0)) + '" style="width:80px; flex:none; background:#f5f5f5;" readonly />' +
@@ -476,6 +506,8 @@ var hotelRoomFund = {
                 '<input type="number" class="form-control" name="HardFundRoom" value="' + (d.HardFundRoom || '') + '" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />' +
                 '<input type="number" class="form-control" name="SoftFundRoom" value="' + (d.SoftFundRoom || '') + '" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />' +
                 '<input type="text" class="form-control datepicker" name="ExpiredDate" value="' + (d.ExpiredDate || '') + '" style="width:120px; flex:none;" />' +
+                '<input type="number" class="form-control" name="Number" value="' + (d.Number || '0') + '" style="width:100px; flex:none;" min="0" oninput="hotelRoomFund.CalcResetDate(this)" />' +
+                '<input type="text" class="form-control" name="ResetDate" value="' + resetDateStr + '" readonly style="width:120px; flex:none; background:#f5f5f5;" />' +
                 '<button type="button" class="btn btn-xs btn-danger remove-detail-btn" style="width:30px; flex:none;" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>' +
                 '</div>';
             detailsList.append(rowHtml);
@@ -488,6 +520,7 @@ var hotelRoomFund = {
             if (hotelRoomFund.CheckOverlap(roomTypeId)) {
                 _msgalert.error("Thời gian bạn vừa chọn bị chồng lấn với các khoảng thời gian khác của hạng phòng này.");
             }
+            hotelRoomFund.CalcResetDate(this);
         });
     },
     ClearDetails: function () {
@@ -507,6 +540,8 @@ var hotelRoomFund = {
                 <input type="number" class="form-control" name="HardFundRoom" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />
                 <input type="number" class="form-control" name="SoftFundRoom" style="width:80px; flex:none;" oninput="hotelRoomFund.CalcNumberOfRooms(this)" />
                 <input type="text" class="form-control datepicker" name="ExpiredDate" style="width:120px; flex:none;" />
+                <input type="number" class="form-control" name="Number" value="0" style="width:100px; flex:none;" min="0" oninput="hotelRoomFund.CalcResetDate(this)" />
+                <input type="text" class="form-control" name="ResetDate" value="" readonly style="width:120px; flex:none; background:#f5f5f5;" />
                 <button type="button" class="btn btn-xs btn-danger remove-detail-btn" style="width:30px; flex:none;" onclick="hotelRoomFund.RemoveDetailRow(this)"><i class="fa fa-trash"></i></button>
             </div>
         `;
@@ -522,6 +557,7 @@ var hotelRoomFund = {
             if (hotelRoomFund.CheckOverlap(roomTypeId)) {
                 _msgalert.error("Thời gian bạn vừa chọn bị chồng lấn với các khoảng thời gian khác của hạng phòng này.");
             }
+            hotelRoomFund.CalcResetDate(this);
         });
     },
     RemoveDetailRow: function (btn) {
@@ -579,7 +615,8 @@ var hotelRoomFund = {
                     EndDateSTR: row.find('input[name="EndDate"]').val(),
                     HardFundRoom: row.find('input[name="HardFundRoom"]').val(),
                     SoftFundRoom: row.find('input[name="SoftFundRoom"]').val(),
-                    ExpiredDateSTR: row.find('input[name="ExpiredDate"]').val()
+                    ExpiredDateSTR: row.find('input[name="ExpiredDate"]').val(),
+                    Number: row.find('input[name="Number"]').val()
                 });
             });
         });
@@ -620,5 +657,21 @@ var hotelRoomFund = {
         var hard = parseFloat(row.find('input[name="HardFundRoom"]').val()) || 0;
         var soft = parseFloat(row.find('input[name="SoftFundRoom"]').val()) || 0;
         row.find('input[name="NumberOfRooms"]').val(hard + soft);
+    },
+    CalcResetDate: function (element) {
+        var row = $(element).closest('.detail-row');
+        var expiredDateStr = row.find('input[name="ExpiredDate"]').val();
+        var subtractDays = parseInt(row.find('input[name="Number"]').val()) || 0;
+        var resetDateInput = row.find('input[name="ResetDate"]');
+        
+        if (expiredDateStr) {
+            var expiredDate = moment(expiredDateStr, 'DD/MM/YYYY');
+            if (expiredDate.isValid()) {
+                var resetDate = expiredDate.clone().subtract(subtractDays, 'days');
+                resetDateInput.val(resetDate.format('DD/MM/YYYY'));
+                return;
+            }
+        }
+        resetDateInput.val('');
     }
 };

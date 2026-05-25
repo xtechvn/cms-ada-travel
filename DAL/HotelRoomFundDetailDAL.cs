@@ -28,7 +28,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[8];
+                SqlParameter[] objParam = new SqlParameter[9];
 
                 objParam[0] = new SqlParameter("@HotelRoomFundId", Model.HotelRoomFundId);
                 objParam[1] = new SqlParameter("@HotelRoomId", Model.HotelRoomId);
@@ -38,6 +38,7 @@ namespace DAL
                 objParam[5] = new SqlParameter("@HardFundRoom", Model.HardFundRoom);
                 objParam[6] = new SqlParameter("@SoftFundRoom", Model.SoftFundRoom);
                 objParam[7] = new SqlParameter("@ExpiredDate", Model.ExpiredDate);
+                objParam[8] = new SqlParameter("@Number", Model.Number);
 
 
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_InsertHotelRoomFundDetail, objParam);
@@ -53,7 +54,7 @@ namespace DAL
             try
             {
 
-                SqlParameter[] objParam = new SqlParameter[9];
+                SqlParameter[] objParam = new SqlParameter[10];
 
                 objParam[0] = new SqlParameter("@Id", Model.Id);
                 objParam[1] = new SqlParameter("@HotelRoomFundId", Model.HotelRoomFundId);
@@ -64,6 +65,7 @@ namespace DAL
                 objParam[6] = new SqlParameter("@HardFundRoom", Model.HardFundRoom);
                 objParam[7] = new SqlParameter("@SoftFundRoom", Model.SoftFundRoom);
                 objParam[8] = new SqlParameter("@ExpiredDate", Model.ExpiredDate);
+                objParam[9] = new SqlParameter("@Number", Model.Number);
                 return _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpdateHotelRoomFundDetail, objParam);
             }
             catch (Exception ex)
