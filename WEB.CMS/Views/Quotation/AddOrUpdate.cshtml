@@ -1,0 +1,262 @@
+@using Entities.ViewModels.Mongo
+@model QuotationMongoModel
+
+@{
+    ViewData["Title"] = string.IsNullOrEmpty(Model._id) ? "Tạo báo giá mới" : "Chỉnh sửa báo giá: " + Model.QuotationNo;
+}
+
+<style>
+    .card-service {
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        background-color: #ffffff;
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+    .card-service-header {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: justify;
+    }
+    .card-service-body {
+        padding: 20px;
+    }
+    .service-title {
+        font-weight: 700;
+        font-size: 16px;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    .service-title i {
+        margin-right: 8px;
+        color: #3b82f6;
+    }
+    .btn-delete-service {
+        color: #ef4444;
+        background: transparent;
+        border: none;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+    .btn-delete-service:hover {
+        background-color: #fef2f2;
+    }
+    .subtable-header {
+        background-color: #f1f5f9;
+        font-weight: 600;
+        font-size: 13px;
+        color: #475569;
+    }
+    .totals-sidebar {
+        position: sticky;
+        top: 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background-color: #ffffff;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        padding: 24px;
+    }
+    .sidebar-section-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        text-transform: uppercase;
+        border-bottom: 2px solid #3b82f6;
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+    }
+    .financial-row {
+        display: flex;
+        justify-content: justify;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    .financial-label {
+        color: #475569;
+        font-size: 14px;
+    }
+    .financial-value {
+        font-weight: 700;
+        font-size: 16px;
+        color: #0f172a;
+    }
+    .financial-input {
+        width: 120px;
+        text-align: right;
+        font-weight: bold;
+    }
+    .profit-positive {
+        color: #16a34a !important;
+    }
+    .profit-negative {
+        color: #dc2626 !important;
+    }
+    .form-section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #64748b;
+        margin-bottom: 10px;
+        margin-top: 15px;
+    }
+    .form-section-title:first-child {
+        margin-top: 0;
+    }
+    .btn-outline-secondary{
+        color: #fff !important;
+        background-color: #28a745 !important;
+        border-color: #28a745 !important;
+    }
+</style>
+
+<section class="main-container">
+    <div class="row-main container">
+        <form id="frm_quotation" autocomplete="off">
+            <input type="hidden" id="hd_quotation_id" value="@Model._id" />
+            <input type="hidden" id="hd_quotation_status" value="@Model.Status" />
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a href="/Quotation/Index" class="text-secondary font-weight-bold mr-2">
+                        <i class="fa fa-arrow-left"></i> Quay lại
+                    </a>
+                    <h2 class="title_page d-inline-block">
+                        @(string.IsNullOrEmpty(Model._id) ? "Tạo báo giá mới" : "Chỉnh sửa báo giá " + Model.QuotationNo)
+                    </h2>
+                </div>
+                <div>
+                  <button type="button" class="btn btn-success mr-2" id="btn_save" onclick="_quotation.Save()">
+                        <i class="fa fa-save mr-1"></i> Lưu 
+                    </button>
+                    <button type="button" class="btn btn-secondary mr-2" id="btn_save_draft" onclick="_quotation.Save()">
+                        <i class="fa fa-save mr-1"></i> Lưu nháp
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btn_save_publish">
+                        <i class="fa fa-paper-plane mr-1"></i> Gửi báo giá
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Cột trái: Danh sách các khối dịch vụ động -->
+                <div class="col-md-9">
+                    <div class="d-flex align-items-center justify-content-between mb-3 bg-light p-3 rounded" style="border: 1px solid #cbd5e1;">
+                        <h4 class="m-0 font-weight-bold text-dark"><i class="fa fa-list mr-1"></i> Danh sách dịch vụ</h4>
+                        
+                        <!-- Dropdown Thêm dịch vụ -->
+                        <div class="dropdown" id="dd_add_service_wrap">
+                            <button class="btn btn-success font-weight-bold" type="button" id="dd_add_service" onclick="_quotation.ToggleServiceMenu(event)">
+                                <i class="fa fa-plus-circle mr-1"></i> Thêm dịch vụ <i class="fa fa-caret-down ml-1"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right shadow" id="dd_service_menu" style="display:none; min-width:200px; z-index:9999;">
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(1)">🏨 KHÁCH SẠN</a>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(2)">✈️ VÉ MÁY BAY</a>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(3)">🗺️ TOUR DU LỊCH</a>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(5)">🎪 VINWONDER</a>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(4)">⚙️ DỊCH VỤ KHÁC</a>
+                            </div>
+                        </div>
+                        <style>
+                            #dd_service_menu .dropdown-item {
+                                font-weight: 600;
+                                font-size: 14px;
+                                color: #1e293b !important;
+                                padding: 10px 16px;
+                            }
+                            #dd_service_menu .dropdown-item:hover {
+                                background-color: #f0f7ff;
+                                color: #2563eb !important;
+                            }
+                        </style>
+                    </div>
+
+                    <!-- Khay chứa các block dịch vụ -->
+                    <div id="services_container">
+                        <!-- RENDER DỰA TRÊN DỮ LIỆU CŨ KHI SỬA (SẼ ĐƯỢC LOAD QUA FOREACH RAZOR HOẶC JAVASCRIPT TRONG INIT) -->
+                    </div>
+                </div>
+
+                <!-- Cột phải: Bảng tổng hợp tài chính và trạng thái -->
+                <div class="col-md-3">
+                    <div class="totals-sidebar">
+                        <div class="sidebar-section-title">Tổng hợp báo giá</div>
+                        
+                        <div class="financial-row mb-3">
+                            <span class="financial-label">Tổng tiền nhập: </span>
+                            <span class="financial-value text-dark" id="lbl_total_import">0 đ</span>
+                        </div>
+                        
+                        <div class="financial-row mb-3">
+                            <span class="financial-label font-weight-bold">Tổng tiền bán: </span>
+                            <span class="financial-value text-primary font-weight-bold" id="lbl_total_export">0 đ</span>
+                        </div>
+                        
+                        <hr class="my-2" />
+                        
+                        <div class="form-group mb-2">
+                            <label class="small font-weight-bold text-muted mb-1">Chi phí khác</label>
+                            <input type="text" class="form-control text-right currency-input financial-calc" id="ip_other_fees" value="@Model.OtherFees.ToString("N0")" />
+                        </div>
+                        
+                        <div class="form-group mb-2">
+                            <label class="small font-weight-bold text-muted mb-1">Hoa hồng CTV</label>
+                            <input type="text" class="form-control text-right currency-input financial-calc" id="ip_collaborator_comm" value="@Model.CollaboratorComm.ToString("N0")" />
+                        </div>
+
+                        <hr class="my-2" />
+                        
+                        <div class="financial-row mb-4">
+                            <span class="financial-label font-weight-bold">Tổng lợi nhuận</span>
+                            <span class="financial-value font-weight-bold profit-positive" id="lbl_total_profit">0 đ</span>
+                        </div>
+
+                        <!-- Panel Trạng thái -->
+                        <div class="sidebar-section-title">Trạng thái</div>
+                        <div class="mb-4">
+                            <span id="badge_status" class="status-badge status-draft font-weight-bold py-2 px-3 text-center d-block">
+                                @(Model.Status == 0 ? "Nháp" : Model.Status == 1 ? "Đã gửi báo giá" : "Khách chốt")
+                            </span>
+                            <span class="text-muted small d-block text-center mt-2" id="lbl_status_desc">
+                                @(Model.Status == 0 ? "Báo giá đang soạn thảo chưa gửi khách" : Model.Status == 1 ? "Đã gửi thông tin báo giá cho khách" : "Khách hàng đồng ý chốt giá")
+                            </span>
+                        </div>
+
+                        <!-- Ghi chú khách hàng -->
+                        <div class="sidebar-section-title">Ghi chú khách hàng</div>
+                        <div class="form-group mb-0">
+                            <textarea class="form-control" id="txt_client_note" rows="4" maxlength="500" placeholder="Nhập ghi chú hiển thị với khách hàng...">@Model.Note</textarea>
+                            <div class="text-right small text-muted mt-1" id="lbl_char_count">0/500</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- THƯ VIỆN CHỨA CÁC ĐỊNH DẠNG HTML HTML_TEMPLATES DÀNH CHO DỊCH VỤ (JS SẼ CLONE VÀ CHÈN) -->
+@await Html.PartialAsync("~/Views/Quotation/_ServiceTemplates.cshtml")
+
+@section scripts {
+    <script src="~/modules/quotation.js" asp-append-version="true"></script>
+    <script src="~/modules/order_detail_html.js" asp-append-version="true"></script>
+    <script src="~/lib/moment/moment.min.js"></script>
+    <script src="~/lib/daterangepicker/daterangepicker.js"></script>
+    <link rel="stylesheet" href="~/lib/daterangepicker/daterangepicker.css" />
+    <script>
+        $(document).ready(function () {
+            // Khởi tạo và nạp dữ liệu từ Model C# hiện tại vào javascript
+            var initialModel = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+            _quotation.InitAddOrUpdate(initialModel);
+        });
+    </script>
+}

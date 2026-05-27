@@ -1,0 +1,107 @@
+@using Entities.ViewModels
+@using Entities.ViewModels.Mongo
+@model GenericViewModel<QuotationMongoModel>
+
+<div class="table-responsive bg_white">
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr class="bg-light">
+                <th style="width: 50px;" class="text-center">STT</th>
+                <th>Mã báo giá</th>
+                <th>Ngày tạo</th>
+               
+                <th>Người phụ trách</th>
+                <th class="text-right">Tổng tiền bán</th>
+                <th class="text-right">Lợi nhuận</th>
+                <th class="text-center">Trạng thái</th>
+                <th>Ghi chú</th>
+                <th style="width: 180px;" class="text-center">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.ListData != null && Model.ListData.Any())
+            {
+                int stt = (Model.CurrentPage - 1) * Model.PageSize;
+                foreach (var item in Model.ListData)
+                {
+                    stt++;
+                    <tr>
+                        <td class="text-center font-weight-bold">@stt</td>
+                        <td>
+                            <a href="/Quotation/AddOrUpdate?id=@item._id" class="font-weight-bold text-primary">
+                                @item.QuotationNo
+                            </a>
+                        </td>
+                        <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    
+                        <td>@item.SalerName</td>
+                        <td class="text-right font-weight-bold text-dark">@item.TotalPrice.ToString("N0") đ</td>
+                        <td class="text-right font-weight-bold text-success">@item.TotalProfit.ToString("N0") đ</td>
+                        <td class="text-center">
+                            @if (item.Status == 0)
+                            {
+                                <span class="status-badge status-draft">Nháp</span>
+                            }
+                            else if (item.Status == 1)
+                            {
+                                <span class="status-badge status-sent">Đã gửi báo giá</span>
+                            }
+                            else if (item.Status == 2)
+                            {
+                                <span class="status-badge status-won">Khách chốt</span>
+                            }
+                        </td>
+                        <td class="text-truncate" style="max-width: 200px;" title="@item.Note">@item.Note</td>
+                        <td class="text-center">
+                            <!-- Các thao tác tác vụ -->
+                            <a class="btn btn-sm btn-info mr-1" href="/Quotation/AddOrUpdate?id=@item._id" title="Xem chi tiết">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a class="btn btn-sm btn-primary mr-1" href="/Quotation/AddOrUpdate?id=@item._id" title="Chỉnh sửa">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            
+                            @if (item.Status == 0)
+                            {
+                                <button class="btn btn-sm btn-success mr-1" onclick="_quotation.ChangeStatus('@item._id', 1)" title="Gửi báo giá">
+                                    <i class="fa fa-paper-plane"></i>
+                                </button>
+                            }
+                            else if (item.Status == 1)
+                            {
+                                <button class="btn btn-sm btn-success mr-1" onclick="_quotation.ChangeStatus('@item._id', 2)" title="Khách chốt">
+                                    <i class="fa fa-check"></i>
+                                </button>
+                            }
+
+                            <button class="btn btn-sm btn-danger" onclick="_quotation.Delete('@item._id')" title="Xóa">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center text-muted p-4">Không có báo giá nào thỏa mãn điều kiện tìm kiếm.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Nạp cấu phần phân trang PagingNew có sẵn của CMS -->
+
+
+<!-- Cập nhật số liệu các Card thống kê ở Index -->
+@if (ViewBag.StatusCounts != null && ViewBag.StatusCounts.Count > 0)
+{
+    var counts = (Dictionary<int, long>)ViewBag.StatusCounts;
+    <script>
+        $('#stat_total').text('@counts[-1].ToString("N0")');
+        $('#stat_draft').text('@counts[0].ToString("N0")');
+        $('#stat_sent').text('@counts[1].ToString("N0")');
+        $('#stat_won').text('@counts[2].ToString("N0")');
+    </script>
+}

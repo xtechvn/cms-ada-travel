@@ -1,0 +1,490 @@
+@using Entities.Models
+@{
+    var otherServiceTypes = ViewBag.OtherServiceTypes as List<AllCode> ?? new List<AllCode>();
+}
+@* ================================================================
+   HIDDEN SERVICE BLOCK TEMPLATES
+   JS sẽ clone các template này khi user chọn "+ Thêm dịch vụ"
+   ================================================================ *@
+
+<div id="service-templates" style="display:none;">
+
+    @* ====== TEMPLATE 1: KHÁCH SẠN ====== *@
+    <div id="tpl-hotel">
+        <div class="card-service service-block" data-type="1">
+            <div class="card-service-header d-flex align-items-center justify-content-between">
+                <span class="service-title"><i class="fa fa-building"></i>&nbsp;🏨 KHÁCH SẠN</span>
+                <button type="button" class="btn-delete-service" onclick="_quotation.RemoveServiceBlock(this)">
+                    <i class="fa fa-trash-o"></i> Xóa dịch vụ này
+                </button>
+            </div>
+            <div class="card-service-body">
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label class="form-section-title">Tên khách sạn <sup class="text-danger">*</sup></label>
+                        <select class="form-control hotel-name" style="width:100% !important">
+                            <option value="">-- Chọn khách sạn --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Check-in <sup class="text-danger">*</sup></label>
+                        <input type="text" class="form-control datepicker hotel-checkin" placeholder="dd/mm/yyyy" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Check-out <sup class="text-danger">*</sup></label>
+                        <input type="text" class="form-control datepicker hotel-checkout" placeholder="dd/mm/yyyy" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Số phòng</label>
+                        <input type="number" class="form-control hotel-rooms-count" placeholder="0" min="0" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Số đêm</label>
+                        <input type="number" class="form-control hotel-nights-count" placeholder="0" min="0" readonly style="background:#f8fafc;" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Chi phí khác</label>
+                        <input type="text" class="form-control currency hotel-other-fees" placeholder="0" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Hoa hồng CTV</label>
+                        <input type="text" class="form-control currency hotel-commission" placeholder="0" />
+                    </div>
+                </div>
+
+                <label class="form-section-title mt-3 d-block">Bảng kê dịch vụ phòng <small class="text-muted">(Đơn giá đã bao gồm thuế phí + Phí dịch vụ Adavigo)</small></label>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered hotel-rooms-table">
+                        <thead class="subtable-header">
+                            <tr>
+                                <th style="width:40px">STT</th>
+                                <th style="min-width:140px">Hạng phòng <sup class="text-danger">*</sup></th>
+                                <th style="min-width:140px">Gói <sup class="text-danger">*</sup></th>
+                                <th style="min-width:160px">Thời gian sử dụng <sup class="text-danger">*</sup></th>
+                                <th style="width:120px">Giá nhập <sup class="text-danger">*</sup></th>
+                                <th style="width:120px">Giá bán <sup class="text-danger">*</sup></th>
+                                <th style="width:60px">Số đêm</th>
+                                <th style="width:80px">SL phòng <sup class="text-danger">*</sup></th>
+                                <th style="width:120px">Tổng tiền nhập</th>
+                                <th style="width:120px">Tổng tiền bán</th>
+                                <th style="width:100px">Lợi nhuận</th>
+                                <th style="width:60px">Tác vụ</th>
+                            </tr>
+                        </thead>
+                        <tbody class="hotel-room-group" data-room-index="1">
+                            <tr class="hotel-package-row">
+                                <td class="hotel-room-stt align-middle room-rowspan" rowspan="1">1</td>
+                                <td class="align-middle room-rowspan" rowspan="1">
+                                    <input type="text" class="form-control form-control-sm room-type-name" placeholder="Nhập hạng phòng" />
+                                </td>
+                                <td class="hotel-room-packages-td">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <a href="javascript:;" class="text-danger mr-1 hotel-pkg-delete" title="Xóa gói" onclick="_quotation.RemoveHotelPackage(this)"><i class="fa fa-trash-o"></i></a>
+                                        <a href="javascript:;" class="text-success mr-1 hotel-pkg-add" title="Thêm gói" onclick="_quotation.AddHotelPackage(this)"><i class="fa fa-plus-circle"></i></a>
+                                        <input type="text" class="form-control form-control-sm hotel-pkg-name" placeholder="Nhập tên gói" />
+                                    </div>
+                                </td>
+                                <td class="hotel-room-daterange-td">
+                                    <input type="text" class="form-control form-control-sm hotel-pkg-daterange datepicker" placeholder="dd/mm/yyyy - dd/mm/yyyy" />
+                                </td>
+                                <td class="hotel-room-import-td">
+                                    <input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" />
+                                </td>
+                                <td class="hotel-room-export-td">
+                                    <input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" />
+                                </td>
+                                <td class="hotel-room-nights-td align-middle">
+                                    <input type="number" class="form-control form-control-sm hotel-nights-row calc-trigger" value="0" readonly style="background:#f5f5f5;" />
+                                </td>
+                                <td class="align-middle room-rowspan" rowspan="1">
+                                    <input type="number" class="form-control form-control-sm room-count calc-trigger" placeholder="1" min="0" value="1" />
+                                </td>
+                                <td class="align-middle"><div class="form-control form-control-sm text-right bg-light border-0 px-2" style="width:100%"><span class="total-import font-weight-bold text-muted">0</span></div></td>
+                                <td class="align-middle"><div class="form-control form-control-sm text-right bg-light border-0 px-2" style="width:100%"><span class="total-export font-weight-bold text-primary">0</span></div></td>
+                                <td class="align-middle"><div class="form-control form-control-sm text-right bg-light border-0 px-2" style="width:100%"><span class="total-profit font-weight-bold text-success">0</span></div></td>
+                                <td class="align-middle text-center room-rowspan" rowspan="1">
+                                    <a href="javascript:;" class="text-info mr-1 hotel-room-clone" title="Nhân bản" onclick="_quotation.CloneHotelRoom(this)"><i class="fa fa-files-o"></i></a>
+                                    <a href="javascript:;" class="text-danger hotel-room-delete" title="Xóa phòng" onclick="_quotation.RemoveHotelRoom(this)"><i class="fa fa-trash-o"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="8" class="text-left">
+                                    <a href="javascript:;" class="btn btn-sm btn-outline-primary hotel-add-room-btn">
+                                        <i class="fa fa-plus-circle"></i> Thêm phòng
+                                    </a>
+                                </td>
+                                <td class="text-right font-weight-bold text-muted hotel-total-import">0</td>
+                                <td class="text-right font-weight-bold text-primary hotel-total-export">0</td>
+                                <td class="text-right font-weight-bold hotel-total-profit">0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ====== TEMPLATE 2: VÉ MÁY BAY ====== *@
+    @* ====== TEMPLATE 2: VÉ MÁY BAY ====== *@
+    @* Cơ chế: giống AddFlyBookingService + AddFlyBookingServiceExtraPackages
+       - Chọn hành trình (1 chiều / khứ hồi), điểm đi/đến (select2 airport codes)
+       - Bảng kê: Loại giá (NL/TE/EB), số lượng, giá nhập, giá bán, thành tiền, lợi nhuận
+       - Chi phí khác + Hoa hồng CTV *@
+    <div id="tpl-flight">
+        <div class="card-service service-block" data-type="2">
+            <div class="card-service-header d-flex align-items-center justify-content-between">
+                <span class="service-title"><i class="fa fa-plane"></i>&nbsp;✈️ VÉ MÁY BAY</span>
+                <button type="button" class="btn-delete-service" onclick="_quotation.RemoveServiceBlock(this)">
+                    <i class="fa fa-trash-o"></i> Xóa dịch vụ này
+                </button>
+            </div>
+            <div class="card-service-body">
+                <div class="row">
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Hành trình <sup class="text-danger">*</sup></label>
+                        <select class="form-control flight-route-type">
+                            <option value="1">Một chiều</option>
+                            <option value="2">Khứ hồi</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Điểm đi <sup class="text-danger">*</sup></label>
+                        <select class="form-control flight-start-point" style="width:100% !important">
+                            <option value="">-- Chọn điểm đi --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Điểm đến <sup class="text-danger">*</sup></label>
+                        <select class="form-control flight-end-point" style="width:100% !important">
+                            <option value="">-- Chọn điểm đến --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Hãng bay</label>
+                        <input type="text" class="form-control flight-airline" placeholder="Vietnam Airlines" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Mã chuyến bay</label>
+                        <input type="text" class="form-control flight-code" placeholder="VN247" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Ngày đi <sup class="text-danger">*</sup></label>
+                        <input type="text" class="form-control datepicker flight-departure-date" placeholder="dd/mm/yyyy" />
+                    </div>
+                    <div class="col-md-2 form-group flight-return-date-wrap">
+                        <label class="form-section-title">Ngày về</label>
+                        <input type="text" class="form-control datepicker flight-return-date" placeholder="dd/mm/yyyy" />
+                    </div>
+                    <div class="col-md-1 form-group">
+                        <label class="form-section-title">Người lớn</label>
+                        <input type="number" class="form-control flight-adults" placeholder="0" min="0" />
+                    </div>
+                    <div class="col-md-1 form-group">
+                        <label class="form-section-title">Trẻ em</label>
+                        <input type="number" class="form-control flight-children" placeholder="0" min="0" />
+                    </div>
+                    <div class="col-md-1 form-group">
+                        <label class="form-section-title">Em bé</label>
+                        <input type="number" class="form-control flight-infants" placeholder="0" min="0" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Chi phí khác</label>
+                        <input type="text" class="form-control currency flight-other-fees" placeholder="0" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Hoa hồng CTV</label>
+                        <input type="text" class="form-control currency flight-commission" placeholder="0" />
+                    </div>
+                </div>
+
+                <label class="form-section-title mt-3 d-block">Bảng kê dịch vụ <small class="text-muted">(Đơn giá đã bao gồm thuế phí + Phí dịch vụ Adavigo)</small></label>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered flight-tickets-table">
+                        <thead class="subtable-header">
+                            <tr>
+                                <th>Loại giá / Hạng vé</th>
+                                <th style="width:80px">Số lượng</th>
+                                <th style="width:130px">Giá nhập/vé <sup class="text-danger">*</sup></th>
+                                <th style="width:130px">Giá bán/vé <sup class="text-danger">*</sup></th>
+                                <th style="width:120px">Thành tiền nhập</th>
+                                <th style="width:120px">Thành tiền bán</th>
+                                <th style="width:100px">Lợi nhuận</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="flight-tickets-body">
+                            <tr class="flight-ticket-row">
+                                <td>
+                                    <select class="form-control form-control-sm ticket-class">
+                                        <option value="adt_amount">Người lớn</option>
+                                        <option value="chd_amount">Trẻ em (2-14 tuổi)</option>
+                                        <option value="inf_amount">Em bé (0-2 tuổi)</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" class="form-control form-control-sm ticket-qty calc-trigger" placeholder="0" min="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
+                                <td><span class="total-import font-weight-bold text-muted">0</span></td>
+                                <td><span class="total-export font-weight-bold text-primary">0</span></td>
+                                <td><span class="total-profit font-weight-bold text-success">0</span></td>
+                                <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="_quotation.AddFlightTicketRow(this)">
+                    <i class="fa fa-plus"></i> Thêm dòng vé
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @* ====== TEMPLATE 3: TOUR DU LỊCH ====== *@
+    @* Cơ chế: giống AddTourService + AddTourServicePackages
+       - Tên tour (select2 ajax), loại tour, hình thức tổ chức, điểm đi/đến (select2 province)
+       - Bảng kê: NL/TE/EB (số lượng, giá nhập, giá bán, lợi nhuận) + dịch vụ khác
+       - Chi phí khác + Hoa hồng CTV + Quỹ CSKH *@
+    <div id="tpl-tour">
+        <div class="card-service service-block" data-type="3">
+            <div class="card-service-header d-flex align-items-center justify-content-between">
+                <span class="service-title"><i class="fa fa-map-marker"></i>&nbsp;🗺️ TOUR DU LỊCH</span>
+                <button type="button" class="btn-delete-service" onclick="_quotation.RemoveServiceBlock(this)">
+                    <i class="fa fa-trash-o"></i> Xóa dịch vụ này
+                </button>
+            </div>
+            <div class="card-service-body">
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label class="form-section-title">Tên tour <sup class="text-danger">*</sup></label>
+                        <select class="form-control tour-name" style="width:100% !important"></select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Loại tour <sup class="text-danger">*</sup></label>
+                        <select class="form-control tour-type">
+                            <option value="1">Nội địa</option>
+                            <option value="2">Inbound</option>
+                            <option value="3">Outbound</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Hình thức tổ chức</label>
+                        <select class="form-control tour-organizing-type">
+                            <option value="0">Tự tổ chức</option>
+                            <option value="1">Mua lại</option>
+                            <option value="2">Liên kết</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Điểm đi <sup class="text-danger">*</sup></label>
+                        <select class="form-control tour-start-point" style="width:100% !important">
+                            <option value="">-- Chọn điểm đi --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Điểm đến</label>
+                        <select class="form-control tour-end-point" style="width:100% !important">
+                            <option value="">-- Chọn điểm đến --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Ngày bắt đầu <sup class="text-danger">*</sup></label>
+                        <input type="text" class="form-control datepicker tour-start-date" placeholder="dd/mm/yyyy" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Ngày kết thúc <sup class="text-danger">*</sup></label>
+                        <input type="text" class="form-control datepicker tour-end-date" placeholder="dd/mm/yyyy" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Chi phí khác</label>
+                        <input type="text" class="form-control currency tour-other-fees" placeholder="0" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Hoa hồng CTV</label>
+                        <input type="text" class="form-control currency tour-commission" placeholder="0" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Quỹ CSKH</label>
+                        <input type="text" class="form-control currency tour-customer-care-fund" placeholder="0" />
+                    </div>
+                </div>
+
+                <label class="form-section-title mt-3 d-block">Bảng kê dịch vụ</label>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered tour-packages-table">
+                        <thead class="subtable-header">
+                            <tr>
+                                <th>Nội dung</th>
+                                <th style="width:80px">Số lượng</th>
+                                <th style="width:130px">Tổng tiền nhập</th>
+                                <th style="width:130px">Tổng tiền bán</th>
+                                <th style="width:100px">Lợi nhuận</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="tour-packages-body">
+                            <tr class="tour-package-row">
+                                <td>
+                                    <select class="form-control form-control-sm tour-include">
+                                        <option value="adt_amount">Người lớn</option>
+                                        <option value="chd_amount">Trẻ em (2-14 tuổi)</option>
+                                        <option value="inf_amount">Em bé (0-2 tuổi)</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" class="form-control form-control-sm tour-qty calc-trigger" placeholder="0" min="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
+                                <td><span class="total-profit font-weight-bold text-success">0</span></td>
+                                <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="_quotation.AddTourPackageRow(this)">
+                    <i class="fa fa-plus"></i> Thêm dịch vụ khác
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @* ====== TEMPLATE 4: DỊCH VỤ KHÁC ====== *@
+    <div id="tpl-other">
+        <div class="card-service service-block" data-type="4">
+            <div class="card-service-header d-flex align-items-center justify-content-between">
+                <span class="service-title"><i class="fa fa-cogs"></i>&nbsp;⚙️ DỊCH VỤ KHÁC</span>
+                <button type="button" class="btn-delete-service" onclick="_quotation.RemoveServiceBlock(this)">
+                    <i class="fa fa-trash-o"></i> Xóa dịch vụ này
+                </button>
+            </div>
+            <div class="card-service-body">
+                <div class="row mb-3">
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Loại dịch vụ <sup class="text-danger">*</sup></label>
+                        <select class="form-control other-service-type" style="width:100% !important">
+                            <option value="">-- Chọn loại dịch vụ --</option>
+                            @foreach (var item in otherServiceTypes)
+                            {
+                                <option value="@item.CodeValue">@item.Description</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Ngày bắt đầu</label>
+                        <input type="text" class="form-control datepicker other-from-date" placeholder="dd/mm/yyyy" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Ngày kết thúc</label>
+                        <input type="text" class="form-control datepicker other-to-date" placeholder="dd/mm/yyyy" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Chi phí khác</label>
+                        <input type="text" class="form-control currency other-other-fees" placeholder="0" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Hoa hồng CTV</label>
+                        <input type="text" class="form-control currency other-commission" placeholder="0" />
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered other-services-table">
+                        <thead class="subtable-header">
+                            <tr>
+                                <th>Nội dung</th>
+                                <th style="width:80px">Số lượng</th>
+                                <th style="width:130px">Đơn giá nhập <sup class="text-danger">*</sup></th>
+                                <th style="width:130px">Đơn giá bán <sup class="text-danger">*</sup></th>
+                                <th style="width:120px">Thành tiền nhập</th>
+                                <th style="width:120px">Thành tiền bán</th>
+                                <th style="width:100px">Lợi nhuận</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="other-services-body">
+                            <tr class="other-service-row">
+                                <td><input type="text" class="form-control form-control-sm other-content" placeholder="Xe 7 chỗ" /></td>
+                                <td><input type="number" class="form-control form-control-sm other-qty calc-trigger" placeholder="0" min="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
+                                <td><span class="total-import font-weight-bold text-muted">0</span></td>
+                                <td><span class="total-export font-weight-bold text-primary">0</span></td>
+                                <td><span class="total-profit font-weight-bold text-success">0</span></td>
+                                <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="_quotation.AddOtherServiceRow(this)">
+                    <i class="fa fa-plus"></i> Thêm dòng dịch vụ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @* ====== TEMPLATE 5: VINWONDER ====== *@
+    <div id="tpl-vinwonder">
+        <div class="card-service service-block" data-type="5">
+            <div class="card-service-header d-flex align-items-center justify-content-between">
+                <span class="service-title"><i class="fa fa-ticket"></i>&nbsp;🎪 VINWONDER</span>
+                <button type="button" class="btn-delete-service" onclick="_quotation.RemoveServiceBlock(this)">
+                    <i class="fa fa-trash-o"></i> Xóa dịch vụ này
+                </button>
+            </div>
+            <div class="card-service-body">
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label class="form-section-title">Địa điểm VinWonder <sup class="text-danger">*</sup></label>
+                        <select class="form-control vinwonder-location" style="width:100% !important">
+                            <option value="">-- Chọn địa điểm --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Chi phí khác</label>
+                        <input type="text" class="form-control currency vinwonder-other-fees" placeholder="0" />
+                    </div>
+                    <div class="col-md-2 form-group">
+                        <label class="form-section-title">Hoa hồng CTV</label>
+                        <input type="text" class="form-control currency vinwonder-commission" placeholder="0" />
+                    </div>
+                </div>
+
+                <label class="form-section-title mt-3 d-block">Chi tiết vé</label>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered vinwonder-packages-table">
+                        <thead class="subtable-header">
+                            <tr>
+                                <th>Loại vé</th>
+                                <th style="width:120px">Ngày sử dụng <sup class="text-danger">*</sup></th>
+                                <th style="width:80px">Số lượng</th>
+                                <th style="width:130px">Giá nhập/vé <sup class="text-danger">*</sup></th>
+                                <th style="width:130px">Giá bán/vé <sup class="text-danger">*</sup></th>
+                                <th style="width:120px">Thành tiền nhập</th>
+                                <th style="width:120px">Thành tiền bán</th>
+                                <th style="width:100px">Lợi nhuận</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="vinwonder-packages-body">
+                            <tr class="vinwonder-package-row">
+                                <td><input type="text" class="form-control form-control-sm vinwonder-ticket-name" placeholder="Vé người lớn" /></td>
+                                <td><input type="text" class="form-control form-control-sm datepicker-datetime vinwonder-date-used" placeholder="dd/mm/yyyy hh:mm" /></td>
+                                <td><input type="number" class="form-control form-control-sm vinwonder-qty calc-trigger" placeholder="0" min="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
+                                <td><span class="total-import font-weight-bold text-muted">0</span></td>
+                                <td><span class="total-export font-weight-bold text-primary">0</span></td>
+                                <td><span class="total-profit font-weight-bold text-success">0</span></td>
+                                <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="_quotation.AddVinWonderPackageRow(this)">
+                    <i class="fa fa-plus"></i> Thêm dòng vé
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
