@@ -42,14 +42,6 @@
                         <label class="form-section-title">Số đêm</label>
                         <input type="number" class="form-control hotel-nights-count" placeholder="0" min="0" readonly style="background:#f8fafc;" />
                     </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Chi phí khác</label>
-                        <input type="text" class="form-control currency hotel-other-fees" placeholder="0" />
-                    </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Hoa hồng CTV</label>
-                        <input type="text" class="form-control currency hotel-commission" placeholder="0" />
-                    </div>
                 </div>
 
                 <label class="form-section-title mt-3 d-block">Bảng kê dịch vụ phòng <small class="text-muted">(Đơn giá đã bao gồm thuế phí + Phí dịch vụ Adavigo)</small></label>
@@ -61,13 +53,10 @@
                                 <th style="min-width:140px">Hạng phòng <sup class="text-danger">*</sup></th>
                                 <th style="min-width:140px">Gói <sup class="text-danger">*</sup></th>
                                 <th style="min-width:160px">Thời gian sử dụng <sup class="text-danger">*</sup></th>
-                                <th style="width:120px">Giá nhập <sup class="text-danger">*</sup></th>
                                 <th style="width:120px">Giá bán <sup class="text-danger">*</sup></th>
                                 <th style="width:60px">Số đêm</th>
                                 <th style="width:80px">SL phòng <sup class="text-danger">*</sup></th>
-                                <th style="width:120px">Tổng tiền nhập</th>
                                 <th style="width:120px">Tổng tiền bán</th>
-                                <th style="width:100px">Lợi nhuận</th>
                                 <th style="width:60px">Tác vụ</th>
                             </tr>
                         </thead>
@@ -85,10 +74,7 @@
                                     </div>
                                 </td>
                                 <td class="hotel-room-daterange-td">
-                                    <input type="text" class="form-control form-control-sm hotel-pkg-daterange datepicker" placeholder="dd/mm/yyyy - dd/mm/yyyy" />
-                                </td>
-                                <td class="hotel-room-import-td">
-                                    <input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" />
+                                    <input type="text" class="form-control form-control-sm hotel-pkg-daterange hotel-room-rates-daterange" placeholder="dd/mm/yyyy - dd/mm/yyyy" />
                                 </td>
                                 <td class="hotel-room-export-td">
                                     <input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" />
@@ -99,9 +85,7 @@
                                 <td class="align-middle room-rowspan" rowspan="1">
                                     <input type="number" class="form-control form-control-sm room-count calc-trigger" placeholder="1" min="0" value="1" />
                                 </td>
-                                <td class="align-middle"><div class="form-control form-control-sm text-right bg-light border-0 px-2" style="width:100%"><span class="total-import font-weight-bold text-muted">0</span></div></td>
                                 <td class="align-middle"><div class="form-control form-control-sm text-right bg-light border-0 px-2" style="width:100%"><span class="total-export font-weight-bold text-primary">0</span></div></td>
-                                <td class="align-middle"><div class="form-control form-control-sm text-right bg-light border-0 px-2" style="width:100%"><span class="total-profit font-weight-bold text-success">0</span></div></td>
                                 <td class="align-middle text-center room-rowspan" rowspan="1">
                                     <a href="javascript:;" class="text-info mr-1 hotel-room-clone" title="Nhân bản" onclick="_quotation.CloneHotelRoom(this)"><i class="fa fa-files-o"></i></a>
                                     <a href="javascript:;" class="text-danger hotel-room-delete" title="Xóa phòng" onclick="_quotation.RemoveHotelRoom(this)"><i class="fa fa-trash-o"></i></a>
@@ -110,14 +94,12 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="8" class="text-left">
-                                    <a href="javascript:;" class="btn btn-sm btn-outline-primary hotel-add-room-btn">
+                                <td colspan="7" class="text-left">
+                                    <a href="javascript:;" class="btn btn-sm btn-outline-primary hotel-add-room-btn" onclick="_quotation.AddHotelRoomRow(this)">
                                         <i class="fa fa-plus-circle"></i> Thêm phòng
                                     </a>
                                 </td>
-                                <td class="text-right font-weight-bold text-muted hotel-total-import">0</td>
                                 <td class="text-right font-weight-bold text-primary hotel-total-export">0</td>
-                                <td class="text-right font-weight-bold hotel-total-profit">0</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -162,22 +144,6 @@
                             <option value="">-- Chọn điểm đến --</option>
                         </select>
                     </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Hãng bay</label>
-                        <input type="text" class="form-control flight-airline" placeholder="Vietnam Airlines" />
-                    </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Mã chuyến bay</label>
-                        <input type="text" class="form-control flight-code" placeholder="VN247" />
-                    </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Ngày đi <sup class="text-danger">*</sup></label>
-                        <input type="text" class="form-control datepicker flight-departure-date" placeholder="dd/mm/yyyy" />
-                    </div>
-                    <div class="col-md-2 form-group flight-return-date-wrap">
-                        <label class="form-section-title">Ngày về</label>
-                        <input type="text" class="form-control datepicker flight-return-date" placeholder="dd/mm/yyyy" />
-                    </div>
                     <div class="col-md-1 form-group">
                         <label class="form-section-title">Người lớn</label>
                         <input type="number" class="form-control flight-adults" placeholder="0" min="0" />
@@ -190,13 +156,51 @@
                         <label class="form-section-title">Em bé</label>
                         <input type="number" class="form-control flight-infants" placeholder="0" min="0" />
                     </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Chi phí khác</label>
-                        <input type="text" class="form-control currency flight-other-fees" placeholder="0" />
+                </div>
+
+                <!-- Thông tin chiều đi -->
+                <div class="row flight-go-info">
+                    <div class="col-md-12"><label class="form-section-title text-primary"><i class="fa fa-arrow-right"></i> CHIỀU ĐI</label></div>
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Hãng bay</label>
+                        <select class="form-control flight-airline" style="width:100% !important">
+                            <option value="">-- Chọn hãng bay --</option>
+                        </select>
                     </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Hoa hồng CTV</label>
-                        <input type="text" class="form-control currency flight-commission" placeholder="0" />
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Mã chuyến bay</label>
+                        <input type="text" class="form-control flight-code" placeholder="VN247" />
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Mã đặt chỗ (PNR)</label>
+                        <input type="text" class="form-control flight-booking-code" placeholder="ABCDEF" />
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Ngày đi <sup class="text-danger">*</sup></label>
+                        <input type="text" class="form-control datepicker-datetime flight-departure-date" placeholder="dd/mm/yyyy" />
+                    </div>
+                </div>
+
+                <!-- Thông tin chiều về (ẩn mặc định) -->
+                <div class="row flight-back-info" style="display:none;">
+                    <div class="col-md-12"><label class="form-section-title text-success"><i class="fa fa-arrow-left"></i> CHIỀU VỀ</label></div>
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Hãng bay chiều về</label>
+                        <select class="form-control flight-airline-back" style="width:100% !important">
+                            <option value="">-- Chọn hãng bay --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Mã chuyến bay chiều về</label>
+                        <input type="text" class="form-control flight-code-back" placeholder="VN248" />
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Mã đặt chỗ chiều về</label>
+                        <input type="text" class="form-control flight-booking-code-back" placeholder="FEDCBA" />
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label class="form-section-title">Ngày về <sup class="text-danger">*</sup></label>
+                        <input type="text" class="form-control datepicker-datetime flight-return-date" placeholder="dd/mm/yyyy" />
                     </div>
                 </div>
 
@@ -207,11 +211,8 @@
                             <tr>
                                 <th>Loại giá / Hạng vé</th>
                                 <th style="width:80px">Số lượng</th>
-                                <th style="width:130px">Giá nhập/vé <sup class="text-danger">*</sup></th>
                                 <th style="width:130px">Giá bán/vé <sup class="text-danger">*</sup></th>
-                                <th style="width:120px">Thành tiền nhập</th>
                                 <th style="width:120px">Thành tiền bán</th>
-                                <th style="width:100px">Lợi nhuận</th>
                                 <th style="width:40px"></th>
                             </tr>
                         </thead>
@@ -225,11 +226,8 @@
                                     </select>
                                 </td>
                                 <td><input type="number" class="form-control form-control-sm ticket-qty calc-trigger" placeholder="0" min="0" /></td>
-                                <td><input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" /></td>
                                 <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
-                                <td><span class="total-import font-weight-bold text-muted">0</span></td>
                                 <td><span class="total-export font-weight-bold text-primary">0</span></td>
-                                <td><span class="total-profit font-weight-bold text-success">0</span></td>
                                 <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
                             </tr>
                         </tbody>
@@ -264,17 +262,17 @@
                     <div class="col-md-2 form-group">
                         <label class="form-section-title">Loại tour <sup class="text-danger">*</sup></label>
                         <select class="form-control tour-type">
-                            <option value="1">Nội địa</option>
-                            <option value="2">Inbound</option>
-                            <option value="3">Outbound</option>
+                            <option value="Nội địa">Nội địa</option>
+                            <option value="Inbound">Inbound</option>
+                            <option value="Outbound">Outbound</option>
                         </select>
                     </div>
                     <div class="col-md-2 form-group">
                         <label class="form-section-title">Hình thức tổ chức</label>
                         <select class="form-control tour-organizing-type">
-                            <option value="0">Tự tổ chức</option>
-                            <option value="1">Mua lại</option>
-                            <option value="2">Liên kết</option>
+                            <option value="Tự tổ chức">Tự tổ chức</option>
+                            <option value="Mua lại">Mua lại</option>
+                            <option value="Liên kết">Liên kết</option>
                         </select>
                     </div>
                     <div class="col-md-2 form-group">
@@ -297,18 +295,6 @@
                         <label class="form-section-title">Ngày kết thúc <sup class="text-danger">*</sup></label>
                         <input type="text" class="form-control datepicker tour-end-date" placeholder="dd/mm/yyyy" />
                     </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Chi phí khác</label>
-                        <input type="text" class="form-control currency tour-other-fees" placeholder="0" />
-                    </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Hoa hồng CTV</label>
-                        <input type="text" class="form-control currency tour-commission" placeholder="0" />
-                    </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Quỹ CSKH</label>
-                        <input type="text" class="form-control currency tour-customer-care-fund" placeholder="0" />
-                    </div>
                 </div>
 
                 <label class="form-section-title mt-3 d-block">Bảng kê dịch vụ</label>
@@ -318,33 +304,53 @@
                             <tr>
                                 <th>Nội dung</th>
                                 <th style="width:80px">Số lượng</th>
-                                <th style="width:130px">Tổng tiền nhập</th>
-                                <th style="width:130px">Tổng tiền bán</th>
-                                <th style="width:100px">Lợi nhuận</th>
+                                <th style="width:130px">Đơn giá  bán</th>
+                                <th style="width:40px"> Thành tiền</th>
                                 <th style="width:40px"></th>
                             </tr>
                         </thead>
                         <tbody class="tour-packages-body">
                             <tr class="tour-package-row">
                                 <td>
-                                    <select class="form-control form-control-sm tour-include">
-                                        <option value="adt_amount">Người lớn</option>
-                                        <option value="chd_amount">Trẻ em (2-14 tuổi)</option>
-                                        <option value="inf_amount">Em bé (0-2 tuổi)</option>
+                                    <select class="form-control form-control-sm tour-include" disabled>
+                                        <option value="adt">Người lớn</option>
+                                        
                                     </select>
                                 </td>
                                 <td><input type="number" class="form-control form-control-sm tour-qty calc-trigger" placeholder="0" min="0" /></td>
-                                <td><input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" /></td>
                                 <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
-                                <td><span class="total-profit font-weight-bold text-success">0</span></td>
+                                <td><span class="total-export font-weight-bold text-primary">0</span></td>
+                                <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
+                            </tr>
+                             <tr class="tour-package-row">
+                                <td>
+                                    <select class="form-control form-control-sm tour-include" disabled>
+                                   
+                                        <option value="chd">Trẻ em (2-14 tuổi)</option>
+                                       
+                                    </select>
+                                </td>
+                                <td><input type="number" class="form-control form-control-sm tour-qty calc-trigger" placeholder="0" min="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
+                                <td><span class="total-export font-weight-bold text-primary">0</span></td>
+                                <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
+                            </tr>
+                             <tr class="tour-package-row">
+                                <td>
+                                    <select class="form-control form-control-sm tour-include" disabled>
+                     
+                                        <option value="inf">Em bé (0-2 tuổi)</option>
+                                    </select>
+                                </td>
+                                <td><input type="number" class="form-control form-control-sm tour-qty calc-trigger" placeholder="0" min="0" /></td>
+                                <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
+                                <td><span class="total-export font-weight-bold text-primary">0</span></td>
                                 <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="_quotation.AddTourPackageRow(this)">
-                    <i class="fa fa-plus"></i> Thêm dịch vụ khác
-                </button>
+                
             </div>
         </div>
     </div>
@@ -366,7 +372,7 @@
                             <option value="">-- Chọn loại dịch vụ --</option>
                             @foreach (var item in otherServiceTypes)
                             {
-                                <option value="@item.CodeValue">@item.Description</option>
+                                <option value="@item.Description">@item.Description</option>
                             }
                         </select>
                     </div>
@@ -378,14 +384,6 @@
                         <label class="form-section-title">Ngày kết thúc</label>
                         <input type="text" class="form-control datepicker other-to-date" placeholder="dd/mm/yyyy" />
                     </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Chi phí khác</label>
-                        <input type="text" class="form-control currency other-other-fees" placeholder="0" />
-                    </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Hoa hồng CTV</label>
-                        <input type="text" class="form-control currency other-commission" placeholder="0" />
-                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered other-services-table">
@@ -393,11 +391,8 @@
                             <tr>
                                 <th>Nội dung</th>
                                 <th style="width:80px">Số lượng</th>
-                                <th style="width:130px">Đơn giá nhập <sup class="text-danger">*</sup></th>
                                 <th style="width:130px">Đơn giá bán <sup class="text-danger">*</sup></th>
-                                <th style="width:120px">Thành tiền nhập</th>
                                 <th style="width:120px">Thành tiền bán</th>
-                                <th style="width:100px">Lợi nhuận</th>
                                 <th style="width:40px"></th>
                             </tr>
                         </thead>
@@ -405,11 +400,8 @@
                             <tr class="other-service-row">
                                 <td><input type="text" class="form-control form-control-sm other-content" placeholder="Xe 7 chỗ" /></td>
                                 <td><input type="number" class="form-control form-control-sm other-qty calc-trigger" placeholder="0" min="0" /></td>
-                                <td><input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" /></td>
                                 <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
-                                <td><span class="total-import font-weight-bold text-muted">0</span></td>
                                 <td><span class="total-export font-weight-bold text-primary">0</span></td>
-                                <td><span class="total-profit font-weight-bold text-success">0</span></td>
                                 <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
                             </tr>
                         </tbody>
@@ -439,14 +431,6 @@
                             <option value="">-- Chọn địa điểm --</option>
                         </select>
                     </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Chi phí khác</label>
-                        <input type="text" class="form-control currency vinwonder-other-fees" placeholder="0" />
-                    </div>
-                    <div class="col-md-2 form-group">
-                        <label class="form-section-title">Hoa hồng CTV</label>
-                        <input type="text" class="form-control currency vinwonder-commission" placeholder="0" />
-                    </div>
                 </div>
 
                 <label class="form-section-title mt-3 d-block">Chi tiết vé</label>
@@ -457,11 +441,8 @@
                                 <th>Loại vé</th>
                                 <th style="width:120px">Ngày sử dụng <sup class="text-danger">*</sup></th>
                                 <th style="width:80px">Số lượng</th>
-                                <th style="width:130px">Giá nhập/vé <sup class="text-danger">*</sup></th>
                                 <th style="width:130px">Giá bán/vé <sup class="text-danger">*</sup></th>
-                                <th style="width:120px">Thành tiền nhập</th>
                                 <th style="width:120px">Thành tiền bán</th>
-                                <th style="width:100px">Lợi nhuận</th>
                                 <th style="width:40px"></th>
                             </tr>
                         </thead>
@@ -470,11 +451,8 @@
                                 <td><input type="text" class="form-control form-control-sm vinwonder-ticket-name" placeholder="Vé người lớn" /></td>
                                 <td><input type="text" class="form-control form-control-sm datepicker-datetime vinwonder-date-used" placeholder="dd/mm/yyyy hh:mm" /></td>
                                 <td><input type="number" class="form-control form-control-sm vinwonder-qty calc-trigger" placeholder="0" min="0" /></td>
-                                <td><input type="text" class="form-control form-control-sm currency import-price calc-trigger" placeholder="0" /></td>
                                 <td><input type="text" class="form-control form-control-sm currency export-price calc-trigger" placeholder="0" /></td>
-                                <td><span class="total-import font-weight-bold text-muted">0</span></td>
                                 <td><span class="total-export font-weight-bold text-primary">0</span></td>
-                                <td><span class="total-profit font-weight-bold text-success">0</span></td>
                                 <td><button type="button" class="btn btn-sm btn-danger" onclick="_quotation.RemoveRow(this)"><i class="fa fa-times"></i></button></td>
                             </tr>
                         </tbody>

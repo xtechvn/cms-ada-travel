@@ -4,6 +4,7 @@ using Entities.ViewModels.Attachment;
 using Entities.ViewModels.Funding;
 using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.HotelBookingRoom;
+using Entities.ViewModels.Mongo;
 using Entities.ViewModels.VinWonder;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,11 +18,13 @@ using System.Net;
 using System.Net.Mail;
 using System.Net.Mime;
 using System.Text;
+using Telegram.Bot.Types.Payments;
 using Utilities;
 using Utilities.Contants;
 using WEB.Adavigo.CMS.Service.ServiceInterface;
 using WEB.CMS.Models;
 using WEB.CMS.Service;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace WEB.Adavigo.CMS.Service
 {
@@ -5613,6 +5616,235 @@ namespace WEB.Adavigo.CMS.Service
                 ressult = false;
             }
             return ressult;
+        }
+        public async Task<bool> SendEmailBaoGia(QuotationMongoModel model)
+        {
+            bool ressult = true;
+            try
+            {
+                //AccountClient orderInfo = JsonConvert.DeserializeObject<AccountClient>(objectStr);
+
+                MailMessage message = new MailMessage();
+
+                message.Subject = "Email báo giá Adavigo";
+                //config send email
+                string from_mail = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["FROM_MAIL"];
+                string account = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["USERNAME"];
+                string password = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["PASSWORD"];
+                string host = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["HOST"];
+                string port = new ConfigurationBuilder().AddJsonFile("appsettings.json")
+                    .Build().GetSection("MAIL_CONFIG")["PORT"];
+
+                message.IsBodyHtml = true;
+                message.From = new MailAddress(from_mail, new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("MAIL_CONFIG")["STMP_USERNAME_Email"]);
+
+                message.Body = await GetTemplateBaoGia(model);
+                //attachment 
+
+                string sendEmailsFrom = account;
+                string sendEmailsFromPassword = password;
+                SmtpClient smtp = new SmtpClient(host, Convert.ToInt32(port));
+                smtp.EnableSsl = true;
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.Credentials = new NetworkCredential(sendEmailsFrom, sendEmailsFromPassword);
+                smtp.Timeout = 50000;
+
+                message.To.Add(model.Email);
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SendEmailBaoGia - MailService: " + ex);
+                ressult = false;
+            }
+            return ressult;
+        }
+        public async Task<string> GetTemplateBaoGia(QuotationMongoModel model)
+        {
+            try
+            {
+                string workingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var template = workingDirectory + @"\EmailTemplate\Bao_Gia_Adavigo.html";
+                string body = File.ReadAllText(template);
+                string Hotel_row = "";
+                string DichVu = "";
+                string Flight_row = "";
+                string Tour_row = "";
+                string Others = "";
+                if (model.Hotels != null && model.Hotels.Count > 0)
+                {
+
+                    foreach (var item in model.Hotels)
+                    {
+                        var Count_pk = item.Rooms.Sum(s => s.Package.Count());
+                        Hotel_row += "<tr>" +
+                                        "<td rowspan='" + (Count_pk + 1) + "' style='text-align: left;'>" +
+                                            "<span style='font-weight: bold; color: #004aad; font-size: 11px; text-transform: uppercase;'>🏨 Khách sạn</span><br>" +
+                                            item.HotelName + "<br>" +
+                                        "</td></tr>";
+                        foreach (var item2 in item.Rooms)
+                        {
+                            foreach (var item3 in item2.Package)
+                            {
+                                Hotel_row += "<tr>" +
+                                             "<td style='text-align: left; font-size: 12px; line-height: 1.6;'>" +
+                                                 "• Hạng phòng: " + item2.RoomTypeName + "<br>" +
+                                                 "• Gói: " + item3.PackageName + "<br>" +
+                                                 "• Check-in: " + item3.From.ToString("dd/MM/yyyy") + "<br>" +
+                                                 "• Check-out: " + item3.To.ToString("dd/MM/yyyy") + "<br>" +
+                                                 "• Số phòng: " + item2.NumberOfRooms + "<br>" +
+                                             "</td>" +
+                                             "<td>-</td>" +
+                                             "<td>-</td>" +
+                                             "<td>-</td>" +
+                                             "<td>" + item3.SalePrice.ToString("N0") + "</td>" +
+                                             "<td>-</td>" +
+                                             "<td>-</td>" +
+                                             "<td style='font-weight: bold; color: #004aad;'>" + (item3.SalePrice * item2.NumberOfRooms).ToString("N0") + "</td>" +
+                                         "</tr>";
+                            }
+
+
+                        }
+                    }
+                }
+               
+                if (model.Flights != null && model.Flights.Count > 0)
+                {
+                    foreach (var item in model.Flights)
+                    {
+                        var adt = item.ExtraPackages.Where(s => s.PackageCode == "adt_amount").ToList();
+                        var cld = item.ExtraPackages.Where(s => s.PackageCode == "chd_amount").ToList();
+                        var inf = item.ExtraPackages.Where(s => s.PackageCode == "inf_amount").ToList();
+                        var Amount = item.ExtraPackages.Sum(s =>s.Amount*s.Quantity );
+                        var banck = "";
+                        var Quantity_adt = adt != null && adt.Count>0 ? adt[0].Quantity.ToString("N0") : "0";
+                        var Quantity_cld = cld != null && cld.Count > 0 ? cld[0].Quantity.ToString("N0") : "0";
+                        var Quantity_inf = inf != null && inf.Count > 0 ? inf[0].Quantity.ToString("N0") : "0";
+                        
+                        var Amount_adt = adt != null && adt.Count > 0 ? adt[0].Amount.ToString("N0") : "0";
+                        var Amount_cld = cld != null && cld.Count > 0 ? cld[0].Amount.ToString("N0") : "0";
+                        var Amount_inf = inf != null && inf.Count > 0 ? inf[0].Amount.ToString("N0") : "0";
+                        if (item.Back != null && item.Back.FlyCode != null)
+                        {
+                            banck = "• Hãng bay chiều về: " + item.Back.Airline + "<br>" +
+                                        "• Mã chuyến bay: " + item.Back.FlyCode + "<br>" +
+                                        "• Mã đặt chỗ: " + item.Back.BookingCode + "<br>" +
+                                        "• Ngày về: " + item.EndDate.ToString("dd/MM/yyyy HH:mm") + "<br>";
+
+                        }
+                        Flight_row = "<tr>" +
+                                        "<td style=\"text-align: left;\">" +
+                                            "<span style=\"font-weight: bold; color: #004aad; font-size: 11px; text-transform: uppercase;\">✈️ Vé máy bay</span><br>" +
+                                        "</td>" +
+                                        "<td style=\"text-align: left; font-size: 12px; line-height: 1.6;\">" +
+                                            "• Hành trình: " + item.StartPoint + " &rarr; " + item.EndPoint + "<br>" +
+                                            "• Hãng bay chiều đi: " + item.Go.Airline + "<br>" +
+                                            "• Mã chuyến bay: " + item.Go.FlyCode + "<br>" +
+                                            "• Mã đặt chỗ: " + item.Go.BookingCode + "<br>" +
+                                            "• Ngày đi: " + item.StartDate.ToString("dd/MM/yyyy HH:mm") + "<br>" +
+                                            banck
+                                            +
+                                        "</td>" +
+                                        "<td>" + Quantity_adt + "</td>" +
+                                        "<td>" + Quantity_cld + "</td>" +
+                                        "<td>" + Quantity_inf + "</td>" +
+                                        "<td>" + Amount_adt + "</td>" +
+                                        "<td>" + Amount_cld + "</td>" +
+                                        "<td>" + Amount_inf + "</td>" +
+                                        "<td style=\"font-weight: bold; color: #004aad;\">" + Amount.ToString("N0") + "</td>" +
+                                    "</tr> ";
+                    }
+
+                }
+
+          
+                if (model.Tours != null && model.Tours.Count > 0)
+                {
+                    foreach (var item in model.Tours)
+                    {
+                        var adt = item.ExtraPackages.FirstOrDefault(s => s.PackageCode == "adt");
+                        var cld = item.ExtraPackages.FirstOrDefault(s => s.PackageCode == "chd");
+                        var inf = item.ExtraPackages.FirstOrDefault(s => s.PackageCode == "inf");
+                        var Amount = item.ExtraPackages.Sum(s =>  s.Amount *s.Quantity);
+                        Tour_row += "<tr>" +
+                                        "<td style=\"text-align: left;\">" +
+                                            "<span style=\"font-weight: bold; color: #004aad; font-size: 11px; text-transform: uppercase;\">🗺️ Tour du lịch</span><br>" +
+                                            "" + item.TourProductName + "" +
+                                        "</td>" +
+                                        "<td style=\"text-align: left; font-size: 12px; line-height: 1.6;\">" +
+                                            "• Loại tour: " + item.TourType + "<br>" +
+
+                                            "• Ngày bắt đầu: " + item.StartDate.ToString("dd/MM/yyyy") + "<br>" +
+                                            "• Ngày kết thúc: " + item.EndDate.ToString("dd/MM/yyyy") + "" +
+                                        "</td>" +
+                                        "<td>" + (adt != null ? adt.Quantity.ToString("N0") : 0) + "</td>" +
+                                        "<td>" + (cld != null ? cld.Quantity.ToString("N0") : 0 )+ "</td>" +
+                                        "<td>" + (inf != null ? inf.Quantity.ToString("N0") : 0) + "</td>" +
+                                        "<td>" + (adt != null ? (adt.Amount).ToString("N0") : 0 )+ "</td>" +
+                                        "<td>" + (cld != null ? (cld.Amount).ToString("N0") : 0) + "</td>" +
+                                        "<td>" + (inf != null ? (inf.Amount).ToString("N0") : 0 )+ "</td>" +
+                                        "<td style=\"font-weight: bold; color: #004aad;\">" + Amount.ToString("N0") + "</td>" +
+                                    "</tr>";
+                    }
+                }
+           
+                if (model.Others != null && model.Others.Count > 0)
+                {
+                    foreach (var item in model.Others)
+                    {
+                        var count_pks = model.Others.Sum(s => s.Packages.Count);
+                        Others += "<tr>" +
+                                 "<td rowspan='" + (count_pks + 1) + "' style=\"text-align: left;\">" +
+                                  " <span style=\"font-weight: bold; color: #004aad; font-size: 11px; text-transform: uppercase;\">🚗 Dịch vụ khác</span><br>" +
+                                  "" + item.ServiceType + "" +
+                               "</td>" +
+                           "</tr>";
+                        if (item.Packages != null && item.Packages.Count > 0)
+                        {
+                           
+                            foreach (var item2 in item.Packages)
+                            {
+                                Others += " <tr>\r\n" +
+                             " <td style=\"text-align: left; font-size: 12px; line-height: 1.6;\">" +
+                                "• Nội dung: " + item2.PackageName + "<br>" +
+                           
+                                "• Ngày: " + item.FromDate.ToString("dd/MM/yyyy") + "<br>" +
+                            "</td>" +
+                            "<td>" + item2.Quantity + "</td>" +
+                            "<td>-</td>" +
+                            "<td>-</td>" +
+                            "<td>" + item2.Amount.ToString("N0") + "</td>" +
+                            "<td>-</td>" +
+                            "<td>-</td>" +
+                            "<td style='font-weight: bold; color: #004aad;'>" + (item2.Amount * item2.Quantity).ToString("N0") + "</td></tr>";
+                            }
+
+                        }
+
+                    }
+                    
+                }
+                DichVu = Others + Tour_row + Flight_row + Hotel_row;
+                var sale = await _userRepository.GetUser((int)model.CreatedBy);
+                body = body.Replace("{{DateCreate}}", DateTime.Now.ToString("dd/MM/yyyy"));
+                body = body.Replace("{{SalesName}}", sale.FullName);
+                body = body.Replace("{{SalesPhone}}", sale.Phone);
+                body = body.Replace("{{SalesEmail}}", sale.Email);
+                body = body.Replace("{{Amount}}", model.TotalAmount.ToString("N0"));
+                body = body.Replace("{{Note}}", model.Note);
+                body = body.Replace("{{DichVu}}", DichVu);
+                return body;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("SendEmailBaoGia - MailService: " + ex);
+            }
+            return null;
         }
     }
 }

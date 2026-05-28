@@ -1,0 +1,448 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo giá Dịch vụ - ADAVIGO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    .white-popup{
+        width:1200px !important;
+        max-width:1600px !important;
+    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+        .text-adavigo-blue { color: #1a499b; }
+        .bg-adavigo-blue { background-color: #1a499b; }
+        .text-adavigo-red { color: #d32f2f; }
+
+        /* Cấu hình viền bảng mỏng và tinh tế */
+        table, th, td {
+            border-color: #e5e7eb;
+        }
+
+        /* Banner Header */
+        .header-banner {
+            background-image: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 40%, rgba(255,255,255,0) 100%), url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80');
+            background-size: cover;
+            background-position: center right;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center">
+
+    <div class="bg-white w-full max-w-[1100px] shadow-xl rounded-lg overflow-hidden relative">
+
+        <!-- Header / Banner -->
+        <div class="header-banner h-32 md:h-40 flex items-center px-8">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-adavigo-blue tracking-tight flex items-center gap-2">
+                    <i class="fa-solid fa-earth-asia text-2xl"></i> ADAVIGO
+                </h1>
+                <p class="text-sm md:text-base text-gray-500 font-medium tracking-widest mt-1">Xứng tầm đẳng cấp</p>
+            </div>
+        </div>
+
+        <div class="p-8">
+            <!-- Thông tin khách hàng & Báo giá -->
+            <div class="flex flex-col lg:flex-row justify-between gap-8 mb-8">
+                <div class="flex-1">
+                    <h2 class="text-xl font-bold mb-4">Kính gửi: Quý khách hàng</h2>
+                    <p class="mb-2 text-sm">Cảm ơn Quý khách đã quan tâm và sử dụng dịch vụ của chúng tôi.</p>
+                    <p class="text-sm">Chúng tôi xin gửi tới Quý khách thông tin báo giá chi tiết như sau:</p>
+                </div>
+
+                <div class="bg-[#f8fafc] border border-gray-100 rounded-lg p-4 flex flex-col md:flex-row gap-6 lg:w-[600px] shadow-sm">
+                    <div class="flex-1 space-y-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-regular fa-file-lines text-adavigo-blue w-5 text-center"></i>
+                            <span class="text-sm text-gray-600 w-24">Mã báo giá:</span>
+                            <span class="text-sm font-bold text-adavigo-red">BG250526-001</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-regular fa-calendar text-adavigo-blue w-5 text-center"></i>
+                            <span class="text-sm text-gray-600 w-24">Ngày báo giá:</span>
+                            <span class="text-sm font-semibold">26/05/2026</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-regular fa-calendar-check text-adavigo-blue w-5 text-center"></i>
+                            <span class="text-sm text-gray-600 w-24">Hiệu lực đến:</span>
+                            <span class="text-sm font-semibold">02/06/2026</span>
+                        </div>
+                    </div>
+
+                    <div class="hidden md:block w-px bg-gray-200"></div>
+
+                    <div class="flex-1 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-regular fa-user text-adavigo-blue w-5 text-center mt-0.5"></i>
+                            <div class="text-sm">
+                                <span class="text-gray-600 block">Nhân viên phụ trách:</span>
+                                <span class="font-bold block">Phạm Thị Hoa</span>
+                                <span class="text-xs text-gray-500">Sale Manager</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-adavigo-blue w-5 text-center text-sm"></i>
+                            <span class="text-sm text-gray-600">SĐT: <span class="font-semibold text-black">1900 1234</span></span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-regular fa-envelope text-adavigo-blue w-5 text-center"></i>
+                            <span class="text-xs text-gray-600">Email: hoa.pt@adavigo.com</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Title Bảng -->
+            <div class="flex items-center gap-2 mb-4 text-adavigo-blue font-bold">
+                <i class="fa-solid fa-list-check"></i>
+                <h3 class="uppercase tracking-wide text-sm">Chi tiết dịch vụ</h3>
+            </div>
+
+            <!-- Bảng Dịch Vụ -->
+            <div class="overflow-x-auto mb-8 rounded-t-lg border border-gray-200 shadow-sm">
+                <table class="w-full text-sm border-collapse bg-white">
+                    <thead class="bg-[#f8fafc] text-center font-semibold text-xs text-gray-700">
+                        <tr>
+                            <th rowspan="2" class="border p-3 w-12">STT</th>
+                            <th rowspan="2" class="border p-3 w-48">DỊCH VỤ</th>
+                            <th rowspan="2" class="border p-3 w-64">THÔNG TIN CHI TIẾT</th>
+                            <th colspan="3" class="border p-2">SỐ LƯỢNG</th>
+                            <th colspan="3" class="border p-2">ĐƠN GIÁ (VNĐ)</th>
+                            <th rowspan="2" class="border p-3 w-32">THÀNH TIỀN<br>(VNĐ)</th>
+                        </tr>
+                        <tr class="text-[10px] md:text-xs text-gray-600 bg-[#f1f5f9]">
+                            <th class="border p-2 w-16">NGƯỜI LỚN</th>
+                            <th class="border p-2 w-16">TRẺ EM<br><span class="font-normal text-[10px]">(2-11 tuổi)</span></th>
+                            <th class="border p-2 w-16">EM BÉ<br><span class="font-normal text-[10px]">(0-2 tuổi)</span></th>
+                            <th class="border p-2">NGƯỜI LỚN</th>
+                            <th class="border p-2">TRẺ EM</th>
+                            <th class="border p-2">EM BÉ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-xs md:text-sm">
+                        <!-- Row 1 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="border p-3 text-center font-semibold">1</td>
+                            <td class="border p-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-adavigo-blue flex-shrink-0">
+                                        <i class="fa-solid fa-hotel text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-adavigo-blue text-[13px] uppercase">Khách sạn</div>
+                                        <div class="text-xs mt-1">A25 Hotel - Deluxe</div>
+                                        <div class="text-yellow-400 text-[10px] mt-0.5">
+                                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="border p-3">
+                                <ul class="list-disc pl-4 space-y-1 text-gray-700 text-xs">
+                                    <li>Check-in: 26/05/2026</li>
+                                    <li>Check-out: 27/05/2026</li>
+                                    <li>Hạng phòng: Deluxe</li>
+                                    <li>Số phòng: 1</li>
+                                </ul>
+                            </td>
+                            <td class="border p-3 text-center">2</td>
+                            <td class="border p-3 text-center">1<br><span class="text-[10px] text-gray-500">(6-11 tuổi)</span></td>
+                            <td class="border p-3 text-center">0<br><span class="text-[10px] text-gray-500">(0-5 tuổi)</span></td>
+                            <td class="border p-3 text-right">600.000</td>
+                            <td class="border p-3 text-right">400.000</td>
+                            <td class="border p-3 text-center text-gray-500">Miễn phí</td>
+                            <td class="border p-3 text-right font-bold text-adavigo-blue">1.400.000</td>
+                        </tr>
+
+                        <!-- Row 2 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="border p-3 text-center font-semibold">2</td>
+                            <td class="border p-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-adavigo-blue flex-shrink-0">
+                                        <i class="fa-solid fa-plane-departure text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-adavigo-blue text-[13px] uppercase">Vé máy bay</div>
+                                        <div class="text-xs mt-1 leading-tight">Hà Nội →<br>Hồ Chí Minh</div>
+                                        <div class="text-yellow-600 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                                            <i class="fa-brands fa-envira text-yellow-500"></i> Vietnam Airlines
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="border p-3">
+                                <ul class="list-disc pl-4 space-y-1 text-gray-700 text-xs">
+                                    <li>Hành trình: HAN → SGN</li>
+                                    <li>Ngày đi: 26/05/2026</li>
+                                    <li>Ngày về: 27/05/2026</li>
+                                    <li>Loại vé: Phổ thông</li>
+                                    <li>Hãng bay: Vietnam Airlines</li>
+                                </ul>
+                            </td>
+                            <td class="border p-3 text-center">2</td>
+                            <td class="border p-3 text-center">1<br><span class="text-[10px] text-gray-500">(2-11 tuổi)</span></td>
+                            <td class="border p-3 text-center">1<br><span class="text-[10px] text-gray-500">(dưới 2 tuổi)</span></td>
+                            <td class="border p-3 text-right">2.200.000</td>
+                            <td class="border p-3 text-right">1.650.000</td>
+                            <td class="border p-3 text-right">500.000</td>
+                            <td class="border p-3 text-right font-bold text-adavigo-blue">6.550.000</td>
+                        </tr>
+
+                        <!-- Row 3 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="border p-3 text-center font-semibold">3</td>
+                            <td class="border p-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-adavigo-blue flex-shrink-0">
+                                        <i class="fa-solid fa-map-location-dot text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-adavigo-blue text-[13px] uppercase">Tour du lịch</div>
+                                        <div class="text-xs mt-1">Tour Đà Nẵng 3N2Đ</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="border p-3">
+                                <ul class="list-disc pl-4 space-y-1 text-gray-700 text-xs">
+                                    <li>Loại tour: Tour trọn gói</li>
+                                    <li>Điểm đến: Đà Nẵng</li>
+                                    <li>Thời gian: 3 ngày 2 đêm</li>
+                                    <li>Ngày bắt đầu: 26/05/2026</li>
+                                </ul>
+                            </td>
+                            <td class="border p-3 text-center">2</td>
+                            <td class="border p-3 text-center">1<br><span class="text-[10px] text-gray-500">(5-11 tuổi)</span></td>
+                            <td class="border p-3 text-center">0<br><span class="text-[10px] text-gray-500">(0-4 tuổi)</span></td>
+                            <td class="border p-3 text-right">3.600.000</td>
+                            <td class="border p-3 text-right">2.700.000</td>
+                            <td class="border p-3 text-center text-gray-500">Miễn phí</td>
+                            <td class="border p-3 text-right font-bold text-adavigo-blue">9.900.000</td>
+                        </tr>
+
+                        <!-- Row 4 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="border p-3 text-center font-semibold">4</td>
+                            <td class="border p-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-adavigo-blue flex-shrink-0">
+                                        <i class="fa-solid fa-car text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-adavigo-blue text-[13px] uppercase">Dịch vụ khác</div>
+                                        <div class="text-xs mt-1">Xe đưa đón sân bay</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="border p-3">
+                                <ul class="list-disc pl-4 space-y-1 text-gray-700 text-xs">
+                                    <li>Nội dung: Xe 7 chỗ</li>
+                                    <li>Đưa đón: Sân bay - Khách sạn</li>
+                                    <li>Ngày: 26/05/2026</li>
+                                </ul>
+                            </td>
+                            <td class="border p-3 text-center">1 xe</td>
+                            <td class="border p-3 text-center text-gray-400">-</td>
+                            <td class="border p-3 text-center text-gray-400">-</td>
+                            <td class="border p-3 text-right">450.000</td>
+                            <td class="border p-3 text-center text-gray-400">-</td>
+                            <td class="border p-3 text-center text-gray-400">-</td>
+                            <td class="border p-3 text-right font-bold text-adavigo-blue">450.000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tổng Tiền -->
+            <div class="flex flex-col lg:flex-row gap-6 mb-8">
+                <!-- Box Tổng Trái -->
+                <div class="flex-1 bg-[#f0f4fc] rounded-lg p-6 border border-blue-100 flex flex-col justify-center">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+                        <span class="text-adavigo-blue font-bold text-lg uppercase tracking-wide">Tổng giá dịch vụ</span>
+                        <span class="text-2xl md:text-3xl font-bold text-adavigo-blue tracking-tight">18.300.000 VNĐ</span>
+                    </div>
+                    <p class="text-sm text-gray-700">Bằng chữ: <span class="italic">Mười tám triệu ba trăm nghìn đồng chẵn.</span></p>
+                </div>
+
+                <!-- Box Tổng Phải -->
+                <div class="flex-1 bg-white border border-gray-200 rounded-lg p-5">
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center text-gray-600">
+                            <span>Tổng tiền dịch vụ</span>
+                            <span class="font-medium text-black">18.300.000</span>
+                        </div>
+                        <div class="flex justify-between items-center text-gray-600 border-t border-dashed pt-2">
+                            <span>Chi phí khác</span>
+                            <span class="font-medium text-black">0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-gray-600 border-t border-dashed pt-2">
+                            <span>Giảm giá</span>
+                            <span class="font-medium text-black">0</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-300">
+                            <span class="text-adavigo-blue font-bold uppercase text-[13px]">Tổng thanh toán</span>
+                            <span class="font-bold text-lg text-adavigo-blue">18.300.000 VNĐ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thanh toán và Ghi chú -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Thông tin thanh toán -->
+                <div>
+                    <h3 class="text-adavigo-blue font-bold uppercase text-sm mb-4">Thông tin thanh toán</h3>
+                    <ul class="space-y-3 text-sm text-gray-700">
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <div><span class="font-semibold text-gray-800">Hình thức thanh toán:</span> Chuyển khoản / Tiền mặt</div>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <div><span class="font-semibold text-gray-800">Ngân hàng:</span> Vietcombank - Chi nhánh Ba Đình, Hà Nội</div>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <div><span class="font-semibold text-gray-800">Chủ tài khoản:</span> Công ty CP TM & DV QT Đại Việt - ADAVIGO</div>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <div><span class="font-semibold text-gray-800">Số tài khoản:</span> 1234 5678 9999</div>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <div><span class="font-semibold text-gray-800">Nội dung CK:</span> BG250526-001_HoTenKhach</div>
+                        </li>
+                    </ul>
+
+                    <div class="mt-5 bg-blue-50 text-blue-800 p-4 rounded-lg text-xs flex items-start gap-3 border border-blue-100">
+                        <i class="fa-solid fa-circle-info mt-0.5 text-adavigo-blue"></i>
+                        <div>
+                            <p class="mb-1">Quý khách vui lòng thanh toán 50% giá trị đơn hàng để giữ dịch vụ.</p>
+                            <p>Thanh toán 50% còn lại trước ngày khởi hành 03 ngày.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ghi chú & Liên hệ -->
+                <div class="bg-[#fcfdfd] border border-gray-100 rounded-lg p-5">
+                    <h3 class="text-adavigo-blue font-bold uppercase text-sm mb-4">Ghi chú</h3>
+                    <ul class="space-y-2 text-sm text-gray-700 mb-6">
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <span>Giá trên đã bao gồm VAT (nếu có).</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <span>Giá có thể thay đổi tùy theo tình trạng dịch vụ tại thời điểm đặt.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <span>Trong trường hợp thay đổi thông tin dịch vụ, quý khách vui lòng thông báo sớm để được hỗ trợ.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <span>Báo giá này có hiệu lực đến ngày <span class="font-bold text-adavigo-red">02/06/2026</span>.</span>
+                        </li>
+                        <li class="flex gap-2">
+                            <span class="text-gray-400 mt-1 text-[10px]">●</span>
+                            <span class="italic font-medium">Rất mong được đồng hành cùng Quý khách!</span>
+                        </li>
+                    </ul>
+
+                    <div class="border-t border-gray-200 pt-4">
+                        <h3 class="text-adavigo-blue font-bold uppercase text-sm mb-3">Thông tin liên hệ</h3>
+                        <p class="text-xs text-gray-600 mb-3">Nếu Quý khách cần hỗ trợ thêm thông tin, vui lòng liên hệ:</p>
+                        <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-phone text-adavigo-blue"></i>
+                                <span class="font-semibold">1900 1234</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-regular fa-envelope text-adavigo-blue"></i>
+                                <span>booking@adavigo.com</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-globe text-adavigo-blue"></i>
+                                <span>www.adavigo.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t-2 border-gray-100 pt-6 mt-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <p class="text-sm mb-1 text-gray-600">Trân trọng,</p>
+                    <h4 class="font-bold text-adavigo-blue uppercase text-[13px] mb-3">Công ty cổ phần thương mại và dịch vụ Quốc tế Đại Việt - ADAVIGO</h4>
+
+                    <div class="space-y-1.5 text-xs text-gray-600">
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot mt-0.5 w-3 text-center text-gray-400"></i>
+                            <span>Tầng 6, Tòa nhà Ladeco, 266 Đội Cấn, Ba Đình, Hà Nội</span>
+                        </div>
+                        <div class="flex gap-6">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-phone w-3 text-center text-gray-400"></i>
+                                <span>1900 1234</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-6">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-envelope w-3 text-center text-gray-400"></i>
+                                <span>booking@adavigo.com</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-globe w-3 text-center text-gray-400"></i>
+                                <span>www.adavigo.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <p class="text-sm font-medium mb-3 text-gray-700">Kết nối với chúng tôi</p>
+                    <div class="flex gap-3 justify-end">
+                        <a href="#" class="w-8 h-8 rounded-full bg-[#1877f2] text-white flex items-center justify-center hover:opacity-80 transition-opacity">
+                            <i class="fa-brands fa-facebook-f text-sm"></i>
+                        </a>
+                        <!-- Icon Zalo (dùng text giả lập vì fontawesome ko có) -->
+                        <a href="#" class="w-8 h-8 rounded-full bg-[#0068ff] text-white flex items-center justify-center hover:opacity-80 transition-opacity font-bold text-[10px]">
+                            Zalo
+                        </a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-[#ff0000] text-white flex items-center justify-center hover:opacity-80 transition-opacity">
+                            <i class="fa-brands fa-youtube text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Note auto-generate -->
+            <div class="text-center text-[10px] text-gray-400 mt-8">
+                Email này được gửi tự động từ hệ thống, vui lòng không trả lời email này.
+            </div>
+            <!-- ========================================== -->
+            <!-- ACTION BUTTONS (Hủy / Xác nhận) - Added here -->
+            <!-- ========================================== -->
+            <div class="mt-8 pt-6 border-t border-gray-200 flex justify-center gap-4">
+                <button type="button" class="px-8 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-200 active:scale-95" onclick="$.magnificPopup.close();">
+                    <i class="fas fa-times mr-2"></i> Hủy
+                </button>
+                <button type="button" style="background:blue!important" class="px-8 py-2.5 bg-brand-blue text-white rounded-lg font-semibold hover:bg-blue-800 transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-95" onclick="_quotation.SeendEmail()">
+                    <i class="fas fa-check mr-2"></i> Xác nhận
+                </button>
+            </div>
+            <!-- ========================================== -->
+        </div>
+    </div>
+
+</body>
+</html>

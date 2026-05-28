@@ -12,6 +12,7 @@ namespace Entities.ViewModels.Mongo
         
         public long CreatedBy { get; set; } // Sales phụ trách (Người tạo)
         public string SalerName { get; set; }
+        public string Email { get; set; }
         
         public string Note { get; set; } // Ghi chú hiển thị cho khách hàng
         public int Status { get; set; } // 0: Nháp, 1: Đã gửi báo giá, 2: Khách chốt
@@ -24,6 +25,7 @@ namespace Entities.ViewModels.Mongo
         public double CollaboratorComm { get; set; } // Hoa hồng CTV
         public double CustomerCareFund { get; set; } // Quỹ CSKH
         
+        public double TotalAmount { get; set; } // Tổng tiền bán = ServicesPriceExport
         public double TotalPrice { get; set; } // Tổng tiền bán = ServicesPriceExport
         public double TotalProfit { get; set; } // Lợi nhuận = TotalPrice - ServicesPriceImport - OtherFees - CollaboratorComm - CustomerCareFund
         
@@ -77,6 +79,7 @@ namespace Entities.ViewModels.Mongo
     {
         public string Id { get; set; }
         public string PackageCode { get; set; }
+        public string PackageName { get; set; }
         public DateTime From { get; set; }
         public DateTime To { get; set; }
         public double OperatorPrice { get; set; } // Giá nhập
@@ -169,7 +172,7 @@ namespace Entities.ViewModels.Mongo
     public class QuotationTourService
     {
         public string Id { get; set; }
-        public int TourType { get; set; }
+        public string TourType { get; set; }
         public int OrganizingType { get; set; }
         public int IsSelfDesigned { get; set; }
         public int StartPoint { get; set; }
@@ -218,7 +221,7 @@ namespace Entities.ViewModels.Mongo
     {
         public string Id { get; set; }
         public string ServiceCode { get; set; }
-        public int ServiceType { get; set; }
+        public string ServiceType { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
         public string Note { get; set; }

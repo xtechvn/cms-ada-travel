@@ -1,6 +1,7 @@
 ﻿using Entities.Models;
 using Entities.ViewModels.Attachment;
 using Entities.ViewModels.HotelBookingCode;
+using Entities.ViewModels.Mongo;
 using Entities.ViewModels.VinWonder;
 using Microsoft.Extensions.Configuration;
 using Nest;
@@ -31,5 +32,6 @@ namespace WEB.Adavigo.CMS.Service.ServiceInterface
         Task<bool> SendEmailpaymentVoucher(int paymentVoucherId, List<AttachFile> attach_file, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name);
         Task<string> GetTemplateHotelBookingCode(long ServiceId, long OrderId,string Note, string Description);
         Task<bool> SendEmailBookingCode(long Id, long OrderId, List<string> CC_Email, List<string> BCC_Email, string Email, string To_Email, string subject_name, string Note, string Description);
+        Task<bool> SendEmailBaoGia(QuotationMongoModel model);
     }
 }

@@ -1,4 +1,6 @@
 using Entities.ViewModels;
+using Entities.ViewModels.Attachment;
+using Entities.ViewModels.HotelBookingCode;
 using Entities.ViewModels.Mongo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -7,9 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
+using WEB.Adavigo.CMS.Service.ServiceInterface;
 using WEB.CMS.Customize;
 using WEB.CMS.Models;
 using WEB.CMS.Service;
@@ -24,18 +28,21 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly ManagementUser _managementUser;
         private readonly QuotationMongoService _quotationMongoService;
         private readonly IAllCodeRepository _allCodeRepository;
+        private readonly IEmailService _emailService;
 
         public QuotationController(
             IConfiguration configuration,
             IUserRepository userRepository,
             ManagementUser managementUser,
-            IAllCodeRepository allCodeRepository)
+            IAllCodeRepository allCodeRepository,
+            IEmailService emailService)
         {
             _configuration = configuration;
             _userRepository = userRepository;
             _managementUser = managementUser;
             _quotationMongoService = new QuotationMongoService(_configuration);
             _allCodeRepository = allCodeRepository;
+            _emailService = emailService;
         }
 
         public IActionResult Index()
@@ -422,6 +429,55 @@ namespace WEB.Adavigo.CMS.Controllers
             
             model.TotalPrice = totalExport;
             model.TotalProfit = totalExport - totalImport - model.OtherFees - model.CollaboratorComm - model.CustomerCareFund;
+        }
+        public async Task<IActionResult> TempletEmail(QuotationMongoModel model)
+        {
+
+            try
+            {
+                return PartialView( model);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("TempletEmail - QuotationController: " + ex);
+               
+            }
+            return PartialView();
+        }
+        public async Task<IActionResult> ConfirmSendEmail(QuotationMongoModel model)
+        {
+
+            var status = (int)ResponseType.ERROR;
+            var msg = "Không thành công";
+            try
+            {
+                long _UserId = 0;
+                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                {
+                    _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                }
+                if (model != null)
+                {
+                    model.CreatedBy = _UserId;
+                    bool resulstSendMail = await _emailService.SendEmailBaoGia(model);
+                    if (resulstSendMail)
+                    {
+                        status = (int)ResponseType.SUCCESS;
+                        msg = "Gửi email thành công";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ConfirmSendEmail - QuotationController: " + ex);
+                status = (int)ResponseType.ERROR;
+                msg = "Đã xảy ra lỗi, vui lòng liên hệ IT";
+            }
+            return Ok(new
+            {
+                status = status,
+                msg = msg
+            });
         }
     }
 }

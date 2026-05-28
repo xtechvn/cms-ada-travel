@@ -134,13 +134,16 @@
                     </h2>
                 </div>
                 <div>
-                  <button type="button" class="btn btn-success mr-2" id="btn_save" onclick="_quotation.Save()">
+                  @*<button type="button" class="btn btn-success mr-2" id="btn_save" onclick="_quotation.Save()">
                         <i class="fa fa-save mr-1"></i> Lưu 
                     </button>
                     <button type="button" class="btn btn-secondary mr-2" id="btn_save_draft" onclick="_quotation.Save()">
                         <i class="fa fa-save mr-1"></i> Lưu nháp
+                    </button>*@
+                    <button type="button" class="btn btn-primary" onclick="_quotation.OpenPopupEmail()">
+                        <i class="fa fa-eye mr-1"></i> Xem trước email báo giá
                     </button>
-                    <button type="button" class="btn btn-primary" id="btn_save_publish">
+                    <button type="button" class="btn btn-primary" onclick="_quotation.SeendEmail()">
                         <i class="fa fa-paper-plane mr-1"></i> Gửi báo giá
                     </button>
                 </div>
@@ -161,7 +164,7 @@
                                 <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(1)">🏨 KHÁCH SẠN</a>
                                 <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(2)">✈️ VÉ MÁY BAY</a>
                                 <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(3)">🗺️ TOUR DU LỊCH</a>
-                                <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(5)">🎪 VINWONDER</a>
+                                <!--<a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(5)">🎪 VINWONDER</a>-->
                                 <a class="dropdown-item" href="javascript:void(0);" onclick="_quotation.AddServiceBlock(4)">⚙️ DỊCH VỤ KHÁC</a>
                             </div>
                         </div>
@@ -191,49 +194,34 @@
                         <div class="sidebar-section-title">Tổng hợp báo giá</div>
                         
                         <div class="financial-row mb-3">
-                            <span class="financial-label">Tổng tiền nhập: </span>
-                            <span class="financial-value text-dark" id="lbl_total_import">0 đ</span>
-                        </div>
-                        
-                        <div class="financial-row mb-3">
                             <span class="financial-label font-weight-bold">Tổng tiền bán: </span>
                             <span class="financial-value text-primary font-weight-bold" id="lbl_total_export">0 đ</span>
                         </div>
                         
                         <hr class="my-2" />
-                        
-                        <div class="form-group mb-2">
-                            <label class="small font-weight-bold text-muted mb-1">Chi phí khác</label>
-                            <input type="text" class="form-control text-right currency-input financial-calc" id="ip_other_fees" value="@Model.OtherFees.ToString("N0")" />
-                        </div>
-                        
-                        <div class="form-group mb-2">
-                            <label class="small font-weight-bold text-muted mb-1">Hoa hồng CTV</label>
-                            <input type="text" class="form-control text-right currency-input financial-calc" id="ip_collaborator_comm" value="@Model.CollaboratorComm.ToString("N0")" />
-                        </div>
-
-                        <hr class="my-2" />
-                        
-                        <div class="financial-row mb-4">
-                            <span class="financial-label font-weight-bold">Tổng lợi nhuận</span>
-                            <span class="financial-value font-weight-bold profit-positive" id="lbl_total_profit">0 đ</span>
-                        </div>
 
                         <!-- Panel Trạng thái -->
-                        <div class="sidebar-section-title">Trạng thái</div>
+                        @*<div class="sidebar-section-title">Trạng thái</div>*@
                         <div class="mb-4">
+                        @*
                             <span id="badge_status" class="status-badge status-draft font-weight-bold py-2 px-3 text-center d-block">
                                 @(Model.Status == 0 ? "Nháp" : Model.Status == 1 ? "Đã gửi báo giá" : "Khách chốt")
                             </span>
+                        *@
                             <span class="text-muted small d-block text-center mt-2" id="lbl_status_desc">
                                 @(Model.Status == 0 ? "Báo giá đang soạn thảo chưa gửi khách" : Model.Status == 1 ? "Đã gửi thông tin báo giá cho khách" : "Khách hàng đồng ý chốt giá")
                             </span>
                         </div>
-
-                        <!-- Ghi chú khách hàng -->
-                        <div class="sidebar-section-title">Ghi chú khách hàng</div>
+                        <!-- Email nhận báo giá -->
+                        <div class="sidebar-section-title">Email nhận báo giá</div>
                         <div class="form-group mb-0">
-                            <textarea class="form-control" id="txt_client_note" rows="4" maxlength="500" placeholder="Nhập ghi chú hiển thị với khách hàng...">@Model.Note</textarea>
+                            <input type="text" class="form-control" id="txt_email_receive" placeholder="Nhập email nhận báo giá" value="" />
+                        </div>
+                        <!-- Ghi chú nội bộ -->
+                        </br>
+                        <div class="sidebar-section-title" >Ghi chú chuyển khoản</div>
+                        <div class="form-group mb-0" >
+                            <textarea style="min-height: 100px;" class="form-control" id="txt_client_note" rows="4" maxlength="500" placeholder="Thông tin chuyển khoản"> @Model.Note</textarea>
                             <div class="text-right small text-muted mt-1" id="lbl_char_count">0/500</div>
                         </div>
                     </div>
@@ -249,9 +237,6 @@
 @section scripts {
     <script src="~/modules/quotation.js" asp-append-version="true"></script>
     <script src="~/modules/order_detail_html.js" asp-append-version="true"></script>
-    <script src="~/lib/moment/moment.min.js"></script>
-    <script src="~/lib/daterangepicker/daterangepicker.js"></script>
-    <link rel="stylesheet" href="~/lib/daterangepicker/daterangepicker.css" />
     <script>
         $(document).ready(function () {
             // Khởi tạo và nạp dữ liệu từ Model C# hiện tại vào javascript
