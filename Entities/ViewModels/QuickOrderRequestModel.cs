@@ -13,7 +13,7 @@ namespace Entities.ViewModels
         public string Label { get; set; }
         public int BranchCode { get; set; }
         public string Note { get; set; }
-        public int HotelId { get; set; }
+        public string HotelId { get; set; }
         public int SupplierId { get; set; }
         
         public int Adult { get; set; }
