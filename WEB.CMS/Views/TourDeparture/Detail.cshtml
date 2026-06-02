@@ -1,0 +1,417 @@
+@using Entities.ViewModels.Tourdepartureschedule
+@using Entities.Models
+@model DetailTourDepartureModel
+@{
+    ViewData["Title"] = "Chi tiết lịch trình khởi hành";
+    var allCode_ = (List<AllCode>)ViewBag.allCode;
+    var itineraryGo = (TourItinerary)ViewBag.itineraryGo;
+    var itineraryBack = (TourItinerary)ViewBag.itineraryBack;
+    var priceRetail = (TourPrice)ViewBag.priceRetail;
+    var priceAgent = (TourPrice)ViewBag.priceAgent;
+    string statusName = "Chưa xác định";
+    string statusColor = "status-grey";
+    
+    if (Model != null && allCode_ != null)
+    {
+        var st = allCode_.FirstOrDefault(x => x.CodeValue == Model.Status);
+        if (st != null)
+        {
+            statusName = st.Description;
+            statusColor = Model.Status == 1 ? "status-green" : "status-oranger";
+        }
+    }
+}
+
+<style>
+    .tour-detail-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .tour-detail-header .tour-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+    }
+    .tour-detail-header .tour-code {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    .card-info {
+        border: 1px solid #e1e5eb;
+        border-radius: 8px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        height: 100%;
+    }
+    .card-info .icon {
+        font-size: 24px;
+        color: #666;
+        margin-right: 15px;
+        width: 40px;
+        text-align: center;
+    }
+    .card-info .content-card .lbl {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 5px;
+        display: block;
+    }
+    .card-info .content-card .val {
+        color: #333;
+        font-size: 16px;
+        font-weight: 600;
+        display: block;
+    }
+    .box-border {
+        border: 1px solid #e1e5eb;
+        border-radius: 8px;
+        padding: 20px;
+        background: #fff;
+        height: 100%;
+    }
+    .box-border h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #0052cc;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+    .grid-info {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 10px 15px;
+        font-size: 14px;
+    }
+    .grid-info .lbl-grid {
+        color: #666;
+    }
+    .grid-info .val-grid {
+        color: #333;
+        font-weight: 500;
+    }
+    .progress-bar-custom {
+        height: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 5px;
+    }
+    .progress-bar-custom .progress-fill {
+        height: 100%;
+        background-color: #28a745;
+    }
+</style>
+
+@if (Model != null)
+{
+    var durationDays = (Model.EndDate - Model.StartDate).Days;
+    if(durationDays <= 0) durationDays = 1;
+
+    <section style="overflow-x: hidden; background: #f8f9fa; padding-bottom: 50px;">
+        <div class="row-main container">
+            
+            <div class="tour-detail-header wrap_bg" style="margin-bottom: 15px; border-radius: 8px;">
+                <div>
+                    <div class="tour-title">
+                        @Model.TourProductName
+                        <span class="@statusColor" style="font-size: 12px; margin-left: 10px; padding: 3px 8px; border-radius: 4px;">@statusName</span>
+                    </div>
+                    <div class="tour-code">Mã lịch trình: <strong>Chưa cấp mã</strong></div>
+                </div>
+                <div>
+                    <a href="/TourDeparture/AddOrUpdate/@Model.Id" class="btn btn-default" style="background: #f1f2f6; border-color: #f1f2f6; color: #333;"><i class="fa fa-pencil"></i> Sửa lịch trình</a>
+                    <button class="btn btn-default bg-main"><i class="fa fa-plus"></i> Tạo giữ chỗ</button>
+                </div>
+            </div>
+
+            <div class="row mb20">
+                <div class="col-md-3">
+                    <div class="card-info">
+                        <div class="icon"><i class="fa fa-calendar-check-o"></i></div>
+                        <div class="content-card">
+                            <span class="lbl">Ngày khởi hành</span>
+                            <span class="val">@Model.StartDate.ToString("dd/MM/yyyy HH:mm")</span>
+                            <span style="font-size: 12px; color: #888;">Thứ @((int)Model.StartDate.DayOfWeek + 1 == 1 ? "Chủ nhật" : ((int)Model.StartDate.DayOfWeek + 1).ToString())</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-info">
+                        <div class="icon"><i class="fa fa-clock-o"></i></div>
+                        <div class="content-card">
+                            <span class="lbl">Thời lượng</span>
+                            <span class="val">@durationDays ngày @(durationDays - 1) đêm</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-info" style="justify-content: space-between;">
+                        <div style="flex: 1; padding-right: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-size: 13px; color: #666;"><i class="fa fa-circle" style="color: #28a745; font-size: 10px; margin-right: 5px;"></i> Đã bán</span>
+                                <span style="font-weight: bold;">0 / @Model.Total</span>
+                            </div>
+                            <div class="progress-bar-custom">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                            <div style="text-align: right; font-size: 11px; color: #888; margin-top: 5px;">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb20">
+                <div class="col-md-6">
+                    <div class="box-border">
+                        <h3>Thông tin lịch trình</h3>
+                        <div class="grid-info">
+                            <div class="lbl-grid">Sản phẩm tour</div>
+                            <div class="val-grid">@Model.TourProductName</div>
+
+                            <div class="lbl-grid">Ngày khởi hành</div>
+                            <div class="val-grid">@Model.StartDate.ToString("dd/MM/yyyy HH:mm") (Thứ @((int)Model.StartDate.DayOfWeek + 1 == 1 ? "Chủ nhật" : ((int)Model.StartDate.DayOfWeek + 1).ToString()))</div>
+
+                            <div class="lbl-grid">Ngày kết thúc</div>
+                            <div class="val-grid">@Model.EndDate.ToString("dd/MM/yyyy HH:mm") (Thứ @((int)Model.EndDate.DayOfWeek + 1 == 1 ? "Chủ nhật" : ((int)Model.EndDate.DayOfWeek + 1).ToString()))</div>
+
+                            <div class="lbl-grid">Hạn đặt chỗ</div>
+                            <div class="val-grid">@(Model.BookingDeadline.HasValue ? Model.BookingDeadline.Value.ToString("dd/MM/yyyy HH:mm") : "-")</div>
+
+                            <div class="lbl-grid">Trạng thái</div>
+                            <div class="val-grid"><span class="@statusColor" style="padding: 2px 5px; border-radius: 3px; font-size: 12px;">@statusName</span></div>
+
+                            <div class="lbl-grid">Tổng quỹ (Số chỗ)</div>
+                            <div class="val-grid">@Model.Total</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="box-border">
+                        <h3>Cấu hình hiển thị</h3>
+                        <div class="grid-info">
+                            <div class="lbl-grid">Hiển thị Website</div>
+                            <div class="val-grid">
+                                @if(Model.IsShowWebsite == true) { <i class="fa fa-check-circle" style="color: #28a745;"></i> } else { <i class="fa fa-times-circle" style="color: #dc3545;"></i> }
+                            </div>
+
+                            <div class="lbl-grid">Waiting List</div>
+                            <div class="val-grid">
+                                @if(Model.IsShowWaitingList == true) { <i class="fa fa-check-circle" style="color: #28a745;"></i> } else { <i class="fa fa-times-circle" style="color: #dc3545;"></i> }
+                            </div>
+
+                            <div class="lbl-grid">Giữ chỗ Online</div>
+                            <div class="val-grid">
+                                @if(Model.IsAllowReserveOnline == true) { <i class="fa fa-check-circle" style="color: #28a745;"></i> } else { <i class="fa fa-times-circle" style="color: #dc3545;"></i> }
+                            </div>
+
+                            <div class="lbl-grid">Cọc Online</div>
+                            <div class="val-grid">
+                                @if(Model.IsAllowDepositOnline == true) { <i class="fa fa-check-circle" style="color: #28a745;"></i> } else { <i class="fa fa-times-circle" style="color: #dc3545;"></i> }
+                            </div>
+
+                            <div class="lbl-grid">Nổi bật</div>
+                            <div class="val-grid">
+                                @if(Model.IsFeatured == true) { <i class="fa fa-check-circle" style="color: #28a745;"></i> } else { <i class="fa fa-times-circle" style="color: #dc3545;"></i> }
+                            </div>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(Model.Note))
+                        {
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee;">
+                                <div style="color: #666; font-size: 13px; margin-bottom: 5px;">Ghi chú:</div>
+                                <div style="font-size: 14px; color: #333; font-style: italic;">@Model.Note</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* HÀNH TRÌNH DI CHUYỂN *@
+            <div class="row mb20">
+                @if (itineraryGo != null)
+                {
+                    <div class="col-md-6 mb10">
+                        <div class="box-border" style="position:relative; padding-top:25px;">
+                            <div style="position:absolute;top:-12px;left:15px;background:#e8f5e9;color:#4caf50;padding:2px 10px;font-weight:bold;font-size:11px;border-radius:4px;">CHIỀU ĐI</div>
+                            <div class="grid-info">
+                                <div class="lbl-grid">Phương tiện</div>
+                                <div class="val-grid">
+                                    @if (itineraryGo.TransportType == 1) { <i class="fa fa-plane mr-1"></i><text>Máy bay</text> }
+                                    else if (itineraryGo.TransportType == 2) { <i class="fa fa-train mr-1"></i><text>Tàu hỏa</text> }
+                                    else { <i class="fa fa-bus mr-1"></i><text>Xe khách</text> }
+                                </div>
+
+                                <div class="lbl-grid">Điểm đi</div>
+                                <div class="val-grid">@(itineraryGo.StartPoint ?? "-")</div>
+
+                                <div class="lbl-grid">Điểm đến</div>
+                                <div class="val-grid">@(itineraryGo.EndPoint ?? "-")</div>
+
+                                <div class="lbl-grid">Hãng/Đơn vị</div>
+                                <div class="val-grid">@(string.IsNullOrEmpty(itineraryGo.TransportProvider) ? "-" : itineraryGo.TransportProvider)</div>
+
+                                <div class="lbl-grid">Giờ đi</div>
+                                <div class="val-grid">@(itineraryGo.DepartureDate != null && itineraryGo.DepartureDate != DateTime.MinValue ? ((DateTime)itineraryGo.DepartureDate).ToString("dd/MM/yyyy HH:mm") : "-")</div>
+
+                                <div class="lbl-grid">Mã chuyến</div>
+                                <div class="val-grid">@(string.IsNullOrEmpty(itineraryGo.TransportCode) ? "-" : itineraryGo.TransportCode)</div>
+
+                                @if (!string.IsNullOrEmpty(itineraryGo.Note))
+                                {
+                                    <div class="lbl-grid">Ghi chú</div>
+                                    <div class="val-grid" style="font-style:italic;color:#555;">@itineraryGo.Note</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (itineraryBack != null)
+                {
+                    <div class="col-md-6 mb10">
+                        <div class="box-border" style="position:relative; padding-top:25px;">
+                            <div style="position:absolute;top:-12px;left:15px;background:#fff3e0;color:#ff9800;padding:2px 10px;font-weight:bold;font-size:11px;border-radius:4px;">CHIỀU VỀ</div>
+                            <div class="grid-info">
+                                <div class="lbl-grid">Phương tiện</div>
+                                <div class="val-grid">
+                                    @if (itineraryBack.TransportType == 1) { <i class="fa fa-plane mr-1"></i><text>Máy bay</text> }
+                                    else if (itineraryBack.TransportType == 2) { <i class="fa fa-train mr-1"></i><text>Tàu hỏa</text> }
+                                    else { <i class="fa fa-bus mr-1"></i><text>Xe khách</text> }
+                                </div>
+
+                                <div class="lbl-grid">Điểm đi</div>
+                                <div class="val-grid">@(itineraryBack.StartPoint ?? "-")</div>
+
+                                <div class="lbl-grid">Điểm đến</div>
+                                <div class="val-grid">@(itineraryBack.EndPoint ?? "-")</div>
+
+                                <div class="lbl-grid">Hãng/Đơn vị</div>
+                                <div class="val-grid">@(string.IsNullOrEmpty(itineraryBack.TransportProvider) ? "-" : itineraryBack.TransportProvider)</div>
+
+                                <div class="lbl-grid">Giờ về</div>
+                                <div class="val-grid">@(itineraryBack.DepartureDate != null && itineraryBack.DepartureDate != DateTime.MinValue ? ((DateTime)itineraryBack.DepartureDate).ToString("dd/MM/yyyy HH:mm") : "-")</div>
+
+                                <div class="lbl-grid">Mã chuyến</div>
+                                <div class="val-grid">@(string.IsNullOrEmpty(itineraryBack.TransportCode) ? "-" : itineraryBack.TransportCode)</div>
+
+                                @if (!string.IsNullOrEmpty(itineraryBack.Note))
+                                {
+                                    <div class="lbl-grid">Ghi chú</div>
+                                    <div class="val-grid" style="font-style:italic;color:#555;">@itineraryBack.Note</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @* BẢNG GIÁ *@
+            @if (priceRetail != null || priceAgent != null)
+            {
+                <div class="box-border mb20">
+                    <h3>Bảng giá theo loại khách</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm" style="font-size:14px;">
+                            <thead style="background:#f9f9f9;">
+                                <tr>
+                                    <th rowspan="2" class="text-center align-middle" style="width:200px;">LOẠI KHÁCH</th>
+                                    <th colspan="2" class="text-center">GIÁ BÁN (VND)</th>
+                                    <th colspan="2" class="text-center">LỢI NHUẬN</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center text-muted" style="font-size:12px;">KHÁCH LẺ</th>
+                                    <th class="text-center text-muted" style="font-size:12px;">ĐẠI LÝ</th>
+                                    <th class="text-center text-muted" style="font-size:12px;">KHÁCH LẺ</th>
+                                    <th class="text-center text-muted" style="font-size:12px;">ĐẠI LÝ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div style="background:#f2f4f7;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:10px;">
+                                                <i class="fa fa-user" style="color:#667085;"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-weight-bold">Người lớn</div>
+                                                <div style="font-size:11px;color:#666;">Từ 11 tuổi trở lên</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-right font-weight-bold">@((priceRetail != null ? priceRetail.AdtAmount ?? 0 : 0).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold">@((priceAgent != null ? priceAgent.AdtAmount ?? 0 : 0).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold" style="color:#2196F3;">@(((priceRetail != null ? priceRetail.AdtAmount ?? 0 : 0) - (priceRetail != null ? priceRetail.AdtPrice ?? 0 : 0)).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold" style="color:#4caf50;">@(((priceAgent != null ? priceAgent.AdtAmount ?? 0 : 0) - (priceAgent != null ? priceAgent.AdtPrice ?? 0 : 0)).ToString("N0")) đ</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div style="background:#e8f5e9;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:10px;">
+                                                <i class="fa fa-child" style="color:#4caf50;"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-weight-bold">Trẻ em</div>
+                                                <div style="font-size:11px;color:#666;">Từ 2 đến dưới 11 tuổi</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-right font-weight-bold">@((priceRetail != null ? priceRetail.ChdAmount ?? 0 : 0).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold">@((priceAgent != null ? priceAgent.ChdAmount ?? 0 : 0).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold" style="color:#2196F3;">@(((priceRetail != null ? priceRetail.ChdAmount ?? 0 : 0) - (priceRetail != null ? priceRetail.ChdPrice ?? 0 : 0)).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold" style="color:#4caf50;">@(((priceAgent != null ? priceAgent.ChdAmount ?? 0 : 0) - (priceAgent != null ? priceAgent.ChdPrice ?? 0 : 0)).ToString("N0")) đ</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div style="background:#fff8e1;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:10px;">
+                                                <i class="fa fa-reddit-alien" style="color:#ffb300;"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-weight-bold">Em bé</div>
+                                                <div style="font-size:11px;color:#666;">Dưới 2 tuổi</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-right font-weight-bold">@((priceRetail != null ? priceRetail.InfAmount ?? 0 : 0).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold">@((priceAgent != null ? priceAgent.InfAmount ?? 0 : 0).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold" style="color:#2196F3;">@(((priceRetail != null ? priceRetail.InfAmount ?? 0 : 0) - (priceRetail != null ? priceRetail.InfPrice ?? 0 : 0)).ToString("N0")) đ</td>
+                                    <td class="text-right font-weight-bold" style="color:#4caf50;">@(((priceAgent != null ? priceAgent.InfAmount ?? 0 : 0) - (priceAgent != null ? priceAgent.InfPrice ?? 0 : 0)).ToString("N0")) đ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <div class="wrap_bg wrap_bg_no-padding mb20">
+                <ul class="nav nav-tabs" id="myTab" role="tablist" style="margin-bottom: 0; padding: 10px 15px 0;">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="tab1-tab" data-toggle="tab" href="#tab1" role="tab">Danh sách Booking (0)</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent" style="padding: 20px;">
+                    <div class="tab-pane active" id="tab1" role="tabpanel">
+                        <div class="text-center" style="padding: 40px 0; color: #212529;">
+                            <div>Hiện chưa có booking nào cho lịch trình này.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+}
+else
+{
+    <div class="container text-center mt-5">
+        <h4>Không tìm thấy thông tin lịch trình</h4>
+        <a href="/TourDeparture" class="btn btn-default mt-3">Quay lại danh sách</a>
+    </div>
+}

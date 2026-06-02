@@ -348,6 +348,20 @@ namespace Utilities.Contants
         public static string sp_UpdateFlightWarehouseHoldTicketStatus = "sp_UpdateFlightWarehouseHoldTicketStatus";
         public static string sp_UpdateFlightWarehouseHoldTicket = "sp_UpdateFlightWarehouseHoldTicket";
 
+        public static string sp_GetListTourDeparture = "sp_GetListTourDeparture";
+        public static string sp_GetTourDepartureById = "sp_GetTourDepartureById";
+        public static string sp_InsertTourDeparture = "sp_InsertTourDeparture";
+        public static string sp_UpdateTourDeparture = "sp_UpdateTourDeparture";
+
+        public static string sp_GetTourItineraryByDepartureId = "sp_GetTourItineraryByDepartureId";
+        public static string sp_InsertTourItinerary = "sp_InsertTourItinerary";
+        public static string sp_UpdateTourItinerary = "sp_UpdateTourItinerary";
+
+        public static string sp_GetTourPriceByDepartureId = "sp_GetTourPriceByDepartureId";
+        public static string sp_InsertTourPrice = "sp_InsertTourPrice";
+        public static string sp_UpdateTourPrice = "sp_UpdateTourPrice";
+        
+
 
 
 

@@ -120,6 +120,7 @@ builder.Services.AddTransient<IUserAgentRepository, UserAgentRepository>();
 builder.Services.AddTransient<IAirlinesRepository, AirlinesRepository>();
 builder.Services.AddTransient<IPassengerRepository, PassengerRepository>();
 builder.Services.AddTransient<ITourRepository, TourRepository>();
+builder.Services.AddTransient<ITourDepartureRepository, TourDepartureRepository>();
 builder.Services.AddTransient<ISupplierRepository, SupplierRepository>();
 builder.Services.AddTransient<INationalRepository, NationalRepository>();
 builder.Services.AddTransient<IPaymentRequestRepository, PaymentRequestRepository>();

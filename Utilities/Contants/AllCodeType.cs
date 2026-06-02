@@ -45,6 +45,7 @@ namespace Utilities.Contants
         public static string WEEKDAY_TYPE = "WEEKDAY_TYPE";
         public static string CLIENT_STATUS = "CLIENT_STATUS";
         public static string CLIENT_SOURCE = "CLIENT_SOURCE";
+        public static string TOUR_DEPARTURE_STATUS = "TOUR_DEPARTURE_STATUS";
 
 
     }

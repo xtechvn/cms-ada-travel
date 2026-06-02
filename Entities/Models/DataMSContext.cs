@@ -167,6 +167,9 @@ namespace Entities.Models
         public virtual DbSet<FlightWarehousePrice> FlightWarehousePrices { get; set; }
         public virtual DbSet<FlightWarehouseSegment> FlightWarehouseSegments { get; set; }
         public virtual DbSet<FlightWarehouseHoldTicket> FlightWarehouseHoldTickets { get; set; }
+        public virtual DbSet<TourPrice> TourPrices { get; set; }
+        public virtual DbSet<TourDeparture> TourDepartures { get; set; }
+        public virtual DbSet<TourItinerary> TourItineraries { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -3146,6 +3149,108 @@ namespace Entities.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.GroupObject).HasDefaultValueSql("((1))");
+            });
+            modelBuilder.Entity<TourItinerary>(entity =>
+            {
+                entity.ToTable("TourItinerary");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DepartureDate).HasColumnType("datetime");
+
+                entity.Property(e => e.EndPoint).HasMaxLength(250);
+
+                entity.Property(e => e.Note).HasMaxLength(500);
+
+                entity.Property(e => e.StartPoint).HasMaxLength(250);
+
+                entity.Property(e => e.TransportCode).HasMaxLength(100);
+
+                entity.Property(e => e.TransportProvider).HasMaxLength(250);
+            });
+            modelBuilder.Entity<TourPrice>(entity =>
+            {
+                entity.ToTable("TourPrice");
+
+                entity.Property(e => e.AdtAmount)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.AdtPrice)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.AdtProfit)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.AdultQuantity).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ChdAmount)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ChdPrice)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ChdProfit)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ChildQuantity).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.InfAmount)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.InfPrice)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.InfProfit)
+                    .HasColumnType("decimal(18, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.InfantQuantity).HasDefaultValueSql("((0))");
+            });
+            modelBuilder.Entity<TourDeparture>(entity =>
+            {
+                entity.ToTable("TourDeparture");
+
+                entity.Property(e => e.BookingDeadline).HasColumnType("datetime");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.IsAllowDepositOnline).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.IsAllowReserveOnline).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.IsFeatured).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.IsShowWaitingList).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.IsShowWebsite).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.Note).HasMaxLength(1000);
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Status).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.Total).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
             });
             OnModelCreatingPartial(modelBuilder);
         }

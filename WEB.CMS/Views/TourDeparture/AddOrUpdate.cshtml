@@ -1,0 +1,394 @@
+@using Entities.ViewModels.Tourdepartureschedule
+@using Entities.Models
+@model DetailTourDepartureModel
+@{
+    ViewData["Title"] = Model != null && Model.Id > 0 ? "Cập nhật lịch trình khởi hành" : "Thêm mới lịch trình khởi hành";
+    var allCode_ = (List<AllCode>)ViewBag.allCode;
+    var tour_product = (TourProduct)ViewBag.TourProduct;
+    var itineraryGo = (TourItinerary)ViewBag.itineraryGo;
+    var itineraryBack = (TourItinerary)ViewBag.itineraryBack;
+    var priceRetail = (TourPrice)ViewBag.priceRetail;
+    var priceAgent = (TourPrice)ViewBag.priceAgent;
+}
+
+<section style="overflow-x: hidden;">
+    <div class="row-main container">
+        <h2 class="txt_18 bold mb20">@(Model != null && Model.Id > 0 ? "Cập nhật lịch trình" : "Thêm mới lịch trình")</h2>
+        
+        <form id="form_tour_departure">
+            <input type="hidden" id="Id" value="@(Model != null ? Model.Id : 0)" />
+            
+            <div class="wrap_bg mb20">
+                <h3 class="title-margin text-uppercase">1. Thông tin chung</h3>
+                <div class="row">
+                    <div class="col-md-6 mb10">
+                        <label class="lbl">Sản phẩm Tour <sup class="red">*</sup></label>
+                        <div class="wrap_input">
+                            <select class="form-control" id="TourProductId" style="width:100%">
+                                @if (tour_product != null && tour_product.Id > 0)
+                                {
+                                    <option value="@tour_product.Id" selected="selected">@tour_product.TourName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                   <div class="col-md-6 mb10">
+                        <label class="lbl">Trạng thái</label>
+                        <div class="wrap_input">
+                            <select class="form-control" id="Status">
+                                @if(allCode_!=null && allCode_.Count>0){
+                                    foreach(var item in allCode_){
+                                        if(Model!=null && item.CodeValue == Model.Status){
+                                            <option value="@item.CodeValue" selected>@item.Description</option>
+                                        }else{
+                                            <option value="@item.CodeValue">@item.Description</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb10">
+                        <label class="lbl">Ngày khởi hành <sup class="red">*</sup></label>
+                        <div class="wrap_input">
+                            <input type="text" class="form-control datepicker-input" id="StartDate" value="@(Model != null && Model.StartDate != DateTime.MinValue ? Model.StartDate.ToString("dd/MM/yyyy HH:mm") : "")" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb10">
+                        <label class="lbl">Ngày về <sup class="red">*</sup></label>
+                        <div class="wrap_input">
+                            <input type="text" class="form-control datepicker-input" id="EndDate" value="@(Model != null && Model.EndDate != DateTime.MinValue ? Model.EndDate.ToString("dd/MM/yyyy HH:mm") : "")" />
+                        </div>
+                    </div>
+                   
+                 
+                    <div class="col-md-12 mb10">
+                        <label class="lbl">Ghi chú</label>
+                        <div class="wrap_input">
+                            <textarea style="min-height:150px !important;" class="form-control" id="Note" rows="3">@(Model != null ? Model.Note : "")</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wrap_bg mb20">
+                <h3 class="title-margin text-uppercase">2. Hành trình di chuyển</h3>
+                <div class="row">
+                    <!-- Chiều đi -->
+                    <div class="col-md-6 mb10 itinerary-block" data-type="1">
+                        <div style="border: 1px solid #e0e0e0; border-radius: 4px; padding: 15px; position: relative; margin-top: 10px;">
+                            <input type="hidden" class="ip-id" value="@itineraryGo.Id" />
+                            <input type="hidden" class="ip-transport-type" value="@itineraryGo.TransportType" />
+                            <div style="position: absolute; top: -12px; left: 15px; background: #e8f5e9; color: #4caf50; padding: 2px 10px; font-weight: bold; font-size: 11px; border-radius: 4px;">CHIỀU ĐI</div>
+                            
+                            <div class="form-group mb10">
+                                <label class="lbl">PHƯƠNG TIỆN DI CHUYỂN <sup class="red">*</sup></label>
+                                <div class="d-flex" style="gap: 5px;">
+                                    <button type="button" class="btn btn-default flex-grow-1 btn-transport @(itineraryGo.TransportType == 1 ? "active" : "")" data-val="1" @(itineraryGo.TransportType == 1 ? "style=background:#e8f5e9;color:#4caf50;border-color:#c8e6c9;" : "")><i class="fa fa-plane"></i> Máy bay</button>
+                                    <button type="button" class="btn btn-default flex-grow-1 btn-transport @(itineraryGo.TransportType == 2 ? "active" : "")" data-val="2" @(itineraryGo.TransportType == 2 ? "style=background:#e8f5e9;color:#4caf50;border-color:#c8e6c9;" : "")><i class="fa fa-train"></i> Tàu hỏa</button>
+                                    <button type="button" class="btn btn-default flex-grow-1 btn-transport @(itineraryGo.TransportType == 3 ? "active" : "")" data-val="3" @(itineraryGo.TransportType == 3 ? "style=background:#e8f5e9;color:#4caf50;border-color:#c8e6c9;" : "")><i class="fa fa-bus"></i> Xe khách</button>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb10">
+                                    <label class="lbl">ĐIỂM ĐI <sup class="red">*</sup></label>
+                                    <select class="form-control select-route-from select2">
+                                        @if (!string.IsNullOrEmpty(itineraryGo.StartPoint))
+                                        {
+                                            <option value="@itineraryGo.StartPoint" selected>@itineraryGo.StartPoint</option>
+                                        }
+                                        else
+                                        {
+                                            <option>Chọn điểm đi</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb10">
+                                    <label class="lbl">ĐIỂM ĐẾN <sup class="red">*</sup></label>
+                                    <select class="form-control select-route-to select2">
+                                        @if (!string.IsNullOrEmpty(itineraryGo.EndPoint))
+                                        {
+                                            <option value="@itineraryGo.EndPoint" selected>@itineraryGo.EndPoint</option>
+                                        }
+                                        else
+                                        {
+                                            <option>Chọn điểm đến</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb10">
+                                    <label class="lbl">HÃNG/ĐƠN VỊ</label>
+                                    <input type="text" class="form-control ip-provider"  placeholder="Nhập hãng/đơn vị" value="@itineraryGo.TransportProvider" />
+                                </div>
+                                <div class="col-md-4 mb10">
+                                    <label class="lbl">GIỜ ĐI</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control datepicker-input ip-date" placeholder="--:--" value="@(itineraryGo.DepartureDate != null && itineraryGo.DepartureDate != DateTime.MinValue ? ((DateTime)itineraryGo.DepartureDate).ToString("dd/MM/yyyy HH:mm") : "")" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb10">
+                                    <label class="lbl">MÃ CHUYẾN</label>
+                                    <input type="text" class="form-control ip-code" placeholder="VD: 29B-12345" value="@itineraryGo.TransportCode" />
+                                </div>
+                            </div>
+
+                            <div class="form-group mb0">
+                                <label class="lbl">GHI CHÚ CHUYẾN ĐI (NẾU CÓ)</label>
+                                <textarea class="form-control ip-note" rows="2" placeholder="Nhập ghi chú..." style="min-height:100px !important;">@itineraryGo.Note</textarea>
+                                <div class="text-right" style="font-size: 11px; color: #999;">0/255</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chiều về -->
+                    <div class="col-md-6 mb10 itinerary-block" data-type="2">
+                        <div style="border: 1px solid #e0e0e0; border-radius: 4px; padding: 15px; position: relative; margin-top: 10px;">
+                            <input type="hidden" class="ip-id" value="@(itineraryBack!=null? itineraryBack.Id:0)" />
+                            <input type="hidden" class="ip-transport-type" value="@(itineraryBack!=null? itineraryBack.TransportType:0)" />
+                            <div style="position: absolute; top: -12px; left: 15px; background: #fff3e0; color: #ff9800; padding: 2px 10px; font-weight: bold; font-size: 11px; border-radius: 4px;">CHIỀU VỀ</div>
+                            
+                            <div class="form-group mb10">
+                                <label class="lbl">PHƯƠNG TIỆN DI CHUYỂN <sup class="red">*</sup></label>
+                                <div class="d-flex" style="gap: 5px;">
+                                    <button type="button" class="btn btn-default flex-grow-1 btn-transport @(itineraryBack.TransportType == 1 ? "active" : "")" data-val="1" @(itineraryBack.TransportType == 1 ? "style=background:#fff3e0;color:#ff9800;border-color:#ffe0b2;" : "")><i class="fa fa-plane"></i> Máy bay</button>
+                                    <button type="button" class="btn btn-default flex-grow-1 btn-transport @(itineraryBack.TransportType == 2 ? "active" : "")" data-val="2" @(itineraryBack.TransportType == 2 ? "style=background:#fff3e0;color:#ff9800;border-color:#ffe0b2;" : "")><i class="fa fa-train"></i> Tàu hỏa</button>
+                                    <button type="button" class="btn btn-default flex-grow-1 btn-transport @(itineraryBack.TransportType == 3 ? "active" : "")" data-val="3" @(itineraryBack.TransportType == 3 ? "style=background:#fff3e0;color:#ff9800;border-color:#ffe0b2;" : "")><i class="fa fa-bus"></i> Xe khách</button>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb10">
+                                    <label class="lbl">ĐIỂM ĐI <sup class="red">*</sup></label>
+                                    <select class="form-control select-route-from select2">
+                                        @if (itineraryBack!=null && itineraryBack.StartPoint!=null)
+                                        {
+                                            <option value="@itineraryBack.StartPoint" selected>@itineraryBack.StartPoint</option>
+                                        }
+                                        else
+                                        {
+                                            <option>Chọn điểm đi</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb10">
+                                    <label class="lbl">ĐIỂM ĐẾN <sup class="red">*</sup></label>
+                                    <select class="form-control select-route-to select2">
+                                        @if (itineraryBack!=null && itineraryBack.EndPoint!=null)
+                                        {
+                                            <option value="@itineraryBack.EndPoint" selected>@itineraryBack.EndPoint</option>
+                                        }
+                                        else
+                                        {
+                                            <option>Chọn điểm đến</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb10">
+                                    <label class="lbl">HÃNG/ĐƠN VỊ</label>
+                                    <input type="text" class="form-control ip-provider"  placeholder="Nhập hãng/đơn vị" value="@itineraryBack.TransportProvider" />
+                                </div>
+                                <div class="col-md-4 mb10">
+                                    <label class="lbl">GIỜ VỀ</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control datepicker-input ip-date" placeholder="--:--" value="@(itineraryBack.DepartureDate != null && itineraryBack.DepartureDate != DateTime.MinValue ? ((DateTime)itineraryBack.DepartureDate).ToString("dd/MM/yyyy HH:mm") : "")" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb10">
+                                    <label class="lbl">MÃ CHUYẾN</label>
+                                    <input type="text" class="form-control ip-code" placeholder="VD: VN123" value="@itineraryBack.TransportCode" />
+                                </div>
+                            </div>
+
+                            <div class="form-group mb0">
+                                <label class="lbl">GHI CHÚ CHUYẾN VỀ (NẾU CÓ)</label>
+                                <textarea class="form-control ip-note" style="min-height:100px !important;" rows="2" placeholder="Nhập ghi chú...">@itineraryBack.Note</textarea>
+                                <div class="text-right" style="font-size: 11px; color: #999;">0/255</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt10 mb0" style="background:#e8f4fd; color:#0366d6; border:none; padding:10px; font-size:13px; border-radius:4px;">
+                    <i class="fa fa-info-circle"></i> Có thể chọn phương tiện di chuyển khác nhau cho chiều đi và chiều về (ví dụ: đi xe khách - về máy bay hoặc ngược lại).
+                </div>
+            </div>
+
+            <div class="wrap_bg mb20">
+                <div class="d-flex align-items-center mb10">
+                    <h3 class="title-margin text-uppercase mb-0">3. Bảng giá theo loại khách</h3>
+                    <i class="fa fa-info-circle ml-2 text-muted" style="font-size:16px;"></i>
+                </div>
+                <div class="text-muted mb10" style="font-size: 13px;">Nhập giá nhập và giá bán, hệ thống sẽ tự động tính lợi nhuận.</div>
+                
+                <div class="table-responsive">
+                        <input type="hidden" class="price-retail-id" value="@(priceRetail != null ? priceRetail.Id : 0)" />
+                        <input type="hidden" class="price-agent-id" value="@(priceAgent != null ? priceAgent.Id : 0)" />
+                        <table class="table table-bordered table-striped" style="border:1px solid #eee;">
+                        <thead style="background:#f9f9f9;">
+                            <tr>
+                                <th rowspan="2" class="text-center align-middle" style="width:200px;">LOẠI KHÁCH</th>
+                                <th colspan="2" class="text-center" style="border-bottom:none;">GIÁ NHẬP (VND)</th>
+                                <th colspan="2" class="text-center" style="border-bottom:none;">GIÁ BÁN (VND)</th>
+                                <th colspan="2" class="text-center" style="border-bottom:none;">LỢI NHUẬN</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center font-weight-normal text-muted" style="font-size:12px;">KHÁCH LẺ</th>
+                                <th class="text-center font-weight-normal text-muted" style="font-size:12px;">ĐẠI LÝ</th>
+                                <th class="text-center font-weight-normal text-muted" style="font-size:12px;">KHÁCH LẺ</th>
+                                <th class="text-center font-weight-normal text-muted" style="font-size:12px;">ĐẠI LÝ</th>
+                                <th class="text-center font-weight-normal text-muted" style="font-size:12px;">KHÁCH LẺ</th>
+                                <th class="text-center font-weight-normal text-muted" style="font-size:12px;">ĐẠI LÝ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div style="background:#f2f4f7; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:10px;">
+                                            <i class="fa fa-user" style="color:#667085;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-weight-bold" style="font-size:14px;">Người lớn</div>
+                                            <div style="font-size:11px; color:#666;">Từ 11 tuổi trở lên</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><input type="text" class="form-control text-right currency price-adt le-nhap" value="@(priceRetail!=null? priceRetail.AdtPrice?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-adt dl-nhap" value="@(priceAgent!=null? priceAgent.AdtPrice?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-adt le-ban" value="@(priceRetail!=null? priceRetail.AdtAmount?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-adt dl-ban" value="@(priceAgent!=null? priceAgent.AdtAmount?.ToString("N0"):"0")" /></td>
+                                <td class="text-center align-middle font-weight-bold price-adt le-loi" style="color:#2196F3;">@(priceRetail!=null? (priceRetail?.AdtAmount - priceRetail?.AdtPrice).Value.ToString("N0"):"0")</td>
+                                <td class="text-center align-middle font-weight-bold price-adt dl-loi" style="color:#4caf50;">@(priceAgent!=null? (priceAgent?.AdtAmount - priceAgent?.AdtPrice).Value.ToString("N0"):"0")</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div style="background:#e8f5e9; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:10px;">
+                                            <i class="fa fa-child" style="color:#4caf50;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-weight-bold" style="font-size:14px;">Trẻ em</div>
+                                            <div style="font-size:11px; color:#666;">Từ 2 đến dưới 11 tuổi</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><input type="text" class="form-control text-right currency price-chd le-nhap" value="@(priceRetail!=null? priceRetail.ChdPrice?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-chd dl-nhap" value="@(priceAgent!=null? priceAgent.ChdPrice?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-chd le-ban" value="@(priceRetail!=null? priceRetail.ChdAmount?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-chd dl-ban" value="@(priceAgent!=null? priceAgent.ChdAmount?.ToString("N0"):"0")" /></td>
+                                <td class="text-center align-middle font-weight-bold price-chd le-loi" style="color:#2196F3;">@(priceRetail!=null? (priceRetail?.ChdAmount - priceRetail?.ChdPrice).Value.ToString("N0"):"0")</td>
+                                <td class="text-center align-middle font-weight-bold price-chd dl-loi" style="color:#4caf50;">@(priceAgent!=null? (priceAgent?.ChdAmount - priceAgent?.ChdPrice).Value.ToString("N0"):"0")</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div style="background:#fff8e1; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-right:10px;">
+                                            <i class="fa fa-reddit-alien" style="color:#ffb300;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-weight-bold" style="font-size:14px;">Em bé</div>
+                                            <div style="font-size:11px; color:#666;">Dưới 2 tuổi</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><input type="text" class="form-control text-right currency price-inf le-nhap" value="@(priceRetail!=null? priceRetail.InfPrice?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-inf dl-nhap" value="@(priceAgent!=null? priceAgent.InfPrice?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-inf le-ban" value="@(priceRetail!=null? priceRetail.InfAmount?.ToString("N0"):"0")" /></td>
+                                <td><input type="text" class="form-control text-right currency price-inf dl-ban" value="@(priceAgent!=null? priceAgent.InfAmount?.ToString("N0"):"0")" /></td>
+                                <td class="text-center align-middle font-weight-bold price-inf le-loi" style="color:#2196F3;">@(priceRetail!=null? (priceRetail?.InfAmount - priceRetail?.InfPrice).Value.ToString("N0"):"0")</td>
+                                <td class="text-center align-middle font-weight-bold price-inf dl-loi" style="color:#4caf50;">@(priceAgent!=null? (priceAgent?.InfAmount - priceAgent?.InfPrice).Value.ToString("N0"):"0")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="wrap_bg mb20">
+                <h3 class="title-margin text-uppercase">4. QUỸ CHỖ & SỐ LƯỢNG</h3>
+                <div class="row">
+                        <div class="col-md-6 mb10">
+                        <label class="lbl">Số chỗ (Total) <sup class="red">*</sup></label>
+                        <div class="wrap_input">
+                            <input type="number" class="form-control" id="Total" value="@(Model != null ? Model.Total : 0)" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb10">
+                        <label class="lbl">Hạn nhận đặt chỗ <sup class="red">*</sup></label>
+                        <div class="wrap_input">
+                            <input type="text" class="form-control datepicker-input" id="BookingDeadline" value="@(Model != null && Model.BookingDeadline.HasValue ? Model.BookingDeadline.Value.ToString("dd/MM/yyyy HH:mm") : "")" />
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="wrap_bg mb20">
+                <h3 class="title-margin text-uppercase">5. Cấu hình hiển thị Website</h3>
+                <div class="row">
+                    <div class="col-md-3 mb10">
+                        <label class="check-list mb10">
+                            <input type="checkbox" id="IsShowWebsite" @(Model != null && Model.IsShowWebsite == true ? "checked" : "") />
+                            <span class="checkmark"></span>
+                            Hiển thị Website
+                        </label>
+                    </div>
+                    <div class="col-md-3 mb10">
+                        <label class="check-list mb10">
+                            <input type="checkbox" id="IsShowWaitingList" @(Model != null && Model.IsShowWaitingList == true ? "checked" : "") />
+                            <span class="checkmark"></span>
+                            Cho phép Waiting List
+                        </label>
+                    </div>
+                    <div class="col-md-3 mb10">
+                        <label class="check-list mb10">
+                            <input type="checkbox" id="IsAllowReserveOnline" @(Model != null && Model.IsAllowReserveOnline == true ? "checked" : "") />
+                            <span class="checkmark"></span>
+                            Cho phép giữ chỗ Online
+                        </label>
+                    </div>
+                    <div class="col-md-3 mb10">
+                        <label class="check-list mb10">
+                            <input type="checkbox" id="IsAllowDepositOnline" @(Model != null && Model.IsAllowDepositOnline == true ? "checked" : "") />
+                            <span class="checkmark"></span>
+                            Cho phép cọc Online
+                        </label>
+                    </div>
+                    <div class="col-md-3 mb10">
+                        <label class="check-list mb10">
+                            <input type="checkbox" id="IsFeatured" @(Model != null && Model.IsFeatured == true ? "checked" : "") />
+                            <span class="checkmark"></span>
+                            Nổi bật
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group align-right mt20 block">
+                <a href="/TourDeparture" class="btn btn-default cancel"><i class="fa fa-minus-circle"></i>Hủy bỏ</a>
+                <button type="button" class="btn btn-default bg-main" onclick="_tour_departure.Save()"><i class="fa fa-floppy-o"></i>Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section scripts {
+    <script type="text/javascript" src="~/modules/tour_departure.js"></script>
+    <script>
+        $(document).ready(function() {
+            _tour_departure.InitAddOrUpdate();
+        });
+    </script>
+}
