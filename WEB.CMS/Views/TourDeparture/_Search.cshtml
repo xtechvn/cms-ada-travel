@@ -72,9 +72,9 @@
                             <tr>
                                 <td class="text-center">@innerStt</td>
                                 <td>
-                                    <a class="blue font-weight-bold" href="/TourDeparture/AddOrUpdate/@item.Id">
-                                        #@item.Id
-                                    </a>
+                                    @* <a class="blue font-weight-bold" href="/TourDeparture/AddOrUpdate/@item.Id">
+                                        @item.Id
+                                    </a> *@
                                 </td>
                                 <td class="text-center">
                                     <div class="font-weight-bold">@item.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
@@ -91,7 +91,7 @@
                                     }
                                 </td>
                                 <td class="text-right">
-                                    <span class="bold text-primary">@item.adtAmount.ToString("N0")₫</span>
+                                    <span class="bold text-primary">@item.AdtAmount.ToString("N0")₫</span>
                                 </td>
                                 <td class="text-center">
                                     @if (item.Status == 1)

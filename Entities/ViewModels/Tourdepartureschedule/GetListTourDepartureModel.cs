@@ -14,7 +14,7 @@ namespace Entities.ViewModels.Tourdepartureschedule
         public string CreatedName { get; set; }
         public string UpdatedName { get; set; }
         public int TotalRow { get; set; }
-        public double adtAmount { get; set; }
+        public double AdtAmount { get; set; }
         public string EndPoint { get; set; }
         public string StartPoint { get; set; }
 
