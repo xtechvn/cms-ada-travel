@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Entities.Models;
+@{
     Layout = null;
 
     Entities.ViewModels.ElasticSearch.UserESViewModel user = (Entities.ViewModels.ElasticSearch.UserESViewModel)ViewBag.User;
@@ -9,6 +10,7 @@
     bool is_order_manual = (bool)ViewBag.IsOrderManual;
     bool is_allow_to_edit = (bool)ViewBag.AllowToEdit;
     bool is_self_design = (bool)ViewBag.IsSelfDesigned;
+    var provinces = (List<Province>)ViewBag.provinces;
 }
 
 <style>
@@ -88,11 +90,54 @@
                     <div class="col-lg-3 col-md-6 mb15">
                         <label class="lbl mb5">Điểm đi <sup class="red">*</sup></label>
                         <select class="service-tour-startpoint" style="width: 100%;">
+                            @if (provinces != null && provinces.Any())
+                            {
+                                foreach (var item in provinces)
+                                {
+                                    if (tour_product != null)
+                                    {
+                                        if (tour_product.StartPoint.ToString().Equals(item.Id.ToString()))
+                                        {
+                                            <option value="@item.Id" selected>@item.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.Name</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                }
+                            }
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-6 mb15">
                         <label class="lbl mb5">Điểm đến <sup class="red">*</sup></label>
                         <select class="service-tour-endpoint" multiple="multiple" style="width: 100%;">
+                            @if (provinces != null && provinces.Any())
+                            {
+                                foreach (var item in provinces)
+                                {
+                                    if (ViewBag.EndPoints != null)
+                                    {
+                                        var end_points = ViewBag.EndPoints.ToString().Split(',');
+                                        if (end_points.Contains(item.Id.ToString()))
+                                        {
+                                            <option value="@item.Id" selected>@item.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.Name</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                }
+                            }
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-6 mb15">

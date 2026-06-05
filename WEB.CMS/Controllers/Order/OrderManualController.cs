@@ -9,9 +9,11 @@ using Entities.ViewModels.OrderManual;
 using Entities.ViewModels.SetServices;
 using ENTITIES.ViewModels.Articles;
 using Microsoft.AspNetCore.Mvc;
+using Nest;
 using Newtonsoft.Json;
 using OfficeOpenXml;
 using Repositories.IRepositories;
+using Repositories.Repositories;
 using System.Security.Claims;
 using Utilities;
 using Utilities.Contants;
@@ -64,13 +66,14 @@ namespace WEB.Adavigo.CMS.Controllers.Order
         private LogActionMongoService LogActionMongo;
         private readonly WorkQueueClient workQueueClient;
         private readonly ICustomerManagerRepository _customerManagerRepositories;
+        private readonly ICommonRepository _commonRepository;
 
         public OrderController(IConfiguration configuration, IOrderRepository orderRepository, IClientRepository clientRepository, IAllCodeRepository allcodeRepository, IUserRepository userRepository, IIdentifierServiceRepository identifierServiceRepository
                 , IAccountClientRepository accountClientRepository, IHotelBookingRepositories hotelBookingRepository, IHotelBookingRoomRepository hotelBookingRoomRepository, IHotelBookingRoomRatesRepository hotelBookingRoomRatesRepository,
                 IHotelBookingRoomExtraPackageRepository hotelBookingRoomExtraPackageRepository, IHotelBookingGuestRepository hotelBookingGuestRepository, IFlyBookingDetailRepository flyBookingDetailRepository, IAirlinesRepository airlinesRepository,
                  IPassengerRepository passengerRepository, IProvinceRepository provinceRepository, INationalRepository nationalRepository, ManagementUser managementUser, IOtherBookingRepository otherBookingRepository,
                  ITourRepository tourRepository, ISupplierRepository supplierRepository, IContractRepository contractRepository, IAttachFileRepository attachFileRepository, IVinWonderBookingRepository vinWonderBookingRepository,
-                 IGroupProductRepository groupProductRepository, IHotelBookingCodeRepository hotelBookingCodeRepository, IDepartmentRepository departmentRepository, IContractPayRepository contractPayRepository, ICustomerManagerRepository customerManagerRepositories)
+                 IGroupProductRepository groupProductRepository, IHotelBookingCodeRepository hotelBookingCodeRepository, IDepartmentRepository departmentRepository, IContractPayRepository contractPayRepository, ICustomerManagerRepository customerManagerRepositories, ICommonRepository commonRepository)
         {
             _configuration = configuration;
             _orderRepository = orderRepository;
@@ -109,6 +112,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
             LogActionMongo = new LogActionMongoService(configuration);
             workQueueClient = new WorkQueueClient(configuration);
             _customerManagerRepositories = customerManagerRepositories;
+            _commonRepository = commonRepository;
         }
 
         [HttpPost]
@@ -1188,7 +1192,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 var current_user = _ManagementUser.GetCurrentUser();
                
                 string link = "/Order/" + result.OrderId;
-                 apiService.SendMessage( _UserId.ToString(),((int) ModuleType.DON_HANG).ToString(), ((int)ActionType.TAO_MOI).ToString(), order.OrderNo, link, current_user==null? "0": current_user.Role);
+                 apiService.SendMessage( _UserId.ToString(),((int) ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.TAO_MOI).ToString(), order.OrderNo, link, current_user==null? "0": current_user.Role);
                 workQueueClient.SyncES(result.OrderId, _configuration["DataBaseConfig:Elastic:SP:sp_GetOrder"], _configuration["DataBaseConfig:Elastic:Index:Order"], ProjectType.ADAVIGO_CMS, "CreateManualOrder OrderManualController");
 
                 //-- Bo sung tao contact client:
@@ -1230,6 +1234,8 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                 if (order_id > 0)
                 {
                     long _UserId = 0;
+                    ViewBag.EndPoints = null;
+                    ViewBag.provinces = null;
                     if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
                     {
                         _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -1249,7 +1255,12 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                             _id = user.Id
                         };
                     }
-
+                    ViewBag.provinces = await _commonRepository.GetProvinceList();
+                    var tourDestination = await _tourRepository.GetTourDestinationByTourProductId(tour_id);
+                    if (tourDestination != null && tourDestination.Any())
+                    {
+                        ViewBag.EndPoints = tourDestination.Select(s => (int)s.LocationId);
+                    }
                     int tour_status = (int)ServiceStatus.OnExcution;
                     var tour = await _tourRepository.GetTourById(tour_id);
                     if (tour != null && tour.Id > 0)
@@ -1745,7 +1756,7 @@ namespace WEB.Adavigo.CMS.Controllers.Order
                  var success = await _orderRepository.UpdateOrderSaler((long)order_id, _UserId);
                 var current_user = _ManagementUser.GetCurrentUser();
                 string link = "/Order/" + order_id;   
-                apiService.SendMessage( _UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)ActionType.NHAN_TRIEN_KHAI).ToString(), OrderNo, link, current_user.Role);
+                apiService.SendMessage( _UserId.ToString(), ((int)ModuleType.DON_HANG).ToString(), ((int)Utilities.Contants.ActionType.NHAN_TRIEN_KHAI).ToString(), OrderNo, link, current_user.Role);
                 var user = await _userRepository.GetById(_UserId);
                 model.Log = "Nhận triển khai";
                 model.Note = user.FullName + " nhận xử lý đơn hàng ";
