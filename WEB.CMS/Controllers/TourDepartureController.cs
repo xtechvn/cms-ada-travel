@@ -20,15 +20,13 @@ namespace WEB.Adavigo.CMS.Controllers
         private readonly ITourDepartureRepository _tourDepartureRepository;
         private readonly IAllCodeRepository _allCodeRepository;
         private readonly ITourRepository _tourRepository;
-        private readonly IConfiguration _configuration;
-        private readonly WorkQueueClient workQueueClient;
-        public TourDepartureController(ITourDepartureRepository tourDepartureRepository, IAllCodeRepository allCodeRepository, ITourRepository tourRepository, IConfiguration configuration)
+
+        public TourDepartureController(ITourDepartureRepository tourDepartureRepository, IAllCodeRepository allCodeRepository, ITourRepository tourRepository)
         {
             _tourDepartureRepository = tourDepartureRepository;
             _allCodeRepository = allCodeRepository;
             _tourRepository = tourRepository;
-            _configuration = configuration;
-            workQueueClient = new WorkQueueClient(configuration);
+
         }
 
         public IActionResult Index()
@@ -106,7 +104,6 @@ namespace WEB.Adavigo.CMS.Controllers
 
                 if (result > 0)
                 {
-                    workQueueClient.SyncES(result,_configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS, "UpsertTourProduct TourProductController");
 
                     return Ok(new { status = 1, msg = "Thành công" });
                 }
