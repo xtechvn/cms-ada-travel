@@ -216,7 +216,7 @@ namespace WEB.Adavigo.CMS.Controllers.SetService
                         cache_name = CacheName.B2B_TOUR_SEARCH;
                         _redisService.DeleteCacheByKeyword(cache_name, db_index);
                     }
-                    workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS, "UpsertTourProduct TourProductController");
+                    //workQueueClient.SyncES(tour_id, _configuration["DataBaseConfig:Elastic:SP:sp_GetTour"], _configuration["DataBaseConfig:Elastic:Index:TourBooking"], ProjectType.ADAVIGO_CMS, "UpsertTourProduct TourProductController");
 
                     return new JsonResult(new
                     {
