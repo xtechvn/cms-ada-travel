@@ -45,7 +45,7 @@ var hotelRoomFund = {
                         results: $.map(data, function (item) {
                             return {
                                 text: item.name,
-                                id: item.hotelid
+                                id: item.id
                             }
                         })
                     };
