@@ -11,7 +11,7 @@ namespace Entities.Models
         }
 
         public int Id { get; set; }
-        public int HotelId { get; set; }
+        public string HotelId { get; set; }
         public int? SupplierId { get; set; }
         public decimal? TotalRooms { get; set; }
         public DateTime? CreateDate { get; set; }

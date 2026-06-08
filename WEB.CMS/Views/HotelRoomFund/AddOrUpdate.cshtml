@@ -58,12 +58,12 @@
                     <div class="col-md-4 mb10" id="div-upsert-hotel" style="@(Model.SupplierId > 0 ? "" : "display:none;")">
                         <label>Khách sạn <span class="text-danger">*</span></label>
                         <select class="select2 form-control" name="HotelId" id="upsert-hotel-id" style="width:100% !important" @(Model.Id > 0 ? "disabled" : "") data-edit-mode="@(Model.Id > 0 ? "1" : "0")">
-                            @if (Model.HotelId > 0)
+                            @if (Model.HotelId !=null)
                             {
                                 <option value="@Model.HotelId" selected>@Model.HotelName</option>
                             }
                         </select>
-                        @if (Model.Id > 0 && Model.HotelId > 0)
+                        @if (Model.Id > 0 && Model.HotelId != null )
                         {
                             <input type="hidden" name="HotelId" value="@Model.HotelId" />
                         }
