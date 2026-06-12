@@ -1,5 +1,5 @@
 var _flight_warehouse = {
-    Init: function () {   
+    Init: function () {
         $("#search-departure").select2({
             theme: 'bootstrap4',
             placeholder: "Điểm đi",
@@ -417,21 +417,25 @@ var _flight_warehouse = {
     },
     ImportExcel: function () {
         let title = 'Tải lên danh sách vé';
-           let url = '/FlightWarehouse/ImportWSExcel';
-        let param = {  };
+        let url = '/FlightWarehouse/ImportWSExcel';
+        let param = {};
         _magnific.OpenSmallPopup(title, url, param);
     },
     ConfirmImport: function () {
         let url = '/FlightWarehouse/ImportWSExcelListing';
         let file = document.getElementById("import-file-ws").files[0];
 
-        var file_type = file['type'];
-        if (file_type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-            $('#import-ws-error').removeClass('mfp-hide');
-            $('#grid_ws').html('');
+        if (!file) {
+            $('#import-ws-error').removeClass('mfp-hide').text("Vui lòng chọn file.");
             return;
         }
-        $('#import-ws-error').hide()
+
+        var ext = file.name.split('.').pop().toLowerCase();
+        if (ext !== "xlsx") {
+            $('#import-ws-error').removeClass('mfp-hide').text("File upload không đúng định dạng. Vui lòng tải lên file .xlsx");
+            return;
+        }
+        $('#import-ws-error').hide();
 
         let formData = new FormData();
         formData.append("file", file)

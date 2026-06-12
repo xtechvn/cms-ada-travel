@@ -454,6 +454,7 @@ namespace WEB.CMS.Controllers
                         model.Booking.FundType = 1;
                         model.Booking.TripType = string.IsNullOrEmpty(Back_time) ? 1 : 2;
                         model.Booking.CreatedBy = _UserId;
+                        model.Booking.IsEX = 1;
 
                         var model_price_1 = new FlightWarehousePriceModel();
                         model_price_1.PriceType = 1;

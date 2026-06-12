@@ -5,7 +5,7 @@
 <div id="data_upload_ex">
     <div class="mb10">
         <label class="btn btn-success" style="margin-right:10px">
-            <input class="mfp-hide" type="file" id="import-file-ws" onchange="ShowFileName(this)">
+            <input class="mfp-hide" type="file" id="import-file-ws" onclick="this.value=null;" onchange="ShowFileName(this)">
             Tải tập tin
         </label>
         <span style="color:#ADB0B1">Upload file . Định dạng: xlsx</span>
@@ -51,4 +51,3 @@
         }
     }
 </script>
-<script type="text/javascript" src="/modules/flight_warehouse.js" asp-append-version="true"></script>
