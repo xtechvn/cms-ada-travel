@@ -20,5 +20,6 @@ namespace Entities.Models
         public int? UpdatedBy { get; set; }
         public int? AgencyTotalTicket { get; set; }
         public int? FundType { get; set; }
+        public int? IsEX { get; set; }
     }
 }

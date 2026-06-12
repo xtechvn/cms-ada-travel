@@ -57,7 +57,7 @@ namespace DAL.FlightWarehouse
         {
             try
             {
-                SqlParameter[] objParam = new SqlParameter[14];
+                SqlParameter[] objParam = new SqlParameter[15];
 
                 objParam[0] = new SqlParameter("@Id", model.Id);
                 objParam[1] = new SqlParameter("@BookingCode", model.BookingCode ?? (object)DBNull.Value);
@@ -73,6 +73,7 @@ namespace DAL.FlightWarehouse
                 objParam[11] = new SqlParameter("@UpdatedBy", model.UpdatedBy > 0 ? model.UpdatedBy : DBNull.Value);
                 objParam[12] = new SqlParameter("@AgencyTotalTicket", model.AgencyTotalTicket !=null  ? model.AgencyTotalTicket : 0);
                 objParam[13] = new SqlParameter("@FundType", model.FundType != null  ? model.FundType : 0);              
+                objParam[14] = new SqlParameter("@IsEX", model.IsEX != null  ? model.IsEX : 0);              
 
                 var result = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.sp_UpsertFlightWarehouseBooking, objParam);
                
@@ -109,6 +110,20 @@ namespace DAL.FlightWarehouse
                 LogHelper.InsertLogTelegram("GetById - FlightWarehouseBookingDAL: " + ex);
             }
             return null;
+        }    
+        public async Task<int> DeleteFlightWarehouseBookingEX()
+        {
+            try
+            {
+                SqlParameter[] objParam = new SqlParameter[0];
+                var result = _DbWorker.ExecuteNonQuery(StoreProcedureConstant.SP_DeleteFlightWarehouseBookingEX, objParam);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("GetById - FlightWarehouseBookingDAL: " + ex);
+            }
+            return 0;
         }
     }
 }

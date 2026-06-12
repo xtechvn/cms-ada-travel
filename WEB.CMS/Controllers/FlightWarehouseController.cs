@@ -4,7 +4,9 @@ using Entities.ViewModels.ElasticSearch;
 using Entities.ViewModels.FlightWarehouse;
 using Microsoft.AspNetCore.Mvc;
 using Nest;
+using OfficeOpenXml;
 using Repositories.IRepositories;
+using Repositories.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -208,10 +210,10 @@ namespace WEB.CMS.Controllers
                 ViewBag.airline = await _airlinesRepository.getAllAirlines();
                 var flightDate = model.Segments.FirstOrDefault(x => x.SegmentType == 0)?.FlightDate;
                 ViewBag.Btnadd = 0;
-                var AgencyTotalTicket = model.Booking.AgencyTotalTicket > 0 ? ((model.Booking.AgencyTotalTicket == null ? 0 : (double)model.Booking.AgencyTotalTicket)+ model.Booking.RemainTicket>0 ? (double)model.Booking.RemainTicket:0) : 0;
+                var AgencyTotalTicket = model.Booking.AgencyTotalTicket > 0 ? ((model.Booking.AgencyTotalTicket == null ? 0 : (double)model.Booking.AgencyTotalTicket) + model.Booking.RemainTicket > 0 ? (double)model.Booking.RemainTicket : 0) : 0;
                 var TotalTicket = model.Booking.TotalTicket > 0 ? (double)model.Booking.TotalTicket : 0;
                 var TotalClosedTicket = model.Booking.TotalClosedTicket > 0 ? (double)model.Booking.TotalClosedTicket : 0;
-                var phantram = TotalTicket > 0? ((AgencyTotalTicket+ TotalClosedTicket) / TotalTicket * 100) : 0;
+                var phantram = TotalTicket > 0 ? ((AgencyTotalTicket + TotalClosedTicket) / TotalTicket * 100) : 0;
                 ViewBag.phantram = phantram.ToString("0.00");
                 if (flightDate <= DateTime.Now)
                 {
@@ -233,7 +235,7 @@ namespace WEB.CMS.Controllers
                 var RemainTicket = booking.RemainTicket > 0 ? (double)booking.RemainTicket : 0;
                 var TotalTicket = booking.TotalTicket > 0 ? (double)booking.TotalTicket : 0;
                 var TotalClosedTicket = booking.TotalClosedTicket > 0 ? (double)booking.TotalClosedTicket : 0;
-                var phantram = TotalTicket > 0? ((AgencyTotalTicket+ TotalClosedTicket) / TotalTicket * 100) : 0;
+                var phantram = TotalTicket > 0 ? ((AgencyTotalTicket + TotalClosedTicket) / TotalTicket * 100) : 0;
                 return Json(new
                 {
                     status = 0,
@@ -276,23 +278,23 @@ namespace WEB.CMS.Controllers
             var segments = await _flightWarehouseRepository.GetSegmentsByBookingId(bookingId);
             var flightDate = segments.FirstOrDefault(x => x.SegmentType == 0)?.FlightDate;
             ViewBag.add = 0;
-            if(flightDate<=DateTime.Now)
+            if (flightDate <= DateTime.Now)
             {
                 ViewBag.add = 1;
             }
             DateTime holdLimit = DateTime.Now;
             if (flightDate.HasValue)
             {
-                    // 🔥 Nếu flightDate còn hơn 7 ngày
-                    if (flightDate.Value.AddDays(-7) > DateTime.Now)
-                    {
-                        holdLimit = DateTime.Now.AddHours(24);
-                    }
-                    else
-                    {
-                        // 🔥 Còn dưới 7 ngày
-                        holdLimit = DateTime.Now.AddHours(1);
-                    }
+                // 🔥 Nếu flightDate còn hơn 7 ngày
+                if (flightDate.Value.AddDays(-7) > DateTime.Now)
+                {
+                    holdLimit = DateTime.Now.AddHours(24);
+                }
+                else
+                {
+                    // 🔥 Còn dưới 7 ngày
+                    holdLimit = DateTime.Now.AddHours(1);
+                }
 
                 // 🔥 Không được vượt quá giờ bay
                 if (holdLimit > flightDate.Value)
@@ -309,7 +311,7 @@ namespace WEB.CMS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpsertHoldTicket([FromBody]FlightWarehouseHoldTicketModel model)
+        public async Task<IActionResult> UpsertHoldTicket([FromBody] FlightWarehouseHoldTicketModel model)
         {
             try
             {
@@ -323,7 +325,7 @@ namespace WEB.CMS.Controllers
                 {
                     return Json(new { status = 1, msg = "Dữ liệu không hợp lệ" });
                 }
-                model.ExpirationDate =  DateUtil.StringToDateTime(model.ExpirationDateStr);
+                model.ExpirationDate = DateUtil.StringToDateTime(model.ExpirationDateStr);
                 model.CreatedBy = _UserId;
                 model.CreatedDate = DateTime.Now;
 
@@ -368,6 +370,169 @@ namespace WEB.CMS.Controllers
             {
                 LogHelper.InsertLogTelegram("UpdateAgencyHold - FlightWarehouseController: " + ex);
                 return Json(new { status = 1, msg = "Lỗi hệ thống" });
+            }
+        }
+        public IActionResult ImportWSExcel()
+        {
+
+            return PartialView();
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> ImportWSExcelListing(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return Json(new { status = 1, msg = "Vui lòng chọn file." });
+                }
+
+                var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+
+                using (var package = new ExcelPackage(stream))
+                {
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+                    if (ws == null) return Json(new { status = 1, msg = "File không có dữ liệu." });
+
+                    var endRow = ws.Cells.End.Row;
+                    var startRow = 4;
+                    await _flightWarehouseRepository.DeleteFlightWarehouseBookingEX();
+
+                    var _UserId = 0;
+                    if (HttpContext.User.FindFirst(ClaimTypes.Name) != null)
+                    {
+                        _UserId = Convert.ToInt32(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                    }
+
+                    for (int row = startRow; row <= endRow; row++)
+                    {
+                        var cellRange = ws.Cells[row, 1, row, 16];
+                        var isRowEmpty = cellRange.All(c => c.Value == null);
+                        if (isRowEmpty) break;
+
+                        var Hanh_trinh = ws.Cells[row, 1].Value?.ToString();
+                        var Hang_bay = ws.Cells[row, 2].Value?.ToString();
+                        var Ma_dat_cho = ws.Cells[row, 3].Value?.ToString();
+                        var Thoi_gian = ws.Cells[row, 4].Value?.ToString();
+                        var Go_time = ws.Cells[row, 5].Value?.ToString();
+                        var Go_shcb = ws.Cells[row, 6].Value?.ToString();
+                        var Back_time = ws.Cells[row, 7].Value?.ToString();
+                        var Back_shcb = ws.Cells[row, 8].Value?.ToString();
+                        var HL_xachtay = ws.Cells[row, 9].Value?.ToString();
+                        var HL_kygui = ws.Cells[row, 10].Value?.ToString();
+
+                        var Gia_KL_str = ws.Cells[row, 13].Value?.ToString().Replace(".","").Replace(",","");
+                        var Gia_DL_str = ws.Cells[row, 14].Value?.ToString().Replace(".","").Replace(".", "");
+                        var SL_str = ws.Cells[row, 15].Value?.ToString();
+                        var DLkhac_ban_str = ws.Cells[row, 16].Value?.ToString();
+
+                        var Gia_KL = string.IsNullOrEmpty(Gia_KL_str) ? 0m : Convert.ToDecimal(Gia_KL_str);
+                        var Gia_DL = string.IsNullOrEmpty(Gia_DL_str) ? 0m : Convert.ToDecimal(Gia_DL_str);
+                        var SL = string.IsNullOrEmpty(SL_str) ? 0 : Convert.ToInt32(SL_str);
+                        var DLkhac_ban = string.IsNullOrEmpty(DLkhac_ban_str) ? 0 : Convert.ToInt32(DLkhac_ban_str);
+
+                        var list_Hanh_trinh = Hanh_trinh != null ? Hanh_trinh.Split('-') : new string[] { "", "" };
+                        var list_Thoi_gian = Thoi_gian != null ? Thoi_gian.Split('-') : new string[] { "", "" };
+
+                        var model = new FlightWarehouseUpsertModel
+                        {
+                            Booking = new FlightWarehouseBookingModel(),
+                            Segments = new List<FlightWarehouseSegmentModel>(),
+                            Prices = new List<FlightWarehousePriceModel>()
+                        };
+
+                        model.Booking.AgencyTotalTicket = DLkhac_ban;
+                        model.Booking.TotalTicket = SL;
+                        model.Booking.Note = Hanh_trinh;
+                        model.Booking.DeparturePoint = list_Hanh_trinh.Length > 0 ? list_Hanh_trinh[0].Trim() : "";
+                        model.Booking.ArrivalPoint = list_Hanh_trinh.Length > 1 ? list_Hanh_trinh[1].Trim() : "";
+                        model.Booking.CarryOnBaggage = HL_xachtay;
+                        model.Booking.CheckedBaggage = HL_kygui;
+                        model.Booking.IsRefundable = 0;
+                        model.Booking.FundType = 1;
+                        model.Booking.TripType = string.IsNullOrEmpty(Back_time) ? 1 : 2;
+                        model.Booking.CreatedBy = _UserId;
+
+                        var model_price_1 = new FlightWarehousePriceModel();
+                        model_price_1.PriceType = 1;
+                        model_price_1.ChdPrice = model_price_1.AdtPrice = Gia_DL - 50000;
+                        model_price_1.ChdAmount = model_price_1.AdtAmount = Gia_DL;
+                        model_price_1.ChdProfit = model_price_1.AdtProfit = 50000;
+                        model_price_1.InfPrice = (Gia_DL * 10 / 100) - 50000;
+                        model_price_1.InfAmount = Gia_DL * 10 / 100;
+                        model_price_1.InfProfit = 50000;
+                        model.Prices.Add(model_price_1);
+
+                        var model_price_2 = new FlightWarehousePriceModel();
+                        model_price_2.PriceType = 2;
+                        model_price_2.ChdPrice = model_price_2.AdtPrice = Gia_KL - 50000;
+                        model_price_2.ChdAmount = model_price_2.AdtAmount = Gia_KL;
+                        model_price_2.ChdProfit = model_price_2.AdtProfit = 50000;
+                        model_price_2.InfPrice = (Gia_KL * 10 / 100) - 50000;
+                        model_price_2.InfAmount = Gia_KL * 10 / 100;
+                        model_price_2.InfProfit = 50000;
+                        model.Prices.Add(model_price_2);
+
+                        var model_Go = new FlightWarehouseSegmentModel();
+                        model_Go.SegmentType = 0;
+                        var goDateStr = (list_Thoi_gian.Length > 0 ? list_Thoi_gian[0].Trim() : "") + " " +Convert.ToDateTime(Go_time).ToString("HH:mm:ss");
+                        model_Go.FlightDateStr = goDateStr;
+                        model_Go.FlightDate = DateUtil.StringToDateTime(goDateStr);
+                        model_Go.Airline = Hang_bay;
+                        model_Go.FlightCode = Go_shcb;
+                        model_Go.Pnrcode = Ma_dat_cho;
+                        model.Segments.Add(model_Go);
+
+                        if (model.Booking.TripType == 2 && !string.IsNullOrEmpty(Back_time))
+                        {
+                            var model_Back = new FlightWarehouseSegmentModel();
+                            model_Back.SegmentType = 1;
+                            var backDateStr = (list_Thoi_gian.Length > 1 ? list_Thoi_gian[1].Trim() : "") + " " + Convert.ToDateTime(Back_time).ToString("HH:mm:ss");
+                            model_Back.FlightDateStr = backDateStr;
+                            model_Back.FlightDate = DateUtil.StringToDateTime(backDateStr);
+                            model_Back.Airline = Hang_bay;
+                            model_Back.FlightCode = Back_shcb;
+                            model_Back.Pnrcode = Ma_dat_cho;
+                            model.Segments.Add(model_Back);
+                        }
+
+                        // Save Booking
+                        var bookingId = await _flightWarehouseRepository.UpsertBooking(model.Booking);
+                        if (bookingId <= 0)
+                        {
+                            return Json(new { status = 1, msg = "Lưu thông tin booking thất bại ở dòng " + row });
+                        }
+
+                        // Save Segments
+                        if (model.Segments != null)
+                        {
+                            foreach (var segment in model.Segments)
+                            {
+                                segment.BookingId = bookingId;
+                                await _flightWarehouseRepository.UpsertSegment(segment);
+                            }
+                        }
+
+                        // Save Prices
+                        if (model.Prices != null)
+                        {
+                            foreach (var price in model.Prices)
+                            {
+                                price.BookingId = bookingId;
+                                await _flightWarehouseRepository.UpsertPrice(price);
+                            }
+                        }
+                    }
+                }
+
+                return Json(new { status = 0, msg = "Tải lên thành công" });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("ImportWSExcelListing - FlightWarehouseController: " + ex.ToString());
+                return Json(new { status = 1, msg = "Lỗi hệ thống: " + ex.Message });
             }
         }
     }

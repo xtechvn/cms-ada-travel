@@ -18,5 +18,6 @@ namespace Repositories.IRepositories
         Task<List<FlightWarehousePriceModel>> GetPricesByBookingId(long bookingId);
         Task<GenericViewModel<FlightWarehouseHoldTicketViewModel>> GetListHoldTicket(FlightWarehouseHoldTicketSearchModel searchModel);
         Task<long> UpsertHoldTicket(FlightWarehouseHoldTicket model);
+        Task<int> DeleteFlightWarehouseBookingEX();
     }
 }

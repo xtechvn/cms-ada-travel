@@ -1,5 +1,5 @@
 var _flight_warehouse = {
-    Init: function () {
+    Init: function () {   
         $("#search-departure").select2({
             theme: 'bootstrap4',
             placeholder: "Điểm đi",
@@ -414,5 +414,50 @@ var _flight_warehouse = {
     },
     onSelectPageSize: function () {
         this.Search();
-    }
+    },
+    ImportExcel: function () {
+        let title = 'Tải lên danh sách vé';
+           let url = '/FlightWarehouse/ImportWSExcel';
+        let param = {  };
+        _magnific.OpenSmallPopup(title, url, param);
+    },
+    ConfirmImport: function () {
+        let url = '/FlightWarehouse/ImportWSExcelListing';
+        let file = document.getElementById("import-file-ws").files[0];
+
+        var file_type = file['type'];
+        if (file_type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+            $('#import-ws-error').removeClass('mfp-hide');
+            $('#grid_ws').html('');
+            return;
+        }
+        $('#import-ws-error').hide()
+
+        let formData = new FormData();
+        formData.append("file", file)
+        _global_function.AddLoading()
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                _global_function.RemoveLoading();
+                if (result != null && result.status === 0) {
+                    _msgalert.success(result.msg);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    $('#import-ws-error').removeClass('mfp-hide').text(result != null ? result.msg : "Lỗi xảy ra, vui lòng thử lại.");
+                }
+            }, error: function (error) {
+                _global_function.RemoveLoading();
+                console.log(error);
+                $('#import-ws-error').removeClass('mfp-hide').text("Lỗi hệ thống.");
+            }
+        });
+    },
 };

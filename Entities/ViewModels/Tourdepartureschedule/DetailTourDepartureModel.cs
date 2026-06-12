@@ -15,5 +15,6 @@ namespace Entities.ViewModels.Tourdepartureschedule
         public string UpdatedName { get; set; }
         public List<TourItinerary> TourItineraries { get; set; }
         public List<TourPrice> TourPrices { get; set; }
+        public int BookedQuantity { get; set; }
     }
 }

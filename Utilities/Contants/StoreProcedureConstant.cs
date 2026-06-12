@@ -360,6 +360,7 @@ namespace Utilities.Contants
         public static string sp_GetTourPriceByDepartureId = "sp_GetTourPriceByDepartureId";
         public static string sp_InsertTourPrice = "sp_InsertTourPrice";
         public static string sp_UpdateTourPrice = "sp_UpdateTourPrice";
+        public static string SP_DeleteFlightWarehouseBookingEX = "SP_DeleteFlightWarehouseBookingEX";
         
 
 

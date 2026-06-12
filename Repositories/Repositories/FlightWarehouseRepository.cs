@@ -105,5 +105,9 @@ namespace Repositories.Repositories
         {
             return await flightWarehouseHoldTicketDAL.InsertFlightWarehouseHoldTicket(model);
         }
+        public async Task<int> DeleteFlightWarehouseBookingEX()
+        {
+            return await flightWarehouseBookingDAL.DeleteFlightWarehouseBookingEX();
+        }
     }
 }

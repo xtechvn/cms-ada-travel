@@ -45,7 +45,7 @@ namespace DAL.StoreProcedure
                 }
             }
             catch (Exception ex)
-            {
+             {
                 string dataLog = "";
 
                 if (parameters != null && parameters.Length > 0)

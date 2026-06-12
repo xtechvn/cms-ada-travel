@@ -52,6 +52,7 @@
                 <div class="col-md-4 mb10">
                     <button class="btn btn-default" onclick="_flight_warehouse.Search()">Tìm kiếm</button>
                     <button class="btn btn-success" onclick="_flight_warehouse.Upsert(0)">Thêm mới</button>
+                    <button class="btn btn-default" onclick="_flight_warehouse.ImportExcel()">Import Excel</button>
                 </div>
             </div>
         </div>
@@ -67,6 +68,10 @@
     <script>
         $(document).ready(function () {
             _flight_warehouse.Init();
+            $('#import-file-ws').change(function () {
+                $('#import-ws-error').addClass('mfp-hide');
+                _flight_warehouse.ConfirmImport();
+            });
         });
     </script>
 }

@@ -156,12 +156,12 @@
                         <div style="flex: 1; padding-right: 20px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                 <span style="font-size: 13px; color: #666;"><i class="fa fa-circle" style="color: #28a745; font-size: 10px; margin-right: 5px;"></i> Đã bán</span>
-                                <span style="font-weight: bold;">0 / @Model.Total</span>
+                                <span style="font-weight: bold;">@Model.BookedQuantity / @Model.Total</span>
                             </div>
                             <div class="progress-bar-custom">
-                                <div class="progress-fill" style="width: 0%;"></div>
+                                <div class="progress-fill" style="width: @((decimal)Model.BookedQuantity / Model.Total * 100)%;"></div>
                             </div>
-                            <div style="text-align: right; font-size: 11px; color: #888; margin-top: 5px;">0%</div>
+                            <div style="text-align: right; font-size: 11px; color: #888; margin-top: 5px;">@((decimal)Model.BookedQuantity / Model.Total * 100)%</div>
                         </div>
                     </div>
                 </div>
