@@ -69,11 +69,15 @@ namespace Utilities
         {
             var formats = new[]
             {
-        "dd/MM/yyyy H:mm:ss",
-        "dd/MM/yyyy HH:mm:ss",
-        "dd/MM/yyyy H:mm",
-        "dd/MM/yyyy HH:mm"
-    };
+                "dd/MM/yyyy H:mm:ss",
+                "dd/MM/yyyy HH:mm:ss",
+                "dd/MM/yyyy H:mm",
+                "dd/MM/yyyy HH:mm",
+                "MM/dd/yyyy H:mm:ss",
+                "MM/dd/yyyy HH:mm:ss",
+                "MM/dd/yyyy H:mm",
+                "MM/dd/yyyy HH:mm",
+            };
 
             if (DateTime.TryParseExact(
                     dateStr,
