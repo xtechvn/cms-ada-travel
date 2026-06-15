@@ -478,7 +478,7 @@ namespace WEB.CMS.Controllers
 
                         var model_Go = new FlightWarehouseSegmentModel();
                         model_Go.SegmentType = 0;
-                        var goDateStr = (list_Thoi_gian.Length > 0 ? list_Thoi_gian[0].Trim() : "") + " " +Convert.ToDateTime(Go_time).ToString("HH:mm:ss");
+                        var goDateStr = (list_Thoi_gian.Length > 0 ? list_Thoi_gian[0].Trim() : "") + " " + ((DateTime)DateUtil.StringToDateTime2(Go_time.Replace("AM","").Replace("PM", "").Trim())).ToString("HH:mm:ss");
                         model_Go.FlightDateStr = goDateStr;
                         model_Go.FlightDate = DateUtil.StringToDateTime(goDateStr);
                         model_Go.Airline = Hang_bay;
@@ -490,7 +490,7 @@ namespace WEB.CMS.Controllers
                         {
                             var model_Back = new FlightWarehouseSegmentModel();
                             model_Back.SegmentType = 1;
-                            var backDateStr = (list_Thoi_gian.Length > 1 ? list_Thoi_gian[1].Trim() : "") + " " + Convert.ToDateTime(Back_time).ToString("HH:mm:ss");
+                            var backDateStr = (list_Thoi_gian.Length > 1 ? list_Thoi_gian[1].Trim() : "") + " " + ((DateTime)DateUtil.StringToDateTime2(Back_time.Replace("AM", "").Replace("PM", "").Trim())).ToString("HH:mm:ss");
                             model_Back.FlightDateStr = backDateStr;
                             model_Back.FlightDate = DateUtil.StringToDateTime(backDateStr);
                             model_Back.Airline = Hang_bay;

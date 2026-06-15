@@ -65,6 +65,28 @@ namespace Utilities
                 return null;
             }
         }
+        public static DateTime? StringToDateTime2(string dateStr)
+        {
+            var formats = new[]
+            {
+        "dd/MM/yyyy H:mm:ss",
+        "dd/MM/yyyy HH:mm:ss",
+        "dd/MM/yyyy H:mm",
+        "dd/MM/yyyy HH:mm"
+    };
+
+            if (DateTime.TryParseExact(
+                    dateStr,
+                    formats,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None,
+                    out var result))
+            {
+                return DateTime.SpecifyKind(result, DateTimeKind.Local);
+            }
+
+            return null;
+        }
 
         public static DateTime Now
         {
