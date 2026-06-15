@@ -53,7 +53,7 @@
                     <thead>
                         <tr class="bg-light">
                             <th style="width: 50px;" class="text-center">STT</th>
-                            <th>Mã lịch trình</th>
+                       @*      <th>Mã lịch trình</th> *@
                             <th class="text-center">Ngày khởi hành</th>
                             <th class="text-center">Hành trình</th>
                             <th class="text-right">Giá từ</th>
@@ -71,11 +71,11 @@
                             innerStt++;
                             <tr>
                                 <td class="text-center">@innerStt</td>
-                                <td>
-                                    @* <a class="blue font-weight-bold" href="/TourDeparture/AddOrUpdate/@item.Id">
+                               @*<td>
+                                     <a class="blue font-weight-bold" href="/TourDeparture/AddOrUpdate/@item.Id">
                                         @item.Id
-                                    </a> *@
-                                </td>
+                                    </a> 
+                                </td> *@
                                 <td class="text-center">
                                     <div class="font-weight-bold">@item.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
                                     
